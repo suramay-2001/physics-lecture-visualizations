@@ -302,4 +302,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-channel-station', label: 'Joint, conditional and mutual information, and capacity', chapter: 'Q23', unit: 'q23-two-variables', needs: ['qc-compare-station'] },
   { id: 'qc-quantum-correlation-station', label: 'Quantum correlations that noise cannot raise', chapter: 'Q23', unit: 'q23-quantum-mutual', needs: ['qc-entropy-rules-station', 'qc-channel-station', 'qc-entanglement-measure'] },
   { id: 'qc-holevo-station', label: 'How much one particle can carry', chapter: 'Q23', unit: 'q23-holevo', needs: ['qc-quantum-correlation-station', 'qc-usd'] },
+  // Chapter Q24 (P-Q24-story §11.1): controlling a real qubit
+  { id: 'qc-divincenzo-station', label: 'Seven things a qubit must do', chapter: 'Q24', unit: 'q24-divincenzo', needs: ['qc-one-qubit-gates'] },
+  { id: 'qc-lindblad-station', label: 'Why a qubit slowly forgets', chapter: 'Q24', unit: 'q24-lindblad', needs: ['qc-channel', 'qc-divincenzo-station'] },
+  { id: 'qc-bloch-eq-station', label: 'Where a driven, decaying qubit settles', chapter: 'Q24', unit: 'q24-bloch-eq', needs: ['qc-lindblad-station'] },
+  { id: 'qc-rabi-station', label: 'Pulses that flip, and gates from them', chapter: 'Q24', unit: 'q24-rabi', needs: ['qc-bloch-eq-station'], sameAs: 'driven-spin' },
+  { id: 'qc-ramsey-station', label: 'Two half pulses and a wait', chapter: 'Q24', unit: 'q24-ramsey', needs: ['qc-rabi-station'] },
+  { id: 'qc-decoupling-station', label: 'Undoing slow noise with flips', chapter: 'Q24', unit: 'q24-decoupling', needs: ['qc-ramsey-station'] },
 ]

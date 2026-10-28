@@ -21,8 +21,10 @@ import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curve
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chainTransmission } from '../../physics/townsend448'
+import { S_STRONG, S_WEAK, decayFactors, steadyExcited } from '../../physics/qc/blocheq'
 import { clonerFidelities, usdKnown, usdProgrammableAt } from '../../physics/qc/machines'
 import { accessibleInfoPair, bscCapacity, holevoChiPair, usdBoundPair, usdFailPair } from '../../physics/qc/infoq'
+import { echoCoherence, errorComposite, errorPlain, ouCoherence } from '../../physics/qc/pulses'
 import { trotterError } from '../../physics/qc/trotter'
 import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
@@ -179,6 +181,17 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   usdBoundPair,
   usdFailPair,
   bscCapacity: memoX(bscCapacity),
+  // Chapter Q24 (physics/qc/blocheq.ts, pulses.ts): decay from |+x> in units of T1 (gamma = 1), the steady excited share against x = Delta T2 at two saturations s, the noise-averaged Ramsey coherence for
+  // sigma = 1 and tau_c = 10 or 0.1 against sigma t, the echo's against the total time, and the pulse errors against the fractional error eps
+  popDecay: (x) => decayFactors(x).pop,
+  cohDecay: (x) => decayFactors(x).coh,
+  steadyLow: (x) => steadyExcited(x, S_WEAK),
+  steadyHigh: (x) => steadyExcited(x, S_STRONG),
+  ouSlow: (x) => ouCoherence(x, 1, 10),
+  ouFast: (x) => ouCoherence(x, 1, 0.1),
+  echoOuSlow: (x) => echoCoherence(x / 2, 1, 10),
+  pulseErr1: (eps) => errorPlain(eps),
+  pulseErr2: (eps) => errorComposite(eps),
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -230,6 +243,15 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   usdBoundPair: { from: 0, to: 1 },
   usdFailPair: { from: 0, to: 1 },
   bscCapacity: { from: 0, to: 0.5 },
+  popDecay: { from: 0, to: 5 },
+  cohDecay: { from: 0, to: 5 },
+  steadyLow: { from: -5, to: 5 },
+  steadyHigh: { from: -5, to: 5 },
+  ouSlow: { from: 0, to: 5 },
+  ouFast: { from: 0, to: 5 },
+  echoOuSlow: { from: 0, to: 5 },
+  pulseErr1: { from: 0, to: 0.3 },
+  pulseErr2: { from: 0, to: 0.3 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -280,8 +302,17 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   usdBoundPair: 'bound',
   usdFailPair: 'exact',
   bscCapacity: 'capacity',
+  popDecay: 'population',
+  cohDecay: 'phase signal',
+  steadyLow: 'weak drive',
+  steadyHigh: 'strong drive',
+  ouSlow: 'slow noise',
+  ouFast: 'fast noise',
+  echoOuSlow: 'echo, slow noise',
+  pulseErr1: 'single pulse',
+  pulseErr2: 'four pulses',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3 }
 
@@ -337,6 +368,16 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   usdBoundPair: { min: 0, max: 1 },
   usdFailPair: { min: 0, max: 1 },
   bscCapacity: { min: 0, max: 1 },
+  // Chapter Q24: factors and coherences are between 0 and 1; the steady excited share never passes 1/2 (the axis stops there); an error is never negative
+  popDecay: { min: 0, max: 1 },
+  cohDecay: { min: 0, max: 1 },
+  steadyLow: { min: 0, max: 0.5 },
+  steadyHigh: { min: 0, max: 0.5 },
+  ouSlow: { min: 0, max: 1 },
+  ouFast: { min: 0, max: 1 },
+  echoOuSlow: { min: 0, max: 1 },
+  pulseErr1: { min: 0, max: Infinity },
+  pulseErr2: { min: 0, max: Infinity },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */

@@ -192,4 +192,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-stinespring': { course: 'qc709', lecture: 'Q13', unit: 'q13-stinespring', label: 'every channel is a unitary on a bigger system' },
   'qc-q15-bb84': { course: 'qc709', lecture: 'Q15', unit: 'q15-bb84', label: 'BB84 and the information an eavesdropper gets' },
   'qc-q11-dense-coding': { course: 'qc709', lecture: 'Q11', unit: 'q11-dense-coding', label: 'two bits sent with one qubit' },
+  // Chapter Q24 (P-Q24-story §11.3): the Q13 and Q21 units it builds on (the Spin Lab and Q3/Q4/Q8 rows it uses already exist)
+  'qc-q13-from-unitary': { course: 'qc709', lecture: 'Q13', unit: 'q13-from-unitary', label: 'tracing out the surroundings gives Kraus operators' },
+  'qc-q13-depolarizing': { course: 'qc709', lecture: 'Q13', unit: 'q13-depolarizing', label: 'noise as a shrinking Bloch ball: damping and dephasing' },
+  'qc-q21-dfs': { course: 'qc709', lecture: 'Q21', unit: 'q21-dfs', label: 'hiding where the noise cannot reach' },
 }
