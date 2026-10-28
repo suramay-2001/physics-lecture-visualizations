@@ -61,7 +61,7 @@ describe('Q24 curves: the engine’s numbers', () => {
   })
   it('echoOuSlow is the echo’s coherence against the total time 2 tau (numpy variance at tau = 1, 2): 0.940 at total time 2', () => {
     const a = R(pl('echoOuSlow', { curve: { vs: 'ouSlow', x: { from: 0, to: 5 }, samples: 50 }, markers: [{ x: 2 }, { x: 4 }] }))
-    expect(a.names.fn).toBe('echo, slow noise')
+    expect(a.names?.fn).toBe('echo, slow noise')
     const e1 = FX.echo.find((k: any) => k.tau === 1 && k.tauC === 10)
     const e2 = FX.echo.find((k: any) => k.tau === 2 && k.tauC === 10)
     close(a.markers[0].y, Math.exp(-e1.var / 2), 1e-12)
