@@ -1,0 +1,19 @@
+{
+ "about": "Claim values for the Optics Lab page O5 (traps made of light), mpmath depth, numeric MOT derivatives and quadrature. Regenerate: python3 pipeline/claims_optics/o.py",
+ "values": {
+  "o5DipoleDepthmK": 11.75,
+  "o5DipoleRate": 1538.0,
+  "o5HeatTimeS": 3.18,
+  "o5DeBroglieHalf": 0.5,
+  "o5LatticeVibkHz": 61.3,
+  "o5LatticeVibER": 16.2,
+  "o5MotKappaOverBeta": 1092.0,
+  "o5MotFreqHz": 540.0,
+  "o5MotSizeMm": 4.33,
+  "o5CsCaptureMs": 59.0,
+  "o5CsCaptureEK": 27.8,
+  "o5CsDensity": 3.22,
+  "o5Frac1K": 1.44,
+  "o5FracRatio": 7.99
+ }
+}

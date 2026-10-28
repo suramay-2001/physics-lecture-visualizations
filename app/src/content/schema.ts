@@ -190,6 +190,8 @@ export interface Correction {
   check: () => boolean
   /** Whose slip it is: the course notes (default), a textbook (Lecture 3: Townsend Ex. 1.2) or a paper (Papers, ruling papers-P1.md R2). */
   source?: 'notes' | 'book' | 'paper'
+  /** A notes or Optics Lab page draws the box inside this section (its id); a chapter lists all of them at the top. */
+  unit?: string
 }
 
 export interface Lecture {

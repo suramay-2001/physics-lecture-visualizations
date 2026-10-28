@@ -101,7 +101,8 @@ describe('plot B1: every point of a series is the engine’s', () => {
     for (const q of ratios) expect(q).toBeCloseTo(10, 9)
     expect(R({ series: [{ fn: 'cleanRun', params: { p: 0.01 } }] }).series![0].points).toHaveLength(PLOT_LIMITS.samplesDefault + 1)
     expect(SERIES_RANGE).toEqual({ N: { from: 1, to: 1000 }, d: { from: 3, to: 25 }, p: { from: 0.0001, to: 0.01 } })
-    expect(SERIES_X).toEqual({ cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R' })
+    // (the Optics Lab's twelve functions, stage/svg/plotOptics.ts, are all kind 'o': a free x with its own range)
+    expect(Object.fromEntries(Object.entries(SERIES_X).filter(([, k]) => k !== 'o'))).toEqual({ cleanRun: 'N', repLogicalVsD: 'd', repLogicalVsP: 'p', surfaceVsP: 'p', surfaceVsD: 'd', voteFail: 'R' })
   })
   it('markers sit on the FIRST series (label optional); the y range covers every series, line and band; a linear axis never goes below 0', () => {
     const r = R({

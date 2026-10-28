@@ -1,6 +1,22 @@
 {
- "about": "Claim values for Physics 709 Optics Lab page O1, numpy (eigh evolution of the driven two-level Hamiltonian to the time of largest transfer). Regenerate: python3 pipeline/claims_optics/o1.py",
+ "about": "Claim values for the Optics Lab page O1 (slowing a sodium beam), numpy/scipy routes (ODE, quadrature, numeric derivative). Regenerate: python3 pipeline/claims_optics/o.py",
  "values": {
-  "o1PeakAtTwoOmega": 0.19999999999999993
+  "o1TransitHz": 167.0,
+  "o1Doppler2Beam": 1.39,
+  "o1RecoilNa": 2.95,
+  "o1IsatNa": 6.26,
+  "o1AmaxNa": 907.0,
+  "o1VPeakNa": 879.0,
+  "o1StopLenNa": 0.426,
+  "o1StopTimeNa": 0.97,
+  "o1HGammaOverK": 12.1,
+  "o1HLambdaNm": 121.6,
+  "o1HLambdaFromRecoil": 121.8,
+  "o1DopplerOverGamma": 152.0,
+  "o1SlowerB0G": 1066.0,
+  "o1SlowerLenM": 0.852,
+  "o1HalfwayB": 0.707,
+  "o1DampUs": 12.7,
+  "o1TransDiffMm": 6.58
  }
 }

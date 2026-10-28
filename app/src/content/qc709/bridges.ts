@@ -171,4 +171,13 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Chapter Q19 (P-Q19-story §11.3): into Spin Lab's lecture 11, for the generator e^{-iHt} and the Schrödinger equation behind quantum simulation
   'qc-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'the Hamiltonian generates each tiny step' },
   'qc-l11-schrodinger': { course: 'sl448', lecture: 'L11', unit: 'l11-schrodinger', label: 'the Schrödinger equation' },
+  // Optics Lab (P-optics-lab §0, ruling O4): the Spin Lab and Chapter Q5 units its sections lean on (eight new rows)
+  'qc-l11-two-level': { course: 'sl448', lecture: 'L11', unit: 'l11-two-level', label: 'a two-level atom in a field' },
+  'qc-l11-stationary': { course: 'sl448', lecture: 'L11', unit: 'l11-stationary', label: 'stationary states and their phases' },
+  'qc-l12-driven': { course: 'sl448', lecture: 'L12', unit: 'l12-driven', label: 'a driven two-level atom and its resonance' },
+  'qc-l13-plane-wave': { course: 'sl448', lecture: 'L13', unit: 'l13-plane-wave', label: 'the plane wave and its momentum' },
+  'qc-l13-generator': { course: 'sl448', lecture: 'L13', unit: 'l13-generator', label: 'momentum generates the shifts' },
+  'qc-l13-stationary': { course: 'sl448', lecture: 'L13', unit: 'l13-stationary', label: 'stationary states of a wave' },
+  'qc-l13-flow': { course: 'sl448', lecture: 'L13', unit: 'l13-flow', label: 'the flow of probability' },
+  'qc-q5-interferometer': { course: 'qc709', lecture: 'Q5', unit: 'q5-interferometer', label: 'interference as a way to compute' },
 }

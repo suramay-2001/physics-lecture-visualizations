@@ -103,10 +103,14 @@ describe('an optics page', () => {
     expect(widgetKindsOf(page)).toEqual(['optics-bench'])
     expect((html.match(/class="notes-widget"/g) ?? []).length).toBe(beats.length)
     expect(html).toContain('data-widget="optics-bench"')
-    expect(html).toContain('data-optics-preset="lorentzian"')
+    // O1 (the content page) opens with the `slower-force` bench and later draws `zeeman-slower`; the demo `lorentzian` is no longer on a page
+    expect(html).toContain('data-optics-preset="slower-force"')
+    expect(html).toContain('data-optics-preset="zeeman-slower"')
     expect(html).toMatch(/<svg class="ob-plot"[^>]*role="img"/)
     expect(html).not.toContain('data-widget-loading') // loaded before the page renders: no placeholder
-    for (const b of beats) expect(html.indexOf(`id="${b.id}"`)).toBeLessThan(html.indexOf('class="notes-widget"'))
+    // each widget sits after its own paragraph (a page may carry several widgets: the k-th beat precedes the k-th widget)
+    const at = [...html.matchAll(/class="notes-widget"/g)].map((m) => m.index as number)
+    beats.forEach((b, k) => expect(html.indexOf(`id="${b.id}"`), b.id).toBeLessThan(at[k]))
     expect(html.includes('<canvas')).toBe(false)
   })
   it('a notes lecture draws no widget: nothing of the widget machinery without one', () => {

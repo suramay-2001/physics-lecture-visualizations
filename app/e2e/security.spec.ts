@@ -27,7 +27,7 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // the 709 lecture notes (docs/roles/proposals/W-709-notes.md): the index and one page per built lecture (a new lecture adds its line here)
   '#/709/notes', '#/709/notes/N1', '#/709/notes/N2', '#/709/notes/N3', '#/709/notes/N4', '#/709/notes/N5', '#/709/notes/N6', '#/709/notes/N7', '#/709/notes/N8', '#/709/notes/N9', '#/709/notes/N10', '#/709/notes/N11',
   // the 709 Optics Lab (the second notes collection): the index and one page per built page (a new page adds its line here)
-  '#/709/optics', '#/709/optics/O1',
+  '#/709/optics', '#/709/optics/O1', '#/709/optics/O2', '#/709/optics/O3', '#/709/optics/O4', '#/709/optics/O5', '#/709/optics/O6',
   // one 709 Arcade game (F1 + Q1 pilots)
   '#/709/arcade/qc-spot-the-error',
   // the Papers section (docs/specs/papers-platform.md): the shelf, the stub lecture, its References used and its prerequisite map

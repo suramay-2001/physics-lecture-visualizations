@@ -15,13 +15,15 @@ import { registerGloss } from '../glossRegistry'
 import '../pack448'
 import type { GlossEntry } from '../schema'
 import { BRIDGES } from './bridges'
+import { OPTICS_GLOSSARY } from './optics/glossary'
 import { QC_CONCEPTS } from './concepts'
 // 709's fidelity notes register with content/fidelity.ts (the drawers of its own stage kinds, and its additions)
 import './fidelity'
 
 const glossaries = import.meta.glob<{ GLOSSARY: GlossEntry[] }>('./[QF]*.glossary.ts', { eager: true })
 
-export const QC_GLOSSARY: readonly GlossEntry[] = Object.values(glossaries).flatMap((m) => m.GLOSSARY)
+// the Optics Lab's 24 `op-` terms (optics/glossary.ts) ride in the same lazy pack
+export const QC_GLOSSARY: readonly GlossEntry[] = [...Object.values(glossaries).flatMap((m) => m.GLOSSARY), ...OPTICS_GLOSSARY]
 
 registerGloss(QC_GLOSSARY)
 registerBridges(BRIDGES)

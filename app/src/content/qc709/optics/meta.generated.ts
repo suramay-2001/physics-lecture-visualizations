@@ -5,65 +5,560 @@ export const OPTICS_META: NotesLectureMeta[] = [
   {
     "id": "O1",
     "number": 1,
-    "title": "The atom as a resonance",
-    "book": "Townsend, A Modern Approach to Quantum Mechanics, §4.4",
-    "pages": "pp. 126–128",
+    "title": "Slowing a sodium beam",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, Introduction and chapter 1",
+    "pages": "pp. 6–15",
     "topics": [
-      "a two-level atom under a weak oscillating drive",
-      "the flip chance and the detuning",
-      "the Lorentzian line and its width",
-      "what the drive strength sets"
+      "an oven beam, a counter-propagating laser and a tapered solenoid",
+      "the photon kick and the largest deceleration",
+      "keeping a slowing atom in resonance",
+      "reading the speeds with a probe laser",
+      "slowing is not yet cooling"
     ],
     "units": [
       {
-        "id": "o1-driven-atom",
-        "title": "§1 A driven two-level atom",
-        "question": "A weak oscillating field can flip a two-level atom, and the flip is largest when the drive matches the level splitting.",
+        "id": "o1-why",
+        "title": "§Intro Why slow atoms",
+        "question": "Brighter atomic beams and sharper clocks need atoms that move slowly, and light can slow them although one photon hardly touches an atom.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 126–127",
+        "pages": "pp. 6–7",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o1-force",
+        "title": "§1.1–1.2 The push of a photon",
+        "question": "Each absorbed photon pushes the atom by one recoil, and the atom can scatter half the time at most, which sets the largest deceleration.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 8–10",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o1-compensation",
+        "title": "§1.2.1 Keeping the atom in tune",
+        "question": "As an atom slows its Doppler shift fades and it leaves the resonance, so the laser, the atom or the spectrum must be adjusted along the way.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 10–13",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o1-probe",
+        "title": "§1.2.2 Reading the speeds",
+        "question": "A weak chopped probe laser downstream turns the Doppler shift into a scale, so the fluorescence against frequency is the speed distribution.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 13",
         "paras": 2,
         "feeds": [
           {
-            "chapter": "Q3",
-            "unit": "q3-bloch"
+            "chapter": "Q8",
+            "unit": "q8-mixed"
           }
         ]
       },
       {
-        "id": "o1-line-width",
-        "title": "§2 The width of the line",
-        "question": "The largest flip chance is a Lorentzian in the detuning, whose width is set by the drive strength and nothing else.",
+        "id": "o1-cooling",
+        "title": "§1.3 Slowing is not yet cooling",
+        "question": "The temperature of a beam is the width of its speed distribution, and recoil sets limits on how narrow and how straight a slowed beam can be.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 127–128",
-        "paras": 1,
+        "pages": "pp. 13–15",
+        "paras": 2,
         "feeds": [
           {
-            "chapter": "Q3",
-            "unit": "q3-spin-operators"
+            "chapter": "Q8",
+            "unit": "q8-mixed"
           }
         ]
+      }
+    ]
+  },
+  {
+    "id": "O2",
+    "number": 2,
+    "title": "Optical molasses",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, chapter 2",
+    "pages": "pp. 17–24",
+    "topics": [
+      "two opposed beams below resonance",
+      "the friction and the capture velocity",
+      "heating against friction: the Doppler limit",
+      "a beam made narrower by transverse molasses",
+      "strong light and the dressed pair"
+    ],
+    "units": [
+      {
+        "id": "o2-friction",
+        "title": "§2.1–2.2 A force that is a friction",
+        "question": "Two opposed beams tuned below resonance push an atom against its own motion with a force proportional to its speed.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 17–19",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o2-limit",
+        "title": "§2.2 Heating against friction",
+        "question": "Recoil heating balances the friction at a temperature that is lowest at a detuning of half a linewidth and does not depend on wavelength or mass.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 18–19",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "o2-collimation",
+        "title": "§2.3–2.3.2 A narrower beam",
+        "question": "Molasses along the two transverse axes of an atomic beam shrinks its sideways spread far below the capture range.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 19–21",
+        "paras": 2,
+        "feeds": []
+      },
+      {
+        "id": "o2-dressed",
+        "title": "§2.3.3 Strong light and the dressed pair",
+        "question": "In strong light the atom and the field form a pair of dressed states, and blue detuning can cool because the force is not capped by the weak-light limit.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 21–23",
+        "paras": 2,
+        "feeds": []
+      },
+      {
+        "id": "o2-3d",
+        "title": "§2.4 Three dimensions: a viscous region, not a trap",
+        "question": "Three perpendicular pairs make a region of friction without a restoring force, so atoms random-walk out of it slowly.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 23–24",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "O3",
+    "number": 3,
+    "title": "Below the Doppler limit",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, chapter 3",
+    "pages": "pp. 27–42",
+    "topics": [
+      "polarization-gradient cooling and its hills",
+      "a weak magnetic field and the MILC model",
+      "σ⁺σ⁻ light without hills",
+      "velocity-selective resonance in a strong field",
+      "the sub-Doppler limit in three dimensions"
+    ],
+    "units": [
+      {
+        "id": "o3-gradient",
+        "title": "§3.1–3.2.2 Hills in a polarization gradient",
+        "question": "Where the light polarization changes in space, ground sublevels have shifted energies, and an atom that climbs a hill and is pumped at its top loses the height.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 27–30",
+        "paras": 5,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-pure-rho"
+          }
+        ]
+      },
+      {
+        "id": "o3-milc",
+        "title": "§3.3 A weak field: magnetically induced cooling",
+        "question": "A standing wave of fixed circular polarization plus a weak transverse field cools by turning the atom at the nodes and pumping it at the antinodes.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 30–31",
+        "paras": 2,
+        "feeds": []
+      },
+      {
+        "id": "o3-sigma",
+        "title": "§3.4 σ⁺σ⁻ light: lag without hills",
+        "question": "In σ⁺σ⁻ light the polarization is linear with an axis that turns, so there are no hills and the cooling comes from the lag of the atomic orientation.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 31–33",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "o3-vsr",
+        "title": "§3.5–3.6 A strong field: velocity-selective resonance",
+        "question": "In a strong field a two-photon transition between ground sublevels is resonant at one speed, and the atoms are cooled to that speed instead of to zero.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 33–35",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o3-theory",
+        "title": "§3.7–3.8 One idea behind four cases",
+        "question": "The full theory splits the force into four parts, and Sisyphus cooling is one dissipative, irreversible idea that appears in four different cases.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 35–40",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-trace-rule"
+          },
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "o3-3d",
+        "title": "§3.9 Three dimensions: a floor set by the light shift",
+        "question": "In three dimensions the temperature scales with the light shift and stops at a floor of a few recoil temperatures.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 40–42",
+        "paras": 2,
+        "feeds": []
+      }
+    ]
+  },
+  {
+    "id": "O4",
+    "number": 4,
+    "title": "A magnetic bowl for atoms",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, chapter 4",
+    "pages": "pp. 46–54",
+    "topics": [
+      "two opposed coils and a field minimum",
+      "the quadrupole potential",
+      "circular orbits and the adiabatic condition",
+      "levels of a V-shaped well",
+      "what the first traps showed"
+    ],
+    "units": [
+      {
+        "id": "o4-why",
+        "title": "§4.1 Why a field minimum",
+        "question": "A magnetic moment can be held only at a minimum of the field, and the energy is stored inside the atom, so magnetic traps are shallow.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 46–47",
+        "paras": 2,
+        "feeds": []
+      },
+      {
+        "id": "o4-quadrupole",
+        "title": "§4.2 The quadrupole potential",
+        "question": "Near its centre the coil pair gives a field that grows linearly, twice as fast along the axis as across it, so the potential is neither central nor harmonic.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 47–48",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o4-orbits",
+        "title": "§4.3–4.3.2 Orbits and the adiabatic condition",
+        "question": "A circular orbit has a speed and a period set by the gradient, and the moment follows the field when the orbit is much larger and faster than a small quantum limit.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 48–49",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o4-quantum",
+        "title": "§4.4–4.4.3 Quantum levels of the trap",
+        "question": "A heuristic rule and an exact solution of the V-shaped well give the energy levels, and the rule is right only for large level numbers.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 50–53",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o4-experiments",
+        "title": "§4.4.4 What the first traps showed",
+        "question": "The first trap was limited by the residual gas, a superconducting trap held atoms for minutes, and absorption and radio-frequency spectra map where the atoms sit.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 53–54",
+        "paras": 3,
+        "feeds": []
+      }
+    ]
+  },
+  {
+    "id": "O5",
+    "number": 5,
+    "title": "Traps made of light",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, chapter 5",
+    "pages": "pp. 56–63",
+    "topics": [
+      "a far-detuned beam as a dipole trap",
+      "optical lattices and their levels",
+      "the magneto-optical trap",
+      "how a vapour fills the trap",
+      "variants of the trap"
+    ],
+    "units": [
+      {
+        "id": "o5-dipole",
+        "title": "§5.1–5.1.1 A far-detuned beam as a trap",
+        "question": "Light far below resonance draws atoms to the intensity maximum while scattering little, but the fluctuations of the force heat the atoms.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 56–58",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o5-lattice",
+        "title": "§5.1.2–5.1.3 Standing waves and optical lattices",
+        "question": "A standing wave makes cells half a wavelength wide, in which atoms vibrate at levels that show up as Raman sidebands.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 58–60",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o5-mot",
+        "title": "§5.2–5.2.1 The magneto-optical trap",
+        "question": "A field gradient and circularly polarized beams give the restoring force that radiation pressure lacks, and the Doppler shift adds damping.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 60–61",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o5-capture",
+        "title": "§5.2.2 How a vapour fills the trap",
+        "question": "The trap catches atoms from a room-temperature vapour because the stopping force acts over centimetres, and the caught share scales with the cube of the capture speed.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 61–62",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "o5-variants",
+        "title": "§5.2.3 Variants of the trap",
+        "question": "The density of a trap is limited by reabsorbed light, and several variants of the beams and fields raise it.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 62–63",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-pure-rho"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "O6",
+    "number": 6,
+    "title": "What cold atoms are for",
+    "book": "Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms, chapters 6 and 7",
+    "pages": "pp. 65–83",
+    "topics": [
+      "brighter beams from transverse cooling",
+      "the fountain clock and Ramsey fringes",
+      "cold collisions and the partial waves",
+      "what a collision can release",
+      "atom optics and matter-wave interferometers",
+      "non-linear optics and the outlook"
+    ],
+    "units": [
+      {
+        "id": "o6-beams",
+        "title": "§6.1 Brighter beams",
+        "question": "Light can cool, deflect and focus an atomic beam, which makes it brighter without changing its speed.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 65–67",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o6-clocks",
+        "title": "§6.2 The fountain clock",
+        "question": "A fountain gives cold atoms a long time between two passes through a microwave cavity, which narrows the Ramsey fringe far below that of a thermal beam.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 67–69",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q5",
+            "unit": "q5-interferometer"
+          }
+        ]
+      },
+      {
+        "id": "o6-collisions",
+        "title": "§6.3–6.3.1 Cold collisions",
+        "question": "Two cold atoms see an attraction that falls as a power of the distance and a centrifugal barrier, and below a threshold temperature only the s wave gets through.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 69–71",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o6-decay",
+        "title": "§6.3.2–6.3.3 What a collision can release",
+        "question": "Light-assisted and internal-energy-changing collisions release energy that is large against any trap depth, so both atoms leave.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 71–73",
+        "paras": 2,
+        "feeds": []
+      },
+      {
+        "id": "o6-matterwaves",
+        "title": "§6.4–6.4.4 Atom optics and matter-wave interferometers",
+        "question": "Cold atoms bounce off light mirrors, split in standing waves and interfere, and their thermal de Broglie wavelength sets when the wave nature matters.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 73–78",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q5",
+            "unit": "q5-interferometer"
+          }
+        ]
+      },
+      {
+        "id": "o6-nonlinear",
+        "title": "§6.5+7 Non-linear optics and the outlook",
+        "question": "When the Doppler width falls below the natural width, narrow resonances appear in non-linear optics, and the summary looks ahead to cold atoms as tools.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 78–83",
+        "paras": 3,
+        "feeds": []
       }
     ]
   }
 ]
 
 export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
-  "q3-bloch": [
+  "q5-interferometer": [
     {
-      "lecture": "O1",
-      "unit": "o1-driven-atom",
-      "label": "Optics Lab O1, §1, pp. 126–127",
-      "where": "§1, pp. 126–127"
+      "lecture": "O6",
+      "unit": "o6-clocks",
+      "label": "Optics Lab O6, §6.2, pp. 67–69",
+      "where": "§6.2, pp. 67–69"
+    },
+    {
+      "lecture": "O6",
+      "unit": "o6-matterwaves",
+      "label": "Optics Lab O6, §6.4–6.4.4, pp. 73–78",
+      "where": "§6.4–6.4.4, pp. 73–78"
     }
   ],
-  "q3-spin-operators": [
+  "q8-mixed": [
     {
       "lecture": "O1",
-      "unit": "o1-line-width",
-      "label": "Optics Lab O1, §2, pp. 127–128",
-      "where": "§2, pp. 127–128"
+      "unit": "o1-probe",
+      "label": "Optics Lab O1, §1.2.2, p. 13",
+      "where": "§1.2.2, p. 13"
+    },
+    {
+      "lecture": "O1",
+      "unit": "o1-cooling",
+      "label": "Optics Lab O1, §1.3, pp. 13–15",
+      "where": "§1.3, pp. 13–15"
+    },
+    {
+      "lecture": "O2",
+      "unit": "o2-limit",
+      "label": "Optics Lab O2, §2.2, pp. 18–19",
+      "where": "§2.2, pp. 18–19"
+    },
+    {
+      "lecture": "O2",
+      "unit": "o2-3d",
+      "label": "Optics Lab O2, §2.4, pp. 23–24",
+      "where": "§2.4, pp. 23–24"
+    },
+    {
+      "lecture": "O3",
+      "unit": "o3-sigma",
+      "label": "Optics Lab O3, §3.4, pp. 31–33",
+      "where": "§3.4, pp. 31–33"
+    },
+    {
+      "lecture": "O3",
+      "unit": "o3-theory",
+      "label": "Optics Lab O3, §3.7–3.8, pp. 35–40",
+      "where": "§3.7–3.8, pp. 35–40"
+    },
+    {
+      "lecture": "O5",
+      "unit": "o5-capture",
+      "label": "Optics Lab O5, §5.2.2, pp. 61–62",
+      "where": "§5.2.2, pp. 61–62"
+    }
+  ],
+  "q8-pure-rho": [
+    {
+      "lecture": "O3",
+      "unit": "o3-gradient",
+      "label": "Optics Lab O3, §3.1–3.2.2, pp. 27–30",
+      "where": "§3.1–3.2.2, pp. 27–30"
+    },
+    {
+      "lecture": "O5",
+      "unit": "o5-variants",
+      "label": "Optics Lab O5, §5.2.3, pp. 62–63",
+      "where": "§5.2.3, pp. 62–63"
+    }
+  ],
+  "q8-trace-rule": [
+    {
+      "lecture": "O3",
+      "unit": "o3-theory",
+      "label": "Optics Lab O3, §3.7–3.8, pp. 35–40",
+      "where": "§3.7–3.8, pp. 35–40"
     }
   ]
 }

@@ -17,7 +17,12 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 
 /** Built optics pages: id, sections, the section whose first paragraph carries the bench, and the first chapter unit that section links. */
 const BUILT = [
-  { id: 'O1', sections: ['o1-driven-atom', 'o1-line-width'], preset: 'lorentzian', benchParagraph: 'o1-line-width:b1', bridge: 'qc-q3-spin-operators', unit: 'q3-spin-operators', chapter: 'Q3' },
+  { id: 'O1', sections: ['o1-why', 'o1-force', 'o1-compensation', 'o1-probe', 'o1-cooling'], preset: 'slower-force', benchParagraph: 'o1-force:b4', bridgeParagraph: 'o1-probe:b2', section: 'o1-probe', bridge: 'qc-q8-mixed', unit: 'q8-mixed', chapter: 'Q8' },
+  { id: 'O2', sections: ['o2-friction', 'o2-limit', 'o2-collimation', 'o2-dressed', 'o2-3d'], preset: 'molasses-force', benchParagraph: 'o2-friction:b4', bridgeParagraph: 'o2-limit:b1', section: 'o2-limit', bridge: 'qc-q8-mixed', unit: 'q8-mixed', chapter: 'Q8' },
+  { id: 'O3', sections: ['o3-gradient', 'o3-milc', 'o3-sigma', 'o3-vsr', 'o3-theory', 'o3-3d'], preset: 'sisyphus-hills', benchParagraph: 'o3-gradient:b5', bridgeParagraph: 'o3-gradient:b4', section: 'o3-gradient', bridge: 'qc-q8-pure-rho', unit: 'q8-pure-rho', chapter: 'Q8' },
+  { id: 'O4', sections: ['o4-why', 'o4-quadrupole', 'o4-orbits', 'o4-quantum', 'o4-experiments'], preset: 'quadrupole-orbit', benchParagraph: 'o4-orbits:b3', bridgeParagraph: 'o4-orbits:b2', section: 'o4-orbits', bridge: 'qc-l11-two-level', unit: 'l11-two-level', chapter: 'L11' },
+  { id: 'O5', sections: ['o5-dipole', 'o5-lattice', 'o5-mot', 'o5-capture', 'o5-variants'], preset: 'dipole-well', benchParagraph: 'o5-dipole:b4', bridgeParagraph: 'o5-capture:b2', section: 'o5-capture', bridge: 'qc-q8-mixed', unit: 'q8-mixed', chapter: 'Q8' },
+  { id: 'O6', sections: ['o6-beams', 'o6-clocks', 'o6-collisions', 'o6-decay', 'o6-matterwaves', 'o6-nonlinear'], preset: 'ramsey-fountain', benchParagraph: 'o6-clocks:b4', bridgeParagraph: 'o6-matterwaves:b2', section: 'o6-matterwaves', bridge: 'qc-q5-interferometer', unit: 'q5-interferometer', chapter: 'Q5' },
 ] as const
 const O1 = BUILT[0]
 
@@ -47,8 +52,8 @@ test('the index is headed "Optics Lab — cooling and trapping atoms" and lists 
   await expect(page.locator('.notes-row')).toHaveCount(BUILT.length)
   const row = page.locator(`.notes-row[data-notes="${O1.id}"]`)
   await expect(row).toContainText('Optics Lab O1')
-  await expect(row.locator('.notes-row-meta')).toContainText('Townsend')
-  await expect(row.locator('.notes-row-meta')).toContainText('pp. 126–128')
+  await expect(row.locator('.notes-row-meta')).toContainText('Metcalf')
+  await expect(row.locator('.notes-row-meta')).toContainText('pp. 6–15')
   await expect(row.locator('.notes-row-meta')).toContainText(`feeds ${O1.chapter}`)
   await expect(row.locator('.notes-row-meta')).not.toContainText('2026') // an optics page has no class date
   await expect(row.locator('.notes-row-sections a')).toHaveCount(O1.sections.length)
@@ -71,10 +76,10 @@ test('a page numbers its sections, prints their pages, and draws its bench in pl
   const errors = collectErrors(page)
   await page.goto(`#/709/optics/${O1.id}`)
   for (const s of O1.sections) await expect(page.locator(`section#${s}`)).toBeVisible()
-  await expect(page.locator('#o1-driven-atom-title')).toContainText('§1')
-  await expect(page.locator('#o1-driven-atom-title .notes-pages')).toHaveText('pp. 126–127')
-  await expect(page.locator('#o1-line-width-title .notes-pages')).toHaveText('pp. 127–128')
-  await expect(page.locator('.notes-meta')).toContainText('Townsend')
+  await expect(page.locator('#o1-why-title')).toContainText('§Intro')
+  await expect(page.locator('#o1-why-title .notes-pages')).toHaveText('pp. 6–7')
+  await expect(page.locator('#o1-force-title .notes-pages')).toHaveText('pp. 8–10')
+  await expect(page.locator('.notes-meta')).toContainText('Metcalf')
   const widget = page.locator(`[data-beat="${O1.benchParagraph}"] .notes-widget[data-widget="optics-bench"]`)
   await expect(widget).toBeVisible()
   await expect(widget.locator(`[data-optics-preset="${O1.preset}"]`)).toBeVisible()
@@ -124,18 +129,18 @@ test('reduced motion: the plot does not fade in (no animation under prefers-redu
 test('a bridge in a page opens the chapter unit with the return bar; Return puts the paragraph back under the centre line with focus', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto(`#/709/optics/${O1.id}`)
-  const beat = page.locator(`[data-beat="${O1.benchParagraph}"]`)
+  const beat = page.locator(`[data-beat="${O1.bridgeParagraph}"]`)
   await beat.scrollIntoViewIfNeeded()
   await beat.locator(`a[data-bridge="${O1.bridge}"]`).click()
-  await expect(page).toHaveURL(new RegExp(`#/709/ch/${O1.chapter}\\?ret=qc709~O1~${O1.benchParagraph}~[0-9.]+~(ground|formal)#${O1.unit}$`))
+  await expect(page).toHaveURL(new RegExp(`#/709/ch/${O1.chapter}\\?ret=qc709~O1~${O1.bridgeParagraph}~[0-9.]+~(ground|formal)#${O1.unit}$`))
   await expect(page.locator(`#${O1.unit}-title`)).toBeFocused()
   await expect(bar(page)).toBeVisible()
   await expect(bar(page)).toContainText('Optics Lab O1')
   await expect(bar(page)).toContainText('step 1')
   await bar(page).getByRole('link').first().click()
   await expect(page).toHaveURL(/#\/709\/optics\/O1/)
-  await expect(page.locator(`[data-beat="${O1.benchParagraph}"]`)).toBeFocused()
-  await expect.poll(() => paragraphAtCentre(page)).toBe(O1.benchParagraph)
+  await expect(page.locator(`[data-beat="${O1.bridgeParagraph}"]`)).toBeFocused()
+  await expect.poll(() => paragraphAtCentre(page)).toBe(O1.bridgeParagraph)
   await expect(bar(page)).toHaveCount(0)
   await expectNoErrors(errors)
 })
@@ -146,9 +151,9 @@ test('the chapter unit shows "From the optics lab"; its chip opens the section w
   const optics = page.locator(`.unit-notes[data-unit-optics="${O1.unit}"]`)
   await expect(optics).toContainText('From the optics lab')
   await expect(optics).toContainText('§2, pp. 127–128')
-  await optics.locator('a[data-bridge="qc-o1-line-width"]').click()
-  await expect(page).toHaveURL(new RegExp(`#/709/optics/O1\\?ret=qc709~${O1.chapter}~${O1.unit}[^#]*#o1-line-width$`))
-  await expect(page.locator('#o1-line-width-title')).toBeFocused()
+  await optics.locator(`a[data-bridge="qc-${O1.section}"]`).click()
+  await expect(page).toHaveURL(new RegExp(`#/709/optics/O1\\?ret=qc709~${O1.chapter}~${O1.unit}[^#]*#${O1.section}$`))
+  await expect(page.locator(`#${O1.section}-title`)).toBeFocused()
   await expect(bar(page)).toContainText(`Chapter ${O1.chapter}`)
   await bar(page).getByRole('link').first().click()
   await expect(page).toHaveURL(new RegExp(`#/709/ch/${O1.chapter}`))

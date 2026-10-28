@@ -18,7 +18,7 @@
  * (`feedsOf`), so the index's "feeds Q6, Q7" and the reverse chapter links have ONE source: the text the reader sees.
  */
 import type { NotesCollection } from '../../courses'
-import type { Claim, Lecture, StageLayout, Unit, WidgetSpec } from '../../schema'
+import type { Claim, Correction, Lecture, StageLayout, Unit, WidgetSpec } from '../../schema'
 import type { Beat } from '../../stage'
 import { layoutStates } from '../../stage'
 import { claimKey } from '../../claimKit'
@@ -66,6 +66,11 @@ export interface NotesSection {
   summary: string
   /** Short lectures 1 to 3 paragraphs a section, full lectures 2 to 12. */
   body: NotesPara[]
+  /**
+   * Errors the audit found in the source of this section (the Optics Lab: the textbook), drawn as a box under the section's paragraphs. Each says where,
+   * what is printed, what our calculation finds, and carries the engine check that makes it so; sentences <= 40 words, TeX only inside `$…$`.
+   */
+  corrections?: Omit<Correction, 'unit'>[]
 }
 
 export interface NotesSpec {
@@ -303,6 +308,17 @@ export function notesProblems(spec: NotesSpec, opts: NotesCheckOptions = {}): st
       }
     })
   }
+  for (const s of spec.sections)
+    (s.corrections ?? []).forEach((c, i) => {
+      const at = `${s.id}.corrections[${i}]`
+      if (!c.where.trim() || !isPlain(c.where)) bad(at, 'where must be plain text (the book, the page, the equation)')
+      for (const [f, t] of [['says', c.says], ['shouldSay', c.shouldSay]] as const) {
+        if (!t.trim()) bad(`${at}.${f}`, 'is empty')
+        if (rawTex(t)) bad(`${at}.${f}`, 'has a TeX command outside $…$')
+        for (const sen of sentencesOf(t)) if (words(sen) > SENTENCE_WORDS_MAX) bad(`${at}.${f}`, `has a sentence of ${words(sen)} words (at most ${SENTENCE_WORDS_MAX})`)
+      }
+      if (typeof c.check !== 'function') bad(at, 'needs an engine check (a correction without one is cut)')
+    })
   const win = spec.length === 'short' ? SHORT_WORDS : FULL_WORDS
   if (totalWords < win.min || totalWords > win.max) bad('prose', `a ${spec.length} lecture holds ${win.min} to ${win.max} words outside $…$, not ${totalWords}`)
 
@@ -355,6 +371,7 @@ export function notesLecture(spec: NotesSpec, opts: NotesCheckOptions = {}): Lec
       claims: story.flatMap((b) => b.claims ?? []),
     }
   })
+  const corrections: Correction[] = spec.sections.flatMap((s) => (s.corrections ?? []).map((c) => ({ source: 'book' as const, ...c, unit: s.id })))
   const lecture: Lecture = {
     id: `${letterOf(spec)}${spec.number}`,
     number: spec.number,
@@ -363,6 +380,7 @@ export function notesLecture(spec: NotesSpec, opts: NotesCheckOptions = {}): Lec
     outcomes: spec.topics,
     prerequisites: [],
     units,
+    ...(corrections.length ? { corrections } : {}),
     symbols: spec.symbols,
   }
   cache.set(spec, lecture)
