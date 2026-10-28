@@ -35,6 +35,14 @@ describe('paths', () => {
     expect(lecturePath('Q8')).toBe('/709/ch/Q8')
     expect(lecturePath('L8')).toBe('/lecture/L8')
   })
+  it('the 709 Optics Lab lives under /709/optics (ids O1…); notes paths are unchanged', () => {
+    expect(coursePath('qc709', 'optics')).toBe('/709/optics')
+    expect(lecturePath('O3')).toBe('/709/optics/O3')
+    expect(lecturePath('O3', 'o3-cooling')).toBe('/709/optics/O3#o3-cooling')
+    expect(courseOfPath('/709/optics/O3')).toBe('qc709')
+    expect(courseOfHash('#/709/optics/O3#o3-cooling')).toBe('qc709')
+    expect(lecturePath('N8')).toBe('/709/notes/N8')
+  })
   it('the Papers section lives under /papers (chapters P and B at /papers/ch/:id, and each paper’s own pages)', () => {
     expect(coursePath('papers')).toBe('/papers')
     expect(lecturePath('P1')).toBe('/papers/ch/P1')
