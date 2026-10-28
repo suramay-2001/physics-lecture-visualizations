@@ -173,6 +173,27 @@ export function clonerFormulaGap(uDeg: number, thetaDeg = 60, phiDeg = 90): { rh
   return { rho1: maxDiff(o1, f1), rho2: maxDiff(o2, f2), rho3: maxDiff(o3, f3), cross: maxDiff(crossOp, mscale(pp, c0 * c1)) }
 }
 
+/** Eq. 8.2: the drawn circuit's final state against psi (x) Xi00 (program 00) or psi moved to wire 2 with Xi00 on wires 1 and 3 (program 0x): max-abs gap. */
+export function clonerEq82Gap(program: '00' | '0x', thetaDeg = 60, phiDeg = 90): number {
+  const psi = blochKet(thetaDeg, phiDeg)
+  const run = clonerRun(program, thetaDeg, phiDeg)
+  const want: Vec = program === '00' ? kron(psi, XI00) : Array.from({ length: 8 }, (_, i) => mul(XI00[2 * ((i >> 2) & 1) + (i & 1)], psi[(i >> 1) & 1]))
+  return Math.max(...want.map((z, i) => abs(c(z.re - run[i].re, z.im - run[i].im))))
+}
+
+/** Eq. 8.5: the equal split (u = 30 degrees): max-abs gap of wires 1 and 2 against 5/6 |psi><psi| + 1/6 |psi-perp><psi-perp|. */
+export function clonerEq85Gap(thetaDeg = 60, phiDeg = 90): number {
+  const psi = blochKet(thetaDeg, phiDeg)
+  const want = madd(mscale(densityOf(psi), 5 / 6), mscale(densityOf(perpKet(psi)), 1 / 6))
+  const [o1, o2] = clonerOutputs({ uDeg: 30 }, thetaDeg, phiDeg)
+  return Math.max(maxDiff(o1, want), maxDiff(o2, want))
+}
+
+/** Eqs. 8.8 and 8.12: the max-abs gap of rho against 2/3 |psi-perp><psi-perp| + 1/3 |psi><psi|. */
+export function unotTargetGap(rho: Mat, psi: Vec): number {
+  return maxDiff(rho, madd(mscale(densityOf(perpKet(psi)), 2 / 3), mscale(densityOf(psi), 1 / 3)))
+}
+
 /** |c0^2 + c1^2 + c0 c1 - ||Xi||^2|: Eq. 8.3's normalisation against the program vector's own length. */
 export function programNormGap(uDeg: number): number {
   const { c0, c1, xi } = clonerProgram(uDeg)
