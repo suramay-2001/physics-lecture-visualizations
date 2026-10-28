@@ -171,4 +171,8 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Chapter Q19 (P-Q19-story §11.3): into Spin Lab's lecture 11, for the generator e^{-iHt} and the Schrödinger equation behind quantum simulation
   'qc-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'the Hamiltonian generates each tiny step' },
   'qc-l11-schrodinger': { course: 'sl448', lecture: 'L11', unit: 'l11-schrodinger', label: 'the Schrödinger equation' },
+  // Chapter Q20 (P-Q20-story §11.3): the three Q13 / Q14 units it builds on
+  'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
+  'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
+  'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
 }

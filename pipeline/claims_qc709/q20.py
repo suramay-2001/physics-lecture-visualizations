@@ -104,6 +104,9 @@ values['q20UnotGap'] = float(np.abs(turned - (2 / 3 * M.dm(M.perp(PSI)) + 1 / 3 
 values['q20UnotFid'] = M.fc(turned, M.perp(PSI))
 values['q20UnotDot'] = float(-np.dot(M.bvec(turned), M.bvec(PP)))
 values['q20UnotShrink'] = float(norm(M.bvec(turned)) / norm(M.bvec(PP)))
+values['q20ShrinkP02'] = float(Fraction(1, 5))
+values['q20ChoiMinP0'] =float(M.choi_spectrum(M.unot_shrunk(0.0))[0])
+values['q20ChoiSlope'] = float(-(M.choi_spectrum(M.unot_shrunk(1.0))[0] - M.choi_spectrum(M.unot_shrunk(0.0))[0]))
 values['q20ChoiMinP02'] = float(M.choi_spectrum(M.unot_shrunk(0.2))[0])
 values['q20ChoiNegP05'] = float(-M.choi_spectrum(M.unot_shrunk(0.5))[0])
 values['q20UnotPStar'] = float(M.unot_limit())
@@ -207,6 +210,8 @@ values['q20DiscPrinted'] = float(-disc_printed)
 values['q20BlockEigLo'] = float(ev[0])
 values['q20BlockEigHi'] = float(ev[1])
 values['q20OptC'] = float(M.disc_opt_c())
+values['q20SumC'] = float(2 * M.disc_opt_c())
+values['q20DetCoef'] = float(np.linalg.det(M.block(1.0, 1.0)[0])) + 1.0  # det of the block at c1 = c2 = 1 is -1 + k, so k is the coefficient of c1 c2
 
 
 def prog_at(s):
