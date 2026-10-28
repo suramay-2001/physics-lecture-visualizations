@@ -108,7 +108,7 @@ o1 = {
     "o1SlowerLenM": rnd(z0, 3),
     "o1HalfwayB": rnd((v712 - a_s * t_half) / v712, 3),
     "o1DampUs": rnd(Na.M / beta_sl * 1e6, 1),
-    "o1TransDiffMm": rnd(dx_q * 1e3, 2),
+    "o1TransDiffMm": rnd(dx_q * 1e3, 1),
 }
 
 # ------------------------------------------------------------------------------------ O2

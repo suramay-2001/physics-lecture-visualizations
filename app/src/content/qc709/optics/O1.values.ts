@@ -36,7 +36,7 @@ export const V = {
   o1HalfwayB: r(zeemanProfile(slower, slower.z0 / 2).B / slower.B0, 3), // B/B₀ at z = z₀/2
   /* o1-cooling */
   o1DampUs: r(slowerDamping(NA_D2, 0.5, 2).time * 1e6, 1), // µs: M/β = 2/γ_R at η = ½, s = 2
-  o1TransDiffMm: r(transverseDiffusion(NA_D2, row.vPeak, 0.5) * 1e3, 2), // mm: (2ħk/3M)√(Γt³)
+  o1TransDiffMm: r(transverseDiffusion(NA_D2, row.vPeak, 0.5) * 1e3, 1), // mm: (2ħk/3M)√(Γt³), the book's estimate (an upper figure)
 } as const
 
 export type ValueKey = keyof typeof V

@@ -125,7 +125,12 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "equations": [],
         "pages": "pp. 19–21",
         "paras": 2,
-        "feeds": []
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
       },
       {
         "id": "o2-dressed",
@@ -245,7 +250,12 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "equations": [],
         "pages": "pp. 40–42",
         "paras": 2,
-        "feeds": []
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
       }
     ]
   },
@@ -296,7 +306,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
       {
         "id": "o4-quantum",
         "title": "§4.4–4.4.3 Quantum levels of the trap",
-        "question": "A heuristic rule and an exact solution of the V-shaped well give the energy levels, and the rule is right only for large level numbers.",
+        "question": "A heuristic rule for circular orbits and the exact levels of a one-dimensional V-shaped well grow with the same power of the level number, but the prefactors differ.",
         "challenges": [],
         "equations": [],
         "pages": "pp. 50–53",
@@ -424,12 +434,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "equations": [],
         "pages": "pp. 67–69",
         "paras": 3,
-        "feeds": [
-          {
-            "chapter": "Q5",
-            "unit": "q5-interferometer"
-          }
-        ]
+        "feeds": []
       },
       {
         "id": "o6-collisions",
@@ -484,12 +489,6 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
   "q5-interferometer": [
     {
       "lecture": "O6",
-      "unit": "o6-clocks",
-      "label": "Optics Lab O6, §6.2, pp. 67–69",
-      "where": "§6.2, pp. 67–69"
-    },
-    {
-      "lecture": "O6",
       "unit": "o6-matterwaves",
       "label": "Optics Lab O6, §6.4–6.4.4, pp. 73–78",
       "where": "§6.4–6.4.4, pp. 73–78"
@@ -516,6 +515,12 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     },
     {
       "lecture": "O2",
+      "unit": "o2-collimation",
+      "label": "Optics Lab O2, §2.3–2.3.2, pp. 19–21",
+      "where": "§2.3–2.3.2, pp. 19–21"
+    },
+    {
+      "lecture": "O2",
       "unit": "o2-3d",
       "label": "Optics Lab O2, §2.4, pp. 23–24",
       "where": "§2.4, pp. 23–24"
@@ -531,6 +536,12 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o3-theory",
       "label": "Optics Lab O3, §3.7–3.8, pp. 35–40",
       "where": "§3.7–3.8, pp. 35–40"
+    },
+    {
+      "lecture": "O3",
+      "unit": "o3-3d",
+      "label": "Optics Lab O3, §3.9, pp. 40–42",
+      "where": "§3.9, pp. 40–42"
     },
     {
       "lecture": "O5",

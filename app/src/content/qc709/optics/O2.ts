@@ -46,7 +46,7 @@ export const O2: Lecture = notesLecture({
           text: `The apparatus is a pair of opposed laser beams, one of them retro-reflected, with sodium atoms between them; three perpendicular pairs make [[qc-op-optical-molasses|optical molasses]] in three dimensions. Both beams are tuned below the atomic resonance, so the detuning $\\delta$ is negative. An atom moving toward one beam sees that beam's frequency raised by the Doppler shift $kv$ for wave number $k$ and speed $v$. The beam is then nearer to resonance, the atom scatters more of its light, and it is pushed back (§2.1, pp. 17–18). The sum of the two forces opposes the motion at any speed (<<qc-l12-driven|the driven-atom unit>>).`,
         },
         {
-          text: `Near zero speed the sum is linear, $F = -\\beta v$, with friction $\\beta = -8\\hbar k^2(\\delta/\\gamma)s/(1 + s + (2\\delta/\\gamma)^2)^2$ for saturation $s$ per beam and linewidth $\\gamma$ (Eq. 2.2). At $\\delta = -\\gamma/2$ and $s = 1$ it is ${d(V.o2BetaK2, 3)} $\\hbar k^2$. The linear law holds only while the Doppler shift stays below about one linewidth, which defines the [[qc-op-capture-velocity|capture velocity]] $v_c = \\gamma/2k$. For sodium it is ${d(V.o2VcNa, 2)} m/s.`,
+          text: `Near zero speed the sum is linear, $F = -\\beta v$, with friction $\\beta = -8\\hbar k^2(\\delta/\\gamma)s/(1 + s + (2\\delta/\\gamma)^2)^2$ for saturation $s$ per beam and linewidth $\\gamma$ (Eq. 2.2). At $\\delta = -\\gamma/2$ and $s = 1$ it is ${d(V.o2BetaK2, 3)} $\\hbar k^2$. The linear law holds only while the Doppler shift stays below about half a linewidth, which defines the [[qc-op-capture-velocity|capture velocity]] $v_c = \\gamma/2k$. For sodium it is ${d(V.o2VcNa, 2)} m/s. The wavelengths, linewidths and masses of sodium and rubidium are standard values (Steck, alkali D-line data; NIST), stated here as inputs.`,
           claims: [
             claim('o2BetaK2', 'the friction at δ = −γ/2 and s = 1 is 0.444 ħk²', () => near(V.o2BetaK2, 0.444, 0.0005)),
             claim('o2VcNa', 'the capture velocity of sodium is 2.89 m/s', () => near(V.o2VcNa, 2.89, 0.005)),
@@ -109,25 +109,25 @@ export const O2: Lecture = notesLecture({
       summary: 'Molasses along the two transverse axes of an atomic beam shrinks its sideways spread far below the capture range.',
       body: [
         {
-          text: `The same idea works sideways on a beam. A rubidium-87 beam crosses a transverse pair of molasses beams and lands on a hot wire grid, which images it (§2.3–2.3.2, pp. 19–21). Atoms with a transverse speed below the capture velocity are damped toward the rms speed $\\sqrt{\\hbar\\gamma/2M}$ for atomic mass $M$. For rubidium the capture velocity is ${d(V.o2RbVc, 2)} m/s and the final width ${d(V.o2RbDvCms, 1)} cm/s (<<qc-l13-plane-wave|the plane-wave unit>>).`,
+          text: `The same idea works sideways on a beam. A rubidium-87 beam crosses a transverse pair of molasses beams and lands on a hot wire grid, which images it (§2.3–2.3.2, pp. 19–21). Atoms with a transverse speed below the capture velocity are damped toward the rms speed $\\sqrt{\\hbar\\gamma/2M}$ for atomic mass $M$. For rubidium the capture velocity is ${d(V.o2RbVc, 2)} m/s and the final width ${d(V.o2RbDvCms, 1)} cm/s, the spread of an ensemble of atoms (<<qc-q8-mixed|the ensemble unit>>).`,
           claims: [
             claim('o2RbVc', 'the capture velocity of rubidium is 2.37 m/s', () => near(V.o2RbVc, 2.37, 0.005)),
             claim('o2RbDvCms', 'the final transverse width of rubidium is 11.8 cm/s', () => near(V.o2RbDvCms, 11.8, 0.05)),
           ],
         },
         {
-          text: `Each axis compresses the momentum width by $\\sqrt{\\gamma/\\gamma_R}$, which is ${d(V.o2RbCompress, 1)} for rubidium, because $\\gamma/\\gamma_R$ is ${n0(V.o2RbGOverGR)} for the recoil rate $\\gamma_R = \\frac{\\hbar k^2}{2M}$. The smallest spread in position that the beam can reach is $\\frac{(2v_c)^2}{2a_{\\max}}$ for the largest deceleration $a_{\\max}$, which is ${d(V.o2RbDxUm, 1)} µm: no force can stop the sideways motion sooner. In phase space each pair of directions shrinks the occupied volume by the factor $\\gamma/\\gamma_R$.`,
+          text: `Each axis compresses the momentum width by $\\sqrt{\\gamma/\\gamma_R}$, which is ${d(V.o2RbCompress, 1)} for rubidium, because $\\gamma/\\gamma_R$ is ${n0(V.o2RbGOverGR)} for the recoil rate $\\gamma_R = \\frac{\\hbar k^2}{2M}$. The smallest transverse expansion of the beam while it crosses the light is $\\frac{(2v_c)^2}{2a_{\\max}}$ for the largest deceleration $a_{\\max}$, which is ${d(V.o2RbDxUm, 1)} µm: no force can stop the sideways motion sooner. In phase space each pair of directions shrinks the occupied volume by the factor $\\gamma/\\gamma_R$.`,
           claims: [
             claim('o2RbCompress', 'the momentum width of rubidium shrinks by 40.1 per axis', () => near(V.o2RbCompress, 40.1, 0.05)),
             claim('o2RbGOverGR', 'γ over the recoil rate of rubidium is 1,609', () => near(V.o2RbGOverGR, 1609, 0.5)),
-            claim('o2RbDxUm', 'the smallest spread of the rubidium beam is 99.9 µm', () => near(V.o2RbDxUm, 99.9, 0.05)),
+            claim('o2RbDxUm', 'the smallest transverse expansion of the rubidium beam is 99.9 µm', () => near(V.o2RbDxUm, 99.9, 0.05)),
             claim('o2RbTimeUs', 'the printed ratio 2v_c/a_max is a time of 42 µs for rubidium', () => near(V.o2RbTimeUs, 42, 0.5)),
           ],
         },
       ],
       corrections: [
         {
-          where: 'Chapter 2, p. 20, the smallest spread',
+          where: 'Chapter 2, p. 20, the minimal transverse expansion',
           says: 'Δx = 2 v_c / a_max',
           shouldSay: `the printed ratio is a time (${n0(V.o2RbTimeUs)} µs for rubidium), not a length. The length is (2v_c)²/(2a_max) = γ/(2kγ_R), which our calculation finds to be ${d(V.o2RbDxUm, 1)} µm, the printed right-hand side.`,
           check: () => near(V.o2RbDxUm, 99.9, 0.05) && near(V.o2RbTimeUs, 42, 0.5),
@@ -173,7 +173,7 @@ export const O2: Lecture = notesLecture({
           text: 'Measured temperatures in three-dimensional molasses came out far below the Doppler limit, which the two-level model cannot explain; the next page gives the reason. Unbalanced beams still hold the atoms: a net force at rest would move them, so they drift at a steady speed instead of leaving.',
         },
         {
-          text: 'In practice the beams are never perfectly balanced, and the intensity differs across the overlap region. An atom then feels a net push along the imbalance until the friction cancels it at a steady drift speed. The cloud therefore drifts toward the brighter beam while staying dense, which is why a molasses cloud visibly moves when one beam is blocked.',
+          text: 'In practice the beams are never perfectly balanced, and the intensity differs across the overlap region. An atom then feels a net push along the imbalance until the friction cancels it at a steady drift speed. The cloud therefore drifts the way the brighter beam travels while staying dense, which is why a molasses cloud visibly moves when one beam is blocked.',
         },
       ],
     },

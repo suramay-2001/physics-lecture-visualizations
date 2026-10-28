@@ -206,4 +206,13 @@ describe('the truth-review fixes stay fixed (docs/roles/audits/P-optics-lab-revi
     expect(Object.keys(OPTICS_VALUE_TABLES.O6).filter((k) => /Prec/.test(k))).toEqual([])
     for (const c of corrections) expect(c.check(), c.where).toBe(true)
   })
+  it('S1: every page states its atomic data as cited inputs (Steck and NIST), and O6 cites the source of C₆', () => {
+    for (const l of OPTICS_CHAPTERS) expect(prose(l.id), l.id).toMatch(/Steck, alkali D-line data; NIST/)
+    expect(prose('O6')).toContain('Derevianko et al., Phys. Rev. Lett. 82, 3589 (1999)')
+  })
+  it('S3: the 540 Hz of the MOT is the undamped frequency of an overdamped trap, and the cell is one atom (rubidium)', () => {
+    expect(prose('O5')).toMatch(/undamped frequency[^.]*would be[^.]*but the motion is overdamped/)
+    expect(prose('O5')).not.toContain('cesium vapour cell')
+    expect(prose('O5')).not.toMatch(/atoms oscillate at/)
+  })
 })

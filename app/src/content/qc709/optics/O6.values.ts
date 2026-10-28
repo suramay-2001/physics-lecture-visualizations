@@ -51,5 +51,8 @@ export const V = {
   o6NaNaturalMHz: r(NA_D2.gamma / (2 * Math.PI) / 1e6, 2), // MHz: γ/2π
 } as const
 
+/** Half the wavelength of the sodium line, nm (the line the figure of o6-matterwaves marks: setup, not a claim). */
+export const HALF_LAMBDA_NA_NM = (NA_D2.lambdaM / 2) * 1e9
+
 export type ValueKey = keyof typeof V
 export const claim = keyedClaim<ValueKey>()

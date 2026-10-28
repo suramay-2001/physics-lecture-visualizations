@@ -20,6 +20,7 @@ export const O3: Lecture = notesLecture({
     '\\delta': 'o3-gradient:b2',
     's': 'o3-gradient:b2',
     'C': 'o3-gradient:b2',
+    '\\Omega': 'o3-gradient:b2',
     '\\gamma': 'o3-gradient:b2',
     'U_1': 'o3-gradient:b4',
     'k': 'o3-gradient:b4',
@@ -54,7 +55,7 @@ export const O3: Lecture = notesLecture({
           text: 'The apparatus is a pair of counter-propagating beams with perpendicular linear polarizations, or one σ⁺ and one σ⁻ beam, crossing a cloud of rubidium or cesium atoms. Coils make a weak or strong uniform field, and a hot wire or a time-of-flight signal reads the velocity. Doppler cooling stops at the limit of the last page. These atoms get colder by a mechanism that needs several ground sublevels (§3.1–3.2.2, pp. 27–30).',
         },
         {
-          text: `Take a ground level of angular momentum one half that is excited to three halves. In the lin⊥lin pair the polarization runs through σ⁺, linear, σ⁻ and linear again within half a wavelength. The [[qc-op-light-shift|light shift]] of a sublevel, $U = 2\\hbar\\delta sC^2/(1 + 4\\delta^2/\\gamma^2)$ (Eq. 3.1), depends on the squared Clebsch–Gordan weight $C^2$ for detuning $\\delta$, saturation $s$ and linewidth $\\gamma$. In σ⁺ light the upper sublevel has the weight ${n0(V.o3CGUp)} and the lower one $${tf(V.o3CGDown)}$ (<<qc-l4-eigen|the eigenvector unit>>).`,
+          text: `Take a ground level of angular momentum one half that is excited to three halves. In the lin⊥lin pair the polarization runs through σ⁺, linear, σ⁻ and linear again within half a wavelength. The [[qc-op-light-shift|light shift]] of a sublevel, $U = 2\\hbar\\delta sC^2/(1 + 4\\delta^2/\\gamma^2)$ (Eq. 3.1), depends on the squared Clebsch–Gordan weight $C^2$ for detuning $\\delta$, saturation $s$ and linewidth $\\gamma$. Here $s = 2\\Omega^2/\\gamma^2$ is the saturation of one beam of Rabi frequency $\\Omega$, the coefficient $C$ multiplies $\\Omega$ so that the shift goes as $C^2 s$, and we keep the book's factor 2. In σ⁺ light the upper sublevel has the weight ${n0(V.o3CGUp)} and the lower one $${tf(V.o3CGDown)}$ (<<qc-l4-eigen|the eigenvector unit>>).`,
           claims: [
             claim('o3CGUp', 'in σ⁺ light the upper ground sublevel has the weight 1', () => V.o3CGUp === 1),
             claim('o3CGDown', 'in σ⁺ light the lower ground sublevel has the weight 1/3', () => near(V.o3CGDown, 1 / 3, 1e-12)),
@@ -64,10 +65,10 @@ export const O3: Lecture = notesLecture({
           text: 'Now follow an atom. It sits in the deep sublevel at the bottom of a hill, moves, and climbs toward a quarter wavelength where the light has changed polarization. There [[qc-op-optical-pumping|optical pumping]] moves it to the other sublevel, which is now low, and the potential energy it gained leaves with the scattered photon. This repeated climbing and pumping is [[qc-op-sisyphus-cooling|Sisyphus cooling]], and the changing polarization that makes it work is a [[qc-op-polarization-gradient|polarization gradient]].',
         },
         {
-          text: `For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, the light shift is $U_1 = -${d(V.o3U1, 1)}$ µK, and the hills are two thirds of it high: ${d(V.o3HillDepth, 1)} µK. The friction is about $\\hbar k^2|\\delta|/\\gamma$ for wave number $k$, larger than the largest Doppler friction by $2|\\delta|/\\gamma$, a factor ${n0(V.o3FrictionRatio)} here (<<qc-q8-pure-rho|the pure-state unit>>).`,
+          text: `For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, the light shift is $U_1 = -${d(V.o3U1, 1)}$ µK by the book's Eq. 3.1 with $C^2 = 1$, rubidium being treated as the model atom with ground level one half and excited level three halves. The hills are two thirds of it high: ${d(V.o3HillDepth, 1)} µK. The wavelengths, linewidths and masses of rubidium and cesium are standard values (Steck, alkali D-line data; NIST), stated here as inputs. The friction is about $\\hbar k^2|\\delta|/\\gamma$ for wave number $k$, larger than the largest Doppler friction by $2|\\delta|/\\gamma$, a factor ${n0(V.o3FrictionRatio)} here (<<qc-q8-pure-rho|the pure-state unit>>).`,
           claims: [
-            claim('o3U1', 'the light shift of rubidium at δ = −4γ and s = ½ is −17.9 µK', () => near(V.o3U1, 17.9, 0.05)),
-            claim('o3HillDepth', 'the hills are 11.9 µK high', () => near(V.o3HillDepth, 11.9, 0.05)),
+            claim('o3U1', 'by Eq. 3.1 with C² = 1 the light shift of rubidium at δ = −4γ and s = ½ is −17.9 µK', () => near(V.o3U1, 17.9, 0.05)),
+            claim('o3HillDepth', 'in that model the hills are 11.9 µK high', () => near(V.o3HillDepth, 11.9, 0.05)),
             claim('o3FrictionRatio', 'the friction is 8 times the Doppler maximum', () => V.o3FrictionRatio === 8),
           ],
           figure: {
@@ -89,10 +90,10 @@ export const O3: Lecture = notesLecture({
       summary: 'A standing wave of fixed circular polarization plus a weak transverse field cools by turning the atom at the nodes and pumping it at the antinodes.',
       body: [
         {
-          text: 'A pair of beams can cool without a polarization gradient: a standing wave of fixed σ⁺ light plus a weak transverse magnetic field, called MILC (§3.3, pp. 30–31). At the nodes of the wave the atomic orientation turns in the field and is redistributed. At the antinodes pumping restores it. The method works when the Larmor rate $\\omega_Z$ is below the Doppler shift $kv$ of an atom at speed $v$, and that shift is below the pumping rate $\\gamma_p$ (<<qc-l11-two-level|the two-level unit>>).',
+          text: 'A pair of beams can cool without a polarization gradient: a standing wave of fixed σ⁺ light plus a weak transverse magnetic field, called MILC (§3.3, pp. 30–31). Near the nodes of the wave the field turns the atomic orientation and redistributes it, and near the antinodes pumping restores it. The method needs the Larmor rate $\\omega_Z$ to lie below the Doppler shift $kv$ of an atom at speed $v$, and that shift below the pumping rate $\\gamma_p$ (<<qc-l11-two-level|the two-level unit>>).',
         },
         {
-          text: `For rubidium-85 in a field of a tenth of a gauss, the lower edge $\\omega_Z/k$ of the working range is ${d(V.o3MilcLow, 2)} cm/s. The one-dimensional Doppler speed that sets the scale of the model is $v_D = \\sqrt{7\\hbar\\gamma/20M}$ for atomic mass $M$, ${d(V.o3VDRb, 2)} cm/s for rubidium-87, the 10 cm/s the book states.`,
+          text: `For rubidium-85 in a field of a tenth of a gauss, the lower edge $\\omega_Z/k$ of the working range is ${d(V.o3MilcLow, 2)} cm/s. The one-dimensional Doppler speed that sets the scale of the model is $v_D = \\sqrt{7\\hbar\\gamma/20M}$ for atomic mass $M$, ${d(V.o3VDRb, 2)} cm/s for rubidium-87, which the book rounds to ten centimetres per second.`,
           claims: [
             claim('o3MilcLow', 'the lower edge of the MILC range at a tenth of a gauss is 3.64 cm/s', () => near(V.o3MilcLow, 3.64, 0.005)),
             claim('o3VDRb', 'the Doppler speed of rubidium-87 is 9.87 cm/s', () => near(V.o3VDRb, 9.87, 0.005)),
@@ -103,7 +104,7 @@ export const O3: Lecture = notesLecture({
         {
           where: 'Chapter 3, p. 31, the Doppler speed',
           says: 'v_D = √(7γ/20k_B)',
-          shouldSay: `the printed expression is not a speed. Our calculation finds v_D = √(7ħγ/20M), which is ${d(V.o3VDRb, 2)} cm/s for rubidium-87, the 10 cm/s the book states.`,
+          shouldSay: `the printed expression is not a speed. Our calculation finds v_D = √(7ħγ/20M), which is ${d(V.o3VDRb, 2)} cm/s for rubidium-87, which the book rounds to ten centimetres per second.`,
           check: () => near(V.o3VDRb, 9.87, 0.005),
         },
       ],
@@ -135,7 +136,7 @@ export const O3: Lecture = notesLecture({
       summary: 'In a strong field a two-photon transition between ground sublevels is resonant at one speed, and the atoms are cooled to that speed instead of to zero.',
       body: [
         {
-          text: `In a strong field the sublevels are split by $\\hbar\\omega_Z$ with $\\omega_Z = g_F\\mu_B B/\\hbar$ for Landé factor $g_F$, Bohr magneton $\\mu_B$ and field $B$ (§3.5–3.6, pp. 33–35). For rubidium-85 in its level with total spin 3, $g_F$ is one third, so $\\omega_Z/2\\pi$ is ${d(V.o3ZeemanMHzG, 3)} MHz per gauss. A two-photon transition between the sublevels is resonant when the Doppler shifts of the two beams match the splitting: [[qc-op-velocity-selective-resonance|velocity-selective resonance]] (<<qc-l12-driven|the driven-atom unit>>).`,
+          text: `In a strong field the sublevels are split by $\\hbar\\omega_Z$ with $\\omega_Z = g_F\\mu_B B/\\hbar$ for Landé factor $g_F$, Bohr magneton $\\mu_B$ and field $B$ (§3.5–3.6, pp. 33–35). For rubidium-85 in its level with total spin 3, $g_F$ is one third, so $\\omega_Z/2\\pi$ is ${d(V.o3ZeemanMHzG, 3)} MHz per gauss. The atom absorbs from one beam and emits into the other, a two-photon step that conserves energy only at the speed where the difference of the two Doppler shifts equals the splitting: [[qc-op-velocity-selective-resonance|velocity-selective resonance]] (<<qc-l12-driven|the driven-atom unit>>).`,
           claims: [claim('o3ZeemanMHzG', 'the Larmor frequency of rubidium-85 is 0.467 MHz per gauss', () => near(V.o3ZeemanMHzG, 0.467, 0.0005))],
         },
         {
@@ -156,7 +157,7 @@ export const O3: Lecture = notesLecture({
       ],
       corrections: [
         {
-          where: 'Chapter 3, pp. 33 and 35, the resonance speed',
+          where: 'Chapter 3, pp. 33 to 35, the resonance speed (p. 34 gives σ⁺σ⁻ as twice the MILC value)',
           says: 'v_r = ω_Z/2k (twice), and then that the peaks lie at ω_Z/k',
           shouldSay: `the text gives ω_Z/2k twice and then says the peaks satisfy ω_Z/k. Our calculation finds ω_Z/2k = ${d(V.o3VsrLin, 1)} cm/s at one gauss for rubidium-85 in lin⊥lin light, and twice that, ${d(V.o3VsrSigma, 1)} cm/s, for σ⁺σ⁻.`,
           check: () => near(V.o3VsrLin, 18.2, 0.05) && near(V.o3VsrSigma, 2 * V.o3VsrLin, 0.1),
@@ -186,16 +187,16 @@ export const O3: Lecture = notesLecture({
       summary: 'In three dimensions the temperature scales with the light shift and stops at a floor of a few recoil temperatures.',
       body: [
         {
-          text: `In three dimensions the temperature follows the light shift, $k_B T = c\\,|U_1|$ (Eq. 3.13), where $c$ is ${d(V.o3CLin, 3)} for lin⊥lin cooling and ${d(V.o3CSigma, 3)} for σ⁺σ⁻ cooling (p. 41). For rubidium at the detuning and saturation above this gives ${d(V.o3TlimLin, 2)} µK and ${d(V.o3TlimSigma, 2)} µK, with a floor at the recoil temperature (§3.9, pp. 40–42; <<qc-l1-quantized|the Stern–Gerlach unit>> shows why a moment's energy is a field times a moment).`,
+          text: `In three dimensions the temperature of the atomic ensemble follows the light shift (<<qc-q8-mixed|the ensemble unit>>), $k_B T = c\\,|U_1|$ (Eq. 3.13), where $c$ is ${d(V.o3CLin, 3)} for lin⊥lin cooling and ${d(V.o3CSigma, 3)} for σ⁺σ⁻ cooling (p. 41). For rubidium at the detuning and saturation above this gives ${d(V.o3TlimLin, 2)} µK and ${d(V.o3TlimSigma, 2)} µK, with a floor at the recoil temperature (§3.9, pp. 40–42).`,
           claims: [
             claim('o3CLin', 'the book’s coefficient for lin⊥lin light is 0.125', () => near(V.o3CLin, 0.125, 1e-12)),
             claim('o3CSigma', 'the book’s coefficient for σ⁺σ⁻ light is 0.097', () => near(V.o3CSigma, 0.097, 1e-12)),
-            claim('o3TlimLin', 'the lin⊥lin limit of rubidium is 2.24 µK', () => near(V.o3TlimLin, 2.24, 0.005)),
-            claim('o3TlimSigma', 'the σ⁺σ⁻ limit of rubidium is 1.74 µK', () => near(V.o3TlimSigma, 1.74, 0.005)),
+            claim('o3TlimLin', 'in that model the lin⊥lin limit of rubidium is 2.24 µK', () => near(V.o3TlimLin, 2.24, 0.005)),
+            claim('o3TlimSigma', 'in that model the σ⁺σ⁻ limit of rubidium is 1.74 µK', () => near(V.o3TlimSigma, 1.74, 0.005)),
           ],
         },
         {
-          text: `The cesium data in the book fall on one line against the light shift, which we report in words only. For cesium the Doppler limit $T_D$ is ${d(V.o3CsTD, 1)} µK and the recoil temperature $T_R$ is ${n0(V.o3CsTR)} nK, so the Doppler limit holds ${n0(V.o3CsTDoverTR)} recoil temperatures. We take $T_R = \\hbar^2k^2/Mk_B$, the definition behind the book's table of Chapter 6 and its factor of 15 on p. 41.`,
+          text: `The cesium data in the book fall on one line against the light shift, which we report in words only. For cesium the Doppler limit $T_D$ is ${d(V.o3CsTD, 1)} µK and the recoil temperature $T_R$ is ${n0(V.o3CsTR)} nK, so the Doppler limit holds ${n0(V.o3CsTDoverTR)} recoil temperatures. We take $T_R = \\hbar^2k^2/Mk_B$, the definition behind the book's table on p. 71 and its comparison, on p. 41, of the coldest cesium sample with the recoil temperature.`,
           claims: [
             claim('o3CsTD', 'the Doppler limit of cesium is 125.6 µK', () => near(V.o3CsTD, 125.6, 0.05)),
             claim('o3CsTR', 'the recoil temperature of cesium is 198 nK', () => near(V.o3CsTR, 198, 0.5)),
@@ -205,7 +206,7 @@ export const O3: Lecture = notesLecture({
       ],
       corrections: [
         {
-          where: 'Chapter 3, p. 41, against Chapter 2, pp. 20 and 52, and the table of Chapter 6',
+          where: 'Chapter 3, p. 41, against Chapter 2, pp. 20 and 52, and the table on p. 71',
           says: 'T_R ≡ ħγ_R/k_B on pp. 20 and 52, but 2.4 µK for sodium and a factor of 15 on p. 41',
           shouldSay: `the pages use two definitions that differ by a factor of two, so they are inconsistent with each other. With T_R = ħ²k²/(Mk_B) our calculation finds ${d(V.o3NaTRMicroK, 2)} µK for sodium, matching the table, and ${n0(V.o3CsTR)} nK for cesium.`,
           check: () => near(V.o3NaTRMicroK, 2.4, 0.005) && near(V.o3CsTR, 198, 0.5),

@@ -54,7 +54,7 @@ export const O1: Lecture = notesLecture({
       summary: 'Brighter atomic beams and sharper clocks need atoms that move slowly, and light can slow them although one photon hardly touches an atom.',
       body: [
         {
-          text: 'The experiment starts with an oven at 712 K that sends sodium atoms down a long vacuum tube. A laser tuned a little below the sodium resonance runs against the beam. A solenoid wound in layers of decreasing length surrounds the tube, and a weak chopped probe laser 40 cm further on reads the speeds from the light the atoms scatter. The probe measures the speed distribution of the beam, before and after the slowing laser acts.',
+          text: 'The experiment starts with an oven at 712 K that sends sodium atoms down a long vacuum tube. A laser tuned a little below the sodium resonance runs against the beam. A solenoid wound in layers of decreasing length surrounds the tube, and a weak chopped probe laser 40 cm further on reads the speeds from the light the atoms scatter. The probe measures the speed distribution of the beam, before and after the slowing laser acts. Wavelength, linewidth and mass of sodium are standard values (Steck, alkali D-line data; NIST), stated here as inputs.',
         },
         {
           text: `Why slow atoms at all? A beam is only as bright as its collimation allows, and a line measured on a beam cannot be narrower than the inverse of the flight time $T$ through the apparatus (Introduction, pp. 6–7). That gives $\\Delta\\nu \\ge 1/T$, which is ${n0(V.o1TransitHz)} Hz for a beam that crosses 3 m at 500 m/s. A moving clock also runs slow: at 500 m/s this second-order Doppler shift is $${d(V.o1Doppler2Beam, 2)}\\times10^{-12}$ of the line frequency.`,
@@ -137,7 +137,7 @@ export const O1: Lecture = notesLecture({
           },
         },
         {
-          text: 'Try it. The bench below draws the field and the resonant speed along the slower on two vertical axes. Slide ‘Entry speed v₀’ and ‘Design fraction η of the maximum deceleration’ to see how a faster beam or a gentler design lengthens the magnet and raises the field. The readouts give the length, the entry field, the stopping time and the chirp rate.',
+          text: 'Try it. The bench below draws the field and the resonant speed along the slower on two vertical axes. Slide ‘Entry speed v₀’ and ‘Design fraction η of the maximum deceleration’ to see how a faster beam lengthens the magnet and raises the field, while a gentler design lengthens the magnet and leaves the entry field alone. The readouts give the length, the entry field, the stopping time and the chirp rate.',
           widget: { kind: 'optics-bench', props: { preset: 'zeeman-slower' }, caption: 'Field and resonant speed along a Zeeman slower for sodium.' },
         },
       ],
@@ -146,7 +146,7 @@ export const O1: Lecture = notesLecture({
           where: 'Chapter 1, p. 11, the field profile',
           says: 'B(z) = B₀√(1 − z₀/z) and v_R = v₀√(1 − z₀/z), with z₀ ≡ m v₀/(η ħ k γ)',
           shouldSay: `B(z) = B₀√(1 − z/z₀) with z₀ = Mv₀²/(ηħkγ), a length: the printed ratio gives an imaginary field for z < z₀, and the printed z₀ is a time. For sodium with η of one half our z₀ is ${d(V.o1SlowerLenM, 3)} m and B₀ is ${n0(V.o1SlowerB0G)} G; the length in the first table (η = 1) is ${d(V.o1StopLenNa, 3)} m.`,
-          check: () => near(V.o1SlowerLenM, 0.852, 0.0005) && near(V.o1SlowerLenM, 2 * V.o1StopLenNa, 0.0015) && Number.isNaN(Math.sqrt(1 - 2)),
+          check: () => near(V.o1SlowerLenM, 0.852, 0.0005) && near(V.o1SlowerLenM, 2 * V.o1StopLenNa, 0.0015) && 1 - V.o1SlowerLenM / (V.o1SlowerLenM / 2) < 0, // the printed ratio z₀/z exceeds 1 at z = z₀/2, so its square root is imaginary
         },
       ],
     },
@@ -177,8 +177,8 @@ export const O1: Lecture = notesLecture({
           claims: [claim('o1DampUs', 'the damping time of the slowed beam is 12.7 µs for sodium', () => near(V.o1DampUs, 12.7, 0.05))],
         },
         {
-          text: `Two limits remain. The beam angle grows as the atoms slow, because the sideways speed stays while the forward speed shrinks, so the angle scales as $1/v$. And every scattered photon kicks the atom sideways at random: over the whole slowing this random walk widens the beam by ${d(V.o1TransDiffMm, 2)} mm for sodium. A slowed beam is cooler along its length but wider across it (<<qc-q8-mixed|the ensemble unit>>).`,
-          claims: [claim('o1TransDiffMm', 'recoil widens the sodium beam by 6.58 mm over the slowing', () => near(V.o1TransDiffMm, 6.58, 0.005))],
+          text: `Two limits remain. The beam angle grows as the atoms slow, because the sideways speed stays while the forward speed shrinks, so the angle scales as $1/v$. And every scattered photon kicks the atom sideways at random: over the whole slowing this random walk widens the beam by about ${d(V.o1TransDiffMm, 1)} mm for sodium by the book's estimate, an upper figure. A slowed beam is cooler along its length but wider across it (<<qc-q8-mixed|the ensemble unit>>).`,
+          claims: [claim('o1TransDiffMm', 'the book’s estimate of the recoil widening of the sodium beam is 6.6 mm', () => near(V.o1TransDiffMm, 6.6, 0.05))],
         },
       ],
     },

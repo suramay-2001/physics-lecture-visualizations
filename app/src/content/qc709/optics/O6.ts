@@ -5,7 +5,7 @@
  */
 import type { Lecture } from '../../schema'
 import { notesLecture } from '../notes/kit'
-import { V, claim, d, n0, near } from './O6.values'
+import { HALF_LAMBDA_NA_NM, V, claim, d, n0, near } from './O6.values'
 
 export const O6: Lecture = notesLecture({
   collection: 'optics',
@@ -61,14 +61,14 @@ export const O6: Lecture = notesLecture({
       summary: 'A fountain gives cold atoms a long time between two passes through a microwave cavity, which narrows the Ramsey fringe far below that of a thermal beam.',
       body: [
         {
-          text: `The second is 9,192,631,770 cycles of the cesium hyperfine line (§6.2, pp. 67–69). In a thermal-beam clock the atoms cross the microwave cavity in about ${n0(V.o6BeamT)} ms, a beam of 3 m at 500 m/s. [[qc-op-ramsey-fringes|Ramsey's method]] sends the atom through two microwave pulses a time $T$ apart. The transition chance falls to one half at a detuning of $1/(4T)$ from the line, so the full width of the central fringe is $1/(2T)$: ${d(V.o6RamseyBeam, 1)} Hz for the beam (<<qc-l12-driven|the driven-atom unit>>).`,
+          text: `The second is 9,192,631,770 cycles of the cesium hyperfine line (§6.2, pp. 67–69). In a thermal-beam clock an atom needs about ${n0(V.o6BeamT)} ms to cover a 3 m apparatus at 500 m/s (our example; the book says a few metres). [[qc-op-ramsey-fringes|Ramsey's method]] sends the atom through two microwave pulses a time $T$ apart, which is ${n0(V.o6BeamT)} ms for this beam. The transition chance falls to one half at a detuning of $1/(4T)$ from the line, so the full width of the central fringe is $1/(2T)$: ${d(V.o6RamseyBeam, 1)} Hz for the beam (<<qc-l12-driven|the driven-atom unit>>).`,
           claims: [
             claim('o6BeamT', 'a 3 m beam at 500 m/s needs 6 ms', () => near(V.o6BeamT, 6, 0.5)),
             claim('o6RamseyBeam', 'the fringe of a thermal beam is 83.3 Hz wide', () => near(V.o6RamseyBeam, 83.3, 0.05)),
           ],
         },
         {
-          text: `A fountain launches cold atoms up through the cavity, and they fall back through it. For atoms that rise 15 cm above the cavity the time between the passes is $T = 2\\sqrt{2h/g}$ for height $h$ and gravity $g$, which is ${d(V.o6FountainT, 3)} s, and the fringe is ${d(V.o6RamseyFountain, 2)} Hz wide. The second-order Doppler shift of such an atom at the cavity is only $${d(V.o6Doppler2Fountain, 2)}\\times10^{-17}$ of the line frequency (<<qc-q5-interferometer|the interferometer unit>>).`,
+          text: `A fountain launches cold atoms up through the cavity, and they fall back through it. For atoms that rise 15 cm above the cavity the time between the passes is $T = 2\\sqrt{2h/g}$ for height $h$ and gravity $g$, which is ${d(V.o6FountainT, 3)} s, and the fringe is ${d(V.o6RamseyFountain, 2)} Hz wide. The second-order Doppler shift of such an atom at the cavity is only $${d(V.o6Doppler2Fountain, 2)}\\times10^{-17}$ of the line frequency.`,
           claims: [
             claim('o6FountainT', 'a fountain 15 cm above the cavity has T = 0.350 s', () => near(V.o6FountainT, 0.35, 0.0005)),
             claim('o6RamseyFountain', 'the fountain fringe is 1.43 Hz wide', () => near(V.o6RamseyFountain, 1.43, 0.005)),
@@ -80,7 +80,7 @@ export const O6: Lecture = notesLecture({
           },
         },
         {
-          text: 'Try it. The bench below draws the fringe of the fountain and of the thermal beam against the detuning. Slide ‘Height above the cavity’ to change the time between passes and watch the central fringe narrow as the square root of the height. The readouts give the time, both widths, their ratio and the second-order Doppler shift.',
+          text: 'Try it. The bench below draws the fringe of the fountain and of the thermal beam against the detuning. Slide ‘Height above the cavity’ to change the time between passes and watch the central fringe narrow as the inverse square root of the height. The readouts give the time, both widths, their ratio and the second-order Doppler shift.',
           widget: { kind: 'optics-bench', props: { preset: 'ramsey-fountain' }, caption: 'Ramsey fringes of a fountain clock and of a thermal beam.' },
         },
       ],
@@ -93,7 +93,7 @@ export const O6: Lecture = notesLecture({
       summary: 'Two cold atoms see an attraction that falls as a power of the distance and a centrifugal barrier, and below a threshold temperature only the s wave gets through.',
       body: [
         {
-          text: `Cold atoms collide, and the collision is set by the attraction $-C_n/R^n$ for separation $R$ and the centrifugal barrier $\\hbar^2\\ell(\\ell+1)/2mR^2$ for reduced mass $m$ and [[qc-op-partial-wave|partial wave]] $\\ell$ (§6.3–6.3.1, pp. 69–71). For two sodium atoms with $C_6$ of 1556 atomic units, a stated input, the barrier of partial wave 1 lies at ${d(V.o6RcNm, 2)} nm and is ${n0(V.o6VcNaUK)} µK high (<<qc-l13-flow|the probability-flow unit>>).`,
+          text: `Cold atoms collide, and the collision is set by the attraction $-C_n/R^n$ for separation $R$ and the centrifugal barrier $\\hbar^2\\ell(\\ell+1)/2mR^2$ for reduced mass $m$ and [[qc-op-partial-wave|partial wave]] $\\ell$ (§6.3–6.3.1, pp. 69–71). For two sodium atoms with $C_6$ of 1556 atomic units, a stated input from Derevianko et al., Phys. Rev. Lett. 82, 3589 (1999), the barrier of partial wave 1 lies at ${d(V.o6RcNm, 2)} nm and is ${n0(V.o6VcNaUK)} µK high (<<qc-l13-flow|the probability-flow unit>>). The wavelengths, linewidths and masses of the atoms on this page are standard values (Steck, alkali D-line data; NIST), stated here as inputs.`,
           claims: [
             claim('o6RcNm', 'the barrier of partial wave 1 for sodium lies at 5.26 nm', () => near(V.o6RcNm, 5.26, 0.005)),
             claim('o6VcNaUK', 'the barrier of partial wave 1 is 1,016 µK high', () => near(V.o6VcNaUK, 1016, 0.5)),
@@ -104,7 +104,7 @@ export const O6: Lecture = notesLecture({
           },
         },
         {
-          text: `Only $\\ell = 0$ passes at low energy. Setting the barrier equal to three halves of $k_BT$ gives the onset temperature $T_Q$ of the [[qc-op-quantum-threshold|quantum threshold]], below which collisions are quantum: ${d(V.o6TQNa, 3)} mK for sodium and ${d(V.o6TQCs, 1)} µK for cesium. The book prints 1 mK and 34 µK, the same order. Above threshold the cross section is $\\pi b_c^2$ for the largest impact parameter $b_c$, so it falls with energy $E$ as $E^{-2/n}$ and has the log-slope $-${d(V.o6Slope, 3)} at $n = 6$.`,
+          text: `Only $\\ell = 0$ passes at low energy. Setting the barrier equal to three halves of $k_BT$ gives the onset temperature $T_Q$ of the [[qc-op-quantum-threshold|quantum threshold]], below which collisions are quantum: ${d(V.o6TQNa, 3)} mK for sodium and ${d(V.o6TQCs, 1)} µK for cesium. The book's table gives the barrier height itself in kelvin, one and a half times ours, because it leaves out the factor of three halves of its Eq. 6.5. Above threshold the cross section is $\\pi b_c^2$ for the largest impact parameter $b_c$, so it falls with energy $E$ as $E^{-2/n}$ and has the log-slope $-${d(V.o6Slope, 3)} at $n = 6$.`,
           claims: [
             claim('o6TQNa', 'the onset temperature for sodium is 0.677 mK', () => near(V.o6TQNa, 0.677, 0.0005)),
             claim('o6TQCs', 'the onset temperature for cesium is 23.2 µK', () => near(V.o6TQCs, 23.2, 0.05)),
@@ -159,7 +159,7 @@ export const O6: Lecture = notesLecture({
         {
           where: 'Chapter 6, p. 72, the loss process in cesium',
           says: 'the process that releases 9.2 GHz is fine-structure changing',
-          shouldSay: `the energy 9.19 GHz is the ground-state hyperfine splitting of cesium, the book's own definition of the second on p. 67. Our calculation finds ${n0(V.o6CsHfsmK)} mK and a kick of ${d(V.o6CsKick, 2)} m/s per atom, which matches, so the process changes the hyperfine state; the fine-structure release in sodium is ${d(V.o6NaFineK, 1)} K.`,
+          shouldSay: `the energy 9.19 GHz is the ground-state hyperfine splitting of cesium, the book's own definition of the second on p. 67. Our calculation finds ${n0(V.o6CsHfsmK)} mK and a kick of ${d(V.o6CsKick, 2)} m/s per atom, matching the 440 mK and about 5 m/s the book gives, so the process changes the hyperfine state; the fine-structure release in sodium is ${d(V.o6NaFineK, 1)} K.`,
           check: () => near(V.o6CsHfsmK, 441, 0.5) && near(V.o6CsKick, 5.25, 0.005) && near(V.o6NaFineK, 24.5, 0.05),
         },
       ],
@@ -179,13 +179,13 @@ export const O6: Lecture = notesLecture({
           ],
         },
         {
-          text: `Interferometers use space, like a Mach–Zehnder with atoms in place of light (<<qc-q5-interferometer|the interferometer unit>>), or time, like Ramsey's pulses. The thermal de Broglie wavelength of sodium is ${d(V.o6LamdBTD, 1)} nm at the Doppler limit and ${n0(V.o6LamdB1uK)} nm at 1 µK. The wave nature rules the lattice once that wavelength reaches half the light wavelength (<<qc-l13-plane-wave|the plane-wave unit>>).`,
+          text: `Interferometers use space, like a Mach–Zehnder with atoms in place of light (<<qc-q5-interferometer|the interferometer unit>>), or time, like Ramsey's pulses. The thermal de Broglie wavelength of sodium is ${d(V.o6LamdBTD, 1)} nm at the Doppler limit and ${n0(V.o6LamdB1uK)} nm at 1 µK. The wave nature matters for the lattice once that wavelength reaches half the light wavelength (<<qc-l13-plane-wave|the plane-wave unit>>).`,
           claims: [
             claim('o6LamdBTD', 'the thermal wavelength of sodium at the Doppler limit is 23.8 nm', () => near(V.o6LamdBTD, 23.8, 0.05)),
             claim('o6LamdB1uK', 'the thermal wavelength of sodium at 1 µK is 364 nm', () => near(V.o6LamdB1uK, 364, 0.5)),
           ],
           figure: {
-            stage: { kind: 'plot', curve: { fn: 'deBroglieVsT' }, xScale: 'log', yScale: 'log', yLines: [{ y: 294.579, label: 'half the light wavelength' }] },
+            stage: { kind: 'plot', curve: { fn: 'deBroglieVsT' }, xScale: 'log', yScale: 'log', yLines: [{ y: HALF_LAMBDA_NA_NM, label: 'half the light wavelength' }] },
             caption: 'The thermal de Broglie wavelength of sodium in nanometres against the temperature in microkelvin, on logarithmic axes, with half the wavelength of the sodium line marked.',
           },
         },
