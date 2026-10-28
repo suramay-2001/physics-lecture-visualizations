@@ -609,12 +609,16 @@ const pi0 = (c1: number, c2: number): Mat => msub(msub(identity(8), mscale(antis
 
 /** The detection chances p1, p2 (Eq. 8.38), the average P, Pi0's smallest eigenvalue, and the zero-error gap max(||Pi2 in1||, ||Pi1 in2||) for the operators of Eq. 8.37. */
 export function programmableUsd(psi1: Vec, psi2: Vec, c1: number, c2: number): { p1: number; p2: number; P: number; pi0MinEig: number; zeroGap: number } {
+  const r = discChances(psi1, psi2, c1, c2)
+  return { ...r, pi0MinEig: eigh(pi0(c1, c2)).values[0] }
+}
+function discChances(psi1: Vec, psi2: Vec, c1: number, c2: number): { p1: number; p2: number; P: number; zeroGap: number } {
   const [in1, in2] = discInputs(psi1, psi2)
   const Pi1 = mscale(antisymmetric(1, 2), c1)
   const Pi2 = mscale(antisymmetric(0, 2), c2)
   const p1 = inner(in1, apply(Pi1, in1)).re
   const p2 = inner(in2, apply(Pi2, in2)).re
-  return { p1, p2, P: (p1 + p2) / 2, pi0MinEig: eigh(pi0(c1, c2)).values[0], zeroGap: Math.max(norm(apply(Pi2, in1)), norm(apply(Pi1, in2))) }
+  return { p1, p2, P: (p1 + p2) / 2, zeroGap: Math.max(norm(apply(Pi2, in1)), norm(apply(Pi1, in2))) }
 }
 
 /** The four orthonormal vectors of Eq. 8.40 spanning the subspace S. */
@@ -681,7 +685,7 @@ export const pairAtOverlap = (s: number): [Vec, Vec] => [[c(1), c(0)], [c(s), c(
 /** The programmable discriminator's chance 1/3 (1 - s^2) from the 8x8 operators at c1 = c2 = 2/3, for the pair at overlap s. */
 export function usdProgrammableAt(s: number): number {
   const [a, b] = pairAtOverlap(s)
-  return programmableUsd(a, b, 2 / 3, 2 / 3).P
+  return discChances(a, b, 2 / 3, 2 / 3).P
 }
 
 /** The known-state chance 1 - s (Chapter Q14's `usd`), for the pair at overlap s. */

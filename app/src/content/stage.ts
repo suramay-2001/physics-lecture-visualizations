@@ -777,8 +777,14 @@ export interface TwoQubitState {
  * (x = M, 1-60; 0.7327 at M = 1 and 0.0486 at M = 15 for order 1; for log-log axes). Smooth in a real argument: `qaoaGammaSlice`, F(gamma, beta = 22.5 degrees) and `qaoaBetaSlice`, F(gamma = 45 degrees, beta)
  * for the MaxCut QAOA state on the 4-cycle, x in degrees (default 0-180); both peak at 3.
  */
+/**
+ * Chapter Q20 (additive; P-Q20-story §9.2 S2; physics/qc/machines.ts). All smooth in their x. `clonerF1` and `clonerF2`: the copy fidelity F_c of wire 1 and of wire 2 of the four-CNOT cloner against the program
+ * angle u in degrees (x = u, 0-60; the program is c0 Xi00 + c1 Xi0x with c0 = cos u - sin u/sqrt3, c1 = 2 sin u/sqrt3; wire 1 falls from 1 to 1/2 while wire 2 rises from 1/2 to 1, and both are 5/6 at u = 30), for the input at
+ Bloch angles (60, 90) degrees; every point is the engine's circuit-free matrix route. `usdProgrammable`: the programmable discriminator's success chance 1/3 (1 - s^2), computed from the 8 x 8 operators at c1 = c2 = 2/3, against the
+ overlap s of the two states (x = s, 0-1); `usdKnown`: the known-state chance 1 - s of Chapter Q14's `usd` for the same pair. Chances: the axis is never padded past 0 or 1.
+ */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | 'clonerF1' | 'clonerF2' | 'usdProgrammable' | 'usdKnown'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).

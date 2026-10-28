@@ -21,6 +21,7 @@ import { cleanRun, repetitionLogical, surfaceFit } from '../../physics/qec/curve
 import { TIMELIKE_LIMITS, productFlip, voteFail } from '../../physics/qec/timelike'
 import { logicalFailure, qhbNeedReal, repetitionFail } from '../../physics/qec/rates'
 import { chainTransmission } from '../../physics/townsend448'
+import { clonerFidelities, usdKnown, usdProgrammableAt } from '../../physics/qc/machines'
 import { trotterError } from '../../physics/qc/trotter'
 import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
@@ -155,6 +156,11 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   trotterErr2: memoN((M) => trotterError(TROTTER_N, 1, TROTTER_T, M, 2)),
   qaoaGammaSlice: (deg) => qaoaF(4, RING4, deg * DEG, 22.5 * DEG),
   qaoaBetaSlice: (deg) => qaoaF(4, RING4, 45 * DEG, deg * DEG),
+  // Chapter Q20 (physics/qc/machines.ts): the two clones' fidelities against the program angle u (degrees), and the two discriminators' chances against the overlap s
+  clonerF1: (u) => clonerFidelities(u).f1,
+  clonerF2: (u) => clonerFidelities(u).f2,
+  usdProgrammable: (s) => usdProgrammableAt(s),
+  usdKnown: (s) => usdKnown(s),
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -196,6 +202,10 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   trotterErr2: { from: 1, to: 32 },
   qaoaGammaSlice: { from: 0, to: 180 },
   qaoaBetaSlice: { from: 0, to: 180 },
+  clonerF1: { from: 0, to: 60 },
+  clonerF2: { from: 0, to: 60 },
+  usdProgrammable: { from: 0, to: 1 },
+  usdKnown: { from: 0, to: 1 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -236,10 +246,14 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   trotterErr2: 'symmetric split',
   qaoaGammaSlice: 'γ slice',
   qaoaBetaSlice: 'β slice',
+  clonerF1: 'wire 1',
+  clonerF2: 'wire 2',
+  usdProgrammable: 'programmable',
+  usdKnown: 'known states',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
-const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4 }
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -281,6 +295,11 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   trotterErr2: { min: 0, max: Infinity },
   qaoaGammaSlice: { min: 0, max: 4 },
   qaoaBetaSlice: { min: 0, max: 4 },
+  // Chapter Q20: fidelities and success chances
+  clonerF1: { min: 0, max: 1 },
+  clonerF2: { min: 0, max: 1 },
+  usdProgrammable: { min: 0, max: 1 },
+  usdKnown: { min: 0, max: 1 },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */
