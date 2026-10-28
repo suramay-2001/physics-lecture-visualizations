@@ -17,7 +17,8 @@ import { chapterName, isCollectionId, metaFor, notesMeta, registerCourseMeta, re
 import { unitDetail } from './meta'
 import { UNIT_DETAIL } from './meta.detail.generated'
 import { LECTURES } from './index'
-import { LOADABLE, LOADABLE_709, LOADABLE_PAPERS, cachedLecture, loadLecture } from './load'
+import { LOADABLE, LOADABLE_PAPERS, cachedLecture, loadLecture } from './load'
+import { LOADABLE_709 } from './qc709/loaders'
 import { LOADABLE_NOTES } from './qc709/notes/loaders'
 import { LOADABLE_OPTICS } from './qc709/optics/loaders'
 import './qc709/registry' // registers the notes listing and loaders with the app, as the 709 pages' registry chunk does

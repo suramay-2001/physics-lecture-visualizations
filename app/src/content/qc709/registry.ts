@@ -15,6 +15,7 @@ import { registerBridges, type BridgeTarget } from '../bridgeRegistry'
 import { registerCourseMeta, registerNotesMeta } from '../courses'
 import { registerLoaders } from '../load'
 import { notesBridgeId, registerUnitNotes } from '../unitNotes'
+import { QC_LOADERS } from './loaders'
 import { QC_META } from './meta.generated'
 import { NOTES_LOADERS } from './notes/loaders'
 import { NOTES_BY_UNIT, NOTES_META } from './notes/meta.generated'
@@ -22,6 +23,7 @@ import { OPTICS_LOADERS } from './optics/loaders'
 import { OPTICS_BY_UNIT, OPTICS_META } from './optics/meta.generated'
 
 registerCourseMeta('qc709', QC_META)
+registerLoaders(QC_LOADERS)
 registerNotesMeta(NOTES_META)
 registerLoaders(NOTES_LOADERS)
 registerUnitNotes(NOTES_BY_UNIT)
