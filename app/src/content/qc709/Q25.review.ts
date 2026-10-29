@@ -102,7 +102,7 @@ export const Q25_REVIEW: Record<string, ReviewCard> = {
       'The Cirac–Zoller gate needs the ion in its motional ground state.',
       `From $n = 1$ its Bell chance is only ${d(V.q25CZbell1, 3)}.`,
       'The Mølmer–Sørensen gate does not care about the phonon number, if its loop closes.',
-      `The same pulse entangles two or four ions; with this one pulse three ions cannot reach a GHZ state, the best chance being ${d(V.q25GHZfid3, 1)} (our calculation).`,
+      `The same pulse entangles two or four ions. With this one pulse three ions cannot reach a GHZ state: the best chance is ${d(V.q25GHZfid3, 1)} (our calculation).`,
     ],
     equations: '\\tilde\\Omega = -(\\eta\\Omega)^2/(\\omega_z - \\delta)',
     trap: 'Believing that the gate works at any time: it must end after a whole number of loops.',
