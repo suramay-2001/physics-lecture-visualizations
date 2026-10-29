@@ -358,7 +358,7 @@ export const Q25: Lecture = {
         props: { theta: 0, rotations: true },
         tryThis: [
           'Press R_z(90°): the angle reads arg(β/α) = 90°.',
-          'Press it again and the point is opposite its start, a phase of 180°: the sign −1 that a 2π pulse leaves on a single atom.',
+          'Press it again and the point is opposite its start, a phase of 180°: the sign −1 a 2π pulse leaves on one atom.',
         ],
       },
       clues: [],
@@ -556,7 +556,7 @@ export const Q25: Lecture = {
           prompt: 'For $\\eta\\Omega = 0.2$ and $\\omega_z - \\delta = 2$ (same units), what is $|\\tilde\\Omega| = (\\eta\\Omega)^2/(\\omega_z - \\delta)$?',
           answer: V.q25gOmt,
           tolerance: 0.005,
-          hints: [{ text: 'Put the numbers into the formula.' }, { text: 'Square $\\eta\\Omega$ first.' }, { text: '$0.2^2 = 0.04$, divided by 2.' }],
+          hints: [{ text: 'Put the numbers into the formula.' }, { text: 'Square $\\eta\\Omega$ first.' }, { text: 'Then divide that square by $\\omega_z - \\delta$, which is 2.' }],
           walkthrough: [{ text: `$0.2^2/2 = ${d(V.q25gOmt, 2)}$.` }],
         },
         {
@@ -567,7 +567,7 @@ export const Q25: Lecture = {
           prompt: 'For $\\eta\\Omega = 0.05$ and $\\omega_z - \\delta = 1$, how many loops $K$ does the Mølmer–Sørensen gate take?',
           answer: V.q25gLoops,
           tolerance: 0,
-          hints: [{ text: 'The gate needs $\\tilde\\Omega t = \\pi/2$ and $t = 2\\pi K/(\\omega_z - \\delta)$.' }, { text: '$K = (\\omega_z-\\delta)^2/4(\\eta\\Omega)^2$.' }, { text: '$4 \\times 0.05^2 = 0.01$.' }],
+          hints: [{ text: 'The gate needs $\\tilde\\Omega t = \\pi/2$ and $t = 2\\pi K/(\\omega_z - \\delta)$.' }, { text: '$K = (\\omega_z-\\delta)^2/4(\\eta\\Omega)^2$.' }, { text: 'The denominator is four times the square of $\\eta\\Omega$.' }],
           walkthrough: [{ text: `$K = 1/(4 \\times 0.05^2) = ${d(V.q25gLoops, 0)}$.` }],
         },
         {

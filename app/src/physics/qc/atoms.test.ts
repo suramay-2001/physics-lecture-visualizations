@@ -210,10 +210,11 @@ describe('Chapter Q25 engine stays out of the entry closure', () => {
   it('only Q25.values.ts, the lazy plot kind and tests import atoms.ts or iontrap.ts', () => {
     const files = import.meta.glob('../../**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
     const importers = Object.entries(files)
-      .filter(([, src]) => /from '[^']*\/qc\/(atoms|iontrap)'/.test(src))
+      .filter(([, src]) => /\bfrom\s+["'][^"']*\/qc\/(atoms|iontrap)["']/.test(src))
       .map(([path]) => path.replace('../../', ''))
       .filter((p) => !/\.test\.tsx?$/.test(p))
       .sort()
     expect(importers.filter((p) => !['content/qc709/Q25.values.ts', 'stage/svg/plot.ts'].includes(p))).toEqual([])
+    expect(importers).toContain('content/qc709/Q25.values.ts')
   })
 })
