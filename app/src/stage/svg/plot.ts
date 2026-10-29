@@ -27,6 +27,7 @@ import { accessibleInfoPair, bscCapacity, holevoChiPair, usdBoundPair, usdFailPa
 import { echoCoherence, errorComposite, errorPlain, ouCoherence } from '../../physics/qc/pulses'
 import { bsReal, distinguishable, homDip, klmSuccess } from '../../physics/qc/photons'
 import { chargeDispersion, f01Band } from '../../physics/qc/solid'
+import { mathieuBeta, mathieuBetaApprox, twoIonPotential } from '../../physics/qc/iontrap'
 import { trotterError } from '../../physics/qc/trotter'
 import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
@@ -202,6 +203,10 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   transmonF01r1: (ng) => f01Band(1, ng),
   transmonF01r20: (ng) => f01Band(20, ng),
   transmonDispersion: (r) => chargeDispersion(r),
+  // Chapter Q25 (physics/qc/iontrap.ts): the Floquet number of z'' = 2 q cos(2 tau) z against q (and the effective-potential line q/sqrt 2), and the two-ion energy s^2/4 + 1/2s against s
+  mathieuBeta,
+  mathieuBetaApprox,
+  twoIonPotential,
 }
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
@@ -268,6 +273,9 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   transmonF01r1: { from: 0, to: 1 },
   transmonF01r20: { from: 0, to: 1 },
   transmonDispersion: { from: 2, to: 30 },
+  mathieuBeta: { from: 0.05, to: 0.95 },
+  mathieuBetaApprox: { from: 0.05, to: 0.95 },
+  twoIonPotential: { from: 0.4, to: 2.5 },
 }
 
 /** The name each curve carries at its right end when a second curve is drawn beside it, and the x axis's name (the cost curves are in n). */
@@ -333,10 +341,13 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   transmonF01r1: 'ratio 1',
   transmonF01r20: 'ratio 20',
   transmonDispersion: 'charge dispersion',
+  mathieuBeta: 'exact',
+  mathieuBetaApprox: 'effective potential',
+  twoIonPotential: 'two-ion energy',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
-const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3, homDip: 2, homDistinguishable: 2, transmonF01r1: 3, transmonF01r20: 3 }
+const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3, homDip: 2, homDistinguishable: 2, transmonF01r1: 3, transmonF01r20: 3, mathieuBeta: 2, mathieuBetaApprox: 2, twoIonPotential: 2 }
 
 /** Curves whose y is a chance: the axis is never padded below 0 or above 1 (W-448 L8-B). */
 const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number } } = {
@@ -404,6 +415,10 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   homDip: { min: 0, max: 1 },
   homDistinguishable: { min: 0, max: 1 },
   klmSuccess: { min: 0, max: 1 },
+  // Chapter Q25: the Floquet number is between 0 and 1; the two-ion energy is positive
+  mathieuBeta: { min: 0, max: 1 },
+  mathieuBetaApprox: { min: 0, max: 1 },
+  twoIonPotential: { min: 0, max: Infinity },
 }
 
 /** The curves whose x is a chance p: it must lie in [0, 1] (the engine refuses any other p). */

@@ -2348,6 +2348,79 @@ export const QC_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "Q25",
+    "number": 25,
+    "title": "Qubits made of atoms: neutral atoms and trapped ions",
+    "units": [
+      {
+        "id": "q25-cooling",
+        "title": "Stopping, cooling and holding an atom",
+        "question": "How is an atom made still enough to be a qubit?",
+        "challenges": [
+          "q25-c-speed",
+          "q25-c-heat",
+          "q25-c-odd"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q25-readout",
+        "title": "Reading a qubit with light",
+        "question": "How many photons tell bright from dark?",
+        "challenges": [
+          "q25-r-p0",
+          "q25-r-sum",
+          "q25-r-err"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q25-atom-gates",
+        "title": "Rotations, Raman light and Rydberg blockade",
+        "question": "How do two neutral atoms entangle?",
+        "challenges": [
+          "q25-a-scale",
+          "q25-a-raman",
+          "q25-a-phase"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q25-ion-trap",
+        "title": "Holding an ion in the air",
+        "question": "Why do oscillating fields trap what static ones cannot?",
+        "challenges": [
+          "q25-t-q",
+          "q25-t-wz",
+          "q25-t-stretch"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q25-phonons",
+        "title": "Spin and motion in one ion",
+        "question": "How can light change an ion’s motion?",
+        "challenges": [
+          "q25-p-eta2",
+          "q25-p-blue",
+          "q25-p-cool"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q25-ion-gates",
+        "title": "Entangling ions through their motion",
+        "question": "How do two ions share a Bell state?",
+        "challenges": [
+          "q25-g-omt",
+          "q25-g-loops",
+          "q25-g-hot"
+        ],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "Q26",
     "number": 26,
     "title": "Qubits made of light: photons and linear optics",

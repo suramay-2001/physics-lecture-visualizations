@@ -243,7 +243,7 @@ export default function CourseHome709() {
                 </svg>
               </span>
               <span className="cr-chip-label">
-                <strong>The qubit chip.</strong> Chapter Q25 ends on it.
+                <strong>The qubit chip.</strong> Chapter Q27 ends on it.
               </span>
             </li>
           </ol>

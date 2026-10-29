@@ -201,4 +201,12 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   // Chapter Q27 (P-Q27-story §11.3): the two units it builds on that no earlier row reaches
   'qc-q4-circuits': { course: 'qc709', lecture: 'Q4', unit: 'q4-circuits', label: 'circuits: wires are time, products run backwards' },
   'qc-q19-simulation': { course: 'qc709', lecture: 'Q19', unit: 'q19-simulation', label: 'imitating a spin chain with gates' },
+  // Chapter Q25 (P-Q25-story §11.3, ruling Z4): the Q24 units it builds on and the Optics Lab pages its laser-cooling beats lean on (a chapter -> optics link is a manual row: the optics pages' own generated rows go the other way)
+  'qc-q24-lindblad': { course: 'qc709', lecture: 'Q24', unit: 'q24-lindblad', label: 'why a qubit slowly forgets' },
+  'qc-q24-bloch-eq': { course: 'qc709', lecture: 'Q24', unit: 'q24-bloch-eq', label: 'where a driven, decaying qubit settles' },
+  'qc-q24-rabi': { course: 'qc709', lecture: 'Q24', unit: 'q24-rabi', label: 'pulses that flip, and gates from them' },
+  'qc-q24-ramsey': { course: 'qc709', lecture: 'Q24', unit: 'q24-ramsey', label: 'two half pulses and a wait' },
+  'qc-q25-o2-limit': { course: 'qc709', lecture: 'O2', unit: 'o2-limit', label: 'recoil heating against friction: the Doppler limit' },
+  'qc-q25-o3-gradient': { course: 'qc709', lecture: 'O3', unit: 'o3-gradient', label: 'cooling below the Doppler limit with polarization gradients' },
+  'qc-q25-o5-dipole': { course: 'qc709', lecture: 'O5', unit: 'o5-dipole', label: 'a far-detuned beam as a trap' },
 }

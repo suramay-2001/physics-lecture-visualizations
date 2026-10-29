@@ -2,9 +2,9 @@
  * Physics 709 as a second course (W-709-platform §A/§D). Runs in both projects.
  *   PW_PREVIEW_PORT=5186 npx playwright test e2e/course709.spec.ts --project=preview
  * The switcher both ways and back; the 709 home's descent (six plates, twelve Parts, the written chapters linked and
- * every other chapter planned); the 709 Map (the written chapters' stations and their dashed links into Spin Lab's map);
+ * no chapter left planned: all 35 are written); the 709 Map (the written chapters' stations and their dashed links into Spin Lab's map);
  * the Arcade, the Formulas boards and the Help page (real content, track toggle, links back, assigned homework hints
- * only) and a planned chapter; the #/448 alias; a trip back to 448 that lands where the
+ * only) and an unknown chapter id; the #/448 alias; a trip back to 448 that lands where the
  * switcher says; 0 console errors throughout. Screenshots of the 709 home and the open
  * switcher (1440×900 and 390×844, light and dark) go to e2e/__screens__/709/ (git-ignored) for visual QA.
  */
@@ -68,10 +68,10 @@ test('switcher: 448 → 709 → 448 → 709, and the document takes each course�
   await expectNoErrors(errors)
 })
 
-/** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel; the rest are planned. */
-const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17', 'Q18', 'Q19', 'Q20', 'Q21', 'Q22', 'Q23', 'Q24', 'Q26', 'Q27']
+/** 709 chapters written so far (content/qc709/meta.generated.ts): linked from the home and the panel. With Q25 merged every chapter of the outline is written, so none is planned. */
+const WRITTEN = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17', 'Q18', 'Q19', 'Q20', 'Q21', 'Q22', 'Q23', 'Q24', 'Q25', 'Q26', 'Q27']
 
-test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; written ones linked, the rest planned', async ({ page }) => {
+test('709 home: the descent lists six plates, twelve Parts and every chapter of the map; every one written and linked, none planned', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/709')
   const rows = page.locator('.cr-plate-row')
@@ -82,14 +82,15 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   await expect(rows.first().locator('.cr-part-num')).toHaveText(['Part F', 'Part I'])
   const chapters = page.locator('.cr-ch')
   await expect(chapters).toHaveCount(35)
-  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(35 - WRITTEN.length)
-  // planned chapters are listed, not linked; a written one links to its page (never visited here: state "new")
+  expect(WRITTEN).toHaveLength(35)
+  // the outline lists no planned chapter: no "planned" state, no "planned" badge; every written one links to its page (never visited here: state "new")
+  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(0)
+  await expect(page.locator('.cr-ch-state').filter({ hasText: /planned/i })).toHaveCount(0)
   await expect(page.locator('.cr-ch a')).toHaveCount(WRITTEN.length)
   await expect(page.locator('.cr-ch[data-state="new"] a .cr-ch-id')).toHaveText(WRITTEN)
   await expect(page.locator('.cr-ch a').first()).toHaveAttribute('href', `#/709/ch/${WRITTEN[0]}`)
   await expect(chapters.first().locator('.cr-ch-id')).toHaveText('F1')
   await expect(chapters.last().locator('.cr-ch-id')).toHaveText('Q27')
-  await expect(page.locator('.cr-ch[data-state="planned"] .cr-ch-state').first()).toHaveText('planned')
   await expect(page.locator('.cr-chip-label')).toContainText('The qubit chip.')
 
   // the Cryostat faces: Archivo for display, Atkinson Hyperlegible Next for the body (self-hosted, loaded for 709)
@@ -99,12 +100,12 @@ test('709 home: the descent lists six plates, twelve Parts and every chapter of 
   )
   await expect(page.locator('#cr-home-h1')).toHaveCSS('font-family', /^"Archivo Variable"/)
 
-  // the topbar's chapter panel: Foundations, then Chapters; the written ones link, the others are planned
+  // the topbar's chapter panel: Foundations, then Chapters; every chapter is written and links
   const menu = page.getByRole('button', { name: /^Chapters/ })
   await menu.click()
   const panel = page.getByRole('region', { name: 'Chapters' })
   await expect(panel.locator('.panel-group')).toHaveText(['Foundations', 'Chapters'])
-  await expect(panel.locator('[data-status="planned"]')).toHaveCount(35 - WRITTEN.length)
+  await expect(panel.locator('[data-status="planned"]')).toHaveCount(0)
   await expect(panel.locator('[data-status="built"] a .panel-num')).toHaveText(WRITTEN)
   // focus moves into the panel: its first link, or the panel itself while its lazy list is still loading
   await expect.poll(() => panel.evaluate((el) => el === document.activeElement || el.contains(document.activeElement))).toBe(true)
@@ -120,8 +121,8 @@ test('709 formulas: every written chapter’s board, in the reader’s track, ea
   await expect(page.locator('main h1')).toHaveText('The boards')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  // real content: all thirty-four chapters (F1…F8, Q1…Q24, Q26, Q27), in course order, with typeset equations
-  await expect(page.locator('.formula-lecture')).toHaveCount(34)
+  // real content: all thirty-five chapters (F1…F8, Q1…Q27), in course order, with typeset equations
+  await expect(page.locator('.formula-lecture')).toHaveCount(35)
   await expect(page.locator('.formula-lecture h2').first()).toHaveText(/^Chapter F1: /)
   await expect(page.locator('.formula-lecture h2').last()).toHaveText(/^Chapter Q27: /)
   await expect(page.locator('#formulas-F1 .formula-line .katex').first()).toBeAttached()
@@ -168,7 +169,7 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expect(page.locator('main h1')).toHaveText('Getting unstuck')
   expect(await course(page)).toBe('qc709')
   await expect(page.locator('.coming-709')).toHaveCount(0)
-  await expect(page.locator('.help-lecture')).toHaveCount(34)
+  await expect(page.locator('.help-lecture')).toHaveCount(35)
   await expect(page.locator('#help-F1 h3')).toHaveText(/^Chapter F1: /)
   expect(await page.locator('.help-toggle').count()).toBeGreaterThan(300)
   // a normal challenge opens to a walkthrough and two ways back to its chapter
@@ -193,14 +194,13 @@ test('709 help: every challenge by chapter with its walkthrough; assigned homewo
   await expectNoErrors(errors)
 })
 
-test('709 planned and unknown chapters answer; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
+test('709: the outline lists no planned chapter; an unknown chapter answers; a 448 id is not a 709 route; the #/448 alias redirects', async ({ page }) => {
   const errors = collectErrors(page)
-  // Q24 is written (2026-10-29): the first planned chapter is now Q25 (Q26 and Q27 follow it)
-  await page.goto('#/709/ch/Q25')
-  await expect(page.locator('main h1')).toHaveText('Qubits made of atoms: neutral atoms and trapped ions')
-  await expect(page.locator('.chapter-planned')).toContainText('Planned, not written yet')
-  await expect(page.locator('.planned-plate')).toContainText('10 mK')
-  await expect(page.locator('.chapter-planned .eyebrow').first()).toHaveText('Part XI · Hardware · Chapter Q25')
+  // every chapter of the outline is written (Q25 was the last, 2026-10-29): the course home shows no "Planned" badge
+  await page.goto('#/709')
+  await expect(page.locator('.cr-ch')).toHaveCount(35)
+  await expect(page.locator('.cr-ch-state').filter({ hasText: /planned/i })).toHaveCount(0)
+  await expect(page.locator('.cr-ch[data-state="planned"]')).toHaveCount(0)
   await page.goto('#/709/ch/Q99')
   await expect(page.locator('main h1')).toContainText('No chapter called')
   // a 448 game is not a 709 game, and a 709 id is not a 448 lecture

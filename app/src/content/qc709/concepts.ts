@@ -323,4 +323,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-transmon-station', label: 'From charge qubit to transmon', chapter: 'Q27', unit: 'q27-transmon', needs: ['qc-josephson-station', 'qc-f4-hermitian'] },
   { id: 'qc-cqed-station', label: 'Reading and coupling qubits through a resonator', chapter: 'Q27', unit: 'q27-cqed', needs: ['qc-transmon-station'] },
   { id: 'qc-spin-dot-station', label: 'A spin in a dot: SWAP, half a SWAP and CZ', chapter: 'Q27', unit: 'q27-dots', needs: ['qc-transmon-station', 'qc-circuits', 'qc-simulation-station'] },
+  // Chapter Q25 (P-Q25-story §11.1): qubits made of atoms and ions
+  { id: 'qc-atom-cooling-station', label: 'Stopping, cooling and holding an atom', chapter: 'Q25', unit: 'q25-cooling', needs: ['qc-bloch-eq-station'] },
+  { id: 'qc-readout-station', label: 'Reading a qubit with light', chapter: 'Q25', unit: 'q25-readout', needs: ['qc-f5-probability', 'qc-atom-cooling-station'] },
+  { id: 'qc-atom-gates-station', label: 'Rotations, Raman light and Rydberg blockade', chapter: 'Q25', unit: 'q25-atom-gates', needs: ['qc-rabi-station', 'qc-cnot'] },
+  { id: 'qc-ion-trap-station', label: 'Holding an ion in the air', chapter: 'Q25', unit: 'q25-ion-trap', needs: ['qc-atom-cooling-station'] },
+  { id: 'qc-phonon-station', label: 'Spin and motion in one ion', chapter: 'Q25', unit: 'q25-phonons', needs: ['qc-ion-trap-station', 'qc-rabi-station'] },
+  { id: 'qc-ion-gates-station', label: 'Entangling ions through their motion', chapter: 'Q25', unit: 'q25-ion-gates', needs: ['qc-phonon-station', 'qc-entanglement'] },
 ]
