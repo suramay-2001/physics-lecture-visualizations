@@ -121,10 +121,10 @@ const encodings: Beat[] = [
     id: 'q26-encodings:b2',
     phase: 'books',
     text:
-      `Wave plates give the table $U = \\begin{pmatrix}\\cos\\theta & ie^{-i\\varphi}\\sin\\theta\\\\ ie^{i\\varphi}\\sin\\theta & \\cos\\theta\\end{pmatrix}$. ` +
+      `Wave plates, set by two angles $\\theta$ (how far the light turns) and $\\varphi$ (the axis), give the table $U = \\begin{pmatrix}\\cos\\theta & ie^{-i\\varphi}\\sin\\theta\\\\ ie^{i\\varphi}\\sin\\theta & \\cos\\theta\\end{pmatrix}$. ` +
       `Start in $|0\\rangle$: the chance of $|1\\rangle$ is $\\sin^2\\theta$, so it is ${d(V.q26WaveP1, 2)} for $\\theta = 30^\\circ$. The chance of $|0\\rangle$ is ${d(V.q26WaveP0, 2)}.`,
     formal:
-      `$U(\\theta,\\varphi) = \\cos\\theta\\,I + i\\sin\\theta(\\cos\\varphi\\,\\sigma_x + \\sin\\varphi\\,\\sigma_y)$ is unitary (Bergou p. 257, <<qc-f4-unitary|Unit F4.4>>), and $U|0\\rangle = \\cos\\theta|0\\rangle + ie^{i\\varphi}\\sin\\theta|1\\rangle$. ` +
+      `$U(\\theta,\\varphi) = \\cos\\theta\\,I + i\\sin\\theta(\\cos\\varphi\\,\\sigma_x + \\sin\\varphi\\,\\sigma_y)$ is unitary for plate angles $\\theta$, $\\varphi$ (Bergou p. 257, <<qc-f4-unitary|Unit F4.4>>), and $U|0\\rangle = \\cos\\theta|0\\rangle + ie^{i\\varphi}\\sin\\theta|1\\rangle$. ` +
       `The page prints the [[relative-phase|relative phase]] as $\\varphi$. Our calculation finds $\\varphi + 90^\\circ$, which is $${d(V.q26TruePhase, 0)}^\\circ$ for $\\theta = 30^\\circ$ and $\\varphi = 40^\\circ$, not $${d(V.q26PrintedPhase, 0)}^\\circ$ (Correction K1). ` +
       `The chances are ${d(V.q26WaveP0, 2)} and ${d(V.q26WaveP1, 2)} either way.`,
     caption: `after the plates: bars ${d(V.q26WaveAmp0, 3)} and ${d(V.q26WaveAmp1, 1)}; the second bar's hue is its phase`,
@@ -270,6 +270,10 @@ const beamsplitter: Beat[] = [
           view: amp(C_BS(0.3), 1, 'probability'),
           viewCaption: 'the chances at the exits',
         },
+        {
+          tex: "|r|^2 + |t|^2 = 1,\\ rt'^* + r'^*t = 0",
+          why: 'Together the columns and the rows give all six relations.',
+        },
       ],
     },
   },
@@ -294,7 +298,7 @@ const beamsplitter: Beat[] = [
       `Send one photon into port 0. Write $|10\\rangle$ for "photon at exit 2" and $|01\\rangle$ for "photon at exit 3": a [[qc-fock-state|Fock state]] lists how many photons sit at each exit. ` +
       `The output is $t'|10\\rangle + r'|01\\rangle$. Neither exit has a state of its own: they are entangled. At 70:30 the entropy is ${d(V.q26Entropy70, 3)} bits.`,
     formal:
-      `Inverting Eq. 14.2, $a_0^\\dagger = t'a_2^\\dagger + r'a_3^\\dagger$, so $|\\psi\\rangle_{\\mathrm{out}} = t'|10\\rangle_{23} + r'|01\\rangle_{23}$. Here [[qc-fock-state|$|ij\\rangle_{23}$]] means $i$ photons in mode 2 and $j$ in mode 3. ` +
+      `With $a_j^\\dagger$ adding a photon to mode $j$ and $|\\mathrm{vac}\\rangle$ the empty field, one photon in port 0 is $a_0^\\dagger|\\mathrm{vac}\\rangle$ (p. 256). Inverting Eq. 14.2, $a_0^\\dagger = t'a_2^\\dagger + r'a_3^\\dagger$, so $|\\psi\\rangle_{\\mathrm{out}} = t'|10\\rangle_{23} + r'|01\\rangle_{23}$. Here [[qc-fock-state|$|ij\\rangle_{23}$]] means $i$ photons in mode 2 and $j$ in mode 3. ` +
       `Rosetta: this is a Fock label, not two qubits, although two occupation wires draw it. ` +
       `At $R = ${d(V.q26R70, 1)}$ the concurrence $2|t'r'|$ is ${d(V.q26Conc70, 4)} (<<qc-q12-concurrence|Unit 12.6>>) and the entropy $H(|t'|^2)$ is ${d(V.q26Entropy70, 4)} bits (<<qc-q9-entropy|Unit 9.3>>). At 50:50 it is ${d(V.q26Entropy50, 0)} bit.`,
     caption: 'two exit-occupation wires: |10⟩ + |01⟩ with unequal weights',
@@ -424,7 +428,7 @@ const hom: Beat[] = [
       `So both photons leave together: $|20\\rangle$ or $|02\\rangle$, each with chance ${d(V.q26HomP20R50, 1)}. The sign between the two parts depends on the splitter: minus for the cosine-and-sine table, plus for Fig. 14.5's.`,
     formal:
       `$|\\psi\\rangle_{\\mathrm{out}} = (|20\\rangle + e^{i\\phi}|02\\rangle)/\\sqrt2$, the [[qc-hong-ou-mandel|Hong–Ou–Mandel effect]] (p. 257). The engine gives $\\phi = ${d(V.q26HomPhaseReal, 0)}^\\circ$ for the real and Chapter Q5 conventions ` +
-      `and $${d(V.q26HomPhaseSym, 0)}^\\circ$ for the symmetric one, and the chance of $|11\\rangle$ is $${d(V.q26HomP11R50, 0)}$ for all three. This pair of exits is the resource of the photonic gates of Unit 26.4.`,
+      `and $${d(V.q26HomPhaseSym, 0)}^\\circ$ for the symmetric one, and the chance of $|11\\rangle$ is $${d(V.q26HomP11R50, 0)}$ for all three. Rosetta: for Fig. 14.5's splitter the page's two-photon state on p. 260 carries a relative $i$, but its own formula on p. 256 gives equal phases, as here. This pair of exits is the resource of the photonic gates of Unit 26.4.`,
     caption: 'at 50:50 the middle bar vanishes and the two outer bars are equal',
     captionFormal: '$|20\\rangle - |02\\rangle$ for the real table: the two phases differ by $180^\\circ$',
     stage: amp(C_HOM(0.5), 1, 'amplitude', { dials: true }),
@@ -594,17 +598,17 @@ const nsCz: Beat[] = [
     id: 'q26-ns-cz:b5',
     phase: 'books',
     text:
-      `Both sign gates must fire: ${d(V.q26NsSuccess, 4)} squared is ${d(V.q26CzSuccess, 4)}, one try in ${d(V.q26CzAttempts, 1)}. The book quotes a limit for any linear-optics CNOT with extra photons: $2/27 = ${d(V.q26NsBound, 3)}$.`,
+      `Both sign gates must fire: ${d(V.q26NsSuccess, 4)} squared is ${d(V.q26CzSuccess, 4)}, one try in ${d(V.q26CzAttempts, 1)}. The book quotes a limit for a linear-optics CNOT built from independent extra photons, with no teleportation: $2/27 = ${d(V.q26NsBound, 3)}$.`,
     formal:
-      `$P_{CZ} = P_{\\mathrm{NS}}^2 = ${d(V.q26CzSuccess, 4)}$ for every input; the book says about 5 %, and our calculation finds the same value for each input because $P_{\\mathrm{NS}}$ does not depend on the state. ` +
-      `The mean number of attempts is ${d(V.q26CzAttempts, 2)}. The bound $2/27 = ${d(V.q26NsBound, 4)}$ of Uskov et al. is cited, not derived (Bergou p. 260); it is ${d(V.q26NsBoundRatio, 2)} times this gate's chance.`,
+      `$P_{CZ} = P_{\\mathrm{NS}}^2 = ${d(V.q26CzSuccess, 4)}$ for every input; the book says about 5 %. Our calculation, which answers the chapter's first problem, finds the same value for each input because $P_{\\mathrm{NS}}$ does not depend on the state. ` +
+      `The mean number of attempts is ${d(V.q26CzAttempts, 2)}. The bound $2/27 = ${d(V.q26NsBound, 4)}$ of Uskov et al. is cited, not derived (Bergou p. 260); it is ${d(V.q26NsBoundRatio, 2)} times this gate's chance. It does not bind the teleported gates of Unit 26.5.`,
     caption: 'this gate against the 2/27 ceiling',
     captionFormal: `this gate, ${d(V.q26CzSuccess, 4)}, against the cited ceiling $2/27$`,
     stage: CZ_COST(),
     claims: [
       claim('q26CzSuccess', 'both sign gates fire with chance 0.0513 for every input', () => close(V.q26CzSuccess, V.q26NsSuccess ** 2, 1e-12) && close(V.q26CzSuccess, 0.0513, 5e-5)),
       claim('q26CzAttempts', 'a CZ gate needs 19.49 attempts on average', () => close(V.q26CzAttempts, 19.49, 5e-3)),
-      claim('q26NsBound', 'the cited limit for a linear-optics CNOT with extra photons is 2/27', () => close(V.q26NsBound, 2 / 27, 1e-12)),
+      claim('q26NsBound', 'the cited limit for a linear-optics CNOT built from independent extra photons, with no teleportation, is 2/27', () => close(V.q26NsBound, 2 / 27, 1e-12)),
       claim('q26NsBoundRatio', 'the cited limit is 1.44 times this gate\'s chance', () => close(V.q26NsBoundRatio, 1.44, 5e-3)),
     ],
   },
@@ -643,7 +647,7 @@ const teleportGate: Beat[] = [
       `Waiting for one sign-gate success takes ${d(V.q26NsInverse, 3)} tries on average.`,
     formal:
       `$P^N$ is exponentially small, so probabilistic gates alone give no advantage (p. 260). Knill, Laflamme and Milburn (2001) teleport the gate with a resource state made by repeat-until-success, as Chapter Q11 teleports a state. ` +
-      `Waiting for one sign-gate success takes $1/${d(V.q26NsSuccess, 4)} = ${d(V.q26NsInverse, 3)}$ tries on average.`,
+      `Waiting for one sign-gate success takes $1/P_{\\mathrm{NS}} = 3 + \\sqrt2 = ${d(V.q26NsInverse, 3)}$ tries on average.`,
     caption: 'preparing the resource may fail; using it never does',
     captionFormal: 'five preparation columns of the resource $|r\\rangle$',
     stage: circ(C_RES, 5),
@@ -705,10 +709,10 @@ const teleportGate: Beat[] = [
     phase: 'books',
     text:
       `A Bell measurement needs a CNOT, which linear optics lacks. It can tell only two of the four Bell states apart: success at most $1/2$ per measurement and $1/4$ per gate. ` +
-      `[[qc-klm|KLM's]] trick raises a teleportation to $n/(n+1)$ and a gate to $(n/(n+1))^2$.`,
+      `[[qc-klm|KLM's]] trick uses $n$ extra photons per teleportation and raises its chance to $n/(n+1)$ and a gate's to $(n/(n+1))^2$.`,
     formal:
       `Calsamiglia and Lütkenhaus: linear optics identifies a Bell state with chance at most $\\tfrac12$ (cited; the engine reaches ${d(V.q26BellAnalyserSuccess, 1)} on a balanced splitter). ` +
-      `KLM: $P_n = (n/(n+1))^2$, so $P_1 = ${d(V.q26Klm1, 2)}$, $P_3 = ${d(V.q26Klm3, 4)}$, $P_9 = ${d(V.q26Klm9, 2)}$, $P_{19} = ${d(V.q26Klm19, 4)}$ and $P_{199} = ${d(V.q26Klm199, 3)}$. ` +
+      `KLM, with $n$ photons per teleportation: $P_n = (n/(n+1))^2$, so $P_1 = ${d(V.q26Klm1, 2)}$, $P_3 = ${d(V.q26Klm3, 4)}$, $P_9 = ${d(V.q26Klm9, 2)}$, $P_{19} = ${d(V.q26Klm19, 4)}$ and $P_{199} = ${d(V.q26Klm199, 3)}$. ` +
       `For $F = P_n \\ge ${d(V.q26Target99, 2)}$ we need $n \\ge \\sqrt F/(1-\\sqrt F) = ${d(V.q26KlmExact99, 1)}$, so $n = ${V.q26KlmN99}$ (p. 262).`,
     caption: 'gate teleportation success against the photon number n, log axis',
     captionFormal: '$P_n$ against $n$, log axis, with the 0.99 line',
@@ -793,8 +797,8 @@ const teleportGate: Beat[] = [
     formal:
       `Beyond the book. On a balanced splitter (four modes: path times polarization) the singlet $\\Psi^-$ exits one photon per port, and $\\Psi^+$ bunches with opposite polarizations. ` +
       `$\\Phi^+$ and $\\Phi^-$ both bunch with equal polarization and identical statistics, so only two of the four states are identified with certainty: success ${d(V.q26BellAnalyserSuccess, 1)} (engine: the permanent route, all four states).`,
-    caption: 'Φ⁺ and Φ⁻ look the same',
-    captionFormal: '$\\Phi^+$ and $\\Phi^-$ make the same patterns',
+    caption: 'bunching at 50:50; polarization separates Ψ⁺ from Φ±',
+    captionFormal: 'bunching at 50:50; polarization separates $\\Psi^+$ from $\\Phi^\\pm$',
     stage: amp(C_HOM(0.5), 1, 'probability'),
   },
 ]
@@ -826,16 +830,19 @@ const nonlinear: Beat[] = [
     id: 'q26-nonlinear:b2',
     phase: 'books',
     text:
-      `Model the medium as one two-level atom (<<qc-l11-two-level|Unit 11.6>>) and one light mode: the [[qc-jaynes-cummings|Jaynes–Cummings model]]. The states $|e,n\\rangle$ and $|g,n+1\\rangle$ mix, and the two energies are $\\sqrt{\\Delta^2 + \\Omega_n^2}$ apart. ` +
-      `For detuning $\\Delta = 10\\Omega_0$ the mixing angle is only $${d(V.q26MixAngle0, 1)}^\\circ$.`,
+      `Model the medium as one two-level atom (<<qc-l11-two-level|Unit 11.6>>) and one light mode: the [[qc-jaynes-cummings|Jaynes–Cummings model]]. Here $g$ is the atom's lower level and $e$ its upper level, so $|e,n\\rangle$ is the atom up with $n$ photons. ` +
+      `$\\Omega_0$ is the coupling to one photon, $\\Omega_n = \\Omega_0\\sqrt{n+1}$, and $\\Delta$ is the detuning of the light from the atom. ` +
+      `The states $|e,n\\rangle$ and $|g,n+1\\rangle$ mix, and the two energies are $\\sqrt{\\Delta^2 + \\Omega_n^2}$ apart. ` +
+      `For $\\Delta = 10\\Omega_0$ the angle $\\varphi_0 = \\tan^{-1}(\\Omega_0/\\Delta)$ is only $${d(V.q26MixAngle0, 1)}^\\circ$, and the dressed state itself turns by half of that.`,
     formal:
-      `The [[qc-jaynes-cummings|Jaynes–Cummings]] block on $\\{|e,n\\rangle,|g,n+1\\rangle\\}$ has levels $E_\\pm(n) = E_n \\pm \\tfrac{\\hbar}{2}\\sqrt{\\Delta^2 + \\Omega_n^2}$ with $\\Omega_n = \\Omega_0\\sqrt{n+1}$ and mixing angle $\\varphi_n = \\tan^{-1}(\\Omega_n/\\Delta)$ (p. 264). ` +
+      `The [[qc-jaynes-cummings|Jaynes–Cummings]] block on $\\{|e,n\\rangle,|g,n+1\\rangle\\}$ has levels $E_\\pm(n) = E_n \\pm \\tfrac{\\hbar}{2}\\sqrt{\\Delta^2 + \\Omega_n^2}$ with $\\Omega_0$ the one-photon coupling, $\\Omega_n = \\Omega_0\\sqrt{n+1}$ and $\\varphi_n = \\tan^{-1}(\\Omega_n/\\Delta)$. ` +
+      `The upper dressed state is $\\cos(\\varphi_n/2)|e,n\\rangle + \\sin(\\varphi_n/2)|g,n+1\\rangle$ (p. 264). ` +
       `The engine's eigenvalues of the $2\\times2$ block equal this for $n = 0$ to 5 at $\\Delta = 10\\Omega_0$ (gap $${d(V.q26JcEigGap, 0)}$), and $\\varphi_0 = ${d(V.q26MixAngle0, 3)}^\\circ$.`,
     caption: 'energy shift of the lower level for 0 to 5 photons',
     captionFormal: '$E_-(n) - E_-(0)$ for $n = 0$ to 5 at $\\Delta = 10\\Omega_0$',
     stage: JC_EXACT(),
     claims: [
-      claim('q26MixAngle0', 'at Delta = 10 Omega_0 and n = 0 the mixing angle is 5.711 degrees', () => close(V.q26MixAngle0, 5.711, 5e-4)),
+      claim('q26MixAngle0', 'at Delta = 10 Omega_0 and n = 0 the angle phi_0 = arctan(Omega_0 / Delta) is 5.711 degrees', () => close(V.q26MixAngle0, 5.711, 5e-4)),
       claim('q26JcEigGap', 'the eigenvalues of the 2x2 block equal -+(1/2) sqrt(Delta^2 + Omega_n^2) for n = 0 to 5 (max-abs gap)', () => close(V.q26JcEigGap, 0, 1e-12)),
     ],
   },
@@ -845,8 +852,8 @@ const nonlinear: Beat[] = [
     text:
       `For large detuning expand the square root: $\\sqrt{\\Delta^2 + x} \\approx \\Delta + \\frac{x}{2\\Delta}$ for small $x$. Each extra photon then shifts the energy by $\\hbar\\chi$, the [[qc-dispersive-shift|dispersive shift]], with $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$, which is ${d(V.q26Chi, 3)} times $\\Omega_0$ for $\\Delta = 10\\Omega_0$.`,
     formal:
-      `$E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with the [[qc-dispersive-shift|dispersive shift]] $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$. For the atom in $|g\\rangle$ this gives $U_{\\mathrm{Kerr}} = e^{i\\chi\\hat a^\\dagger\\hat a t}$ (p. 265). ` +
-      `The exact first step is ${d(V.q26ChiExact01, 4)}$\\,\\Omega_0$ against ${d(V.q26Chi, 3)}$\\,\\Omega_0$, and $\\chi t = \\pi$ at $t = ${d(V.q26ChiPhaseTime, 1)}/\\Omega_0$. Rosetta: Bergou's $\\Delta$ is signed; our $\\chi$ uses its size.`,
+      `$E_n$ is the bare energy of the block, $\\frac{(2n+1)\\hbar\\omega}{2}$ for light of frequency $\\omega$; apart from $n\\hbar\\omega$, $E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with the [[qc-dispersive-shift|dispersive shift]] $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$. For the atom in $|g\\rangle$ this gives $U_{\\mathrm{Kerr}} = e^{i\\chi\\hat a^\\dagger\\hat a t}$ (p. 265). ` +
+      `The exact first step is ${d(V.q26ChiExact01, 4)}$\\,\\Omega_0$ against ${d(V.q26Chi, 3)}$\\,\\Omega_0$, and $\\chi t = \\pi$ at $t = ${d(V.q26ChiPhaseTime, 1)}/\\Omega_0$. Rosetta: Bergou's $\\Delta$ is signed; our $\\chi$ uses its size. For light below the atomic frequency the atom stays in $|g\\rangle$, in the lower dressed level.`,
     caption: 'the exact shifts hug the straight line −χn',
     captionFormal: 'exact $E_-(n) - E_-(0)$ against the line $-\\chi n$',
     stage: JC_BOTH(),
@@ -866,11 +873,11 @@ const nonlinear: Beat[] = [
         },
         {
           tex: 'E_-(n) \\approx E_n - \\frac{\\Delta}{2} - \\frac{\\Omega_0^2(n+1)}{4\\Delta}',
-          why: 'Put $x = \\Omega_0^2(n+1)$ and halve: the lower level moves down by $\\frac{\\Omega_0^2(n+1)}{4\\Delta}$.',
+          why: 'Put $x = \\Omega_0^2(n+1)$ and halve: the lower level moves down by $\\frac{\\Omega_0^2(n+1)}{4\\Delta}$. Here $E_n$ is the bare energy of the block, $\\frac{(2n+1)\\hbar\\omega}{2}$ for light of frequency $\\omega$.',
         },
         {
           tex: '\\chi = \\frac{\\Omega_0^2}{4\\Delta}',
-          why: 'The part that grows with $n$ is $-n\\frac{\\Omega_0^2}{4\\Delta}$, so each photon shifts the level by $\\hbar\\chi$.',
+          why: 'Apart from the bare $n\\hbar\\omega$, the part that grows with $n$ is $-n\\frac{\\Omega_0^2}{4\\Delta}$, so each photon shifts the level by $\\hbar\\chi$.',
           view: JC_BOTH(),
           viewCaption: 'the same shifts against the line −χn',
         },
@@ -878,7 +885,7 @@ const nonlinear: Beat[] = [
       formal: [
         {
           tex: 'E_-(n) = E_n - \\frac{\\hbar}{2}\\sqrt{\\Delta^2 + \\Omega_0^2(n+1)} \\simeq E_n - \\frac{\\hbar\\Delta}{2} - \\hbar\\frac{\\Omega_0^2(n+1)}{4\\Delta}',
-          why: 'Expand the root for $\\Omega_n \\ll |\\Delta|$.',
+          why: 'Expand the root for $\\Omega_n \\ll |\\Delta|$, with $E_n = \\frac{(2n+1)\\hbar\\omega}{2}$ the bare energy.',
           view: JC_EXACT(),
           viewCaption: 'exact shifts of the lower level',
         },

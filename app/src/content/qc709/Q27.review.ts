@@ -79,7 +79,7 @@ export const Q27_REVIEW: Record<string, ReviewCard> = {
       points: [
         'Eq. 15.8: $\\hat H = E_C(\\hat n - n_g)^2 - E_J\\cos\\hat\\theta$, with Mathieu levels.',
         'Eq. 15.9, with our sign: $-E_C(n_g - \\tfrac12)\\sigma_z - \\frac{E_J}{2}\\sigma_x$.',
-        'The charge dispersion falls as $e^{-\\sqrt{32E_J/E_C}}$ and the anharmonicity as a power of the ratio.',
+        'The charge dispersion falls as $e^{-\\sqrt{32E_J/E_C}}$ (Correction K2) and the anharmonicity as a power of the ratio.',
       ],
       trap: 'Using the printed exponent $\\sqrt{2E_J/E_C}$ for the charge dispersion.',
     },

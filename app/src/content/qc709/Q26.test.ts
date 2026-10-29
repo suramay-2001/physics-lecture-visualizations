@@ -64,12 +64,12 @@ describe('Q26 shape: six units, 35 beats, six clues, two Go-deeper beats, all bo
     expect(GLOSSARY).toHaveLength(15)
     for (const g of GLOSSARY) expect(beat(g.first).text + (beat(g.first).formal ?? ''), g.id).toContain(`[[${g.id}|`)
   })
-  it('five derivations (Ground 17 steps, Formal 12), each with at least as many Ground-up steps as Formal ones', () => {
+  it('five derivations (Ground 17 steps, Formal 13), each with at least as many Ground-up steps as Formal ones', () => {
     const ds = beats.filter((b) => b.derivation)
     expect(ds.map((b) => b.id)).toEqual(['q26-beamsplitter:b2', 'q26-hom:b1', 'q26-ns-cz:b2', 'q26-teleport-gate:b5', 'q26-nonlinear:b3'])
     for (const b of ds) expect(b.derivation!.ground.length, b.id).toBeGreaterThanOrEqual(b.derivation!.formal!.length)
     expect(ds.reduce((n, b) => n + b.derivation!.ground.length, 0)).toBe(17)
-    expect(ds.reduce((n, b) => n + b.derivation!.formal!.length, 0)).toBe(12)
+    expect(ds.reduce((n, b) => n + b.derivation!.formal!.length, 0)).toBe(13)
   })
   it('eighteen challenges, three per unit, each with exactly three hints and a full walkthrough (no sheet assigns any of them); three are choices', () => {
     for (const u of units) {
