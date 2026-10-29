@@ -147,15 +147,15 @@ const GT = cnotTeleportSweep(6, 26)
 const PLUS: Vec = [c(S2), c(S2)]
 const ZERO: Vec = [c(1), c(0)]
 const OUT0000 = teleportOutput(PLUS, ZERO, '0000')
-const COH2 = coherentFock(2, 11)
-const CAT2 = catFock(2, 1, 11)
+const COH2 = coherentFock(2, 60).slice(0, 12)
 const CAT_LONG = catFock(2, 1, 60)
+const CAT2 = CAT_LONG.slice(0, 12)
 const KLM99 = klmNeeded(0.99)
 const KLM90 = klmNeeded(0.9)
 const KERR_STATE = last(C_KERR)
 const GAP_SETS = [bsReal(0.5), bsSym(), bsQ5()]
 
-export const V = {
+const SCALARS = {
   // ---- q26-encodings
   q26WaveP0: abs2(U3040[0]),
   q26WaveP1: waveP1(30, 40),
@@ -169,11 +169,11 @@ export const V = {
   q26DualRailP1: abs2(DR[1]),
   q26DualRailGap: Math.max(...DR.map((z, i) => abs(c(z.re - dualRailKet(30, 40)[i].re, z.im - dualRailKet(30, 40)[i].im)))),
   q26Polar225: blochPolarDeg(waveKet(22.5, 0)),
-  q26Sin2_225: waveP1(22.5, 0),
+  q26Sin2225: waveP1(22.5, 0),
 
   // ---- q26-beamsplitter
-  q26T2_70: abs2(S70[0][0]),
-  q26R_70: abs2(S70[1][0]),
+  q26T270: abs2(S70[0][0]),
+  q26R70: abs2(S70[1][0]),
   q26StokesGap: stokesGapSweep(200, 26),
   q26ConvGap: conventionGap(),
   q26Conc70: concurrencePure(ENT30),
@@ -186,18 +186,18 @@ export const V = {
   // ---- q26-hom
   q26R25: 0.25,
   q26R20: 0.2,
-  q26HomP20_R25: abs2(H25.a20),
-  q26HomP11_R25: abs2(H25.a11),
-  q26HomP02_R25: abs2(H25.a02),
+  q26HomP20R25: abs2(H25.a20),
+  q26HomP11R25: abs2(H25.a11),
+  q26HomP02R25: abs2(H25.a02),
   q26HomCancel: homCancelGap(200, 26),
   q26HomTt: bsReal(0.5)[0][0].re * bsReal(0.5)[1][1].re,
   q26HomRr: bsReal(0.5)[1][0].re * bsReal(0.5)[0][1].re,
-  q26HomP20_R50: abs2(H50.a20),
-  q26HomP11_R50: abs2(H50.a11),
+  q26HomP20R50: abs2(H50.a20),
+  q26HomP11R50: abs2(H50.a11),
   q26HomPhaseReal: homPhaseDeg(bsReal(0.5)),
   q26HomPhaseSym: homPhaseDeg(bsSym()),
   q26HomR20: homDip(0.2),
-  q26HomP20_R20: abs2(H20.a20),
+  q26HomP20R20: abs2(H20.a20),
   q26HomBunch20: 1 - homDip(0.2),
   q26DistinguishableR50: distinguishable(bsReal(0.5)),
   q26HomClosedGap: twoPhotonFormulaGap(50, 26),
@@ -230,7 +230,6 @@ export const V = {
   q26CzIn100: 100 * P_CZ,
   q26Cz3Chain: P_CZ ** 3,
   q26CzAttempts3: Math.round(attempts(P_CZ ** 3)),
-  ...list('q26CzChain', [1, 2, 3, 4].map((k) => P_CZ ** k)),
 
   // ---- q26-teleport-gate
   q26NsInverse: attempts(NS.success),
@@ -264,8 +263,6 @@ export const V = {
   q26Chi: jcChi(10, 1),
   q26ChiExact01: jcShift(0, 10, 1) - jcShift(1, 10, 1),
   q26ChiPhaseTime: jcPiTime(10, 1),
-  ...list('q26JcShift', [0, 1, 2, 3, 4, 5].map((n) => jcShift(n, 10, 1))),
-  ...list('q26JcLine', [0, 1, 2, 3, 4, 5].map((n) => jcLine(n, 10, 1))),
   q26Overlap1: coherentOverlap(1, -1),
   q26Overlap2: coherentOverlap(2, -2),
   q26OverlapSeriesGap: Math.abs(coherentOverlapSeries(1, -1, 80) - coherentOverlap(1, -1)),
@@ -275,9 +272,17 @@ export const V = {
   q26CohP0: COH2[0] ** 2,
   q26CatMean: meanPhotons(CAT_LONG),
   q26CohMean: meanPhotons(coherentFock(2, 60)),
+} as const
+
+/** The plotted lists, one key per point (a value table is flat): chain of CZ gates, lower-level shifts and their straight line, photon-number chances. */
+export const V = {
+  ...SCALARS,
+  ...list('q26CzChain', [1, 2, 3, 4].map((k) => P_CZ ** k)),
+  ...list('q26JcShift', [0, 1, 2, 3, 4, 5].map((n) => jcShift(n, 10, 1))),
+  ...list('q26JcLine', [0, 1, 2, 3, 4, 5].map((n) => jcLine(n, 10, 1))),
   ...list('q26CohPn', fockChances(COH2)),
   ...list('q26CatPn', fockChances(CAT2)),
-} as const
+} as typeof SCALARS & Record<`q26CzChain${number}`, number> & Record<`q26JcShift${number}`, number> & Record<`q26JcLine${number}`, number> & Record<`q26CohPn${number}`, number> & Record<`q26CatPn${number}`, number>
 
 export type ValueKey = keyof typeof V
 export const claim = keyedClaim<ValueKey>()

@@ -2199,5 +2199,78 @@ export const QC_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "Q26",
+    "number": 26,
+    "title": "Qubits made of light: photons and linear optics",
+    "units": [
+      {
+        "id": "q26-encodings",
+        "title": "Three ways to write a photon qubit",
+        "question": "Which angle matters when light holds a qubit?",
+        "challenges": [
+          "q26-e-p1",
+          "q26-e-polar",
+          "q26-e-phase"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q26-beamsplitter",
+        "title": "One splitter, four numbers",
+        "question": "What must t, r, t′, r′ obey, and what does one photon do?",
+        "challenges": [
+          "q26-b-r",
+          "q26-b-entropy",
+          "q26-b-two"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q26-hom",
+        "title": "Two photons that leave together",
+        "question": "Why do two photons exit one splitter by the same port?",
+        "challenges": [
+          "q26-h-p11",
+          "q26-h-r20",
+          "q26-h-why"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q26-ns-cz",
+        "title": "A sign flip from a heralded photon",
+        "question": "Can light do CZ, and with what chance?",
+        "challenges": [
+          "q26-n-success",
+          "q26-n-attempts",
+          "q26-n-100"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q26-teleport-gate",
+        "title": "Teleport the gate, then count photons",
+        "question": "How do KLM’s counts rescue a probabilistic gate?",
+        "challenges": [
+          "q26-t-klm3",
+          "q26-t-n90",
+          "q26-t-outcome"
+        ],
+        "equations": []
+      },
+      {
+        "id": "q26-nonlinear",
+        "title": "Photons that talk through matter",
+        "question": "Can matter give π between photons? And big-photon qubits?",
+        "challenges": [
+          "q26-k-overlap",
+          "q26-k-chi",
+          "q26-k-cat"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]

@@ -586,7 +586,7 @@ export const jcEigenGap = (delta: number, omega0: number, nMax = 5): number =>
 /** The shift of the lower level against n = 0: E_-(n) - E_-(0) = -(1/2)(sqrt(Delta^2 + Omega_n^2) - sqrt(Delta^2 + Omega_0^2)). */
 export const jcShift = (n: number, delta: number, omega0: number): number => jcLevels(n, delta, omega0)[0] - jcLevels(0, delta, omega0)[0]
 /** The dispersive straight line -chi n. */
-export const jcLine = (n: number, delta: number, omega0: number): number => -jcChi(delta, omega0) * n
+export const jcLine = (n: number, delta: number, omega0: number): number => 0 - jcChi(delta, omega0) * n
 /** chi = Omega_0^2 / (4 |Delta|). */
 export const jcChi = (delta: number, omega0: number): number => (omega0 * omega0) / (4 * Math.abs(delta))
 /** The mixing angle tan^{-1}(Omega_n / |Delta|) in degrees. */

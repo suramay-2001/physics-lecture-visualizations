@@ -184,4 +184,6 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },
   'qc-q13-properties': { course: 'qc709', lecture: 'Q13', unit: 'q13-properties', label: 'completely positive maps and the Choi test' },
   'qc-q14-usd': { course: 'qc709', lecture: 'Q14', unit: 'q14-usd', label: 'telling two states apart without ever being wrong' },
+  // Chapter Q26 (P-Q26-story §11.3): the Q11 unit that teleports a state (the other rows it uses exist already)
+  'qc-q11-teleport-circuit': { course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit', label: 'the teleportation circuit and its two readings' },
 }

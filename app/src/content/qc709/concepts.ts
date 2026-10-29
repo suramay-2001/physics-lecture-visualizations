@@ -295,4 +295,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-heralded-station', label: 'A machine that sometimes fails and says so', chapter: 'Q20', unit: 'q20-probabilistic', needs: ['qc-processor-station', 'qc-cnot'] },
   { id: 'qc-flip-program-station', label: 'Programming a phase flip with a Bell state', chapter: 'Q20', unit: 'q20-bell-programs', needs: ['qc-heralded-station', 'qc-bell-basis-station'] },
   { id: 'qc-prog-usd-station', label: 'A discriminator that is told the states', chapter: 'Q20', unit: 'q20-discriminator', needs: ['qc-usd'] },
+  // Chapter Q26 (P-Q26-story §11.1): photons. Each station needs the one before it in the chapter plus what the unit leans on from earlier chapters.
+  { id: 'qc-photon-encodings-station', label: 'Three ways to write a photon qubit', chapter: 'Q26', unit: 'q26-encodings', needs: ['qc-photon-frames'] },
+  { id: 'qc-splitter-station', label: 'One splitter, four numbers', chapter: 'Q26', unit: 'q26-beamsplitter', needs: ['qc-photon-encodings-station', 'qc-f4-unitary'] },
+  { id: 'qc-hom-station', label: 'Two photons that leave together', chapter: 'Q26', unit: 'q26-hom', needs: ['qc-splitter-station'] },
+  { id: 'qc-ns-cz-station', label: 'A sign flip from a heralded photon', chapter: 'Q26', unit: 'q26-ns-cz', needs: ['qc-hom-station', 'qc-cnot'] },
+  { id: 'qc-gate-teleport-station', label: 'Teleport the gate, then count photons', chapter: 'Q26', unit: 'q26-teleport-gate', needs: ['qc-ns-cz-station', 'qc-teleportation'] },
+  { id: 'qc-kerr-station', label: 'Photons that talk through matter', chapter: 'Q26', unit: 'q26-nonlinear', needs: ['qc-hom-station'] },
 ]
