@@ -4,7 +4,7 @@
  *
  * Build notes against the plan:
  * - Phase `'books'` throughout (no 709 notes cover Bergou Chapter 8): ramp beats are `books`, the clues are `clue`, the Go-deeper beats are `deeper` and last in their unit.
- * - Every number is the ENGINE's (Q20.values.ts, physics/qc/machines.ts). A number shown with a minus sign is stored as its size and the sign is asserted in the claim.
+ * - Every number is the ENGINE's (Q20.values.ts, physics/qc/machines.ts). A number shown with a minus sign is stored as its size (the claims reader compares sizes) and the claim tests the sign on the signed value in SIGNED.
  * - Bergou's "fidelity" <psi|rho|psi> is the SQUARE of Chapter Q9's root fidelity: called the copy fidelity F_c throughout, with the Rosetta line in cloner:b1.
  * - Bergou's Bell names are swapped against the standard ones (his Psi+- are our Phi+-); the standard names are used with "(Bergou: ...)" on first use.
  * - The state to flip in Unit 20.5 is written chi (Bergou's phi), because the course keeps phi for an angle.
@@ -18,7 +18,7 @@
  */
 import type { Circuit } from '../../physics/qc/circuit'
 import type { AmpSource, AmplitudesState, BallState, Beat, BlochState, CircuitStageState, Dir, MatrixGridState, MatrixSource, PlotState, StageLayout, StageState } from '../schema'
-import { C_CL, C_D1, C_D2, C_PR, C_RUS, R_MP_CLONE, R_MP_UNOT, R_OUT1, R_OUT1_OTHER, R_OUT3, R_PSI, R_TURNED, V, claim, close, d, tf, uf } from './Q20.values'
+import { C_CL, C_D1, C_D2, C_PR, C_RUS, R_MP_CLONE, R_MP_UNOT, R_OUT1, R_OUT1_OTHER, R_OUT3, R_PSI, R_TURNED, SIGNED, V, claim, close, d, tf, uf } from './Q20.values'
 
 /* ---------------------------------------------------------------------------------------------- */
 /* Stage shorthand (plan "Stage shorthand"), as plain builder functions                              */
@@ -494,7 +494,7 @@ const noGo: Beat[] = [
     id: 'q20-no-go:b3',
     phase: 'books',
     text:
-      `Program 1 gives $U_1$ and program 2 gives $U_2$. Overlap the outputs: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\,\\langle\\Pi_2'|\\Pi_1'\\rangle$. The left side ignores $\\psi$, so the right side must too. ` +
+      `Program 1 gives $U_1$ and program 2 gives $U_2$. Write $\\Pi_k$ for program $k$ before the run and $\\Pi_k'$ for what it leaves after. Overlap the outputs: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\,\\langle\\Pi_2'|\\Pi_1'\\rangle$. The left side ignores $\\psi$, so the right side must too. ` +
       `For $U_1 = I$ and $U_2 = \\sigma_z$ the first factor is $\\cos\\theta$ at polar angle $\\theta$: $1$, $${d(V.q20ExpZ60, 1)}$, $0$, $-${d(V.q20ExpZ60, 1)}$, $-1$ at $0^\\circ$, $60^\\circ$, $90^\\circ$, $120^\\circ$, $180^\\circ$. It changes with the state.`,
     formal:
       `Taking [[inner-product|inner products]] of $G(|\\psi\\rangle|\\Pi_k\\rangle) = U_k|\\psi\\rangle|\\Pi'_k\\rangle$ gives Eq. 8.16: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\langle\\Pi'_2|\\Pi'_1\\rangle$. ` +
@@ -570,11 +570,11 @@ const noGo: Beat[] = [
     id: 'q20-no-go:b5',
     phase: 'clue',
     text:
-      'Add a measurement: read the program wire at the end, and if the result is 1, apply a known gate $V$ to the data. Does this beat the counting argument?',
+      'Add a measurement: read the program wire at the end, and if it reads 1, apply $V^{-1}$ to undo the extra gate $V$. Does this beat the counting argument?',
     formal:
       'Take the processor of Eq. 8.18, $G(|\\psi\\rangle|k\\rangle) = \\tfrac{1}{\\sqrt2}(U_k|\\psi\\rangle|0\\rangle + VU_k|\\psi\\rangle|1\\rangle)$ for $k = 1, 2$, followed by measure-and-correct. How many different operations can two programs realise?',
     caption: 'the processor again: a reading added at the end',
-    captionFormal: 'Eq. 8.18: the program wire read, then $V$ if the reading is 1',
+    captionFormal: 'Eq. 8.18: the program wire read, then $V^{-1}$ if the reading is 1',
     stage: circ(C_PR(ALPHA), 3),
     reveal: {
       text:
@@ -627,13 +627,13 @@ const probabilistic: Beat[] = [
       `Its arrow is $(${d(V.q20RotX, 4)}, -${d(V.q20RotY, 4)}, 0)$.`,
     formal:
       `$U(\\alpha)|+\\rangle$ has azimuth $-2\\alpha$, so its [[relative-phase|relative phase]] is $-2\\alpha$: its Bloch vector is $(${d(V.q20RotX, 4)}, -${d(V.q20RotY, 4)}, 0)$ at $\\alpha = 30^\\circ$. ` +
-      `The success branch equals $U(\\alpha)\\psi$ and the failure branch $U^{-1}(\\alpha)\\psi$ exactly (engine gap $${d(V.q20RotGap, 0)}$).`,
+      `The success branch equals $U(\\alpha)\\psi$ and the failure branch $U^{-1}(\\alpha)\\psi$ exactly (engine gap $${d(Math.abs(V.q20RotGap), 0)}$).`,
     caption: 'the output arrow turned by −60° about z',
     captionFormal: '$R_z(-60^\\circ)$ applied to $|+\\rangle$',
     stage: bl('+x', { rotate: { axis: 'z', angleDeg: -2 * ALPHA } }),
     claims: [
       claim('q20RotX', 'after a success at α = 30 degrees the arrow of |+> has x part 0.5000', () => close(V.q20RotX, 0.5, 1e-9)),
-      claim('q20RotY', 'and y part of size 0.8660, pointing to minus y', () => close(V.q20RotY, 0.866, 5e-5)),
+      claim('q20RotY', 'and y part of size 0.8660, pointing to minus y', () => close(V.q20RotY, 0.866, 5e-5) && SIGNED.rotY < 0 && close(-SIGNED.rotY, V.q20RotY, 1e-12)),
       claim('q20RotGap', 'the success branch is U(α)ψ and the failure branch U−1(α)ψ (gap from a global phase)', () => close(V.q20RotGap, 0, 1e-12)),
     ],
   },
@@ -730,7 +730,7 @@ const probabilistic: Beat[] = [
       text:
         `Seven rounds: $1 - 2^{-7} = ${d(V.q20Rus7, 3)}$, while six give ${d(V.q20Rus6, 3)}. Each round halves the chance of failing but needs a fresh program qubit.`,
       formal:
-        `$k = ${V.q20RusRounds99}$: ${d(V.q20Rus6, 3)} at six rounds and ${d(V.q20Rus7, 3)} at seven, with programs $\\Xi(\\alpha), \\Xi(2\\alpha), \\dots, \\Xi(64\\alpha)$ (our extension of Bergou's remark that the procedure can be repeated, p. 152). ` +
+        `$k = ${V.q20RusRounds99}$: ${d(V.q20Rus6, 3)} at six rounds and ${d(V.q20Rus7, 3)} at seven, with programs $\\Xi(\\alpha), \\Xi(2\\alpha), \\dots, \\Xi(64\\alpha)$ (our extension of Bergou's remark that the procedure can be repeated, p. 153). ` +
         `To pass ${d(V.q20Target999, 3)} takes ${V.q20RusRounds999} rounds.`,
       caption: 'the chances of the readings of the two program wires',
       captionFormal: 'the first two rounds of the doubling programs',
@@ -770,7 +770,8 @@ const bellPrograms: Beat[] = [
       `Return to the cloner circuit: qubit 1 is the data, qubits 2 and 3 the program. Feed it a <<qc-q6-bell-basis|Bell state>>. The program comes out unchanged and the data gets a Pauli gate. Each of the four Bell states gives a different gate.`,
     formal:
       `Eq. 8.23, with the standard names (Bergou's $\\Psi_\\pm = (|00\\rangle \\pm |11\\rangle)/\\sqrt2$ are our $\\Phi^\\pm$ and his $\\Phi_\\pm$ our $\\Psi^\\pm$): $\\Phi^+ \\to I$, $\\Phi^- \\to \\sigma_z$, $\\Psi^+ \\to \\sigma_x$ and $\\Psi^- \\to -i\\sigma_y$, ` +
-      `each acting on $|\\psi\\rangle_1$ with the program state unchanged. Each is a [[qc-bell-program|Bell program]]; the engine's gap is $${d(V.q20BellProgGap, 0)}$ for all four at $\\theta = 60^\\circ$, $\\varphi = 90^\\circ$.`,
+      `each acting on $|\\psi\\rangle_1$ with the program state unchanged. Each is a [[qc-bell-program|Bell program]]; the engine's gap is $${d(V.q20BellProgGap, 0)}$ for all four at $\\theta = 60^\\circ$, $\\varphi = 90^\\circ$. ` +
+      `Rosetta: the printed Eq. 8.23 lists $\\Psi_-$ on both of its last two lines; the fourth is $\\Phi_-$.`,
     caption: 'program Φ⁻: the data wire after the circuit, with Z applied',
     captionFormal: 'the state after program $\\Phi^-$, with the data wire traced out to the left',
     stage: split(circ(C_CL('Phi-'), 6), mx(rho(C_CL('Phi-'), 6), { partialTrace: { keep: [0] } })),
@@ -790,9 +791,9 @@ const bellPrograms: Beat[] = [
     captionFormal: 'the Bloch direction of $\\chi$ at $(60^\\circ, 0^\\circ)$',
     stage: bl({ thetaDeg: 60, phiDeg: 0 }),
     claims: [
-      claim('q20Prog60x', 'at (60, 0) degrees the σx coefficient has size 0.8660 and is negative', () => close(V.q20Prog60x, 0.866, 5e-5)),
+      claim('q20Prog60x', 'at (60, 0) degrees the σx coefficient has size 0.8660 and is negative', () => close(V.q20Prog60x, 0.866, 5e-5) && SIGNED.prog60x < 0 && close(-SIGNED.prog60x, V.q20Prog60x, 1e-12)),
       claim('q20Prog60y', 'the −iσy coefficient is 0', () => close(V.q20Prog60y, 0, 1e-12)),
-      claim('q20Prog60z', 'the σz coefficient has size 0.5 and is negative', () => close(V.q20Prog60z, 0.5, 1e-12)),
+      claim('q20Prog60z', 'the σz coefficient has size 0.5 and is negative', () => close(V.q20Prog60z, 0.5, 1e-12) && SIGNED.prog60z < 0 && close(-SIGNED.prog60z, V.q20Prog60z, 1e-12)),
       claim('q20UphiGap', 'the Pauli form equals I − 2|χ><χ| at five directions (Eq. 8.25, max-abs gap)', () => close(V.q20UphiGap, 0, 1e-12)),
     ],
   },
@@ -800,7 +801,7 @@ const bellPrograms: Beat[] = [
     id: 'q20-bell-programs:b3',
     phase: 'books',
     text:
-      `Put those three coefficients on three Bell states: that is the program $\\Xi_\\chi$. Run the circuit, then ask whether the program wires hold the equal mix of the three Bell states used. ` +
+      `Put those three coefficients on three Bell states: that is the program $\\Xi_\\chi$. Run the circuit, then ask whether the program wires hold the equal superposition of the three Bell states used. ` +
       `That happens one time in three, whatever $\\chi$ and the data. When it does, the data was flipped.`,
     formal:
       `Eq. 8.26, in standard names: $|\\Xi_\\chi\\rangle = c_x|\\Psi^+\\rangle + c_y|\\Psi^-\\rangle + c_z|\\Phi^-\\rangle$, with $c_x$, $c_y$, $c_z$ the coefficients of the last beat. ` +
@@ -818,7 +819,7 @@ const bellPrograms: Beat[] = [
       ground: [
         {
           tex: '|\\Xi_\\chi\\rangle = c_x|\\Psi^+\\rangle + c_y|\\Psi^-\\rangle + c_z|\\Phi^-\\rangle,\\quad |c_x|^2 + |c_y|^2 + |c_z|^2 = 1',
-          why: 'The program is the three-term mix of Bell states with the flip coefficients.',
+          why: 'The program is the three-term superposition of Bell states with the flip coefficients.',
           view: circ(C_CL(XI60), 6),
           viewCaption: 'the program circuit',
         },
@@ -830,7 +831,7 @@ const bellPrograms: Beat[] = [
         },
         {
           tex: '\\tfrac{1}{\\sqrt3}\\,U_\\chi|\\psi\\rangle\\ \\text{is left, so}\\ \\Pr = \\tfrac13',
-          why: 'Projecting the program wires on the equal mix leaves the data in $U_\\chi\\psi$ with weight $1/\\sqrt3$, so the chance is one third.',
+          why: 'Projecting the program wires on the equal superposition leaves the data in $U_\\chi\\psi$ with weight $1/\\sqrt3$, so the chance is one third.',
           view: amp(C_CL(XI60), 6, 'probability', { keep: [1, 2] }),
           viewCaption: 'readings of the program wires',
         },
@@ -897,7 +898,7 @@ const bellPrograms: Beat[] = [
     text:
       `This does not break Unit 20.3. The machine succeeds only one time in three. More tries need fresh programs, as in Unit 20.4.`,
     formal:
-      `A heralded gate: deterministic programmability is excluded (Unit 20.3), probabilistic is not. The chance $${tf(V.q20FlipSuccess)}$ is Bergou's value for this circuit (p. 153), and retries reuse the scheme of Unit 20.4.`,
+      `A heralded gate: deterministic programmability is excluded (Unit 20.3), probabilistic is not. The chance $${tf(V.q20FlipSuccess)}$ is Bergou's value for this circuit (p. 152), and retries reuse the scheme of Unit 20.4.`,
     caption: 'the program circuit once more',
     captionFormal: 'the cloner circuit with the flip program',
     stage: circ(C_CL(XI60), 6),
@@ -914,7 +915,7 @@ const discriminator: Beat[] = [
     id: 'q20-discriminator:b1',
     phase: 'books',
     text:
-      `In <<qc-q14-usd|Unit 14.4>> the two states were built into the machine. Now they arrive as data: one qubit in $\\psi_1$, one in $\\psi_2$, and a third in either of them. Name which, never wrongly, or say "failed". ` +
+      `In <<qc-q14-usd|Unit 14.4>> the two states were built into the machine. Now they arrive as data on three qubits A, B, C: A holds $\\psi_1$, B holds $\\psi_2$, and C holds either of them. Name which, never wrongly, or say "failed". ` +
       `Their overlap is $s = |\\langle\\psi_1|\\psi_2\\rangle|$, here ${uf(V.q20DiscOverlap)}. This is a [[qc-programmable-discriminator|programmable discriminator]].`,
     formal:
       `(Bergou §8.5, p. 154) On registers A, B, C the inputs are $|\\Psi_1^{\\rm in}\\rangle = |\\psi_1\\rangle_A|\\psi_2\\rangle_B|\\psi_1\\rangle_C$ and $|\\Psi_2^{\\rm in}\\rangle = |\\psi_1\\rangle_A|\\psi_2\\rangle_B|\\psi_2\\rangle_C$ (Eq. 8.31), with $\\psi_1$ and $\\psi_2$ unknown. ` +
@@ -929,7 +930,7 @@ const discriminator: Beat[] = [
     id: 'q20-discriminator:b2',
     phase: 'books',
     text:
-      `We know nothing of $\\psi_1$ and $\\psi_2$ except symmetry. Input 1 is unchanged if wires A and C swap. A swap-symmetric state has no overlap with the [[qc-antisymmetric-projector|antisymmetric projector]] of that pair. So test for it.`,
+      `We know nothing of $\\psi_1$ and $\\psi_2$ except symmetry. Input 1 is unchanged if wires A and C swap. A swap-symmetric state has no overlap with the [[qc-antisymmetric-projector|antisymmetric projector]] of that pair. So test for it. Test the pair B, C with weight $c_1$ and the pair A, C with weight $c_2$; call the two tests $\\Pi_1$ and $\\Pi_2$.`,
     formal:
       `$|\\Psi_1^{\\rm in}\\rangle$ is symmetric under swapping $A$ and $C$, and $|\\Psi_2^{\\rm in}\\rangle$ under swapping $B$ and $C$. With $|\\psi^-\\rangle = (|01\\rangle - |10\\rangle)/\\sqrt2$ and $P^{\\rm as} = |\\psi^-\\rangle\\langle\\psi^-|$ the [[qc-antisymmetric-projector|antisymmetric projector]], take ` +
       `$\\Pi_1 = c_1I_A \\otimes P^{\\rm as}_{BC}$ and $\\Pi_2 = c_2I_B \\otimes P^{\\rm as}_{AC}$ (Eq. 8.37). The engine finds $\\Pi_2|\\Psi_1^{\\rm in}\\rangle = \\Pi_1|\\Psi_2^{\\rm in}\\rangle = 0$ (gap $${d(V.q20DiscZeroGap, 0)}$) and $p_j = c_j(1 - s^2)/2$ (Eq. 8.38), which is $${d(V.q20DiscPj, 4)}$ at $c_j = ${tf(V.q20OptC)}$ and $s = ${tf(V.q20DiscOverlap)}$.`,
@@ -976,7 +977,7 @@ const discriminator: Beat[] = [
       claim('q20DiscPj', 'at that constant each detection chance is 0.2500 at s = one half', () => close(V.q20DiscPj, 0.25, 1e-12)),
       claim('q20ConstTrue', 'the true determinant at c = two thirds is 0', () => close(V.q20ConstTrue, 0, 1e-12)),
       claim('q20ConstPrinted', 'the printed constant would give two thirds there', () => close(V.q20ConstPrinted, 2 / 3, 1e-9)),
-      claim('q20DiscPrinted', 'the printed discriminant is −2.2222, so non-real roots for a Hermitian block', () => close(V.q20DiscPrinted, 20 / 9, 1e-9)),
+      claim('q20DiscPrintedAbs', 'the printed discriminant is −2.2222, so non-real roots for a Hermitian block', () => close(V.q20DiscPrintedAbs, 20 / 9, 1e-9) && SIGNED.discPrinted < 0 && close(-SIGNED.discPrinted, V.q20DiscPrintedAbs, 1e-12)),
       claim('q20BlockEigLo', 'the block has the eigenvalue 0 at c = two thirds', () => close(V.q20BlockEigLo, 0, 1e-12)),
       claim('q20BlockEigHi', 'and the eigenvalue 0.6667', () => close(V.q20BlockEigHi, 2 / 3, 1e-9)),
     ],
@@ -1035,7 +1036,7 @@ const discriminator: Beat[] = [
       `If the two states were known, the best chance would be $1 - s$ (<<qc-q14-usd|Unit 14.4>>). At $s = ${tf(V.q20DiscOverlap)}$ that is ${d(V.q20DiscKnown05, 1)}, against ${d(V.q20DiscP05, 2)} for the programmable machine. ` +
       `The programmable machine gives up chance for flexibility: it works for any two states.`,
     formal:
-      `$P_{\\rm known} = 1 - s \\ge P_{\\rm prog} = \\tfrac13(1 - s^2)$ with ratio $(1+s)/3$: $${tf(V.q20DiscP0)}$ at $s = 0$, ${d(V.q20DiscRatio05, 1)} at $s = ${tf(V.q20DiscOverlap)}$, and ${d(V.q20DiscRatio0707, 3)} at $s = ${d(V.q20S0707, 4)}$ ` +
+      `With equal priors, $P_{\\rm known} = 1 - s \\ge P_{\\rm prog} = \\tfrac13(1 - s^2)$ with ratio $(1+s)/3$: $${tf(V.q20DiscP0)}$ at $s = 0$, ${d(V.q20DiscRatio05, 1)} at $s = ${tf(V.q20DiscOverlap)}$, and ${d(V.q20DiscRatio0707, 3)} at $s = ${d(V.q20S0707, 4)}$ ` +
       `(the chances ${d(V.q20DiscP0707, 4)} against ${d(V.q20DiscKnown0707, 4)}), tending to $${tf(V.q20OptC)}$ as $s \\to 1$. Knowing the states is like owning unlimited copies of each (Bergou p. 157).`,
     caption: 'the programmable curve under the known-state curve',
     captionFormal: '$P_{\\rm prog}$ below $P_{\\rm known}$ for every $s$',

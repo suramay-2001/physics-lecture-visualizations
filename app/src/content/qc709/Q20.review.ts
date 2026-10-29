@@ -9,7 +9,7 @@ export const Q20_REVIEW: Record<string, ReviewCard> = {
   'q20-cloner': {
     points: [
       'Three wires and four CNOT gates make a cloner; the two lower wires hold the program.',
-      'A mix of the two programs shares the state between wire 1 and wire 2.',
+      'A superposition of the two programs shares the state between wire 1 and wire 2.',
       `The equal split gives two clones, each with fidelity $${tf(V.q20F56)}$.`,
       'Every input is treated alike, so this is a universal cloner.',
     ],
@@ -81,7 +81,7 @@ export const Q20_REVIEW: Record<string, ReviewCard> = {
   'q20-bell-programs': {
     points: [
       'Used as the program, each Bell state makes the circuit apply one Pauli gate.',
-      'A phase flip about any direction is a mix of three Paulis, so its program is a mix of three Bell states.',
+      'A phase flip about any direction is a sum of three Paulis, so its program is a superposition of three Bell states.',
       `The flip works one time in three, whatever the direction and the data.`,
     ],
     equations: 'U_\\chi = -\\mathbf n\\cdot\\boldsymbol\\sigma',
