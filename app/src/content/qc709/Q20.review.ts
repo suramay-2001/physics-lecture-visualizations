@@ -81,7 +81,7 @@ export const Q20_REVIEW: Record<string, ReviewCard> = {
   'q20-bell-programs': {
     points: [
       'Used as the program, each Bell state makes the circuit apply one Pauli gate.',
-      'A phase flip about any direction is a mix of three Paulis, so its program is a mix of three Bell states.',
+      'A phase flip about any direction is a sum of three Paulis, so its program is a superposition of three Bell states.',
       `The flip works one time in three, whatever the direction and the data.`,
     ],
     equations: 'U_\\chi = -\\mathbf n\\cdot\\boldsymbol\\sigma',

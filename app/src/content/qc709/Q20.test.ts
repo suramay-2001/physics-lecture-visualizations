@@ -9,7 +9,7 @@ import { Q20 } from './Q20'
 import Q20Source from './Q20.ts?raw'
 import Q20Story from './Q20.story.ts?raw'
 import { GLOSSARY } from './Q20.glossary'
-import { C_RUS, V, d } from './Q20.values'
+import { C_RUS, SIGNED, V, d } from './Q20.values'
 import { circuitUnitary } from '../../physics/qc/circuit'
 import { discGridBest, programmableUsdBest, pairAtOverlap, rusRounds } from '../../physics/qc/machines'
 
@@ -96,11 +96,12 @@ describe('Q20 rulings: Z2 no hardware digits, Z3 two Corrections for the review 
     expect(c1.claims!.map((c) => c.text.split(' · ')[0])).toEqual(expect.arrayContaining(['q20MpCloneSingle', 'q20MpCloneBoth', 'q20CloneBoth']))
     const c2 = beat('q20-discriminator:b4')
     expect(c2.formal).toContain('Correction')
-    expect(c2.claims!.map((c) => c.text.split(' · ')[0])).toEqual(expect.arrayContaining(['q20ConstTrue', 'q20ConstPrinted', 'q20DiscPrinted', 'q20BlockEigHi']))
+    expect(c2.claims!.map((c) => c.text.split(' · ')[0])).toEqual(expect.arrayContaining(['q20ConstTrue', 'q20ConstPrinted', 'q20DiscPrintedAbs', 'q20BlockEigHi']))
     // the true determinant is zero at c = 2/3 while the printed constant gives two thirds and a negative discriminant
     expect(V.q20ConstTrue).toBeCloseTo(0, 12)
     expect(V.q20ConstPrinted).toBeCloseTo(2 / 3, 12)
-    expect(V.q20DiscPrinted).toBeCloseTo(20 / 9, 12)
+    expect(V.q20DiscPrintedAbs).toBeCloseTo(20 / 9, 12)
+    expect(SIGNED.discPrinted).toBeCloseTo(-20 / 9, 12)
   })
   it('the harmless sign slip after Eq. 8.6 is a Rosetta line in unot:b3, not a box; the fidelity Rosetta is in cloner:b1 and the U(α) Rosetta in probabilistic:b1', () => {
     expect(beat('q20-unot:b3').formal).toMatch(/Rosetta: here \$U_0\|0\\rangle = \+\|1\\rangle\$/)

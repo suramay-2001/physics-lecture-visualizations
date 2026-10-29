@@ -153,6 +153,14 @@ const USD_BEST = programmableUsdBest(P1S, P2S)
 const S0707 = Math.SQRT1_2
 const PAIR0707 = pairAtOverlap(S0707)
 
+/** The engine values that carry a sign in the text. V stores their size (the claims reader compares sizes); the claims test the sign here (review N2). */
+export const SIGNED = {
+  rotY: blochVector(densityOf(cnotProcessor(30, PLUS_X).success))[1],
+  prog60x: phaseFlipProgram(60, 0).coef[0].re,
+  prog60z: phaseFlipProgram(60, 0).coef[2].re,
+  discPrinted: BLOCK23.discPrinted,
+} as const
+
 export const V = {
   // ---- q20-cloner
   q20OverlapPrograms: inner(XI00, XI0X).re,
@@ -223,7 +231,7 @@ export const V = {
   // ---- q20-probabilistic
   q20CnotSuccess: cnotProcessor(30, PLUS_X).pSuccess,
   q20RotX: blochVector(densityOf(cnotProcessor(30, PLUS_X).success))[0],
-  q20RotY: Math.abs(blochVector(densityOf(cnotProcessor(30, PLUS_X).success))[1]),
+  q20RotY: Math.abs(SIGNED.rotY),
   q20RotGap: cnotBranchGap(30, PLUS_X),
   q20Rus1: rusSuccess(1),
   q20Rus2: rusSuccess(2),
@@ -246,9 +254,9 @@ export const V = {
 
   // ---- q20-bell-programs
   q20BellProgGap: bellProgramGap(60, 90),
-  q20Prog60x: Math.abs(phaseFlipProgram(60, 0).coef[0].re),
+  q20Prog60x: Math.abs(SIGNED.prog60x),
   q20Prog60y: abs(phaseFlipProgram(60, 0).coef[1]),
-  q20Prog60z: Math.abs(phaseFlipProgram(60, 0).coef[2].re),
+  q20Prog60z: Math.abs(SIGNED.prog60z),
   q20UphiGap: Math.max(...FLIP_DIRS.map(([t, p]) => phaseFlipFormulaGap(t, p)), phaseFlipFormulaGap(60, 0)),
   q20Prog120z: FLIP_120.coef[2].re,
   q20FlipSuccess: Math.min(...FLIP_DIRS.map(([t, p]) => phaseFlipRun(PSI, t, p).p)),
@@ -265,7 +273,7 @@ export const V = {
   q20BlockGap: Math.max(discBlockGap(2 / 3, 2 / 3), discBlockGap(0.3, 0.5), discBlockGap(0.9, 0.1)),
   q20ConstTrue: BLOCK23.detTrue,
   q20ConstPrinted: BLOCK23.detPrinted,
-  q20DiscPrinted: -BLOCK23.discPrinted,
+  q20DiscPrintedAbs: Math.abs(SIGNED.discPrinted),
   q20BlockEigLo: BLOCK23.eigs[0],
   q20BlockEigHi: BLOCK23.eigs[1],
   q20OptC: USD_BEST.c,

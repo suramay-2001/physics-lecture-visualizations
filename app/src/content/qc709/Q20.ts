@@ -1,7 +1,7 @@
 import type { Lecture } from '../schema'
 import { Q20_REVIEW } from './Q20.review'
 import { Q20_STORY, Q20_UNIT_CLAIMS_BY_ID } from './Q20.story'
-import { V, close, d, tf } from './Q20.values'
+import { SIGNED, V, close, d, tf } from './Q20.values'
 
 // Physics 709, chapter Q20: "Quantum machines: cloners, U-NOT, programmable processors" (Bergou Ch. 8, pp. 145-157; Problems 8.1-8.3 cited only), in both tracks. A `'books'`-phase chapter
 // (the 709 notes do not reach Chapter 8): every ramp beat is [B], every clue is [C], the Go-deeper beats are [D] and last in their unit. Plan: docs/roles/proposals/P-Q20-story.md;
@@ -443,7 +443,7 @@ export const Q20: Lecture = {
       question: 'How does the cloner circuit become a programmable gate?',
       lecture: {
         pages: 'Bergou §8.4, pp. 152–153, Eqs. 8.22–8.28; Problem 3 cited (no lecture-notes source)',
-        summary: 'In the cloner circuit each Bell state, used as the program, applies one Pauli gate. A mix of three Bell states programs a phase flip about any axis, with chance one third.',
+        summary: 'In the cloner circuit each Bell state, used as the program, applies one Pauli gate. A superposition of three Bell states programs a phase flip about any axis, with chance one third.',
       },
       books: [{ source: 'bergou', where: '§8.4, pp. 152–153, Eqs. 8.22–8.28', adds: 'the Bell programs, the Pauli form of a phase flip, and the success chance one third.' }],
       visual: {
@@ -455,8 +455,8 @@ export const Q20: Lecture = {
         ],
       },
       clues: [],
-      insight: 'Each Bell state used as the program applies one Pauli gate. A mix of three Bell states programs a phase flip about any axis, one time in three.',
-      insightFormal: 'Eqs. 8.23–8.26: $U_\\chi = -\\mathbf n\\cdot\\boldsymbol\\sigma$ is programmed by $c_x|\\Psi^+\\rangle + c_y|\\Psi^-\\rangle + c_z|\\Phi^-\\rangle$, and the projection on the equal mix succeeds with chance $\\tfrac13$.',
+      insight: 'Each Bell state used as the program applies one Pauli gate. A superposition of three Bell states programs a phase flip about any axis, one time in three.',
+      insightFormal: 'Eqs. 8.23–8.26: $U_\\chi = -\\mathbf n\\cdot\\boldsymbol\\sigma$ is programmed by $c_x|\\Psi^+\\rangle + c_y|\\Psi^-\\rangle + c_z|\\Phi^-\\rangle$, and the projection on the equal superposition succeeds with chance $\\tfrac13$.',
       pitfalls: ['Using the book’s Bell names for the standard ones: his $\\Psi_\\pm$ are our $\\Phi^\\pm$ and his $\\Phi_\\pm$ are our $\\Psi^\\pm$.'],
       play: [
         {
@@ -467,8 +467,8 @@ export const Q20: Lecture = {
           prompt: 'What is the chance that the phase-flip machine succeeds, for any direction and any data state?',
           answer: V.q20FlipSuccess,
           tolerance: 0.005,
-          hints: [{ text: 'The program wires must hold the equal mix of three Bell states.' }, { text: 'The chance does not depend on the direction or the data.' }, { text: 'It is one over the number of Bell states used.' }],
-          walkthrough: [{ text: `Projecting on the equal mix of three Bell states leaves weight $1/\\sqrt3$, so the chance is $(1/\\sqrt3)^2 = ${d(V.q20FlipSuccess, 3)}$.` }],
+          hints: [{ text: 'The program wires must hold the equal superposition of three Bell states.' }, { text: 'The chance does not depend on the direction or the data.' }, { text: 'It is one over the number of Bell states used.' }],
+          walkthrough: [{ text: `Projecting on the equal superposition of three Bell states leaves weight $1/\\sqrt3$, so the chance is $(1/\\sqrt3)^2 = ${d(V.q20FlipSuccess, 3)}$.` }],
         },
         {
           id: 'q20-b-coef',
@@ -514,7 +514,7 @@ export const Q20: Lecture = {
         kind: 'bloch',
         props: { theta: 120, phi: 0, editable: true, measure: 'z' },
         tryThis: [
-          'At θ = 120° this is ψ₂, at overlap 0.5 with |0⟩: the widget reads +z 25.0%, which is s² for s = 0.5.',
+          'Take ψ₁ = |0⟩. At θ = 120° the widget shows ψ₂, at overlap 0.5 with ψ₁: it reads +z 25.0%, which is s² for s = 0.5.',
           'The machine’s chance then is ⅓(1 − s²) = 0.25, since only s matters.',
         ],
       },
@@ -570,8 +570,8 @@ export const Q20: Lecture = {
     {
       where: 'Bergou pp. 156–157, Eqs. 8.42–8.43',
       says: 'The constant term of the characteristic polynomial of each 2 × 2 block is 1 − (2 − c₁ − c₂) + (3/4)c₁c₂, and the second condition for non-negative eigenvalues is that this is at least 0.',
-      shouldSay: `Our calculation finds that the block’s determinant is 1 − c₁ − c₂ + (3/4)c₁c₂. At c₁ = c₂ = 2/3 the printed constant gives discriminant −${d(V.q20DiscPrinted, 4)}, non-real roots for a Hermitian block, while the true determinant is ${d(V.q20ConstTrue, 0)} and the eigenvalues are ${d(V.q20BlockEigLo, 0)} and ${d(V.q20BlockEigHi, 4)}. Eqs. 8.44, 8.46 and 8.47 follow from the true determinant.`,
-      check: () => close(V.q20ConstTrue, 0, 1e-12) && V.q20DiscPrinted > 0 && close(V.q20BlockEigHi, 2 / 3, 1e-9) && close(V.q20ConstPrinted, 2 / 3, 1e-9),
+      shouldSay: `Our calculation finds that the block’s determinant is 1 − c₁ − c₂ + (3/4)c₁c₂. At c₁ = c₂ = 2/3 the printed constant gives discriminant −${d(V.q20DiscPrintedAbs, 4)}, non-real roots for a Hermitian block, while the true determinant is ${d(V.q20ConstTrue, 0)} and the eigenvalues are ${d(V.q20BlockEigLo, 0)} and ${d(V.q20BlockEigHi, 4)}. Eqs. 8.44, 8.46 and 8.47 follow from the true determinant.`,
+      check: () => close(V.q20ConstTrue, 0, 1e-12) && SIGNED.discPrinted < 0 && close(-SIGNED.discPrinted, V.q20DiscPrintedAbs, 1e-12) && close(V.q20BlockEigHi, 2 / 3, 1e-9) && close(V.q20ConstPrinted, 2 / 3, 1e-9),
       source: 'book',
     },
   ],
