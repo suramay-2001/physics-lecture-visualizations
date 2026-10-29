@@ -83,7 +83,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-klm',
     term: 'KLM scheme',
-    gloss: 'The plan that makes linear-optics gates succeed with chance close to 1 by using many photons.',
+    gloss: 'The plan that makes linear-optics gates succeed with chance close to 1 by using $n$ extra photons.',
     formal: 'Gate teleportation with success $P_n = (n/(n+1))^2$ (Knill, Laflamme and Milburn 2001).',
     first: 'q26-teleport-gate:b5',
   },

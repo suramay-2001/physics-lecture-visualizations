@@ -70,6 +70,8 @@ export const Q26: Lecture = {
     '\\chi': 'q26-nonlinear:b3',
     'E_-': 'q26-nonlinear:b2',
     'E_n': 'q26-nonlinear:b2',
+    'g': 'q26-nonlinear:b2',
+    '\\omega': 'q26-nonlinear:b3',
     '\\hat n_1': 'q26-nonlinear:b1',
     '\\hat n_2': 'q26-nonlinear:b1',
     '|\\alpha\\rangle': 'q26-nonlinear:b5',
@@ -91,7 +93,7 @@ export const Q26: Lecture = {
     'H': 'q26-beamsplitter:b4',
     '|2\\rangle': 'q26-hom:b1',
     'a': 'q26-hom:b1',
-    'a_j': 'q26-hom:b1',
+    'a_j': 'q26-beamsplitter:b4',
     'S_kj': 'q26-hom:b1',
     'a_k': 'q26-hom:b1',
     'c_0': 'q26-ns-cz:b1',
@@ -470,7 +472,7 @@ export const Q26: Lecture = {
       },
       clues: [],
       insight: 'Each photon shifts a detuned atom’s level by the same small step, so the atom gives a phase that grows with the photon number. A cat state has only even or only odd photon numbers.',
-      insightFormal: '$E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$ gives $U_{\\mathrm{Kerr}} = e^{i\\chi\\hat a^\\dagger\\hat a t}$; $|\\langle -\\alpha|\\alpha\\rangle|^2 = e^{-4\\alpha^2}$ and $|\\alpha\\rangle \\pm |-\\alpha\\rangle$ are orthogonal.',
+      insightFormal: 'Apart from the bare $n\\hbar\\omega$, $E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$ gives $U_{\\mathrm{Kerr}} = e^{i\\chi\\hat a^\\dagger\\hat a t}$; $|\\langle -\\alpha|\\alpha\\rangle|^2 = e^{-4\\alpha^2}$ and $|\\alpha\\rangle \\pm |-\\alpha\\rangle$ are orthogonal.',
       pitfalls: ['Assuming any two coherent states are orthogonal: they are only nearly so when far apart.'],
       play: [
         {

@@ -84,7 +84,7 @@ export const Q26_REVIEW: Record<string, ReviewCard> = {
     trap: 'Repeating a failed gate inside the program until it works: only the resource can be repeated.',
     formal: {
       points: [
-        '$|r\\rangle = (I \\otimes \\mathrm{CNOT})(|\\Phi^+\\rangle|\\Phi^+\\rangle)$ and one Pauli per output fixes every Bell outcome (Fig. 14.7).',
+        '$|r\\rangle = (I \\otimes \\mathrm{CNOT})(|\\Phi^+\\rangle|\\Phi^+\\rangle)$ and one Pauli per output fixes every Bell outcome (Fig. 14.6 to Fig. 14.8).',
         `$P_n = (n/(n+1))^2$; $F \\ge ${d(V.q26Target99, 2)}$ needs $n = ${V.q26KlmN99}$.`,
       ],
       equations: 'P_n = (n/(n+1))^2',
@@ -101,7 +101,7 @@ export const Q26_REVIEW: Record<string, ReviewCard> = {
     trap: 'Assuming any two coherent states are orthogonal: they are only nearly so when far apart.',
     formal: {
       points: [
-        '$E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$ for $|\\Delta| \\gg \\Omega_n$ (p. 265).',
+        'Apart from the bare $n\\hbar\\omega$, $E_-(n) - E_-(0) \\simeq -\\hbar\\chi n$ with $\\chi = \\frac{\\Omega_0^2}{4\\Delta}$ for $|\\Delta| \\gg \\Omega_n$ (p. 265).',
         `$|\\langle -\\alpha|\\alpha\\rangle|^2 = e^{-4\\alpha^2}$: ${d(V.q26Overlap1, 4)} at $\\alpha = 1$; the even cat has no odd photon numbers.`,
       ],
       equations: 'U_{\\mathrm{Kerr}} = e^{i\\chi\\hat a^\\dagger\\hat a t}',
