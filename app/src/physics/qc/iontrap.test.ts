@@ -11,6 +11,7 @@ import {
   BE_TRAP,
   annihilation,
   bchGap,
+  kickCircuit,
   carrierExact,
   carrierGround,
   coolTime,
@@ -26,6 +27,7 @@ import {
   mathieuBetaApprox,
   mathieuEdge,
   mathieuTrace,
+  quadrupoleCurvatures,
   msBell,
   msBookTime,
   msCircuit,
@@ -86,6 +88,16 @@ describe('the Paul trap: the Mathieu equation z\'\' = 2 q cos(2 tau) z', () => {
   })
 })
 
+describe('Earnshaw', () => {
+  it('the quadrupole curvatures are 2, 2 and -4 and sum to zero', () => {
+    const k = quadrupoleCurvatures()
+    near(k[0], 2, 1e-6)
+    near(k[1], 2, 1e-6)
+    near(k[2], -4, 1e-6)
+    near(k[0] + k[1] + k[2], 0, 1e-6)
+  })
+})
+
 describe('two ions', () => {
   const wz = trapParams(BE_TRAP).omegaZ
   it('the spacing is 5.97 micrometres and the energy u(s) = s^2/4 + 1/2s has its minimum 0.75 at s = 1', () => {
@@ -126,6 +138,14 @@ describe('Lamb-Dicke number, kicks, sidebands and cooling', () => {
     for (let n = 0; n < 4; n++) near(Math.hypot(psi[n].re, psi[n].im), Math.exp(-(0.343 ** 2) / 2) * 0.343 ** n / Math.sqrt([1, 1, 2, 6][n]), 1e-12)
     near(bchGap(0.3), 0, 1e-12)
     expect(annihilation(3)[0][1].re).toBe(1)
+  })
+  it('the kick circuit is valid and its bars are the first four recoil amplitudes (renormalised)', () => {
+    const circ = kickCircuit(0.343)
+    expect(validateCircuit(circ)).toBeTruthy()
+    const psi = runCircuit(circ).states.at(-1)!
+    const ref = recoilState(0.343, 3)
+    const nrm = Math.sqrt(ref.reduce((s, z) => s + z.re ** 2 + z.im ** 2, 0))
+    for (let n = 0; n < 4; n++) near(Math.hypot(psi[n].re - ref[n].re / nrm, psi[n].im - ref[n].im / nrm), 0, 1e-9)
   })
   it('the cooling time is pi times the sum of k^{-1/2}: 15.77 against 31.42 from n = 10', () => {
     for (const e of FX.coolTime) near(coolTime(e.n), e.value, 1e-12)

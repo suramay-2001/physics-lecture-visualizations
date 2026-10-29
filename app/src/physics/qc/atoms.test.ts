@@ -18,6 +18,8 @@ import {
   blockadeRadiusScale,
   forceOverGravity,
   gammaIdentityGap,
+  groundSublevels,
+  poissonConvolutionGap,
   gateError,
   heatPerPhoton,
   logSlope,
@@ -123,6 +125,15 @@ describe('loading, counting and the readout error', () => {
   })
   it('the incomplete-gamma form of the book equals the Poisson sum (gap near 1e-13) for three cases', () => {
     for (const e of FX.gammaId) near(gammaIdentityGap(e.nc, e.mean), 0, 1e-9)
+  })
+})
+
+describe('counting rules', () => {
+  it('ground sublevels: caesium 7 + 9 = 16, strontium-87 10; two Poisson counts add into one Poisson law (gap near 1e-17)', () => {
+    expect(groundSublevels(3.5, 0.5)).toBe(16)
+    expect(groundSublevels(4.5, 0)).toBe(10)
+    near(poissonConvolutionGap(8, 0.2), 0, 1e-15)
+    near(poissonConvolutionGap(3.3, 4.1), 0, 1e-15)
   })
 })
 

@@ -12,7 +12,7 @@
  * pulse unitaries by expm and the force Hamiltonian by DOP853). NOT in the entry closure: imported only by `Q25.values.ts`, the lazy `plot` kind and tests (qc/atoms.test.ts guards it).
  */
 import { type C, c } from '../complex'
-import { type Mat, type Vec, dagger, identity, madd, matmul, mscale } from '../linalg'
+import { type Mat, type Vec, dagger, fromColumns, gramSchmidt, identity, madd, matmul, mscale, normalize } from '../linalg'
 import { C_LIGHT, E_CHARGE, H_PLANCK, K_BOLTZMANN } from '../constants'
 import { expmGeneral } from './blocheq'
 import type { Circuit, UnitaryOp } from './circuit'
@@ -111,6 +111,12 @@ export const secularExact = (q: number, omegaRf: number): number => (mathieuBeta
 export const twoIonSpacing = (massKg: number, omegaZ: number): number => (E_CHARGE ** 2 / (2 * Math.PI * EPS0 * massKg * omegaZ ** 2)) ** (1 / 3)
 /** The energy of the pair in units of m omega_z^2 Z_eq^2 at separation s Z_eq: s^2/4 + 1/(2 s). */
 export const twoIonPotential = (s: number): number => (s * s) / 4 + 1 / (2 * s)
+/** The curvatures of the quadrupole potential x^2 + y^2 - 2 z^2 along x, y and z by central second differences: 2, 2, -4, which sum to 0 (Earnshaw: the Laplacian vanishes, so no rest point). */
+export function quadrupoleCurvatures(h = 1e-3): [number, number, number] {
+  const phi = (x: number, y: number, z: number): number => x * x + y * y - 2 * z * z
+  const d2 = (f: (t: number) => number): number => (f(h) - 2 * f(0) + f(-h)) / (h * h)
+  return [d2((t) => phi(t, 0, 0)), d2((t) => phi(0, t, 0)), d2((t) => phi(0, 0, t))]
+}
 /** The two normal-mode angular frequencies from a central-difference Hessian of U(z1, z2) = m omega^2 (z1^2 + z2^2)/2 + e^2/(4 pi eps0 |z2 - z1|) at z = -/+ Z_eq/2. */
 export function twoIonModes(massKg: number, omegaZ: number): { com: number; stretch: number; ratio: number } {
   const Zeq = twoIonSpacing(massKg, omegaZ)
@@ -164,6 +170,16 @@ export const sidebandFirstOrder = (eta: number, n: number): number => eta * Math
 export const carrierGround = (eta: number): number => Math.exp(-(eta * eta) / 2)
 /** The oscillator after a light kick from the ground state: the first column of e^{i eta (a + a^dagger)}, levels 0 ... nmax (amplitudes e^{-eta^2/2}(i eta)^n/sqrt(n!)). */
 export const recoilState = (eta: number, nmax: number): Vec => kickOperator(eta, nmax).map((row) => row[0])
+/**
+ * Unit 25.5: two wires for the oscillator levels n = 0 ... 3 (binary), one box whose first column is the (renormalised) light-kick state of `recoilState(eta, 3)`, completed to a unitary by
+ * Gram-Schmidt: the bars after the box are the amplitudes e^{-eta^2/2}(i eta)^n/sqrt(n!) up to the tiny weight beyond n = 3.
+ */
+export function kickCircuit(eta: number): Circuit {
+  const xi = normalize(recoilState(eta, 3))
+  const unit = (k: number): Vec => Array.from({ length: 4 }, (_, i) => (i === k ? c(1) : c(0)))
+  const U = fromColumns(gramSchmidt([xi, unit(1), unit(2), unit(3)]).basis)
+  return { version: 1, qubits: 2, init: '00', wires: ['n1', 'n0'], columns: [[unitaryOp(U, [0, 1], 'kick')]] }
+}
 /** The largest entry difference over the first 10 levels between e^{A+B} and e^{-eta^2/2} e^A e^B with A = i eta a^dagger, B = i eta a (the Baker-Campbell-Hausdorff identity). */
 export function bchGap(eta: number, nmax = 40): number {
   const A = mscale(creation(nmax), c(0, eta))

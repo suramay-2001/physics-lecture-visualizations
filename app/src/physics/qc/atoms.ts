@@ -372,3 +372,20 @@ export function wCoupling(N: number): number {
 }
 /** sqrt(N): the closed form of the same number (the W state couples sqrt(N) times faster). */
 export const wCouplingClosed = (N: number): number => Math.sqrt(N)
+
+/** The number of ground sublevels, the sum of 2F + 1 over F = |I - J| ... I + J, for nuclear spin I and electronic angular momentum J (caesium I = 7/2, J = 1/2: 7 + 9 = 16; strontium-87 I = 9/2, J = 0: 10). */
+export function groundSublevels(I: number, J: number): number {
+  let n = 0
+  for (let F = Math.abs(I - J); F <= I + J + 1e-9; F += 1) n += 2 * F + 1
+  return Math.round(n)
+}
+/** max over n = 0 ... nMax of |sum_m P(m, a) P(n - m, b) - P(n, a + b)|: signal and background counts add into one Poisson law (Eq. 13.6). */
+export function poissonConvolutionGap(a: number, b: number, nMax = 40): number {
+  let gap = 0
+  for (let n = 0; n <= nMax; n++) {
+    let s = 0
+    for (let m = 0; m <= n; m++) s += poissonPmf(m, a) * poissonPmf(n - m, b)
+    gap = Math.max(gap, Math.abs(s - poissonPmf(n, a + b)))
+  }
+  return gap
+}

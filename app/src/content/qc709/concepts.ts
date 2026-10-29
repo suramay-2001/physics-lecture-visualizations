@@ -309,4 +309,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-rabi-station', label: 'Pulses that flip, and gates from them', chapter: 'Q24', unit: 'q24-rabi', needs: ['qc-bloch-eq-station'], sameAs: 'driven-spin' },
   { id: 'qc-ramsey-station', label: 'Two half pulses and a wait', chapter: 'Q24', unit: 'q24-ramsey', needs: ['qc-rabi-station'] },
   { id: 'qc-decoupling-station', label: 'Undoing slow noise with flips', chapter: 'Q24', unit: 'q24-decoupling', needs: ['qc-ramsey-station'] },
+  // Chapter Q25 (P-Q25-story §11.1): qubits made of atoms and ions
+  { id: 'qc-atom-cooling-station', label: 'Stopping, cooling and holding an atom', chapter: 'Q25', unit: 'q25-cooling', needs: ['qc-bloch-eq-station'] },
+  { id: 'qc-readout-station', label: 'Reading a qubit with light', chapter: 'Q25', unit: 'q25-readout', needs: ['qc-f5-probability', 'qc-atom-cooling-station'] },
+  { id: 'qc-atom-gates-station', label: 'Rotations, Raman light and Rydberg blockade', chapter: 'Q25', unit: 'q25-atom-gates', needs: ['qc-rabi-station', 'qc-cnot'] },
+  { id: 'qc-ion-trap-station', label: 'Holding an ion in the air', chapter: 'Q25', unit: 'q25-ion-trap', needs: ['qc-atom-cooling-station'] },
+  { id: 'qc-phonon-station', label: 'Spin and motion in one ion', chapter: 'Q25', unit: 'q25-phonons', needs: ['qc-ion-trap-station', 'qc-rabi-station'] },
+  { id: 'qc-ion-gates-station', label: 'Entangling ions through their motion', chapter: 'Q25', unit: 'q25-ion-gates', needs: ['qc-phonon-station', 'qc-entanglement'] },
 ]
