@@ -309,4 +309,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-rabi-station', label: 'Pulses that flip, and gates from them', chapter: 'Q24', unit: 'q24-rabi', needs: ['qc-bloch-eq-station'], sameAs: 'driven-spin' },
   { id: 'qc-ramsey-station', label: 'Two half pulses and a wait', chapter: 'Q24', unit: 'q24-ramsey', needs: ['qc-rabi-station'] },
   { id: 'qc-decoupling-station', label: 'Undoing slow noise with flips', chapter: 'Q24', unit: 'q24-decoupling', needs: ['qc-ramsey-station'] },
+  // Chapter Q26 (P-Q26-story §11.1): photons. Each station needs the one before it in the chapter plus what the unit leans on from earlier chapters.
+  { id: 'qc-photon-encodings-station', label: 'Three ways to write a photon qubit', chapter: 'Q26', unit: 'q26-encodings', needs: ['qc-photon-frames'] },
+  { id: 'qc-splitter-station', label: 'One splitter, four numbers', chapter: 'Q26', unit: 'q26-beamsplitter', needs: ['qc-photon-encodings-station', 'qc-f4-unitary'] },
+  { id: 'qc-hom-station', label: 'Two photons that leave together', chapter: 'Q26', unit: 'q26-hom', needs: ['qc-splitter-station'] },
+  { id: 'qc-ns-cz-station', label: 'A sign flip from a heralded photon', chapter: 'Q26', unit: 'q26-ns-cz', needs: ['qc-hom-station', 'qc-cnot'] },
+  { id: 'qc-gate-teleport-station', label: 'Teleport the gate, then count photons', chapter: 'Q26', unit: 'q26-teleport-gate', needs: ['qc-ns-cz-station', 'qc-teleportation'] },
+  { id: 'qc-kerr-station', label: 'Photons that talk through matter', chapter: 'Q26', unit: 'q26-nonlinear', needs: ['qc-hom-station'] },
 ]

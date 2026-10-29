@@ -196,4 +196,6 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q13-from-unitary': { course: 'qc709', lecture: 'Q13', unit: 'q13-from-unitary', label: 'tracing out the surroundings gives Kraus operators' },
   'qc-q13-depolarizing': { course: 'qc709', lecture: 'Q13', unit: 'q13-depolarizing', label: 'noise as a shrinking Bloch ball: damping and dephasing' },
   'qc-q21-dfs': { course: 'qc709', lecture: 'Q21', unit: 'q21-dfs', label: 'hiding where the noise cannot reach' },
+  // Chapter Q26 (P-Q26-story §11.3): the Q11 unit that teleports a state (the other rows it uses exist already)
+  'qc-q11-teleport-circuit': { course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit', label: 'the teleportation circuit and its two readings' },
 }
