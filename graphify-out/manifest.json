@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1793224926.7652552,
-    "ast_hash": "1041df2091f021354338be3667191c90",
+    "mtime": 1793240304.0373056,
+    "ast_hash": "d2be404763e77107e11c69302e1a4757",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1793040559.274082,
-    "ast_hash": "5d1cddd5a7cf4e1492847233d0c8fadd",
+    "mtime": 1793246179.3806052,
+    "ast_hash": "fb53d9744841351251e06c522f7f2798",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "app/src/content/stage.ts": {
-    "mtime": 1793224975.0671704,
-    "ast_hash": "ca2176fc46fc4f72fbe8fed850619ca3",
+    "mtime": 1793240290.730128,
+    "ast_hash": "21cdb5bc53dfc9a6ad5c33d4009a7b93",
     "semantic_hash": ""
   },
   "app/src/content/stageVocab.ts": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1793229364.5067027,
-    "ast_hash": "663b2343661ec312814665f8d60eee23",
+    "mtime": 1793244025.7051284,
+    "ast_hash": "b72ac4f7db51f3e1a046d563a58f2736",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -935,8 +935,8 @@
     "semantic_hash": ""
   },
   "docs/roles/interface-changes.md": {
-    "mtime": 1793224166.230015,
-    "ast_hash": "df7249e6f36180473986196d71639aa9",
+    "mtime": 1793229525.7625144,
+    "ast_hash": "4278af80c97e4d466246477395137fc0",
     "semantic_hash": ""
   },
   "docs/roles/proposals/D-L1-scenes.md": {
@@ -2655,7 +2655,7 @@
     "semantic_hash": ""
   },
   "app/src/content/meta.generated.ts": {
-    "mtime": 1793226484.1257968,
+    "mtime": 1793244025.338524,
     "ast_hash": "9d0fedc11329d892df512a350fe2c43b",
     "semantic_hash": ""
   },
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1793224926.764781,
-    "ast_hash": "8cabb273755043743945428c9e3c55e3",
+    "mtime": 1793246179.3812733,
+    "ast_hash": "5260cab16d7831489073e15f8ec1ad49",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1793224926.7700565,
-    "ast_hash": "6343eec68554946254c8c8f3221da489",
+    "mtime": 1793240290.7278004,
+    "ast_hash": "ca2cf5c693d89ba2dc448757772f59c6",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1793226484.1272302,
-    "ast_hash": "2d14501841afc99fa5b888c900935c14",
+    "mtime": 1793244025.340281,
+    "ast_hash": "724c0d1334acd9583853afb16be91fda",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.test.ts": {
@@ -3140,8 +3140,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/CourseHome709.tsx": {
-    "mtime": 1793220640.8082218,
-    "ast_hash": "9f921b998eeadadcbd5b583ad35b5c21",
+    "mtime": 1793240339.6458042,
+    "ast_hash": "57ca189761cca7d169890248f447d8c3",
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.tsx": {
@@ -3370,8 +3370,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1793224946.7984984,
-    "ast_hash": "102a19394c8de4617f79b91157efc389",
+    "mtime": 1793240290.7273269,
+    "ast_hash": "25fe08f23d5f5886b04a802585373b48",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -4385,8 +4385,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/plot.ts": {
-    "mtime": 1793224946.8003361,
-    "ast_hash": "88ff71c995c4beebab59a635758da33f",
+    "mtime": 1793240283.0441232,
+    "ast_hash": "c2965bd1b8154e8aa455d70ff45aff60",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q8.glossary.ts": {
@@ -5285,13 +5285,13 @@
     "semantic_hash": ""
   },
   "app/src/content/meta.detail.generated.ts": {
-    "mtime": 1793226484.1265128,
+    "mtime": 1793244025.3394225,
     "ast_hash": "a3284c431f3d01cecd36e389bf77c79c",
     "semantic_hash": ""
   },
   "app/src/content/notation.classes.test.ts": {
-    "mtime": 1792452648.9816232,
-    "ast_hash": "b8971b23562684421469dfacda36f5c5",
+    "mtime": 1793229745.0372717,
+    "ast_hash": "0f1f4b24cd7a13080ce3d15aba0209c5",
     "semantic_hash": ""
   },
   "app/src/content/notation.context.test.ts": {
@@ -5410,7 +5410,7 @@
     "semantic_hash": ""
   },
   "app/src/content/papers/meta.generated.ts": {
-    "mtime": 1793226484.1277406,
+    "mtime": 1793244025.3405962,
     "ast_hash": "106015c16774b1324a0400d5365e3216",
     "semantic_hash": ""
   },
@@ -5815,7 +5815,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/meta.generated.ts": {
-    "mtime": 1793226484.1304252,
+    "mtime": 1793244025.343198,
     "ast_hash": "fcc7ca22c946452715c9bc3c08c08c34",
     "semantic_hash": ""
   },
@@ -7375,13 +7375,13 @@
     "semantic_hash": ""
   },
   "docs/context/cards/pipeline.md": {
-    "mtime": 1793224926.7776284,
-    "ast_hash": "c05547fb7c1fce9f849d4d8cae4a6c3d",
+    "mtime": 1793240290.7281215,
+    "ast_hash": "204188e7ff4d03d4a3420371c5449765",
     "semantic_hash": ""
   },
   "docs/context/cards/qc-engine.md": {
-    "mtime": 1793224926.7780879,
-    "ast_hash": "4e95b54e0f8a235e005046775ed17414",
+    "mtime": 1793240290.7285838,
+    "ast_hash": "3e07273c33657cb8d78bb6acf5ac99ac",
     "semantic_hash": ""
   },
   "docs/context/cards/qec-engine.md": {
@@ -7390,8 +7390,8 @@
     "semantic_hash": ""
   },
   "docs/context/cards/stage-kinds.md": {
-    "mtime": 1793224946.7988994,
-    "ast_hash": "c68b2b45b306fcb91d4b9da7f22537a2",
+    "mtime": 1793240296.0842414,
+    "ast_hash": "fbef92a701a78d4be67699667fed7622",
     "semantic_hash": ""
   },
   "docs/context/cards/tests-and-gate.md": {
@@ -10120,18 +10120,18 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.review.ts": {
-    "mtime": 1793224926.767514,
-    "ast_hash": "3b1edc6ddb58167168e9ce751a1bc84c",
+    "mtime": 1793236605.1165268,
+    "ast_hash": "fc06f2919295990e00ed275088d78264",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.story.ts": {
-    "mtime": 1793224926.7679026,
-    "ast_hash": "52c98fbf4fdacc1b33afa666ca4a80bb",
+    "mtime": 1793236605.1173713,
+    "ast_hash": "debfd07ca3e5c19dd59a453b76344fc9",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.test.ts": {
-    "mtime": 1793224926.768188,
-    "ast_hash": "2388e3736628be85368a5739659b58c5",
+    "mtime": 1793236605.1181808,
+    "ast_hash": "418fd3929f4b88ec1cf7397da4d03340",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.tryits.test.tsx": {
@@ -10140,13 +10140,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.ts": {
-    "mtime": 1793224926.7687087,
-    "ast_hash": "24b896295d083c03e7fe8e076a6cba28",
+    "mtime": 1793236605.118699,
+    "ast_hash": "28d69c096bb450e46ce17cd88f6b72d4",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.values.ts": {
-    "mtime": 1793224926.769033,
-    "ast_hash": "7677eb32c902f222df32d679e9ce4f54",
+    "mtime": 1793236605.1193383,
+    "ast_hash": "ceb0ff25bf6e0c568bd1db56001aa73d",
     "semantic_hash": ""
   },
   "app/src/content/qc709/loaders.ts": {
@@ -10240,7 +10240,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/meta.generated.ts": {
-    "mtime": 1793226484.131464,
+    "mtime": 1793244025.3444145,
     "ast_hash": "eea61b445503193b6bd2b908846adf49",
     "semantic_hash": ""
   },
@@ -10300,8 +10300,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims-qc709/q20.json": {
-    "mtime": 1793224926.7720823,
-    "ast_hash": "2d0a2d27cdf493e4a5e73aa8f8e49d5f",
+    "mtime": 1793236605.1220186,
+    "ast_hash": "f70c921a648dc88615b0f34d3cdf603f",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/optics.json": {
@@ -10405,8 +10405,8 @@
     "semantic_hash": ""
   },
   "pipeline/claims_qc709/q20.py": {
-    "mtime": 1793224926.779478,
-    "ast_hash": "f1012bd13d6eaa2164d566183403d801",
+    "mtime": 1793236605.1232471,
+    "ast_hash": "c7b0217243b84a923a939b7f7dd7d956",
     "semantic_hash": ""
   },
   "pipeline/machines_numpy.py": {
@@ -10502,6 +10502,456 @@
   "docs/roles/proposals/P-optics-lab.md": {
     "mtime": 1793219741.007411,
     "ast_hash": "2fb0e90b051c590bd6a13677299d6e4a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.glossary.ts": {
+    "mtime": 1793229525.7546277,
+    "ast_hash": "2fb57467840b1ab1197de8de96d59c05",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.review.ts": {
+    "mtime": 1793229525.7548301,
+    "ast_hash": "eac33d2bb3733a1f65d4f91ea47e9ecf",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.story.ts": {
+    "mtime": 1793236605.1202314,
+    "ast_hash": "71ab41059f09730a56fca42405b62c36",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.test.ts": {
+    "mtime": 1793236605.120766,
+    "ast_hash": "6d594c0944dfc29ffa77cac36b66da67",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.tryits.test.tsx": {
+    "mtime": 1793229525.7556674,
+    "ast_hash": "d93e9c1e1b147071af4886ddb28e3cc7",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.ts": {
+    "mtime": 1793236605.1214547,
+    "ast_hash": "3318478c72b4d30621a49cd3d3abbb19",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.values.ts": {
+    "mtime": 1793229525.7562191,
+    "ast_hash": "4b7aa998c05efd39b769bae65254e7df",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.glossary.ts": {
+    "mtime": 1793244011.3912354,
+    "ast_hash": "e46913c87774dba65f5617847c4b692a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.review.ts": {
+    "mtime": 1793229745.038249,
+    "ast_hash": "6d08b571e0119df4de07b8e07358397a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.story.ts": {
+    "mtime": 1793244011.392163,
+    "ast_hash": "28d46815c258e09c586dbe7e7a809cb9",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.test.ts": {
+    "mtime": 1793229745.0391235,
+    "ast_hash": "f4146eefc3d60876d452404ca1ddfd96",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.tryits.test.tsx": {
+    "mtime": 1793229745.0394337,
+    "ast_hash": "ce9148da847f3961f6cf48d752cb36f5",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.ts": {
+    "mtime": 1793244011.3928175,
+    "ast_hash": "61e7d92f3e0a7d472610b87681cb9924",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.values.ts": {
+    "mtime": 1793229745.0400646,
+    "ast_hash": "6a0a35bee5456587973a3ee6088b648d",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.glossary.ts": {
+    "mtime": 1793244011.3937316,
+    "ast_hash": "4cfe7b3b1f515c22176b7ceb7322a639",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.review.ts": {
+    "mtime": 1793244011.3943036,
+    "ast_hash": "192c6a091d7e0eb3facd3aa7bfe8b8ae",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.story.ts": {
+    "mtime": 1793244011.395173,
+    "ast_hash": "8b2ec8090720096a0f37767b33f454f0",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.test.ts": {
+    "mtime": 1793244011.3958256,
+    "ast_hash": "416decd4c4dcd3a8700fe9e308078a40",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.tryits.test.tsx": {
+    "mtime": 1793240247.1144805,
+    "ast_hash": "e93024bc9b2fd6172952f1249624ed90",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.ts": {
+    "mtime": 1793244011.3964124,
+    "ast_hash": "2157c05f9905e00edf1bcbe42760b6c1",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.values.ts": {
+    "mtime": 1793244011.3968682,
+    "ast_hash": "1fad3472dee3fa0453e3832e43d46463",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.glossary.ts": {
+    "mtime": 1793239523.965868,
+    "ast_hash": "4e9987b5762bd2e47596535932f9f5ad",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.review.ts": {
+    "mtime": 1793239523.9663386,
+    "ast_hash": "c5608904f8db3839a8ed67005c11a696",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.story.ts": {
+    "mtime": 1793239523.9675102,
+    "ast_hash": "e55de40dc0b4ad30e0a2f1e6c46a4a1f",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.test.ts": {
+    "mtime": 1793239523.9684672,
+    "ast_hash": "ced48248592b7daacec72873256835d9",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.tryits.test.tsx": {
+    "mtime": 1793236734.0064802,
+    "ast_hash": "4636a3c6503474f1b6aa762fa8f8755c",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.ts": {
+    "mtime": 1793239523.96909,
+    "ast_hash": "a50516b9911e7651c01d8e55bb779e15",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.values.ts": {
+    "mtime": 1793236734.0072186,
+    "ast_hash": "e3b430b4771a62703d292f632ec15757",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.glossary.ts": {
+    "mtime": 1793239523.969907,
+    "ast_hash": "fcb195c4822f15a359df4cef3afcf746",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.review.ts": {
+    "mtime": 1793239523.9703279,
+    "ast_hash": "1899ce21e39e4ea103a3c5cf2eff273e",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.story.ts": {
+    "mtime": 1793239523.9710941,
+    "ast_hash": "13118acbe45f4f59fa5c51c38e4bb0bf",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.test.ts": {
+    "mtime": 1793237048.4987788,
+    "ast_hash": "af06dcd1a85c7b87dfd479c0615fa4fe",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.tryits.test.tsx": {
+    "mtime": 1793237048.499008,
+    "ast_hash": "d1a37412b9e1f7afe5aa1af51268518d",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.ts": {
+    "mtime": 1793239523.9718533,
+    "ast_hash": "6b238a6517fadcc8fb5a3d6226da8c2b",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.values.ts": {
+    "mtime": 1793237048.499514,
+    "ast_hash": "3d21cde1d09b2a869a7f3e4ba8805456",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q23.json": {
+    "mtime": 1793229525.7590656,
+    "ast_hash": "cd404d6e46bbd52f6fab7f148a030617",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q24.json": {
+    "mtime": 1793229745.0425828,
+    "ast_hash": "2254b82f855821580067871bd4dfa955",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q25.json": {
+    "mtime": 1793240247.1182725,
+    "ast_hash": "ee260652192479993c63e922c92a502a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q26.json": {
+    "mtime": 1793236734.009964,
+    "ast_hash": "16d704bb2cecca20cf73f48c868a0f7a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q27.json": {
+    "mtime": 1793237048.501443,
+    "ast_hash": "1539ad517271b7089598a4022cf7ca90",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-infoq.json": {
+    "mtime": 1793229525.7592852,
+    "ast_hash": "703a3e2d59a7501c2be9cbaab692cac9",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-photons.json": {
+    "mtime": 1793236734.0103807,
+    "ast_hash": "87c85849e3ec7076a24434c835679902",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-q24.json": {
+    "mtime": 1793229745.0431447,
+    "ast_hash": "06d59ff7a12ab53e65531986e28d09e4",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-q25.json": {
+    "mtime": 1793240247.1187105,
+    "ast_hash": "eb6dec47afedc48fbf5d5e544513e8cc",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-solid.json": {
+    "mtime": 1793237048.5016465,
+    "ast_hash": "6ffd647a5859c791cbf933466aa2af89",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/atoms.test.ts": {
+    "mtime": 1793240247.1190863,
+    "ast_hash": "c37ece0e7cb3f98cb237217e751cf868",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/atoms.ts": {
+    "mtime": 1793240247.1194944,
+    "ast_hash": "15959d3258481dd21d2c3406b4973a04",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/blocheq.test.ts": {
+    "mtime": 1793229745.043445,
+    "ast_hash": "9008f58b9a01c1ae57389cc9ee9f9148",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/blocheq.ts": {
+    "mtime": 1793229745.0437577,
+    "ast_hash": "22fcc7c8fd44ae3bd35741c1257fa437",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/infoq.test.ts": {
+    "mtime": 1793229525.7595284,
+    "ast_hash": "aeaa126c6505a451bd681c69f32bd81b",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/infoq.ts": {
+    "mtime": 1793229525.7598653,
+    "ast_hash": "a8d697db19a1ba1a4af59adb3334a4df",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/iontrap.test.ts": {
+    "mtime": 1793240247.1199691,
+    "ast_hash": "ea82fc51728666eaff3e724bcee7660a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/iontrap.ts": {
+    "mtime": 1793240247.1202958,
+    "ast_hash": "f87aa5947a5bab1b6321d1f8cb6e05fb",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/photons.test.ts": {
+    "mtime": 1793236734.0107691,
+    "ast_hash": "0bb54f721ffc67e789ff7654e0c78cfc",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/photons.ts": {
+    "mtime": 1793236734.0111537,
+    "ast_hash": "eae8c80a7bda97bf961c0bb58bbe8952",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/pulses.test.ts": {
+    "mtime": 1793229745.044029,
+    "ast_hash": "0c0f552be18c43850add2589570ce7e6",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/pulses.ts": {
+    "mtime": 1793229745.0444586,
+    "ast_hash": "43f25a83bbc7797a21b4b2dfd934043d",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/solid.test.ts": {
+    "mtime": 1793237048.501868,
+    "ast_hash": "44a6e1820351af2aa6875f50cc8213f4",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/solid.ts": {
+    "mtime": 1793237048.5020993,
+    "ast_hash": "e848ded62707500118b527f59abe44a5",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotInfoq.test.ts": {
+    "mtime": 1793229525.7607017,
+    "ast_hash": "e6549fa18580fd0a3e0f0c83d4621780",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotPhotons.test.ts": {
+    "mtime": 1793236734.011933,
+    "ast_hash": "294deabbe1ca771867bfaddefd5ad758",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotQ24.test.ts": {
+    "mtime": 1793229745.045304,
+    "ast_hash": "fd948a9032b56816b2ad95e28ee3acc2",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotQ25.test.ts": {
+    "mtime": 1793240247.1211553,
+    "ast_hash": "ba8e1716d09e60cd16e2dd5d209ad15a",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotSolid.test.ts": {
+    "mtime": 1793237048.5027435,
+    "ast_hash": "bec60e1d984ad13fd0385ed017d2323e",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q23.py": {
+    "mtime": 1793229525.7628565,
+    "ast_hash": "7d30ac00b138f761347aeaacc5da9c70",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q24.py": {
+    "mtime": 1793229745.0471182,
+    "ast_hash": "45acf26095631a4f3cc407dd4905691b",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q25.py": {
+    "mtime": 1793240247.1230261,
+    "ast_hash": "da97bb63e6568e7b8ff40db6c62c7508",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q26.py": {
+    "mtime": 1793236734.0141017,
+    "ast_hash": "95c444b38840226a37378306798b4e89",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q27.py": {
+    "mtime": 1793237048.5038388,
+    "ast_hash": "fa6286b750576af70b40fec4c8f1e84e",
+    "semantic_hash": ""
+  },
+  "pipeline/infoq_numpy.py": {
+    "mtime": 1793229525.7630882,
+    "ast_hash": "cd8e4ebbd0e06b0c29ad70a760a142e2",
+    "semantic_hash": ""
+  },
+  "pipeline/make_infoq_fixtures.py": {
+    "mtime": 1793229525.7633083,
+    "ast_hash": "35d720ae913e72d140d29dabfc0d90c2",
+    "semantic_hash": ""
+  },
+  "pipeline/make_photon_fixtures.py": {
+    "mtime": 1793236734.0145621,
+    "ast_hash": "304c45ad182b2712174b4495641e50d7",
+    "semantic_hash": ""
+  },
+  "pipeline/make_q24_fixtures.py": {
+    "mtime": 1793229745.0474904,
+    "ast_hash": "5097b5e1cdb6d8d30bdaad9d00e630ae",
+    "semantic_hash": ""
+  },
+  "pipeline/make_q25_fixtures.py": {
+    "mtime": 1793240247.123511,
+    "ast_hash": "4e4f3754a4c144b45f6c9c821a8f6c19",
+    "semantic_hash": ""
+  },
+  "pipeline/make_solid_fixtures.py": {
+    "mtime": 1793237048.5040753,
+    "ast_hash": "860fc776fefcc3b88b3ea5a22b396cf3",
+    "semantic_hash": ""
+  },
+  "pipeline/photon_numpy.py": {
+    "mtime": 1793236734.0151782,
+    "ast_hash": "0f20f66c40583df7770da29934683ac9",
+    "semantic_hash": ""
+  },
+  "pipeline/q24_numpy.py": {
+    "mtime": 1793229745.0478256,
+    "ast_hash": "bf20b9bf17256c6df3709445e17d3918",
+    "semantic_hash": ""
+  },
+  "pipeline/q25_numpy.py": {
+    "mtime": 1793240247.1239674,
+    "ast_hash": "425f43a0645a658d4355bcf968c731dd",
+    "semantic_hash": ""
+  },
+  "pipeline/solid_numpy.py": {
+    "mtime": 1793237048.5042956,
+    "ast_hash": "fed2f7055520f83b7110e2c44528c92a",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q20Q23-fix.md": {
+    "mtime": 1793236605.1223738,
+    "ast_hash": "263e700a6f760bbd80e79667bbc225d3",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q23.md": {
+    "mtime": 1793229525.7618585,
+    "ast_hash": "d936b6eefc89e219014e7f637f02922b",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q24.md": {
+    "mtime": 1793229745.046797,
+    "ast_hash": "47bf6878f3e72aadc15e4ebcee36c35c",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q24Q25-fix.md": {
+    "mtime": 1793244011.3972642,
+    "ast_hash": "8d971a5b70435f249e14dafc1ad765ce",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q25.md": {
+    "mtime": 1793240247.1226518,
+    "ast_hash": "caf0c37734cf750901bb0fc6fd147a8b",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q26.md": {
+    "mtime": 1793236734.013699,
+    "ast_hash": "c57e2c23ab325c5ecd7a44732dafd76a",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q26Q27-fix.md": {
+    "mtime": 1793239523.9722283,
+    "ast_hash": "3cbd60d3069b7f487a58393848976838",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q27.md": {
+    "mtime": 1793237048.503605,
+    "ast_hash": "da511fe41c1eb97e10025e31cfbab7b2",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-Q20Q23-review.md": {
+    "mtime": 1793230919.7603362,
+    "ast_hash": "d5ed505dc3a6fcc1f2aa4f7e358cc483",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-Q24Q25-review.md": {
+    "mtime": 1793242121.8376136,
+    "ast_hash": "f57022c9ded581556e95906edfe2e179",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-Q26Q27-review.md": {
+    "mtime": 1793238551.6739583,
+    "ast_hash": "16f9a3a8e2346a843309dce450116066",
     "semantic_hash": ""
   }
 }
