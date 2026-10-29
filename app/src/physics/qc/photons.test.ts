@@ -6,9 +6,11 @@ import { describe, expect, it } from 'vitest'
 import raw from '../__fixtures__/qc-photons.json?raw'
 import { abs, abs2, c } from '../complex'
 import { type Mat, type Vec, dagger, identity, matEq, matmul } from '../linalg'
+import { photonTurn } from '../polarization'
 import { rng } from '../random'
 import { circuitUnitary, runCircuit, validateCircuit } from './circuit'
 import { eigh, randomUnitary } from './cmat'
+import { Ry } from './gates'
 import {
   bellAnalyzerSuccess,
   blochPolarDeg,
@@ -116,6 +118,13 @@ describe('wave plates and the dual-rail qubit (pp. 253-258)', () => {
       expect(validateCircuit(waveCircuit(th, ph)).ok).toBe(true)
       expect(vgap(runCircuit(dualRailCircuit(th, ph)).states.at(-1)!, dualRailKet(th, ph))).toBeLessThan(1e-14)
     }
+  })
+})
+
+describe('the chapter reuses what is already built: Q5\'s splitter and 448\'s photon turn', () => {
+  it('Chapter Q5\'s balanced splitter is R_y(pi/2), and the plate pair at varphi = -90 degrees is 448\'s photonTurn (a turn of the light by theta is a sphere turn of 2 theta about y)', () => {
+    expect(matEq(bsQ5(), Ry(Math.PI / 2), 1e-12)).toBe(true)
+    for (const th of [10, 30, 22.5, 45]) expect(matEq(waveUnitary(th, -90), photonTurn((th * Math.PI) / 180), 1e-12), `theta ${th}`).toBe(true)
   })
 })
 

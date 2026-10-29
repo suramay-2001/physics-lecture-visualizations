@@ -23,7 +23,7 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // Physics 709 (second course): its home and pages load lazily with their own stylesheet and faces
   '#/709', '#/709/map', '#/709/arcade', '#/709/formulas', '#/709/help',
   // written 709 chapters
-  '#/709/ch/F1', '#/709/ch/F2', '#/709/ch/F3', '#/709/ch/F4', '#/709/ch/F5', '#/709/ch/F6', '#/709/ch/F7', '#/709/ch/F8', '#/709/ch/Q1', '#/709/ch/Q2', '#/709/ch/Q3', '#/709/ch/Q4', '#/709/ch/Q5', '#/709/ch/Q6', '#/709/ch/Q7', '#/709/ch/Q8', '#/709/ch/Q9', '#/709/ch/Q10', '#/709/ch/Q11', '#/709/ch/Q12', '#/709/ch/Q13', '#/709/ch/Q14', '#/709/ch/Q15', '#/709/ch/Q16', '#/709/ch/Q17', '#/709/ch/Q18', '#/709/ch/Q19', '#/709/ch/Q20', '#/709/ch/Q21', '#/709/ch/Q22',
+  '#/709/ch/F1', '#/709/ch/F2', '#/709/ch/F3', '#/709/ch/F4', '#/709/ch/F5', '#/709/ch/F6', '#/709/ch/F7', '#/709/ch/F8', '#/709/ch/Q1', '#/709/ch/Q2', '#/709/ch/Q3', '#/709/ch/Q4', '#/709/ch/Q5', '#/709/ch/Q6', '#/709/ch/Q7', '#/709/ch/Q8', '#/709/ch/Q9', '#/709/ch/Q10', '#/709/ch/Q11', '#/709/ch/Q12', '#/709/ch/Q13', '#/709/ch/Q14', '#/709/ch/Q15', '#/709/ch/Q16', '#/709/ch/Q17', '#/709/ch/Q18', '#/709/ch/Q19', '#/709/ch/Q20', '#/709/ch/Q21', '#/709/ch/Q22', '#/709/ch/Q26',
   // the 709 lecture notes (docs/roles/proposals/W-709-notes.md): the index and one page per built lecture (a new lecture adds its line here)
   '#/709/notes', '#/709/notes/N1', '#/709/notes/N2', '#/709/notes/N3', '#/709/notes/N4', '#/709/notes/N5', '#/709/notes/N6', '#/709/notes/N7', '#/709/notes/N8', '#/709/notes/N9', '#/709/notes/N10', '#/709/notes/N11',
   // the 709 Optics Lab (the second notes collection): the index and one page per built page (a new page adds its line here)
