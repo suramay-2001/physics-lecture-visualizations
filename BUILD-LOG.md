@@ -57,6 +57,19 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**709 COMPLETE (2026-10-29): every chapter in `outline.ts` is written (F1–F8, Q1–Q27).** Q20, Q23, Q24, Q25, Q26, Q27
+built (one Sonnet builder per chapter, engine + content), reviewed in pairs (`audits/P-Q20Q23-review.md`,
+`P-Q24Q25-review.md`, `P-Q26Q27-review.md`) and fixed; every Correction re-read on the page images before shipping
+(rulings `decisions/qc709-Q20-Q27.md` Z1–Z7). New engines `physics/qc/machines.ts`, `infoq.ts`, `blocheq.ts`, `pulses.ts`,
+`atoms.ts`, `iontrap.ts`, `photons.ts`, `solid.ts`; Q25 reuses `physics/optics/cooling.ts` and tags the Optics Lab's
+glossary. Merges of parallel chapters were done by a Sonnet merge agent in the main checkout (unions of e2e lists,
+bridges, concepts, `PlotCurveName` + `| OpticsCurveName`, plot tables). The "planned chapter" e2e step now asserts none
+remain. Entry ~485 KB raw (~12 KB headroom). Weekly meter ~49 % at the end (cap 54 %).
+NEXT (owner's call): Arcade items, films and openers for Q19–Q27 were deferred; a live-site header check needs the URL.
+LESSONS: a failed command early in an `&&` chain silently skipped writing two briefs (agents launched against missing
+files) — write briefs in their own command and `ls` them before launching; reviewers can quote the book: the leak hook
+catches 12-word runs in audits too.
+
 **Optics Lab PUSHED (2026-10-29; rulings `decisions/optics-lab.md` O1–O8).** Owner: build Metcalf and van der Straten,
 *Cooling and Trapping of Neutral Atoms* (`sources/mvs`, git-ignored) as optical experiments, prioritized, Sonnet workers,
 ≤ 10 points. Built: the notes machinery generalized to a second collection `optics` (`O1`–`O6`, `#/709/optics`, chips
