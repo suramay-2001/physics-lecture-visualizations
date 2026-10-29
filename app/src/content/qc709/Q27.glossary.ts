@@ -1,0 +1,161 @@
+/**
+ * Chapter Q27 glossary (Physics 709; P-Q27-story §5), merged into the lazy course pack by file name (pack.ts). Every entry has a Ground-up sentence (`gloss`, ≤ 25 words)
+ * and a Formal one (`formal`, ≤ 40), paraphrased. Ids start `qc-`. `introduces` marks the two notation beats: the flux and charge operators (q27-lc:b3) and the charging energy
+ * E_C (q27-transmon:b1), each introduced by exactly one beat of this chapter (content.test.tsx).
+ *
+ * Reused without a new entry here: qubit, hamiltonian, two-level-system, tunnelling, rotating-wave, qc-swap-gate, qc-phase-gate, qc-heisenberg-chain, qc-bloch-sphere.
+ */
+import type { GlossEntry } from '../schema'
+
+export const GLOSSARY: GlossEntry[] = [
+  {
+    id: 'qc-lumped-element',
+    term: 'lumped-element circuit',
+    gloss: 'A circuit much smaller than the wavelength of its own oscillation, treated as single lumps.',
+    formal: 'A circuit whose elements are much smaller than $\\lambda = c/f$, described by $L$ and $C$ alone (p. 271).',
+    first: 'q27-lc:b2',
+  },
+  {
+    id: 'qc-flux-charge',
+    term: 'flux and charge operators',
+    gloss: 'The circuit’s position-like and momentum-like variables.',
+    formal: 'The operators $\\hat\\Phi$ and $\\hat Q$ with $[\\hat\\Phi, \\hat Q] = i\\hbar$ and $\\hat H = \\frac{\\hat Q^2}{2C} + \\frac{\\hat\\Phi^2}{2L}$.',
+    first: 'q27-lc:b3',
+    introduces: 'notation',
+    bridge: 'qc-l11-two-level',
+    symbols: ['\\hat\\Phi', '\\hat Q'],
+  },
+  {
+    id: 'qc-cooper-pair',
+    term: 'Cooper pair',
+    gloss: 'Two electrons bound by a weak attraction, carrying charge $2e$ and acting as a boson.',
+    formal: 'A bound pair of conduction electrons of charge $2e$, with binding energy about $2E_ce^{-2/N_FV}$ in the toy model (p. 275).',
+    first: 'q27-superconductivity:b1',
+  },
+  {
+    id: 'qc-meissner-effect',
+    term: 'Meissner effect',
+    gloss: 'A superconductor pushes a magnetic field out, except for a thin skin.',
+    formal: 'The field obeys $\\nabla^2\\mathbf B = \\mathbf B/\\lambda^2$ and falls as $e^{-x/\\lambda}$ inside the metal (p. 276).',
+    first: 'q27-superconductivity:b2',
+  },
+  {
+    id: 'qc-flux-quantum',
+    term: 'flux quantum $\\Phi_0$',
+    gloss: 'The smallest unit of magnetic flux a superconducting ring can hold: $h/2e$.',
+    formal: 'The flux through a ring with no current is $\\Phi = p\\Phi_0$ with $\\Phi_0 = h/2e$ (p. 277).',
+    first: 'q27-superconductivity:b3',
+  },
+  {
+    id: 'qc-josephson-junction',
+    term: 'Josephson junction',
+    gloss: 'Two superconductors separated by a thin insulator through which pairs tunnel.',
+    formal: 'A tunnel junction with current $I = I_0\\sin\\theta$ and phase rate $\\dot\\theta = 2eV/\\hbar$ (p. 278).',
+    first: 'q27-josephson:b1',
+    bridge: 'qc-l11-two-level',
+  },
+  {
+    id: 'qc-josephson-inductance',
+    term: 'Josephson inductance',
+    gloss: 'The inductance of a junction, which depends on its phase.',
+    formal: 'The junction acts as the inductance $L_J = \\Phi_0/2\\pi I_0\\cos\\theta$ (p. 279).',
+    first: 'q27-josephson:b2',
+  },
+  {
+    id: 'qc-squid',
+    term: 'SQUID',
+    gloss: 'A ring with two junctions whose tunnelling strength the flux through the ring tunes.',
+    formal: 'A ring of two junctions with effective coupling $E_J \\to 2E_J|\\cos(\\pi\\Phi/\\Phi_0)|$ (eq. 15.7).',
+    first: 'q27-josephson:b4',
+  },
+  {
+    id: 'qc-charge-qubit',
+    term: 'charge qubit',
+    gloss: 'A small island of Cooper pairs whose two lowest charge states form the qubit.',
+    formal: 'The Hamiltonian $\\hat H = E_C(\\hat n - n_g)^2 - E_J\\cos\\hat\\theta$ restricted to $n = 0, 1$ (eqs. 15.8–15.9).',
+    first: 'q27-transmon:b1',
+    bridge: 'qc-l11-two-level',
+  },
+  {
+    id: 'qc-charging-energy',
+    term: 'charging energy $E_C$',
+    gloss: 'The energy cost of one extra Cooper pair on the island.',
+    formal: 'The book’s $E_C = (2e)^2/2C_\\Sigma$ counts Cooper pairs and is four times the common $e^2/2C_\\Sigma$.',
+    first: 'q27-transmon:b1',
+    introduces: 'notation',
+    symbols: ['E_C'],
+  },
+  {
+    id: 'qc-transmon',
+    term: 'transmon',
+    gloss: 'A charge qubit run with a large ratio $E_J/E_C$, so that charge noise barely matters.',
+    formal: 'The Cooper-pair box with $E_J/E_C \\gg 1$, whose levels are Mathieu eigenvalues (p. 283).',
+    first: 'q27-transmon:b4',
+  },
+  {
+    id: 'qc-anharmonicity',
+    term: 'anharmonicity',
+    gloss: 'The amount by which the rungs of a ladder are unevenly spaced.',
+    formal: 'The relative anharmonicity is $\\alpha = (E_{21} - E_{10})/E_{10}$.',
+    first: 'q27-transmon:b6',
+  },
+  {
+    id: 'qc-charge-dispersion',
+    term: 'charge dispersion',
+    gloss: 'How much a level’s energy changes as the gate charge goes through one period.',
+    formal: 'The charge dispersion of level $k$ is $\\epsilon_k = E_k(n_g = \\tfrac12) - E_k(n_g = 0)$.',
+    first: 'q27-transmon:b7',
+  },
+  {
+    id: 'qc-circuit-qed',
+    term: 'circuit QED',
+    gloss: 'A qubit on a chip coupled to a microwave resonator.',
+    formal: 'A superconducting qubit coupled to one resonator mode, described by the quantum Rabi or Jaynes–Cummings model (p. 285).',
+    first: 'q27-cqed:b1',
+  },
+  {
+    id: 'qc-cooperativity',
+    term: 'cooperativity',
+    gloss: 'How far the qubit–resonator coupling beats the two loss rates.',
+    formal: 'The ratio $C_{\\rm coop} = g^2/\\kappa\\gamma$ of the coupling squared to the product of the two loss rates (p. 286).',
+    first: 'q27-cqed:b2',
+  },
+  {
+    id: 'qc-dispersive-readout',
+    term: 'dispersive readout',
+    gloss: 'Reading a qubit from the small, state-dependent shift of a resonator’s frequency.',
+    formal: 'For $|\\Delta| \\gg g$ the resonator frequency shifts by $\\pm g^2/\\Delta$ with the qubit state (p. 286).',
+    first: 'q27-cqed:b3',
+  },
+  {
+    id: 'qc-iswap',
+    term: 'iSWAP gate',
+    gloss: 'A swap of two qubits that also puts a factor $i$ on the swapped part.',
+    formal: 'In this chapter’s convention iSWAP sends $|01\\rangle$ to $-i|10\\rangle$ and $|10\\rangle$ to $-i|01\\rangle$, and fixes $|00\\rangle$ and $|11\\rangle$.',
+    first: 'q27-cqed:b4',
+    bridge: 'qc-q4-circuits',
+  },
+  {
+    id: 'qc-quantum-dot',
+    term: 'quantum dot',
+    gloss: 'A tiny region that holds a few electrons, like an artificial atom.',
+    formal: 'A gate-defined potential well with discrete orbitals that traps single electrons (p. 290).',
+    first: 'q27-dots:b1',
+  },
+  {
+    id: 'qc-exchange-interaction',
+    term: 'exchange interaction',
+    gloss: 'The energy difference between spin singlet and triplet caused by Coulomb repulsion and the Pauli rule.',
+    formal: 'The spin coupling $\\hat H_{\\rm ex} = J\\,\\mathbf s_1\\cdot\\mathbf s_2$ with $J = -2K$ (eq. 15.12).',
+    first: 'q27-dots:b4',
+    bridge: 'qc-q19-simulation',
+  },
+  {
+    id: 'qc-sqrt-swap',
+    term: '√SWAP',
+    gloss: 'The gate that is half a swap and entangles two spins.',
+    formal: 'The gate $e^{i\\pi\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2/8}$, whose square is SWAP up to a phase (eq. 15.13).',
+    first: 'q27-dots:b5',
+    bridge: 'qc-q4-circuits',
+  },
+]

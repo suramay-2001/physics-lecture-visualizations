@@ -316,4 +316,11 @@ export const QC_CONCEPTS: QcConcept[] = [
   { id: 'qc-ns-cz-station', label: 'A sign flip from a heralded photon', chapter: 'Q26', unit: 'q26-ns-cz', needs: ['qc-hom-station', 'qc-cnot'] },
   { id: 'qc-gate-teleport-station', label: 'Teleport the gate, then count photons', chapter: 'Q26', unit: 'q26-teleport-gate', needs: ['qc-ns-cz-station', 'qc-teleportation'] },
   { id: 'qc-kerr-station', label: 'Photons that talk through matter', chapter: 'Q26', unit: 'q26-nonlinear', needs: ['qc-hom-station'] },
+  // Chapter Q27 (P-Q27-story §11.1): qubits in chips
+  { id: 'qc-lc-station', label: 'A circuit that rings at gigahertz and needs millikelvin', chapter: 'Q27', unit: 'q27-lc', needs: ['qc-f5-probability', 'qc-f4-hermitian'] },
+  { id: 'qc-flux-quantum-station', label: 'Cooper pairs and the flux quantum', chapter: 'Q27', unit: 'q27-superconductivity', needs: ['qc-lc-station', 'qc-phase'] },
+  { id: 'qc-josephson-station', label: 'A junction as an inductor that depends on the phase', chapter: 'Q27', unit: 'q27-josephson', needs: ['qc-flux-quantum-station', 'qc-f4-unitary'] },
+  { id: 'qc-transmon-station', label: 'From charge qubit to transmon', chapter: 'Q27', unit: 'q27-transmon', needs: ['qc-josephson-station', 'qc-f4-hermitian'] },
+  { id: 'qc-cqed-station', label: 'Reading and coupling qubits through a resonator', chapter: 'Q27', unit: 'q27-cqed', needs: ['qc-transmon-station'] },
+  { id: 'qc-spin-dot-station', label: 'A spin in a dot: SWAP, half a SWAP and CZ', chapter: 'Q27', unit: 'q27-dots', needs: ['qc-transmon-station', 'qc-circuits', 'qc-simulation-station'] },
 ]

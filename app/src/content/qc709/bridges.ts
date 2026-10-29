@@ -198,4 +198,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q21-dfs': { course: 'qc709', lecture: 'Q21', unit: 'q21-dfs', label: 'hiding where the noise cannot reach' },
   // Chapter Q26 (P-Q26-story §11.3): the Q11 unit that teleports a state (the other rows it uses exist already)
   'qc-q11-teleport-circuit': { course: 'qc709', lecture: 'Q11', unit: 'q11-teleport-circuit', label: 'the teleportation circuit and its two readings' },
+  // Chapter Q27 (P-Q27-story §11.3): the two units it builds on that no earlier row reaches
+  'qc-q4-circuits': { course: 'qc709', lecture: 'Q4', unit: 'q4-circuits', label: 'circuits: wires are time, products run backwards' },
+  'qc-q19-simulation': { course: 'qc709', lecture: 'Q19', unit: 'q19-simulation', label: 'imitating a spin chain with gates' },
 }
