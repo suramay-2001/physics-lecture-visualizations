@@ -7,8 +7,8 @@ import { V, close, d } from './Q23.values'
 // without proof, pp. 400, 511, 514, 521, 528-531), in both tracks. A `'books'`-phase chapter (the 709 notes stop at von Neumann and conditional entropy, which Chapters Q9 and Q12 teach): every ramp beat is [B],
 // every clue is [C], the Go-deeper beats are [D] and last in their unit. Plan: docs/roles/proposals/P-Q23-story.md; rulings docs/roles/decisions/qc709-Q20-Q27.md (Z1-Z7). Every number a learner sees is
 // computed in Q23.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy, pipeline/claims_qc709/q23.py). No sheet assigns any Q23 item (the
-// course homework does not touch Chapter 11), so every challenge below carries a full walkthrough; Bergou's Problems 1 to 4 of §11.7 are cited, never worked. The three Corrections are ours: "our calculation
-// finds ...", each with an engine check, each to be re-read on the page image by the independent review (ruling Z3), which decides which of them ship.
+// course homework does not touch Chapter 11), so every challenge below carries a full walkthrough; Bergou's Problems 1 to 4 of §11.7 are cited, never worked. The two Corrections are ours: "our calculation
+// finds ...", each with an engine check, each re-read on the page image by the independent review (ruling Z3); the p. 48 sign slip is a Rosetta line, not a box.
 
 export const Q23: Lecture = {
   id: 'Q23',
@@ -159,7 +159,7 @@ export const Q23: Lecture = {
         kind: 'projector',
         props: { state: 45, basis: 20, editableBasis: true },
         tryThis: [
-          'With the state at 45° (the arrow $\\sqrt p$ of the fair coin) and the basis at 20°, the first row reads 0.906 with P = 82.1%: the classical fidelity of the fair coin with the table whose square-root arrow lies at 20°.',
+          'State at 45° (the arrow $\\sqrt p$ of the fair coin), basis at 20°: the first row reads 0.906 with P = 82.1%. That is the classical fidelity of the fair coin with the table whose square-root arrow lies at 20°.',
           'Turn the basis to 45°: the first row reads 1 with P = 100.0%, the fidelity of a table with itself.',
         ],
       },
@@ -348,7 +348,7 @@ export const Q23: Lecture = {
         kind: 'pair-grid',
         props: { mode: 'classical', coins: 'dealer' },
         tryThis: [
-          'One dealer, two coins: both off-diagonal boxes read 1/2, the lines read coin A: +1 0.5, −1 0.5 and the correlation is −1; knowing one coin gives the other.',
+          'One dealer, two coins: both off-diagonal boxes read 1/2, the lines read coin A: +1 0.5, −1 0.5 and the correlation is −1. Knowing one coin gives the other.',
           'Press two separate dealers: every box reads 1/4 and the correlation is 0.',
         ],
       },
@@ -446,7 +446,7 @@ export const Q23: Lecture = {
           title: 'Any noisy operation on one half',
           prompt: 'Bob applies any noisy operation to his half of a pair. Then $S(A{:}B)$ can',
           options: [
-            { text: 'only stay the same or fall', correct: true, why: `A unitary keeps it, as in the Bell pair at $${d(V.q23ILocalU, 0)}$ bits; a noisy operation can lower it, as the phase error did by $${d(V.q23DataProcFall, 3)}$ bits.` },
+            { text: 'only stay the same or fall', correct: true, why: `A unitary keeps it, as in the Bell pair at $${d(V.q23ILocalU, 0)}$ bits. A noisy operation can lower it, as the phase error did by $${d(V.q23DataProcFall, 3)}$ bits.` },
             { text: 'rise as well as fall', correct: false, why: 'A noisy operation is a unitary on a bigger system plus discarding a helper, and neither step raises the mutual information.' },
             { text: 'only fall, never stay the same', correct: false, why: 'A unitary is a noiseless operation and leaves the mutual information exactly as it was.' },
           ],
@@ -475,7 +475,7 @@ export const Q23: Lecture = {
         props: { theta: 0, phi: 0, editable: true, measure: 'x' },
         tryThis: [
           'With the state at $|0\\rangle$ (θ = 0°) and the x axis, the bars read +x 50.0% and −x 50.0%.',
-          'Move θ to 90°, which is $|{+}\\rangle$: the bars read +x 100.0% and −x 0.0%. The two x tables of the pair of Unit 23.6 are 0.5 apart, which is why an x reading learns only 0.311 bit of the 0.601 allowed.',
+          'Move θ to 90°, which is $|{+}\\rangle$: the bars read +x 100.0% and −x 0.0%. The two x tables of the pair of Unit 23.6 are 0.5 apart. That is why an x reading learns only 0.311 bit of the 0.601 allowed.',
         ],
       },
       clues: [],
@@ -537,7 +537,7 @@ export const Q23: Lecture = {
     {
       where: 'Bergou p. 191, after Eq. 11.4',
       says: 'The classical relative entropy, defined for two chance tables, is offered as a gauge of how far apart two quantum states lie.',
-      shouldSay: `Our calculation finds that for states the relevant quantity is the quantum relative entropy $S(\\rho\\|\\sigma)$, which sees the eigenvectors: $\\rho = \\mathrm{diag}(0.9, 0.1)$ and a state $\\sigma$ with the same eigenvalues along $x$ give $${d(V.q23SrelSameEig, 3)}$ bits, while the classical formula on the two identical eigenvalue tables gives $${d(V.q23HeigSame, 0)}$.`,
+      shouldSay: `Our calculation finds that the sentence belongs to chance tables; for states, as the identical sentence after Eq. 11.9 (p. 192) says, the quantity is the quantum relative entropy $S(\\rho\\|\\sigma)$, which sees the eigenvectors: $\\rho = \\mathrm{diag}(0.9, 0.1)$ and a state $\\sigma$ with the same eigenvalues along $x$ give $${d(V.q23SrelSameEig, 3)}$ bits, while the classical formula on the two identical eigenvalue tables gives $${d(V.q23HeigSame, 0)}$.`,
       check: () => close(V.q23HeigSame, 0, 1e-12) && close(V.q23SrelSameEig, 1.268, 5e-4),
       source: 'book',
     },
@@ -546,13 +546,6 @@ export const Q23: Lecture = {
       says: 'Because $C$ starts in a pure state, $S(\\rho_{AB}) = S(\\rho_B)$ and $S(\\rho_{ABC}) = S(\\rho_{AB})$.',
       shouldSay: `Our calculation finds that the first equality should read $S(\\rho_{BC}) = S(\\rho_B)$: for a Bell pair $S(\\rho_{AB}) = ${d(V.q23SlipSAB, 0)}$ but $S(\\rho_B) = ${d(V.q23SlipSB, 0)}$, while with a pure helper $C$ the pair $BC$ has $S = ${d(V.q23SlipSBC, 0)}$. The conclusion $S(A{:}B) = S(A{:}BC)$ stands.`,
       check: () => close(V.q23SlipSAB, 0, 1e-9) && close(V.q23SlipSB, 1, 1e-9) && close(V.q23SlipSBC, V.q23SlipSB, 1e-9),
-      source: 'book',
-    },
-    {
-      where: 'Bergou p. 48, before Eq. 3.45',
-      says: 'The line $y = \\log x_1 + \\frac{\\log x_2 - \\log x_1}{x_2 - x_1}(x - x_1)$ is rewritten with $s = (x - x_1)/(x_1 - x_2)$.',
-      shouldSay: `Our calculation finds that the denominator should be $x_2 - x_1$. At $x_1 = 1$, $x_2 = 4$ and $x = 1.5$ the printed $s = -\\tfrac16$ gives $\\log x_1 + s(\\log x_2 - \\log x_1) = ${d(V.q23LhsPrinted, 4)}$, above $\\log[x_1 + s(x_2 - x_1)] = ${d(V.q23RhsPrinted, 0)}$, so the inequality as written fails; the true $s = +\\tfrac16$ gives $${d(V.q23LhsTrue, 4)} \\le ${d(V.q23RhsTrue, 4)}$.`,
-      check: () => V.q23LhsPrinted > V.q23RhsPrinted && V.q23LhsTrue <= V.q23RhsTrue,
       source: 'book',
     },
   ],

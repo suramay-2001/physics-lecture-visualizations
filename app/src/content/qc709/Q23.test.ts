@@ -1,6 +1,6 @@
 /**
  * Chapter Q23's own invariants (plan P-Q23-story, rulings qc709-Q20-Q27.md Z1-Z7): the shape of the chapter (six units, 36 beats, six clues, three Go-deeper beats), the three notation beats, the
- * eight derivations, the 19 challenges (every answer the engine's), the three Corrections (each with an engine check that fails when the printed slip is absent), the order of the engine values the text
+ * eight derivations, the 19 challenges (every answer the engine's), the two Corrections (each with an engine check that fails when the printed slip is absent), the order of the engine values the text
  * words ("never above", "a ceiling, not a promise"), the references to the book (pages and "Eq." citations), and the entry-closure rule for `physics/qc/infoq.ts`. (The generic lints, symbols before use,
  * claims against numpy, derivation views, the verbatim 8-gram test, run in content.test.tsx, symbols.test.ts, claims.test.ts and verbatim.test.ts for every chapter.)
  */
@@ -69,14 +69,14 @@ describe('Q23 shape: six units, 36 beats, six clues, three Go-deeper beats, all 
 })
 
 describe('Q23 rulings: Z3 Corrections, the words and the order of the engine values', () => {
-  it('there are exactly three Corrections, all from the book, each worded "Our calculation finds" with an engine check that holds', () => {
-    expect(Q23.corrections).toHaveLength(3)
+  it('there are exactly two Corrections, all from the book, each worded "Our calculation finds" with an engine check that holds', () => {
+    expect(Q23.corrections).toHaveLength(2)
     for (const c of Q23.corrections ?? []) {
       expect(c.source).toBe('book')
       expect(c.shouldSay.startsWith('Our calculation finds')).toBe(true)
       expect(c.check()).toBe(true)
     }
-    expect(Q23.corrections!.map((c) => c.where)).toEqual(['Bergou p. 191, after Eq. 11.4', 'Bergou p. 195, the ancilla argument after Eq. 11.19', 'Bergou p. 48, before Eq. 3.45'])
+    expect(Q23.corrections!.map((c) => c.where)).toEqual(['Bergou p. 191, after Eq. 11.4', 'Bergou p. 195, the ancilla argument after Eq. 11.19'])
   })
   it('each check fails when the discrepancy is absent (mutation): the printed slip and the right form give different numbers', () => {
     // N1: the classical formula on equal eigenvalue tables says 0, the quantum quantity does not
@@ -85,7 +85,7 @@ describe('Q23 rulings: Z3 Corrections, the words and the order of the engine val
     // N2: S(rho_AB) of a Bell pair is 0 but S(rho_B) is 1, so the printed equality is false; with a pure helper S(rho_BC) = S(rho_B)
     expect(V.q23SlipSB - V.q23SlipSAB).toBeGreaterThan(0.99)
     expect(Math.abs(V.q23SlipSBC - V.q23SlipSB)).toBeLessThan(1e-9)
-    // N3: with the printed denominator the chord lies ABOVE log (the concavity inequality fails); with x2 - x1 it holds
+    // p. 48 (a Rosetta line, not a box): with the printed denominator the chord lies ABOVE log (the concavity inequality fails); with x2 - x1 it holds
     expect(V.q23LhsPrinted - V.q23RhsPrinted).toBeGreaterThan(0.6)
     expect(V.q23RhsTrue - V.q23LhsTrue).toBeGreaterThan(0.2)
   })
@@ -123,12 +123,13 @@ describe('Q23 rulings: Z3 Corrections, the words and the order of the engine val
     expect(V.q23UsdInfo05).toBeLessThan(V.q23ChiS05)
     expect(V.q23ChiBellAliceOnly).toBeLessThan(1e-9)
   })
-  it('the p. 48 slip is reported with the denominator the page prints: (x1 - x2), and the box says so in the Formal beat, the Correction and the plan’s numbers', () => {
-    const slip = Q23.corrections![2]
-    expect(slip.says).toContain('x_1 - x_2')
-    expect(slip.shouldSay).toContain('x_2 - x_1')
-    expect(slip.shouldSay).toContain(d(V.q23LhsPrinted, 4))
-    expect(beats.find((b) => b.id === 'q23-quantum-compare:b4')!.formal).toContain('Corrections box')
+  it('the p. 48 sign slip is a Rosetta line in quantum-compare:b4, not a box: it names the printed denominator (x1 - x2) and the right one (x2 - x1), and no Correction carries it', () => {
+    const f = beats.find((b) => b.id === 'q23-quantum-compare:b4')!.formal!
+    expect(f).toContain('Rosetta')
+    expect(f).toContain('(x_1 - x_2)')
+    expect(f).toContain('$x_2 - x_1$')
+    expect(f).not.toContain('Corrections box')
+    expect(Q23.corrections!.some((c) => c.where.includes('p. 48'))).toBe(false)
   })
 })
 

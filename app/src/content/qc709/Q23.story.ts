@@ -322,7 +322,7 @@ const quantumCompare: Beat[] = [
       `Their fidelity is ${d(V.q23FquantumDiag, 3)}, the same number as for the two coins.`,
     formal:
       `$F(\\rho,\\sigma) = \\mathrm{Tr}\\sqrt{\\sigma^{1/2}\\rho\\,\\sigma^{1/2}}$ is symmetric, lies in $[0,1]$, equals 1 only if $\\rho = \\sigma$ and is 0 for [[qc-orthogonal|orthogonal]] supports (Bergou p. 192, Eqs. 11.6–11.7). ` +
-      `For commuting states it is $\\sum_x\\sqrt{p_xq_x}$ of the eigenvalue tables: $${d(V.q23FquantumDiag, 4)}$. As for tables, $\\cos^{-1}F$ is a metric and $F$ is not.`,
+      `For commuting states it is $\\sum_x\\sqrt{p_xq_x}$ of the eigenvalue tables: $${d(V.q23FquantumDiag, 4)}$. As for tables, $\\cos^{-1}F$ is a metric and $F$ is not. The definition is the one of <<qc-q9-distance|Unit 9.6>>.`,
     caption: 'the biased coin written as a diagonal state',
     captionFormal: '$\\sigma = \\mathrm{diag}(0.9, 0.1)$: the eigenvalue table of the biased coin',
     stage: mx(RHO9),
@@ -360,7 +360,7 @@ const quantumCompare: Beat[] = [
       `Then $S(\\rho\\|\\sigma) \\ge H(p\\|r) \\ge 0$, and the classical result finishes the proof.`,
     formal:
       `Let $\\rho = \\sum_ip_i|u_i\\rangle\\langle u_i|$, $\\sigma = \\sum_jq_j|v_j\\rangle\\langle v_j|$ and $r_i = \\sum_j|\\langle u_i|v_j\\rangle|^2q_j$ (Bergou pp. 48–49, Eqs. 3.43–3.46; N&C p. 511). Concavity of $\\log$ gives $S(\\rho\\|\\sigma) \\ge \\sum_ip_i\\log\\frac{p_i}{r_i}$, Eq. 3.45, and then $\\ln x \\le x - 1$ gives $\\ge 0$, Eq. 3.46. ` +
-      `For $\\rho = \\mathrm{diag}(0.9, 0.1)$ and $\\sigma = \\tfrac12(I + 0.8X)$: $S = ${d(V.q23SrelNC, 3)} \\ge H(p\\|r) = ${d(V.q23KleinH, 3)} \\ge 0$, with $r = (\\tfrac12, \\tfrac12)$. The Corrections box lists a sign slip in the step before Eq. 3.45.`,
+      `For $\\rho = \\mathrm{diag}(0.9, 0.1)$ and $\\sigma = \\tfrac12(I + 0.8X)$: $S = ${d(V.q23SrelNC, 3)} \\ge H(p\\|r) = ${d(V.q23KleinH, 3)} \\ge 0$, with $r = (\\tfrac12, \\tfrac12)$. Rosetta: the line before Eq. 3.45 prints $s = (x - x_1)/(x_1 - x_2)$; the denominator is $x_2 - x_1$, which changes nothing downstream.`,
     caption: 'same eigenvalues, turned eigenvectors: the chain 1.268, 0.531, 0',
     captionFormal: 'Eq. 3.45: $S(\\rho\\|\\sigma) \\ge H(p\\|r)$, with $r = (\\tfrac12, \\tfrac12)$',
     stage: split(mx(RHO9), ball({ r: [0.8, 0, 0] })),
@@ -421,7 +421,7 @@ const quantumCompare: Beat[] = [
     stage: mx(RHO9),
     reveal: {
       text: `No: ${d(V.q23SrelSameEig, 3)} bits. The classical formula on the two eigenvalue lists would say $${d(V.q23HeigSame, 0)}$. Turning the eigenvectors counts.`,
-      formal: `$S(\\rho\\|\\sigma) = ${d(V.q23SrelSameEig, 3)}$, against $H(p\\|p) = ${d(V.q23HeigSame, 0)}$ for the identical tables: the quantum quantity is not the classical $H$ of anything read off the eigenvalues alone. This is what the Corrections box says about the sentence after Eq. 11.4.`,
+      formal: `$S(\\rho\\|\\sigma) = ${d(V.q23SrelSameEig, 3)}$, against $H(p\\|p) = ${d(V.q23HeigSame, 0)}$ for the identical tables: the quantum quantity is not the classical $H$ of anything read off the eigenvalues alone. This is the point of the Corrections box on p. 191.`,
       caption: 'the same eigenvalues, now along $x$',
       captionFormal: '$\\sigma = 0.9|{+}\\rangle\\langle{+}| + 0.1|{-}\\rangle\\langle{-}|$',
       stage: mx(mix([0.9, k('+')], [0.1, k('-')])),
@@ -521,7 +521,7 @@ const entropyProps: Beat[] = [
       `The missing ${d(V.q23SubaddGap, 0)} bits are the correlation, named in Unit 23.5. This rule is called [[qc-subadditivity|subadditivity]].`,
     formal:
       `Apply Klein with $\\rho = \\rho_{AB}$ and $\\sigma = \\rho_A\\otimes\\rho_B$: $S(\\rho_{AB}\\|\\rho_A\\otimes\\rho_B) = S(A) + S(B) - S(AB) \\ge 0$ (Bergou p. 50, Eqs. 3.50–3.53, the entropy triangle inequality; [[qc-subadditivity|subadditivity]]). ` +
-      `Problem 2 asks for the relative-entropy form of the mutual information; it is this line, cited and not worked. For a Bell pair $S(AB) = 0$, $S(A) + S(B) = 2$ and the gap is $${d(V.q23SubaddGap, 0)}$.`,
+      `Problem 2 asks for the relative-entropy form of the mutual information; it is this line, cited and not worked. Rosetta: the first line of Eq. 3.52 prints $\\mathrm{Tr}(\\rho_{AB}\\log\\rho_{AB})$ where $\\mathrm{Tr}[\\rho_{AB}\\log(\\rho_A\\otimes\\rho_B)]$ is meant. For a Bell pair $S(AB) = 0$, $S(A) + S(B) = 2$ and the gap is $${d(V.q23SubaddGap, 0)}$.`,
     caption: 'a Bell pair, and the entropy of one half',
     captionFormal: 'a Bell pair: one half has entropy 1 while the whole has entropy 0',
     stage: mx({ rho: { ket: b('00+11') } }, { partialTrace: 'B', spectrum: 'entropy' }),
@@ -565,7 +565,7 @@ const entropyProps: Beat[] = [
       claim('q23SsaRhs1', 'and the first right side $1.837$', () => close(V.q23SsaRhs1, 1.8366, 5e-4)),
       claim('q23SsaLhs2', 'the second left side is $1.650$', () => close(V.q23SsaLhs2, 1.65, 5e-4)),
       claim('q23SsaRhs2', 'and the second right side $1.837$', () => close(V.q23SsaRhs2, 1.8366, 5e-4)),
-      claim('q23SsaGap1', 'the first gap is $0.5366$', () => close(V.q23SsaGap1, 0.5366, 1e-4)),
+      claim('q23SsaGap1', 'the first gap is $0.5365$', () => close(V.q23SsaGap1, 0.5365, 5e-5)),
       claim('q23SsaGap2', 'the second gap is $0.1866$', () => close(V.q23SsaGap2, 0.1866, 1e-4)),
       claim('q23InFair', 'the mixture is half and half: weights $0.5$', () => close(V.q23InFair, 0.5, 1e-12)),
     ],
@@ -987,9 +987,9 @@ const holevo: Beat[] = [
     phase: 'books',
     text:
       `Bob measures along $z$: he learns $${d(V.q23IZPz, 3)}$ bits. The best axis, along the difference of the two arrows, learns $${d(V.q23IBestZP, 3)}$. ` +
-      `No measurement reaches $${d(V.q23ChiZP, 3)}$: the Holevo number is a ceiling, not a promise.`,
+      `No axis reaches $${d(V.q23ChiZP, 3)}$, and a search over all measurements found none that does: the Holevo number is a ceiling, not a promise.`,
     formal:
-      `A $z$ reading gives $I = H(Y) - H(Y|X) = ${d(V.q23PairZHY, 4)} - ${d(V.q23PairZHYgX, 1)} = ${d(V.q23IZPz, 4)}$. Over a grid of $3601$ projective measurements in the $xz$ plane the maximum is $${d(V.q23IBestZP, 4)} = 1 - h(\\tfrac12(1 - \\sqrt{1 - s^2}))$, at the Helstrom axis of <<qc-q14-min-error|Unit 14.5>>. ` +
+      `A $z$ reading gives $I = H(Y) - H(Y|X) = ${d(V.q23PairZHY, 4)} - ${d(V.q23PairZHYgX, 1)} = ${d(V.q23IZPz, 4)}$. Over a grid of $3601$ projective measurements in the $xz$ plane the maximum is $${d(V.q23IBestZP, 4)} = 1 - h(\\tfrac12(1 - \\sqrt{1 - s^2}))$, at the Helstrom axis of <<qc-q14-min-error|Unit 14.5>>. That closed form is a known result for two pure states. ` +
       `So $${d(V.q23IBestZP, 4)} \\le I_{\\mathrm{acc}} \\le \\chi = ${d(V.q23ChiZP, 4)}$. An optimiser over rank-one POVMs with up to six outcomes found nothing above $${d(V.q23IBestZP, 4)}$; that search is our evidence, not a claim.`,
     caption: 'the same ensemble with Bob’s best measurement axis',
     captionFormal: '$I_{\\mathrm{acc}} \\ge 0.3991$ at the Helstrom axis; $\\chi = 0.6009$ is the ceiling',
@@ -1070,7 +1070,7 @@ const holevo: Beat[] = [
       `Holevo caps what any unambiguous measurement can tell. Alice sends one of two equal-chance pure states, and Bob names it or says “failed”. ` +
       `The chance of failing is at least $1 - h(\\tfrac{1+s}{2})$: $${d(V.q23UsdBound05, 3)}$ at overlap $s = 0.5$. The best machine of <<qc-q14-usd|Unit 14.4>> fails with chance $${d(V.q23UsdPfExact05, 1)}$.`,
     formal:
-      `Let $P_f$ be the total failure chance and $q_x = p_x(1 - p_{xx})/P_f$. Then $I = H(\\{p_x\\}) - P_fH(\\{q_x\\})$, Eq. 11.37 (Bergou pp. 198–199, Eqs. 11.30–11.40). Holevo gives $I \\le S(\\rho)$ and $H(\\{q_x\\}) \\le \\log N$, so $P_f \\ge (H(\\{p_x\\}) - S(\\rho))/\\log N$, Eq. 11.40. ` +
+      `Let $p_{xx}$ be the chance of naming $x$ correctly when $x$ was sent, $N$ the number of states, $P_f$ the total failure chance and $q_x = p_x(1 - p_{xx})/P_f$. Then $I = H(\\{p_x\\}) - P_fH(\\{q_x\\})$, Eq. 11.37 (Bergou pp. 198–199, Eqs. 11.30–11.40). Holevo gives $I \\le S(\\rho)$ and $H(\\{q_x\\}) \\le \\log N$, so $P_f \\ge (H(\\{p_x\\}) - S(\\rho))/\\log N$, Eq. 11.40. ` +
       `For two equiprobable pure states at overlap $s$ the bound is $1 - h(\\tfrac{1+s}{2})$: $0$ at $s = 0$, $${d(V.q23UsdBound05, 4)}$ at $0.5$, $${d(V.q23UsdBound0707, 4)}$ at $${d(V.q23PairOverlap, 4)}$ and $${d(V.q23UsdBound09, 4)}$ at $0.9$. ` +
       `The exact optimum fails with chance $s$ (Chapter Q14): $${d(V.q23UsdPfExact05, 1)}$, $${d(V.q23UsdPfExact0707, 4)}$ and $${d(V.q23UsdPfExact09, 1)}$. At $s = 0.5$ the optimum has $I = ${d(V.q23UsdInfo05, 1)} \\le \\chi = ${d(V.q23ChiS05, 4)}$.`,
     caption: 'the failure bound under the exact failure chance, against the overlap',
