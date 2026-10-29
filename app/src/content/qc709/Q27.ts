@@ -135,6 +135,7 @@ export const Q27: Lecture = {
     'Z': 'q27-dots:b6',
     'U': 'q27-dots',
     't_\\pi': 'q27-dots.play.q27-d-pi.walkthrough[0]',
+    'm_e': 'q27-dots.play.q27-d-f.hints[1]',
   },
   symbolsFormal: {
     'd': 'q27-lc:b1',
@@ -287,7 +288,7 @@ export const Q27: Lecture = {
           prompt: 'A circuit has $C = 0.3$ pF and $L = 3$ nH. What is its frequency $f = \\omega/2\\pi$ in GHz?',
           answer: V.q27LcFreqGHz,
           tolerance: 0.005,
-          hints: [{ text: 'Use $\\omega = 1/\\sqrt{LC}$.' }, { text: 'Then divide by $2\\pi$ to get the frequency.' }, { text: 'In SI units $LC = 9\\times10^{-22}$, so $\\omega$ is about $3.3\\times10^{10}$ per second.' }],
+          hints: [{ text: 'Use $\\omega = 1/\\sqrt{LC}$.' }, { text: 'Then divide by $2\\pi$ to get the frequency.' }, { text: 'Convert nH and pF to henry and farad first, then take the square root.' }],
           walkthrough: [{ text: `$\\omega = 1/\\sqrt{LC} = ${d(V.q27LcOmega, 3)}\\times10^{10}$ per second, so $f = \\omega/2\\pi = ${d(V.q27LcFreqGHz, 3)}$ GHz.` }],
         },
         {
@@ -298,7 +299,7 @@ export const Q27: Lecture = {
           prompt: 'The model circuit rings at 5.305 GHz. What is the chance that it sits in its ground state at 1 K?',
           answer: V.q27P01K,
           tolerance: 0.005,
-          hints: [{ text: 'Use $P = 1 - e^{-hf/k_{\\rm B}T}$.' }, { text: 'First find $hf/k_{\\rm B}$ in kelvin.' }, { text: 'It is $0.255$ K, so the exponent is $-0.255$ at $T = 1$ K.' }],
+          hints: [{ text: 'Use $P = 1 - e^{-hf/k_{\\rm B}T}$.' }, { text: 'First find $hf/k_{\\rm B}$ in kelvin.' }, { text: `It is $${d(V.q27HfOverK, 3)}$ K, so the exponent is $-${d(V.q27HfOverK, 3)}$ at $T = 1$ K.` }],
           walkthrough: [{ text: `$hf/k_{\\rm B} = ${d(V.q27HfOverK, 3)}$ K, so $P = 1 - e^{-${d(V.q27HfOverK, 3)}} = ${d(V.q27P01K, 3)}$.` }],
         },
         {
@@ -309,7 +310,7 @@ export const Q27: Lecture = {
           prompt: 'At what temperature, in mK, is the model circuit in its ground state with chance 0.99? Give the nearest whole number.',
           answer: Math.round(V.q27T99mK),
           tolerance: 0,
-          hints: [{ text: 'Solve $1 - e^{-hf/k_{\\rm B}T} = 0.99$ for $T$.' }, { text: 'Then $e^{-hf/k_{\\rm B}T} = 0.01$, so $hf/k_{\\rm B}T = \\ln 100$.' }, { text: 'Divide the rung temperature $0.2546$ K by $\\ln 100 = 4.605$.' }],
+          hints: [{ text: 'Solve $1 - e^{-hf/k_{\\rm B}T} = 0.99$ for $T$.' }, { text: 'Then $e^{-hf/k_{\\rm B}T} = 0.01$, so $hf/k_{\\rm B}T = \\ln 100$.' }, { text: `Divide the rung temperature $${d(V.q27HfOverK, 4)}$ K by $\\ln 100 = ${Math.log(100).toFixed(3)}$.` }],
           walkthrough: [{ text: `$T = (hf/k_{\\rm B})/\\ln 100 = ${d(V.q27T99mK, 1)}$ mK, which is ${Math.round(V.q27T99mK)} mK to the nearest whole number.` }],
         },
       ],
@@ -344,7 +345,7 @@ export const Q27: Lecture = {
           prompt: 'What is $\\Phi_0 = h/2e$ in units of $10^{-15}$ Wb?',
           answer: V.q27Phi0,
           tolerance: 0.005,
-          hints: [{ text: 'Planck’s constant is $h = 6.626\\times10^{-34}$ J s.' }, { text: 'The charge is $2e$ with $e = 1.602\\times10^{-19}$ C.' }, { text: 'Divide $6.626\\times10^{-34}$ by $3.204\\times10^{-19}$.' }],
+          hints: [{ text: 'Planck’s constant $h$ and the electron charge $e$ are in the table of constants.' }, { text: 'The charge in the flux quantum is $2e$.' }, { text: 'Divide $h$ by $2e$ in SI units and write the result in units of $10^{-15}$ Wb.' }],
           walkthrough: [{ text: `$\\Phi_0 = h/2e = ${d(V.q27Phi0, 3)}\\times10^{-15}$ Wb.` }],
         },
         {
@@ -445,9 +446,9 @@ export const Q27: Lecture = {
       },
       books: [{ source: 'bergou', where: '§15.6–15.7, pp. 280–285, Eqs. 15.8–15.9', adds: 'the charge qubit, its two-level cut and sweet spot, the transmon limit, the Mathieu levels, the charge dispersion and the anharmonicity.' }],
       visual: {
-        kind: 'bloch',
-        props: { theta: 90, phi: 0, editable: true, measure: 'z', rotations: true },
-        tryThis: ['At the sweet spot the eigenstates put equal weight on |0⟩ and |1⟩, so they lie on the equator: at θ = 90° the readout says |α|², |β|² is 1/2, 1/2, and the +z and −z bars read 50.0% each.'],
+        kind: 'amplitude-bars',
+        props: { state: [90, 0], basis: 'z', editable: true },
+        tryThis: ['At the sweet spot the eigenstates put equal weight on |0⟩ and |1⟩, so they lie on the equator. At θ = 90° the two amplitudes are 1/√2 and the +z and −z bars read 50.0% each.'],
       },
       clues: [],
       insight: 'A large $E_J/E_C$ makes the charge dependence die exponentially while the anharmonicity shrinks only as a power law. The transmon buys coherence cheaply and keeps enough unevenness to address two levels.',
@@ -462,7 +463,7 @@ export const Q27: Lecture = {
           prompt: 'At $E_J/E_C = 1$, what is the maximum of $f_{01}$ over its minimum as $n_g$ goes through one period?',
           answer: V.q27F01spread1,
           tolerance: 0.005,
-          hints: [{ text: 'The maximum is at $n_g = 0$ and the minimum at $n_g = 1/2$.' }, { text: 'Diagonalise the charge-basis matrix at those two values.' }, { text: 'The engine’s ratio is the number in the plot’s first marker.' }],
+          hints: [{ text: 'The maximum is at $n_g = 0$ and the minimum at $n_g = 1/2$.' }, { text: 'Diagonalise the charge-basis matrix at those two values.' }, { text: 'The ratio comes to a little under 1.4.' }],
           walkthrough: [{ text: `The ratio $f_{01}(0)/f_{01}(\\tfrac12) = ${d(V.q27F01spread1, 3)}$, a swing of ${d(V.q27F01swing1 * 100, 1)} %.` }],
         },
         {
@@ -534,7 +535,7 @@ export const Q27: Lecture = {
           prompt: 'The model has $g/2\\pi = 10$ MHz, $\\kappa/2\\pi = 1.0$ kHz and $\\gamma/2\\pi = 1.59$ kHz. What is $C = g^2/\\kappa\\gamma$ in units of $10^7$?',
           answer: V.q27Coop,
           tolerance: 0.005,
-          hints: [{ text: 'The factors of $2\\pi$ cancel in the ratio.' }, { text: 'Put all three rates in kilohertz: $g = 10^4$ kHz.' }, { text: 'Compute $10^8/(1.0 \\times 1.59)$.' }],
+          hints: [{ text: 'The factors of $2\\pi$ cancel in the ratio.' }, { text: 'Put all three rates in kilohertz: $g = 10^4$ kHz.' }, { text: 'Divide $g^2$ by the product $\\kappa\\gamma$ in those units.' }],
           walkthrough: [{ text: `$C = g^2/\\kappa\\gamma = ${d(V.q27Coop, 3)}\\times10^{7}$.` }],
         },
         {
@@ -576,7 +577,7 @@ export const Q27: Lecture = {
       visual: {
         kind: 'two-clocks',
         props: { upper: 2, lower: 1, start: '+x' },
-        tryThis: ['Drag the time slider to 90°. The readout line says gap = 90° and the arrow on the equator points along +y: it turns at the gap of the two clocks, as a spin turns at the Zeeman frequency.'],
+        tryThis: ['Drag the time slider to 90°. The readout line says gap = 90° and the arrow on the equator points along +y. The arrow turns at the gap of the two clocks, as a spin turns at the Zeeman frequency.'],
       },
       clues: [],
       insight: 'A spin in a field has two energies. The exchange of two neighbouring spins turns a pulse into SWAP, half a SWAP, and with one-qubit turns the gate CZ.',
@@ -591,7 +592,7 @@ export const Q27: Lecture = {
           prompt: 'What is $f = 2\\mu_BB/h$ at $B = 0.1$ T, in GHz?',
           answer: V.q27Zeeman01GHz,
           tolerance: 0.005,
-          hints: [{ text: 'The two energies are $\\pm\\mu_BB$.' }, { text: 'The Bohr magneton is $\\mu_B = 9.274\\times10^{-24}$ J/T.' }, { text: 'Divide $2\\mu_BB$ by $h = 6.626\\times10^{-34}$ J s.' }],
+          hints: [{ text: 'The two energies are $\\pm\\mu_BB$.' }, { text: 'The Bohr magneton $\\mu_B = e\\hbar/2m_e$ is in the table of constants.' }, { text: 'Divide $2\\mu_BB$ by Planck’s constant $h$.' }],
           walkthrough: [{ text: `$f = 2\\mu_BB/h = ${d(V.q27Zeeman01GHz, 3)}$ GHz.` }],
         },
         {
@@ -624,7 +625,7 @@ export const Q27: Lecture = {
           prompt: 'At what field $B$, in tesla, does a spin qubit’s frequency equal the LC circuit’s 5.305 GHz?',
           answer: V.q27ZeemanB5GHz,
           tolerance: 0.005,
-          hints: [{ text: 'Solve $2\\mu_BB/h = 5.305\\times10^9$ per second for $B$.' }, { text: 'So $B = hf/2\\mu_B$.' }, { text: 'It is about twice the 0.1 T of the first beat.' }],
+          hints: [{ text: `Solve $2\\mu_BB/h = ${d(V.q27F5GHz, 3)}$ GHz for $B$.` }, { text: 'So $B = hf/2\\mu_B$.' }, { text: 'It is about twice the 0.1 T of the first beat.' }],
           walkthrough: [{ text: `$B = hf/2\\mu_B = ${d(V.q27ZeemanB5GHz, 4)}$ T.` }],
         },
       ],

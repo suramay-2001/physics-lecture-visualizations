@@ -855,7 +855,7 @@ const dots: Beat[] = [
     phase: 'books',
     text:
       `Wait with the field on and the spin relaxes to its lower level. The chance of the lower level at temperature $T$ is $1/(1 + e^{-hf/k_{\\rm B}T})$. It is ${d(V.q27ZeemanPDown100mK, 3)} at 100 mK and ${d(V.q27ZeemanPDown20mK, 4)} at 20 mK. ` +
-      `To read the spin, let one spin state tunnel out of the dot and sense the charge change nearby. The reading destroys the state.`,
+      `To read the spin, let one spin state escape from the dot and sense the charge change nearby. The reading destroys the state.`,
     formal:
       `The two-level thermal chance is $P_\\downarrow = 1/(1 + e^{-hf/k_{\\rm B}T})$: ${d(V.q27ZeemanPDown100mK, 4)}$ at 100 mK and ${d(V.q27ZeemanPDown20mK, 5)}$ at 20 mK for $f = ${d(V.q27Zeeman01GHz, 4)}$ GHz (model temperatures, ours). ` +
       `Spin-dependent tunnelling and a nearby charge sensor turn spin into charge, and destroy the state (pp. 290–291). Readout fidelities and the non-destructive variants are described there and not repeated as numbers.`,
