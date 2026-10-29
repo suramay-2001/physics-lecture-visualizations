@@ -171,9 +171,9 @@ export const C_SITE: Circuit = {
   init: '0',
   wires: ['atom'],
   columns: [
-    [{ op: 'gate', gate: 'Ry', targets: [0], params: [Math.PI / 2], label: 'global' }],
-    [{ op: 'gate', gate: 'Rz', targets: [0], params: [0.7], label: 'local θ' }],
     [{ op: 'gate', gate: 'Ry', targets: [0], params: [-Math.PI / 2], label: 'global' }],
+    [{ op: 'gate', gate: 'Rz', targets: [0], params: [0.7], label: 'local θ' }],
+    [{ op: 'gate', gate: 'Ry', targets: [0], params: [Math.PI / 2], label: 'global' }],
   ],
 }
 export const C_CZG: Circuit = {

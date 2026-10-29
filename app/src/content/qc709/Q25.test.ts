@@ -10,7 +10,9 @@ import Q25Source from './Q25.ts?raw'
 import Q25Story from './Q25.story.ts?raw'
 import AtomsSource from '../../physics/qc/atoms.ts?raw'
 import { GLOSSARY } from './Q25.glossary'
-import { V, d } from './Q25.values'
+import { C_SITE, V, d } from './Q25.values'
+import { circuitUnitary } from '../../physics/qc/circuit'
+import { Rx } from '../../physics/qc/gates'
 
 const units = Q25.units
 const beats = units.flatMap((u) => u.story ?? [])
@@ -38,11 +40,11 @@ describe('Q25 shape: six units, 33 beats, three clues, one Go-deeper beat, all b
     expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['q25-atom-gates:b6'])
     for (const u of units) expect((u.story ?? [])[0].phase, `${u.id} opens with a books beat`).toBe('books')
   })
-  it('the one notation entry, the Lamb-Dicke number, is introduced by exactly one beat, at or before its first use; 17 glossary terms in all', () => {
+  it('the one notation entry, the Lamb-Dicke number, is introduced by exactly one beat, at or before its first use; 14 glossary terms in all', () => {
     const intro = beats.filter((b) => b.introduces?.length).map((b) => [b.id, b.introduces!.join()])
     expect(intro).toEqual([['q25-phonons:b2', 'qc-lamb-dicke']])
     expect(GLOSSARY.filter((g) => g.introduces).map((g) => [g.id, g.introduces, g.first])).toEqual([['qc-lamb-dicke', 'notation', 'q25-phonons:b2']])
-    expect(GLOSSARY).toHaveLength(17)
+    expect(GLOSSARY).toHaveLength(14)
   })
   it('ten derivations, each with at least as many Ground-up steps as Formal ones', () => {
     const ds = beats.filter((b) => b.derivation)
@@ -68,7 +70,7 @@ describe('Q25 rulings: Z2 no hardware digits, Z3 one Correction for the review t
     expect(Q25Story).not.toMatch(/\b\d+(\.\d+)?\s*(kHz|ms|µs|μs)\s+(coherence|phase time)/)
     expect(beat('q25-readout:b4').formal).toContain('model input')
     expect(beat('q25-phonons:b2').formal).toContain('our input')
-    expect(beat('q25-ion-gates:b4').formal).toContain('in words only here')
+    expect(beat('q25-ion-gates:b4').formal).toContain('no number is quoted here')
   })
   it('exactly one Correction, worded “our calculation finds”, with an engine check, from the book, naming the page of the table', () => {
     expect(Q25.corrections).toHaveLength(1)
@@ -99,6 +101,11 @@ describe('Q25 rulings: Z2 no hardware digits, Z3 one Correction for the review t
     const ids = GLOSSARY.map((g) => g.id)
     for (const reused of ['qc-t1', 'qc-t2', 'qc-rabi-frequency', 'qc-ramsey-interferometry', 'qc-w-state', 'hyperfine', 'rotating-wave']) expect(ids).not.toContain(reused)
   })
+  it('review Q25-S6: the Optics Lab terms recoil, optical molasses and Doppler limit are linked from the Optics Lab glossary, not defined again here', () => {
+    const ids = GLOSSARY.map((g) => g.id)
+    for (const dup of ['qc-photon-recoil', 'qc-optical-molasses', 'qc-doppler-limit']) expect(ids).not.toContain(dup)
+    for (const id of ['qc-op-recoil', 'qc-op-optical-molasses', 'qc-op-doppler-limit']) expect(Q25Story, id).toContain(`[[${id}|`)
+  })
 })
 
 describe('Q25 numbers worded from the engine', () => {
@@ -116,6 +123,18 @@ describe('Q25 numbers worded from the engine', () => {
     expect(V.q25eta0).toBeCloseTo(0.3433, 4)
     expect(V.q25CZbell1).toBeCloseTo(0.254, 3)
     expect(V.q25MSInfid1736).toBeGreaterThan(50 * V.q25MSInfidK17)
+  })
+  it('review Q25-S1: the site-selective circuit, read in time order from left to right, multiplies to R_x(0.7) and not to R_x(-0.7)', () => {
+    const U = circuitUnitary(C_SITE)
+    const gap = (A: typeof U, B: typeof U) => Math.max(...A.flatMap((row, i) => row.map((z, j) => Math.hypot(z.re - B[i][j].re, z.im - B[i][j].im))))
+    expect(gap(U, Rx(0.7))).toBeLessThan(1e-12)
+    expect(gap(U, Rx(-0.7))).toBeGreaterThan(0.5)
+  })
+  it('review Q25-S2: the speed a learner computes from the rounded givens in the prompt is accepted, and the heat walkthrough prints five digits', () => {
+    const speed = units.flatMap((u) => u.play).find((c) => c.id === 'q25-c-speed') as { answer: number; tolerance: number }
+    const fromPrompt = Number(d(V.q25vRb300, 1)) - (20000 * Number(d(V.q25vRecRb, 3))) / 1000
+    expect(Math.abs(fromPrompt - speed.answer)).toBeLessThanOrEqual(speed.tolerance)
+    expect(Q25Source).toContain('d(V.q25HeatPerPhoton, 5)')
   })
 })
 
@@ -153,9 +172,9 @@ describe('Q25 challenges: every number is read from the engine, none is typed', 
     expect(ans['q25-g-omt']).toBeCloseTo(0.02, 12)
     expect(ans['q25-g-loops']).toBe(100)
   })
-  it('an integer answer carries tolerance 0 and a decimal one 0.005; each choice challenge has exactly one correct option', () => {
+  it('an integer answer carries tolerance 0 and a decimal one 0.005 (0.05 for the speed, whose stated givens are rounded to 293.4 and 5.885: review Q25-S2); each choice challenge has exactly one correct option', () => {
     for (const c of units.flatMap((u) => u.play)) {
-      if (c.kind === 'numeric') expect([0, 0.005], c.id).toContain(c.tolerance)
+      if (c.kind === 'numeric') expect(c.id === 'q25-c-speed' ? [0.05] : [0, 0.005], c.id).toContain(c.tolerance)
       if (c.kind === 'numeric' && c.tolerance === 0) expect(Number.isInteger(c.answer), c.id).toBe(true)
       if (c.kind === 'choice') expect(c.options.filter((o) => o.correct), c.id).toHaveLength(1)
     }

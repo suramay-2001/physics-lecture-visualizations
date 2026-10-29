@@ -197,7 +197,7 @@ const cooling: Beat[] = [
       `A photon carries momentum $\\hbar k$. An atom that absorbs it gets a kick of $\\hbar k/m$ in speed. For rubidium this is ${d(V.q25vRecRb, 3)} mm/s, tiny, but the atom scatters millions of photons a second. ` +
       `Warm atoms are fast: caesium at 300 kelvin moves at ${d(V.q25vCs300, 1)} m/s.`,
     formal:
-      `Energy and momentum conservation (Eqs. 13.1–13.2) give the atom a velocity change $\\hbar(\\mathbf k - \\mathbf k_{\\rm sp})/m$ per cycle (Eqs. 13.3–13.4); a photon of this size is a [[qc-photon-recoil|photon recoil]]. ` +
+      `Energy and momentum conservation (Eqs. 13.1–13.2) give the atom a velocity change $\\hbar(\\mathbf k - \\mathbf k_{\\rm sp})/m$ per cycle (Eqs. 13.3–13.4); a photon of this size is a [[qc-op-recoil|photon recoil]]. ` +
       `For ⁸⁷Rb at 780 nm, $v_{\\rm rec} = \\hbar k/m = ${d(V.q25vRecRb, 3)}$ mm/s. A caesium atom at $300\\,$K moves at $v = \\sqrt{3k_BT/m} = ${d(V.q25vCs300, 1)}$ m/s and at $10\\,$mK at $${d(V.q25vCs10mK, 3)}$ m/s; Bergou rounds these to 240 and 1.4.`,
     caption: 'speed against photons absorbed: a straight line down to zero',
     captionFormal: 'speed against photons absorbed: a straight line down to zero',
@@ -244,12 +244,12 @@ const cooling: Beat[] = [
     phase: 'books',
     text:
       `Each scattered photon also heats the atom, by a third of the recoil temperature: ${d(V.q25HeatPerPhoton, 4)} µK for rubidium, so ${d(V.q25Heat100, 2)} µK after 100 photons. ` +
-      `Cooling beams balance this at $k_BT_D = \\hbar\\gamma/2$, the [[qc-doppler-limit|Doppler limit]]. <<qc-q25-o2-limit|Optics Lab O2>> works out the balance, and <<qc-q25-o3-gradient|Optics Lab O3>> shows how light can cool below it.`,
+      `Cooling beams balance this at $k_BT_D = \\hbar\\gamma/2$, the [[qc-op-doppler-limit|Doppler limit]]. <<qc-q25-o2-limit|Optics Lab O2>> works out the balance, and <<qc-q25-o3-gradient|Optics Lab O3>> shows how light can cool below it.`,
     formal:
       `Random emission gives $T_j = (2U_r/3k_B)\\,rt$ (Eq. 13.5), with $U_r = \\frac{(\\hbar k)^2}{2m}$ and $T_r = 2U_r/k_B = ${d(V.q25TrRb, 3)}\\,\\mu$K for rubidium. Each photon adds $T_r/3 = ${d(V.q25HeatPerPhoton, 4)}\\,\\mu$K, and 100 photons add $${d(V.q25Heat100, 2)}\\,\\mu$K. ` +
-      `Red-detuned opposed beams ([[qc-optical-molasses|optical molasses]]) reach $k_BT_D = \\hbar\\gamma/2$ (p. 225). Recomputing the table on p. 225 gives $T_D = ${d(V.q25TDRb, 1)}, ${d(V.q25TDCs, 1)}, ${d(V.q25TDSr461, 1)}, ${d(V.q25TDSr689, 3)}\\,\\mu$K ` +
+      `Red-detuned opposed beams ([[qc-op-optical-molasses|optical molasses]]) reach $k_BT_D = \\hbar\\gamma/2$ (p. 225). Recomputing the table on p. 225 gives $T_D = ${d(V.q25TDRb, 1)}, ${d(V.q25TDCs, 1)}, ${d(V.q25TDSr461, 1)}, ${d(V.q25TDSr689, 3)}\\,\\mu$K ` +
       `and $T_r = ${d(V.q25TrRb, 3)}, ${d(V.q25TrCs, 3)}, ${d(V.q25TrSr461, 3)}, ${d(V.q25TrSr689, 3)}\\,\\mu$K for rubidium, caesium and strontium at 461 nm and at 689 nm. The last $T_D$ is printed as $${d(V.q25TDPrinted, 2)}$ (Errata). ` +
-      `The same numbers come out of the <<qc-q25-o2-limit|Optics Lab>> engine.`,
+      `The same formulas run in the <<qc-q25-o2-limit|Optics Lab>> engine, with Steck's linewidths, so its rubidium and caesium limits differ in the fourth digit.`,
     caption: 'Doppler temperature of the four columns: ours (filled) against as printed (hollow); the fourth disagrees',
     captionFormal: 'Doppler temperature of the four columns: ours (filled) against as printed (hollow); the fourth disagrees',
     stage: TD_STAGE,
@@ -275,8 +275,8 @@ const cooling: Beat[] = [
     id: 'q25-cooling:b6',
     phase: 'books',
     text:
-      `Far-detuned light holds atoms in a focused [[qc-optical-tweezer|tweezer]]. Its trap depth falls as $1/\\Delta$ but its scattering falls as $1/\\Delta^2$. At ten times the detuning the ratio of scattering to depth is $${d(V.q25ScatPerDepth, 1)}$. ` +
-      `Collisions remove atoms in pairs, so a site holds one atom at most half the time.`,
+      `Far-detuned light holds atoms in a focused [[qc-optical-tweezer|tweezer]]. Its trap depth falls as $1/\\Delta$ but its scattering falls as $1/\\Delta^2$. At ten times the detuning the ratio of scattering to depth falls to one tenth ($${d(V.q25ScatPerDepth, 1)}$ of what it was). ` +
+      `Collisions remove atoms in pairs, so, for Poisson loading, a site holds one atom at most half the time.`,
     formal:
       `Scattering scales as $1/\\Delta^2$ and the light shift as $1/\\Delta$ (<<qc-q25-o5-dipole|Optics Lab O5>>). If a site loads $N \\sim$ Poisson($\\mu$) atoms and pairs leave, a site ends with one atom with chance $P(N\\ \\mathrm{odd}) = (1 - e^{-2\\mu})/2$, ` +
       `which is $${d(V.q25PodMu1, 3)}$ at $\\mu = 1$ and never above one half. After [[qc-rearrangement|rearrangement]] into a full block, $${V.q25Sites100}$ sites loaded at a half give at least 100 atoms with chance $${d(V.q25P100of235, 2)}$, while 200 sites give $${d(V.q25P100of200, 3)}$.`,
@@ -284,7 +284,7 @@ const cooling: Beat[] = [
     captionFormal: 'chance of at least 100 atoms against the number of sites loaded half full',
     stage: SITES_STAGE,
     claims: [
-      cv('q25ScatPerDepth', 'at ten times the detuning the ratio of scattering to depth is 0.1', 0.1, 1e-12),
+      cv('q25ScatPerDepth', 'at ten times the detuning the ratio of scattering to depth falls to 0.1 of what it was', 0.1, 1e-12),
       cv('q25PodMu1', 'at mu = 1 a site holds one atom with chance 0.432', 0.432),
       claim('q25Sites100', '235 sites loaded at a half give at least 100 atoms with chance 0.99', () => V.q25Sites100 === 235),
       cv('q25P100of235', 'with chance 0.99', 0.99, 5e-3),
@@ -295,7 +295,7 @@ const cooling: Beat[] = [
     id: 'q25-cooling:b7',
     phase: 'clue',
     text:
-      `A rubidium atom leaves a room-temperature oven at about ${d(V.q25vRb300, 1)} m/s. How many photons must it scatter to stop, and how long does that take at the maximum rate?`,
+      `A rubidium atom in a room-temperature oven has a thermal speed of about ${d(V.q25vRb300, 1)} m/s. How many photons must it scatter to stop, and how long does that take at the maximum rate?`,
     formal: `Using $v_{\\rm rec}$ and $r_{\\max}$ of the earlier beats, find $N = v/v_{\\rm rec}$ and $t = N/r_{\\max}$ for $v = \\sqrt{3k_BT/m}$ at $300\\,$K.`,
     caption: 'the same line: zero speed at the last photon',
     captionFormal: 'the same line: zero speed at the last photon',
@@ -390,11 +390,11 @@ const readout: Beat[] = [
     id: 'q25-readout:b4',
     phase: 'books',
     text:
-      `A hotter atom feels a slightly different light shift at each vibration level. That spreads the Ramsey frequency (<<qc-q24-ramsey|Unit 24.5>>) and washes out the fringes. The signal falls to $1/e$ at $T_2^* = ${d(V.q25T2starCoeff, 3)}\\,\\hbar/(\\bar\\eta k_BT)$.`,
+      `A hotter atom feels a slightly different light shift at each vibration level. That spreads the Ramsey frequency (<<qc-q24-ramsey|Unit 24.5>>) and washes out the fringes. The signal falls to $1/e$ at $T_2^* = ${d(V.q25T2starCoeff, 3)}\\,\\hbar/(\\bar\\eta k_BT)$. Here $\\bar\\eta$ is the fraction by which the light shift differs between the two qubit states.`,
     formal:
       `$\\theta_n = \\tfrac{\\bar\\eta}{2}\\,\\mathbf n\\cdot\\boldsymbol\\omega_0 - \\Delta$ (Eq. 13.9). For a thermal state each shift $\\tfrac{\\bar\\eta}{2}n_j\\omega_j$ is exponentially distributed with mean $\\bar\\eta k_BT/2\\hbar$, ` +
       `so the envelope is $1\\big/\\sqrt{(1 + t^2/T_0^2)^3}$ with $T_0 = 2\\hbar/\\bar\\eta k_BT$. It equals $e^{-1}$ at $t = T_0\\sqrt{e^{${d(V.q25TwoThirdsArg, 4)}} - 1}$, so $T_2^*/T_0 = ${d(V.q25T2starOverT0, 4)}$ and $T_2^* = ${d(V.q25T2starCoeff, 3)}\\,\\hbar/\\bar\\eta k_BT$ (Eq. 13.10). ` +
-      `With the light-shift fraction $\\bar\\eta = ${d(V.q25EtaLS, 5)}$ (a model input, Fig. 13.5) and trap frequencies of 50, 50 and 10 kHz (ours): $T_2^* = ${d(V.q25T2star10uK, 2)}$ ms at $10\\,\\mu$K and $${d(V.q25T2star1uK, 1)}$ ms at $1\\,\\mu$K. ` +
+      `With the light-shift fraction $\\bar\\eta = ${d(V.q25EtaLS, 5)}$ (a model input, Fig. 13.5) and trap frequencies of 50, 50 and 10 kHz (Fig. 13.5): $T_2^* = ${d(V.q25T2star10uK, 2)}$ ms at $10\\,\\mu$K and $${d(V.q25T2star1uK, 1)}$ ms at $1\\,\\mu$K. ` +
       `The exact thermal sum gives $${d(V.q25T2starQ10uK, 2)}$ ms and $${d(V.q25T2starQ1uK, 3)}$ s, which is $${d(V.q25QuantRatio1uK, 1)}$ times more at $1\\,\\mu$K, where few levels are occupied.`,
     caption: 'T2* against temperature: semiclassical (filled) and exact thermal sum (second mark)',
     captionFormal: 'T2* against temperature: semiclassical (filled) and exact thermal sum (second mark)',
@@ -461,8 +461,8 @@ const atomGates: Beat[] = [
     formal:
       `Resonant Rabi pulses give $R_x$ and $R_y$ (<<qc-q24-rabi|Unit 24.4>>, with the sign correction); $Z = iYX$. With a global turn $G_y(\\varphi) = R_y(\\varphi)$ on every atom and a local $R_z$: $R_x(\\theta) = G_y(\\tfrac{\\pi}{2})R_z(\\theta)G_y(-\\tfrac{\\pi}{2})$ and ` +
       `$R_y(\\theta) = G_x(-\\tfrac{\\pi}{2})R_z(\\theta)G_x(\\tfrac{\\pi}{2})$ (p. 233); both hold to machine precision (gap $${d(V.q25IdRxGap, 0)}$ at $\\theta = ${d(V.q25InTheta, 1)}$). Atoms that miss the local pulse see $G_yG_y^{-1} = I$.`,
-    caption: 'the three-pulse sandwich as a circuit',
-    captionFormal: 'the three-pulse sandwich as a circuit',
+    caption: 'the three-pulse sandwich as a circuit, in time order from left to right',
+    captionFormal: 'the three-pulse sandwich as a circuit, in time order from left to right',
     stage: circ(C_SITE, 3),
     claims: [gap('q25IdRxGap', 'the sandwich with Ry gives Rx (max-abs gap)'), gap('q25IdRyGap', 'the sandwich with Rx gives Ry (max-abs gap)'), cv('q25InTheta', 'the test angle is 0.7', 0.7, 1e-9)],
   },
@@ -475,7 +475,7 @@ const atomGates: Beat[] = [
     formal:
       `$\\Omega = \\frac{\\Omega_1^*\\Omega_2}{2\\Delta}$ for a detuning $\\Delta$ from the intermediate level (p. 233). For $|\\Omega_1| = |\\Omega_2|$ the $\\pi$ time is $2\\pi|\\Delta|/|\\Omega_1|^2$, the intermediate level holds on average $\\frac{|\\Omega_1|^2}{4\\Delta^2}$, ` +
       `and the loss is $P_{\\rm scat} = \\gamma\\bar\\rho_{22}t_\\pi = (\\pi/2)\\gamma/|\\Delta|$, which is $${d(V.q25RamanHalfPi50, 4)}$ at $\\Delta = 50\\gamma$. Bergou's $\\sim\\gamma/|\\Delta|$ omits the factor. ` +
-      `A three-level simulation gives $${d(V.q25RamanLoss50, 4)}$ at $50\\gamma$ and $${d(V.q25RamanLoss200, 5)}$ at $200\\gamma$; its $\\pi$ time is $${d(V.q25RamanTpiRatio50, 4)}$ times $2\\pi|\\Delta|/|\\Omega_1|^2$.`,
+      `With $\\Omega_1 = \\gamma$, a three-level simulation gives $${d(V.q25RamanLoss50, 4)}$ at $50\\gamma$ and $${d(V.q25RamanLoss200, 5)}$ at $200\\gamma$; its $\\pi$ time is $${d(V.q25RamanTpiRatio50, 4)}$ times $2\\pi|\\Delta|/|\\Omega_1|^2$.`,
     caption: 'loss per π pulse against Δ/γ: our simulation and the estimate',
     captionFormal: 'loss per π pulse against Δ/γ: our simulation and the estimate',
     stage: RAMAN_STAGE,
@@ -490,9 +490,9 @@ const atomGates: Beat[] = [
     id: 'q25-atom-gates:b3',
     phase: 'books',
     text:
-      `A Rydberg atom is huge, so its dipole grows as $n^2$. Two such atoms feel $U \\propto d^4/\\delta R^6$, and the level spacing $\\delta$ shrinks as $n^{-3}$. Together the interaction grows as $n^{${V.q25VdwExp}}$, so doubling $n$ multiplies it by ${grp(V.q25RydScale2n)}.`,
+      `A Rydberg atom is huge, so its dipole grows as $n^2$. Two such atoms feel $U \\propto d^4/\\delta R^6$, and the level spacing $\\delta$ shrinks as $n^{-3}$. Together the interaction grows as about $n^{${V.q25VdwExp}}$ (Bergou allows $n^{${V.q25VdwExp}}$ to $n^{${V.q25VdwExp + 1}}$); taking $n^{${V.q25VdwExp}}$, doubling $n$ multiplies it by ${grp(V.q25RydScale2n)}.`,
     formal:
-      `The dipole matrix element scales as $n^2$ and the resonant interaction as $U_{dd} \\propto n^4$. Off resonance, $U_{vdW} \\sim U_{dd}^2/\\delta \\propto n^8/n^{-3} = n^{${V.q25VdwExp}}$ (p. 234), a [[qc-rydberg-blockade|Rydberg blockade]] when $U(R_B) = \\hbar\\Omega$; ` +
+      `The dipole matrix element scales as $n^2$ and the resonant interaction as $U_{dd} \\propto n^4$. Off resonance, $U_{vdW} \\sim U_{dd}^2/\\delta \\propto n^8/n^{-3} = n^{${V.q25VdwExp}}$ (p. 234; Bergou allows $n^{${V.q25VdwExp}}$ to $n^{${V.q25VdwExp + 1}}$, and we take $n^{${V.q25VdwExp}}$), a [[qc-rydberg-blockade|Rydberg blockade]] when $U(R_B) = \\hbar\\Omega$; ` +
       `then $R_B \\propto n^{${d(V.q25RBexp, 4)}}$. Doubling $n$ gives $2^{${V.q25VdwExp}} = ${grp(V.q25RydScale2n)}$ in $U$ and $${d(V.q25RBscale2n, 3)}$ in $R_B$ (Fig. 13.6).`,
     caption: 'interaction strength against n (relative to n = 25), logarithmic',
     captionFormal: 'interaction strength against n (relative to n = 25), logarithmic',
@@ -625,7 +625,7 @@ const ionTrap: Beat[] = [
     id: 'q25-ion-trap:b2',
     phase: 'books',
     text:
-      `Flip the voltage fast and the saddle becomes a trap. The motion obeys Mathieu's equation with one number $\\tilde q = 2qV_0/mz_c^2\\omega_{\\rm rf}^2$ (a [[qc-paul-trap|Paul trap]]). It is stable only for $\\tilde q$ below ${d(V.q25StabEdge, 3)}. ` +
+      `Flip the voltage fast and the saddle becomes a trap. The motion obeys Mathieu's equation with one number $\\tilde q = 2qV_0/mz_c^2\\omega_{\\rm rf}^2$ (a [[qc-paul-trap|Paul trap]]). Here $q$ is the ion's charge, $V_0$ the voltage amplitude, $m$ its mass, $z_c$ the distance to the electrode and $\\omega_{\\rm rf}$ the drive frequency. It is stable only for $\\tilde q$ below ${d(V.q25StabEdge, 3)}. ` +
       `A beryllium ion driven at 10 MHz has $\\tilde q = ${d(V.q25qz, 4)}$.`,
     formal:
       `With $\\tau = \\omega_{\\rm rf}t/2$ the axial motion obeys $z'' = 2\\tilde q_z\\cos(2\\tau)\\,z$; the primary stable region is $0 \\le \\tilde q_z \\le ${d(V.q25StabEdge, 3)}$ (p. 238). The Floquet monodromy gives the edge $${d(V.q25StabEdge, 3)}$. ` +
@@ -921,11 +921,11 @@ const ionGates: Beat[] = [
     id: 'q25-ion-gates:b4',
     phase: 'books',
     text:
-      `The same pulse entangles four ions into $(|gggg\\rangle + |eeee\\rangle)/\\sqrt2$ in the same time as two. For three it cannot: the best chance over all pulse lengths is ${d(V.q25GHZfid3, 1)}, which the untouched state already has. Larger ion machines must link several traps.`,
+      `The same pulse entangles four ions into $(|gggg\\rangle + |eeee\\rangle)/\\sqrt2$ in the same time as two. With this one pulse three ions cannot reach a GHZ state: the best chance is ${d(V.q25GHZfid3, 1)} (our calculation), which the untouched state already has. Larger ion machines must link several traps.`,
     formal:
       `With $S_y = \\sum_j\\sigma_y^{(j)}$, $H_{\\rm eff}\\propto S_y^2$ and $\\exp(-i\\theta S_y^2)|g\\ldots g\\rangle$ reaches $(|g\\ldots g\\rangle + e^{i\\alpha}|e\\ldots e\\rangle)/\\sqrt2$ at $\\theta = \\pi/8 = ${d(V.q25GHZtheta, 4)}$ for $N = 2$ and $N = 4$ ` +
       `(fidelity $${d(V.q25GHZfid2, 3)}$, the same time). For $N = 3$ the best fidelity is $${d(V.q25GHZfid3, 1)}$, since only even excitation numbers are reachable: our calculation for the recipe printed for $N$ qubits (p. 246). ` +
-      `Larger machines use shuttling or photonic links with entanglement swapping (Chapter Q26); the best gates and coherence times on any platform are reported for ions, in words only here.`,
+      `Larger machines use shuttling or photonic links with entanglement swapping (Chapter Q26); Bergou (pp. 236, 246) reports that ions hold the records for gate fidelity and coherence time (as of the book, 2021); no number is quoted here.`,
     caption: 'four ions after the Mølmer–Sørensen pulse: two equal bars, |gggg⟩ and |eeee⟩',
     captionFormal: 'four ions after the Mølmer–Sørensen pulse: two equal bars, $|gggg\\rangle$ and $|eeee\\rangle$',
     stage: amp(C_MS4, 1, 'probability'),

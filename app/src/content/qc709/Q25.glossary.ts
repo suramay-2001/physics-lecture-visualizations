@@ -2,7 +2,7 @@
  * Chapter Q25 glossary (Physics 709; P-Q25-story §5), merged into the lazy course pack by file name (pack.ts). Every entry has a Ground-up sentence (`gloss`, ≤ 25 words) and a Formal one
  * (`formal`, ≤ 40), paraphrased from Bergou Ch. 13. Ids start `qc-`. `introduces` marks the one notation entry: the Lamb-Dicke number (q25-phonons:b2), introduced by exactly one beat.
  *
- * Reused without a new entry here: hyperfine and rotating-wave (Spin Lab), qc-t1, qc-t2, qc-rabi-frequency, qc-ramsey-interferometry (Chapter Q24), qc-w-state (Chapter Q12), qubit.
+ * Reused without a new entry here: hyperfine and rotating-wave (Spin Lab), qc-t1, qc-t2, qc-rabi-frequency, qc-ramsey-interferometry (Chapter Q24), qc-w-state (Chapter Q12), qubit, and the Optics Lab's qc-op-recoil, qc-op-optical-molasses and qc-op-doppler-limit (linked, not redefined).
  */
 import type { GlossEntry } from '../schema'
 
@@ -13,28 +13,6 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'A level whose energy hardly moves when the magnetic field wobbles.',
     formal: 'An $m = 0$ hyperfine level, which has no linear Zeeman shift (Bergou p. 227).',
     first: 'q25-cooling:b1',
-  },
-  {
-    id: 'qc-photon-recoil',
-    term: 'photon recoil',
-    gloss: 'The small kick an atom gets when it absorbs or emits a photon.',
-    formal: 'The velocity change $\\hbar k/m$ per photon, with recoil energy $U_r = (\\hbar k)^2/2m$ (Bergou, eqs. 13.1–13.4).',
-    first: 'q25-cooling:b3',
-  },
-  {
-    id: 'qc-optical-molasses',
-    term: 'optical molasses',
-    gloss: 'Light from opposite sides, tuned a little low, that slows a moving atom like syrup.',
-    formal: 'Counter-propagating red-detuned beams: a friction force from the Doppler shift (Bergou p. 225).',
-    first: 'q25-cooling:b5',
-  },
-  {
-    id: 'qc-doppler-limit',
-    term: 'Doppler limit',
-    gloss: 'The lowest temperature this light cooling reaches.',
-    formal: 'The temperature $k_BT_D = \\hbar\\gamma/2$ at detuning $\\Delta = -\\gamma/2$, set by balancing friction against recoil heating (Bergou p. 225).',
-    first: 'q25-cooling:b5',
-    bridge: 'qc-q24-lindblad',
   },
   {
     id: 'qc-optical-tweezer',
@@ -64,6 +42,7 @@ export const GLOSSARY: GlossEntry[] = [
     gloss: 'Two light beams that together move an atom between two levels through a third one.',
     formal: 'A two-photon transition of Rabi frequency $\\Omega_1^*\\Omega_2/2\\Delta$ through an intermediate level detuned by $\\Delta$ (Bergou p. 233).',
     first: 'q25-atom-gates:b2',
+    bridge: 'qc-q24-lindblad',
   },
   {
     id: 'qc-rydberg-blockade',
