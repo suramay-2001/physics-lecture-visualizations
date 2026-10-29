@@ -19,7 +19,7 @@ export const Q25_REVIEW: Record<string, ReviewCard> = {
     formal: {
       points: [
         'Eqs. 13.1–13.5 give the recoil, the heating $T_r/3$ per photon and the Doppler limit $\\hbar\\gamma/2k_B$ (Bergou pp. 223–225).',
-        `Recomputing the table on p. 225 finds one slip: the narrow-line Doppler temperature is ${d(V.q25TDSr689, 3)} µK, printed as ${d(V.q25TDPrinted, 2)}.`,
+        `Recomputing the table on p. 225 finds one clear slip: the narrow-line Doppler temperature is ${d(V.q25TDSr689, 3)} µK, printed as ${d(V.q25TDPrinted, 2)}.`,
         `Poisson loading with pair loss leaves one atom with chance $(1 - e^{-2\\mu})/2$, ${d(V.q25PodMu1, 3)} at $\\mu = 1$.`,
       ],
       trap: 'Taking the trap depth as free: scattering grows with intensity at a fixed detuning.',
@@ -102,7 +102,7 @@ export const Q25_REVIEW: Record<string, ReviewCard> = {
       'The Cirac–Zoller gate needs the ion in its motional ground state.',
       `From $n = 1$ its Bell chance is only ${d(V.q25CZbell1, 3)}.`,
       'The Mølmer–Sørensen gate does not care about the phonon number, if its loop closes.',
-      'The same pulse entangles two or four ions, but three ions reach only half the GHZ chance.',
+      `The same pulse entangles two or four ions. With this one pulse three ions cannot reach a GHZ state: the best chance is ${d(V.q25GHZfid3, 1)} (our calculation).`,
     ],
     equations: '\\tilde\\Omega = -(\\eta\\Omega)^2/(\\omega_z - \\delta)',
     trap: 'Believing that the gate works at any time: it must end after a whole number of loops.',

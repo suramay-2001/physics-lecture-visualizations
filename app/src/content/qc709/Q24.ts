@@ -364,12 +364,12 @@ export const Q24: Lecture = {
           prompt: 'A real positive $\\Omega$ with $\\Delta = 0$ acts for $\\theta = 90^\\circ$. Which operator does it give?',
           options: [
             { text: '$R_x(-90^\\circ)$', correct: true, why: 'Eq. 12.7 has $+i\\sin(\\theta/2)$ off the diagonal, which is $R_x(-\\theta)$; the engine matches it exactly.' },
-            { text: '$R_x(+90^\\circ)$', correct: false, why: `That is the printed form; it is ${d(V.q24SignRxPlus, 3)} away from the engine's operator at this angle.` },
+            { text: '$R_x(+90^\\circ)$', correct: false, why: `That is the printed form; it is ${d(V.q24SignRxPlus, 3)} away from the engine's operator at this angle, in operator norm.` },
             { text: '$R_y(+90^\\circ)$', correct: false, why: 'That needs an imaginary $\\Omega$ with $i\\Omega > 0$.' },
             { text: '$R_z(+90^\\circ)$', correct: false, why: 'A resonant drive never turns about $z$; only a detuning does.' },
           ],
           hints: [{ text: 'Write Eq. 12.7 at $\\Delta = 0$.' }, { text: 'Compare the sign of the off-diagonal entries with $R_x(\\theta)$.' }, { text: '$R_x(\\theta)$ has $-i\\sin(\\theta/2)$ off the diagonal.' }],
-          walkthrough: [{ text: `At $\\Delta = 0$ the off-diagonal entries are $+i\\sin(\\theta/2)$, the opposite of $R_x(\\theta)$, so $U = R_x(-\\theta)$; at $90^\\circ$ the printed form is ${d(V.q24SignRxPlus, 3)} away.` }],
+          walkthrough: [{ text: `At $\\Delta = 0$ the off-diagonal entries are $+i\\sin(\\theta/2)$, the opposite of $R_x(\\theta)$, so $U = R_x(-\\theta)$; at $90^\\circ$ the printed form is ${d(V.q24SignRxPlus, 3)} away in operator norm.` }],
         },
       ],
     },
@@ -498,7 +498,7 @@ export const Q24: Lecture = {
     {
       where: 'Bergou p. 209, §12.4.1, the R_x line',
       says: 'With Ω real and positive and t = θ/|Ω| the evolution is R_x(θ), with −i sin(θ/2) off the diagonal.',
-      shouldSay: `Our calculation finds that Eq. 12.7 at Δ = 0 with Ω real and positive has +i sin(θ/2) off the diagonal, which is R_x(−θ): at θ = π/2 it is ${d(V.q24SignRxPlus, 3)} from R_x(θ). R_x(θ) needs Ω real and negative. The R_y case, with iΩ > 0, is right.`,
+      shouldSay: `Our calculation finds that Eq. 12.7 at Δ = 0 with Ω real and positive has +i sin(θ/2) off the diagonal, which is R_x(−θ): at θ = π/2 it is ${d(V.q24SignRxPlus, 3)} from R_x(θ) in operator norm. R_x(θ) needs Ω real and negative. The R_y case, with iΩ > 0, is right.`,
       check: () => close(V.q24SignRxMinus, 0, 1e-12) && close(V.q24SignRxPlus, Math.SQRT2, 1e-9) && close(V.q24RxNegGap, 0, 1e-12) && close(V.q24RyGap, 0, 1e-12),
       source: 'book',
     },

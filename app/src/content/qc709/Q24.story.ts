@@ -84,7 +84,7 @@ const divincenzo: Beat[] = [
       `One gate takes the time $t_{\\rm gate} = 1$ microsecond. The [[qc-t2|phase time]] $T_2$ is how long the qubit's phase signal takes to fall to $1/e$ of its size, here 1 millisecond. How many gates fit before the phase signal is down to $1/e$?`,
     formal:
       `Take $t_{\\rm gate} = 1$ microsecond and the [[qc-t2|phase time]] $T_2 = 1$ millisecond (model values, not a platform's). Find $N = T_2/t_{\\rm gate}$, the coherence factor $e^{-t_{\\rm gate}/T_2}$ per gate, and the factor after $N$ gates.`,
-    caption: 'the model: one gate in a thousandth of the phase time',
+    caption: 'the model: gate and phase times as stated',
     captionFormal: '$t_{\\rm gate} = 1$ microsecond, $T_2 = 1$ millisecond',
     stage: ball(R_PLUS_X),
     reveal: {
@@ -114,7 +114,7 @@ const lindblad: Beat[] = [
     phase: 'books',
     introduces: ['qc-lindblad-operator'],
     text:
-      `A qubit never sits alone. Ignore its surroundings and each short time step acts like a set of [[qc-kraus-operator|Kraus operators]] (<<qc-q13-from-unitary|Unit 13.1>>). ` +
+      `A qubit never sits alone. Describe it alone, whatever its surroundings do, and each short time step acts like a set of [[qc-kraus-operator|Kraus operators]] (<<qc-q13-from-unitary|Unit 13.1>>). ` +
       `One is nearly the identity. The others are small jumps, the [[qc-lindblad-operator|Lindblad operators]] $L_j$.`,
     formal:
       `Trace out the environment (Fig. 12.1): $\\rho(t) = \\sum_j A_j\\rho(t_0)A_j^\\dagger$ with Kraus operators $A_j$. For a step $\\delta t$ take $A_0 = I + L_0\\delta t$ and $A_j = L_j\\sqrt{\\delta t}$ for $j \\ge 1$, the [[qc-lindblad-operator|Lindblad operators]] $L_j$ of Eq. 12.1. ` +
@@ -207,7 +207,7 @@ const lindblad: Beat[] = [
     formal:
       `$\\rho_{ee}(t) = \\rho_{ee}(0)e^{-\\gamma t}$ and $\\rho_{ge}(t) = \\rho_{ge}(0)e^{-\\gamma t/2}$, since the excited amplitude falls as $e^{-\\gamma t/2}$. So the [[qc-t1|population time]] is $T_1 = 1/\\gamma$ and $T_2 = 2/\\gamma = ${V.q24T2OverT1}T_1$, read off the superoperator (p. 205). ` +
       `Extra dephasing only shortens $T_2$, so $T_2 \\le 2T_1$.`,
-    caption: `population left (solid) and phase signal left (dashed) against time in units of $T_1$: at 1 the values are ${d(V.q24PopFactorT1, 3)} and ${d(V.q24CohFactorT1, 3)}, and at 2 the phase signal is ${d(V.q24CohFactor2T1, 3)}`,
+    caption: `population (solid) and phase signal (dashed) against $t/T_1$: at 1 they are ${d(V.q24PopFactorT1, 3)} and ${d(V.q24CohFactorT1, 3)}, at 2 the phase signal is ${d(V.q24CohFactor2T1, 3)}`,
     captionFormal: `$e^{-t/T_1}$ and $e^{-t/T_2}$: at $t = T_1$ they are ${d(V.q24PopFactorT1, 3)} and ${d(V.q24CohFactorT1, 3)}; at $2T_1$ the second is ${d(V.q24CohFactor2T1, 3)}`,
     stage: PL('popDecay', 'cohDecay', [1, 2]),
     claims: [
@@ -241,7 +241,7 @@ const lindblad: Beat[] = [
       `Noise can also scramble phase without moving population: [[qc-dephasing|dephasing]], at a rate $\\gamma_\\varphi = 1/T_\\varphi$. Then $\\frac{1}{T_2} = \\frac{\\gamma}{2} + \\gamma_\\varphi$. With $T_1 = T_\\varphi = 1$ the phase lives ${d(V.q24T2Tphi, 4)}, down from $2$.`,
     formal:
       `A second jump, the [[qc-dephasing|dephasing]] jump $\\sqrt{\\gamma_\\varphi/2}\\,Z$, written with the Pauli matrix $Z$ (<<qc-q13-depolarizing|Unit 13.4>>), shrinks $\\rho_{ge}$ at $\\gamma_\\varphi$ and leaves populations alone, so $\\frac{1}{T_2} = \\frac{\\gamma}{2} + \\frac{1}{T_\\varphi}$ with $\\gamma = 1/T_1$. ` +
-      `At $T_1 = T_\\varphi = 1$ the decay rate of the off-diagonal entry is ${d(V.q24CohRate, 1)} and $T_2 = ${d(V.q24T2Tphi, 4)}$. Without decay the solved equation equals the Chapter Q13 dephasing channel with $p = (1 - e^{-t/T_\\varphi})/2$ (gap $${d(V.q24DephKrausGap, 0)}$). Problem 2 of §12.6 is cited, not worked.`,
+      `At $T_1 = T_\\varphi = 1$ the decay rate of the off-diagonal entry is ${d(V.q24CohRate, 1)} and $T_2 = ${d(V.q24T2Tphi, 4)}$. Without decay the solved equation equals the Chapter Q13 dephasing channel with $p = (1 - e^{-t/T_\\varphi})/2$ (gap $${d(V.q24DephKrausGap, 0)}$). Problem 2 of §12.6 is partly worked: the dephasing channel only.`,
     caption: 'after half a lifetime with decay and dephasing: shorter and lower than with decay alone',
     captionFormal: 'decay and dephasing together at half a lifetime',
     stage: ball(R_TPHI),
@@ -397,7 +397,7 @@ const rabi: Beat[] = [
     phase: 'books',
     text:
       `With no decay, two amplitudes tell the story. The drive turns one into the other: a [[qc-rabi-oscillation|Rabi oscillation]]. Spin Lab met this as magnetic resonance (<<qc-l11-two-level|Unit L11.6>>, <<qc-l12-driven|Unit L12.7>>). ` +
-      `Here the drive strength is $\\Omega$, and Townsend's drive strength is twice this: $\\omega_1 = 2\\Omega$.`,
+      `Here the drive strength is $\\Omega$, and Townsend's drive strength is twice this: $\\omega_1 = 2\\Omega$. Write $\\Omega' = \\sqrt{|\\Omega|^2 + \\Delta^2}$ for the length of the field the drive and the detuning make together.`,
     formal:
       `With amplitudes $c_g$ and $c_e$ and the rotating-wave step: $\\dot c_g = \\frac{i\\Omega^*}{2}c_ee^{i\\Delta t}$ and $\\dot c_e = \\frac{i\\Omega}{2}c_ge^{-i\\Delta t}$ (Eq. 12.6), solved by $\\mathbf c(t) = U(t)\\mathbf c(0)$ with $\\Omega' = \\sqrt{|\\Omega|^2 + \\Delta^2}$ (Eq. 12.7), the [[qc-rabi-oscillation|Rabi oscillation]]. ` +
       `Rosetta: Townsend's $\\omega_1$ is $2\\Omega$. The engine's $U$ equals the exponential of the constant-coefficient form for real and complex $\\Omega$ (gap $${d(V.q24U127Gap, 0)}$), and Townsend's closed form of Eq. 4.45 agrees with $\\omega_1 = 2\\Omega$ (gap $${d(V.q24TownsendGap, 0)}$).`,
@@ -483,12 +483,12 @@ const rabi: Beat[] = [
       `At $\\Delta = 0$ the phase of the drive picks the axis, through a gate $R_x$ or $R_y$ (<<qc-q4-one-qubit-gates|Unit 4.2>>). Our calculation finds that the book's sign for $x$ is reversed: real positive $\\Omega$ turns the arrow the other way.`,
     formal:
       `At $\\Delta = 0$: $U = \\begin{pmatrix}\\cos\\frac{\\theta}{2} & i\\frac{\\Omega^*}{|\\Omega|}\\sin\\frac{\\theta}{2}\\\\ i\\frac{\\Omega}{|\\Omega|}\\sin\\frac{\\theta}{2} & \\cos\\frac{\\theta}{2}\\end{pmatrix}$, $\\theta = |\\Omega|t$. Real $\\Omega > 0$ gives $R_x(-\\theta)$; $R_x(\\theta)$ needs $\\Omega < 0$. ` +
-      `For imaginary $\\Omega$ with $i\\Omega > 0$, as printed, the result is $R_y(\\theta)$. At $\\theta = \\pi/2$ the printed $R_x$ is ${d(V.q24SignRxPlus, 3)} from the engine's $U$ (the Correction below).`,
+      `For imaginary $\\Omega$ with $i\\Omega > 0$, as printed, the result is $R_y(\\theta)$. At $\\theta = \\pi/2$ the printed $R_x$ is ${d(V.q24SignRxPlus, 3)} from the engine's $U$ in operator norm (the Correction below).`,
     caption: 'a real positive drive: the arrow goes to +y, not −y',
     captionFormal: '$U(\\Omega > 0) = R_x(-90^\\circ)$: $|0\\rangle \\to |{+y}\\rangle$',
     stage: bl('+z', { rotate: { axis: 'x', angleDeg: { from: 0, to: -90 } } }),
     claims: [
-      cv('q24SignRxPlus', 'the printed R_x is 1.414 from the engine’s U at θ = π/2', 1.414, 5e-4),
+      cv('q24SignRxPlus', 'the printed R_x is 1.414 from the engine’s U at θ = π/2, in operator norm', 1.414, 5e-4),
       gap('q24SignRxMinus', 'the engine’s U for real positive Ω equals R_x(−θ) (max-abs gap)'),
       gap('q24RyGap', 'for imaginary Ω with iΩ positive U equals R_y(θ) (max-abs gap)'),
       gap('q24RxNegGap', 'for real negative Ω, U equals R_x(θ) (max-abs gap)'),
@@ -554,7 +554,7 @@ const rabi: Beat[] = [
     phase: 'clue',
     text: `Rabi pulses make $x$ and $y$ turns. How can you make a $Z$ gate from them? How long does it take at $\\Omega = 2\\pi$?`,
     formal: `Show that $Z = iYX$ and give the time of two π pulses for $\\Omega = 2\\pi$.`,
-    caption: 'two π pulses, about x then y: the product matrix',
+    caption: 'the matrix of two gates',
     captionFormal: 'the product $YX$, which is $-iZ$',
     stage: mx({ product: [G('Y'), G('X')] }),
     reveal: {
@@ -583,8 +583,8 @@ const ramsey: Beat[] = [
     formal:
       `$R_y(\\frac{\\pi}{2})\\,\\mathrm{diag}(1, e^{i\\varphi})\\,R_y(\\frac{\\pi}{2})|0\\rangle = e^{i\\varphi/2}(-i\\sin\\frac{\\varphi}{2},\\ \\cos\\frac{\\varphi}{2})^T$, so $P(1) = \\cos^2(\\varphi/2)$ (Fig. 12.4), [[qc-ramsey-interferometry|Ramsey interferometry]]. ` +
       `The engine agrees with $\\cos^2(\\varphi/2)$ for $0 \\le \\varphi \\le 7$ (gap $${d(V.q24RamseyGap, 0)}$). Ramsey interference is the heart of atomic clocks (p. 211).`,
-    caption: 'three snapshots: after the first half pulse, after the wait by 60°, after the second half pulse',
-    captionFormal: 'the sequence for $\\varphi = 60^\\circ$: equator, turned equator, and the final state with $P(1) = 0.75$',
+    caption: 'the first half pulse: the arrow turns from the north pole to the equator',
+    captionFormal: '$R_y(\\pi/2)|0\\rangle = |{+x}\\rangle$',
     stage: bl('+z', { rotate: { axis: 'y', angleDeg: { from: 0, to: 90 } } }),
     claims: [
       claim('q24RamseyP1Deg0', 'at φ = 0 the chance of 1 is 1', () => close(V.q24RamseyP1Deg0, 1, 1e-12)),
@@ -654,7 +654,7 @@ const ramsey: Beat[] = [
     id: 'q24-ramsey:b3',
     phase: 'books',
     text:
-      `If the noise only changes the field's strength, the arrow's height stays and its sideways part turns by a random angle $\\chi$. Averaged, the sideways part shrinks by $e^{-\\frac{\\sigma^2}{2}}$, where $\\sigma$ is the noise's rms size: ` +
+      `If the noise only changes the field's strength, the arrow's height stays and its sideways part turns by a random angle $\\chi$. Averaged, the sideways part shrinks by $e^{-\\frac{\\sigma^2}{2}}$, where $\\sigma$ is the rms size of that angle: ` +
       `${d(V.q24Gauss1, 3)} at $\\sigma = 1$ and ${d(V.q24Gauss2, 3)} at $\\sigma = 2$.`,
     formal:
       `For noise along $\\mathbf B_0$ the height $M_\\parallel$ is constant and $M_+ = M_x + iM_y$ turns: $M_+(t) = e^{i\\varphi}M_+(0)$ with $\\varphi = B_0t + \\chi$ (Eq. 12.11). ` +
@@ -701,7 +701,7 @@ const ramsey: Beat[] = [
     phase: 'books',
     text:
       `The phase variance grows like the area under the noise's correlation curve times $t$ when the noise forgets itself quickly. It grows like $t^2$ when the noise hardly changes. ` +
-      `The [[qc-t2-star|noise phase time]] $T_2^*$ is the $1/e$ time. Fast noise gives an exponential, $T_2^* = 1/(\\sigma^2\\tau_c)$, with the noise's correlation time $\\tau_c$. Slow noise gives a bell curve, $T_2^* = \\sqrt2/\\sigma$.`,
+      `Let the noise change the field by an rms size $\\sigma$; slow noise then turns the arrow by an angle of rms $\\sigma t$. The [[qc-t2-star|noise phase time]] $T_2^*$ is the $1/e$ time. Fast noise gives an exponential, $T_2^* = 1/(\\sigma^2\\tau_c)$, with the noise's correlation time $\\tau_c$. Slow noise gives a bell curve, $T_2^* = \\sqrt2/\\sigma$.`,
     formal:
       `Take noise of rms $\\sigma$ and correlation time $\\tau_c$ (our Ornstein–Uhlenbeck model): $\\langle\\chi^2\\rangle = 2\\sigma^2\\tau_c^2(\\frac{t}{\\tau_c} - 1 + e^{-t/\\tau_c})$, which quadrature confirms (gap $${d(V.q24OuVarGap, 0)}$). ` +
       `For $t \\gg \\tau_c$ it is $t$ times the area $2\\sigma^2\\tau_c$; Bergou writes the same growth rate through the noise spectrum at zero frequency, and Eq. 12.12 is the resulting $T_2^*$. For $t \\ll \\tau_c$ it is $\\sigma^2t^2$. ` +
