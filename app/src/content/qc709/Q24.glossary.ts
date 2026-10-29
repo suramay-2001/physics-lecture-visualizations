@@ -55,7 +55,7 @@ export const GLOSSARY: GlossEntry[] = [
     term: 'dephasing',
     gloss: 'Loss of phase without loss of population.',
     formal: 'The off-diagonal entry shrinks as $e^{-t/T_\\varphi}$ with populations fixed; $\\frac{1}{T_2} = \\frac{1}{2T_1} + \\frac{1}{T_\\varphi}$ (Bergou p. 205 and Problem 2 of §12.6).',
-    first: 'q24-lindblad:b6',
+    first: 'q24-lindblad:b5',
     bridge: 'qc-q13-depolarizing',
   },
   {
@@ -72,7 +72,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-detuning',
     term: 'detuning $\\Delta$',
     gloss: 'How far the drive’s frequency is from the qubit’s.',
-    formal: '$\\Delta = \\omega - \\omega_q$, the drive frequency minus the qubit frequency.',
+    formal: '$\\Delta = \\omega - \\omega_q$, the drive frequency minus the qubit frequency; see also “detuning” in the Optics Lab, which uses the same sign convention.',
     first: 'q24-bloch-eq:b2',
     introduces: 'notation',
     symbols: ['\\Delta'],
@@ -119,7 +119,7 @@ export const GLOSSARY: GlossEntry[] = [
   {
     id: 'qc-t2-star',
     term: 'noise phase time $T_2^*$',
-    gloss: 'The phase lifetime when the noise is slow and nothing undoes it.',
+    gloss: 'The $1/e$ time of the phase signal once the noise is averaged over, with nothing undoing it.',
     formal: 'The $1/e$ time of the noise-averaged coherence, the inhomogeneous time of Bergou p. 215; it is at most the true $T_2$.',
     first: 'q24-ramsey:b4',
     symbols: ['T_2^*'],
