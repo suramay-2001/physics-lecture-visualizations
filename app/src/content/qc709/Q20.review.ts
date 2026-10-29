@@ -9,7 +9,7 @@ export const Q20_REVIEW: Record<string, ReviewCard> = {
   'q20-cloner': {
     points: [
       'Three wires and four CNOT gates make a cloner; the two lower wires hold the program.',
-      'A superposition of the two programs shares the state between wire 1 and wire 2.',
+      'A mix of the two programs shares the state between wire 1 and wire 2.',
       `The equal split gives two clones, each with fidelity $${tf(V.q20F56)}$.`,
       'Every input is treated alike, so this is a universal cloner.',
     ],

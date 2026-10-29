@@ -494,7 +494,7 @@ const noGo: Beat[] = [
     id: 'q20-no-go:b3',
     phase: 'books',
     text:
-      `Program 1 gives $U_1$ and program 2 gives $U_2$. Write $\\Pi_k$ for program $k$ before the run and $\\Pi_k'$ for what it leaves after. Overlap the outputs: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\,\\langle\\Pi_2'|\\Pi_1'\\rangle$. The left side ignores $\\psi$, so the right side must too. ` +
+      `Program 1 gives $U_1$ and program 2 gives $U_2$. Write $|\\Pi_1\\rangle$ and $|\\Pi_2\\rangle$ for the two programs, and $|\\Pi_1'\\rangle$ and $|\\Pi_2'\\rangle$ for what they leave after the run. Overlap the outputs: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\,\\langle\\Pi_2'|\\Pi_1'\\rangle$. The left side ignores $\\psi$, so the right side must too. ` +
       `For $U_1 = I$ and $U_2 = \\sigma_z$ the first factor is $\\cos\\theta$ at polar angle $\\theta$: $1$, $${d(V.q20ExpZ60, 1)}$, $0$, $-${d(V.q20ExpZ60, 1)}$, $-1$ at $0^\\circ$, $60^\\circ$, $90^\\circ$, $120^\\circ$, $180^\\circ$. It changes with the state.`,
     formal:
       `Taking [[inner-product|inner products]] of $G(|\\psi\\rangle|\\Pi_k\\rangle) = U_k|\\psi\\rangle|\\Pi'_k\\rangle$ gives Eq. 8.16: $\\langle\\Pi_2|\\Pi_1\\rangle = \\langle\\psi|U_2^{-1}U_1|\\psi\\rangle\\langle\\Pi'_2|\\Pi'_1\\rangle$. ` +
@@ -801,7 +801,7 @@ const bellPrograms: Beat[] = [
     id: 'q20-bell-programs:b3',
     phase: 'books',
     text:
-      `Put those three coefficients on three Bell states: that is the program $\\Xi_\\chi$. Run the circuit, then ask whether the program wires hold the equal superposition of the three Bell states used. ` +
+      `Put those three coefficients on three Bell states: that is the program $\\Xi_\\chi$. Run the circuit, then ask whether the program wires hold the equal [[superposition|superposition]] of the three Bell states used. ` +
       `That happens one time in three, whatever $\\chi$ and the data. When it does, the data was flipped.`,
     formal:
       `Eq. 8.26, in standard names: $|\\Xi_\\chi\\rangle = c_x|\\Psi^+\\rangle + c_y|\\Psi^-\\rangle + c_z|\\Phi^-\\rangle$, with $c_x$, $c_y$, $c_z$ the coefficients of the last beat. ` +
