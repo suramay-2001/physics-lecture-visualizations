@@ -55,8 +55,8 @@ export const Q27: Lecture = {
     'd': 'q27-superconductivity:b3',
     'l': 'q27-superconductivity:b3',
     '\\mu': 'q27-superconductivity:b4',
-    '\\rm': 'q27-superconductivity:b4',
-    'm': 'q27-superconductivity:b4',
+    '\\rm': 'q27-superconductivity:b2',
+    'm': 'q27-superconductivity:b2',
     'B': 'q27-superconductivity.play.q27-s-loop.hints[2]',
     'q': 'q27-superconductivity.play.q27-s-charge.walkthrough[0]',
     'K': 'q27-josephson:b1',
@@ -138,6 +138,7 @@ export const Q27: Lecture = {
     'm_e': 'q27-dots.play.q27-d-f.hints[1]',
   },
   symbolsFormal: {
+    '|+\\rangle': 'q27-transmon:b2',
     'd': 'q27-lc:b1',
     't': 'q27-lc:b1',
     'I_0': 'q27-lc:b1',
@@ -452,7 +453,7 @@ export const Q27: Lecture = {
       },
       clues: [],
       insight: 'A large $E_J/E_C$ makes the charge dependence die exponentially while the anharmonicity shrinks only as a power law. The transmon buys coherence cheaply and keeps enough unevenness to address two levels.',
-      insightFormal: 'The charge qubit $E_C(\\hat n - n_g)^2 - E_J\\cos\\hat\\theta$ has dispersion $\\epsilon_0 \\propto e^{-\\sqrt{32E_J/E_C}}$ and anharmonicity $\\alpha \\simeq -1/\\sqrt{32E_J/E_C}$ (Eqs. 15.8–15.9, Mathieu).',
+      insightFormal: 'The charge qubit $E_C(\\hat n - n_g)^2 - E_J\\cos\\hat\\theta$ has dispersion $\\epsilon_0 \\propto e^{-\\sqrt{32E_J/E_C}}$ (Correction K2) and anharmonicity $\\alpha \\simeq -1/\\sqrt{32E_J/E_C}$ (Eqs. 15.8–15.9, Mathieu).',
       pitfalls: ['Believing that a transmon needs a large anharmonicity: the anharmonicity only needs to separate the first two transitions.'],
       play: [
         {
@@ -635,7 +636,7 @@ export const Q27: Lecture = {
     {
       where: 'Bergou p. 281, Eq. 15.9',
       says: 'In the basis of the charge states n = 1 and n = 0 the two-level Hamiltonian of the charge qubit is H = E_C(n_g − 1/2)σ_z − (E_J/2)σ_x.',
-      shouldSay: `Our calculation finds the coefficient of σ_z to be −E_C(n_g − 1/2) for that basis: at E_C = 1, E_J = ${d(V.q27InEJ, 1)} and n_g = ${d(V.q27InNg, 1)} it is +${d(V.q27ZcoTrue, 1)}, where the printed form gives −${d(V.q27ZcoTrue, 1)}. The state n = 1 lies above n = 0 for n_g < 1/2, so with the printed sign |0⟩ would be the upper state. The gap and the sweet spot are unchanged.`,
+      shouldSay: `Our calculation finds the coefficient of σ_z to be −E_C(n_g − 1/2) when |+⟩ is the state n = 1, as the page lists them: at E_C = 1, E_J = ${d(V.q27InEJ, 1)} and n_g = ${d(V.q27InNg, 1)} it is +${d(V.q27ZcoTrue, 1)}, where the printed form gives −${d(V.q27ZcoTrue, 1)}. With the printed sign the state n = 1 would lie below n = 0 for n_g < 1/2, but E_C(n − n_g)² puts it above. The gap, the sweet spot and every number in this chapter are unchanged.`,
       check: () => close(V.q27ZcoTrue, 0.2, 1e-12) && close(V.q27ZcoPrinted, -0.2, 1e-12) && close(V.q27ZcoTrue, -V.q27ZcoPrinted, 1e-12),
       source: 'book',
     },

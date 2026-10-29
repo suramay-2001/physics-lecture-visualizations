@@ -185,10 +185,10 @@ const superconductivity: Beat[] = [
     phase: 'books',
     text:
       `Pairs move so as to cancel any magnetic field inside the metal. The field dies away as $e^{-x/\\lambda}$ over a length $\\lambda$ of a few tens of nanometres. ` +
-      `This is the [[qc-meissner-effect|Meissner effect]]. For the book's pair density, $\\lambda = ${d(V.q27LondonNm, 1)}$ nm.`,
+      `This is the [[qc-meissner-effect|Meissner effect]]. For the book's charge density $n = 10^{28}\\,{\\rm m}^{-3}$ and the electron mass $m$, $\\lambda = ${d(V.q27LondonNm, 1)}$ nm.`,
     formal:
       `Eq. 15.5, $\\mathbf J = \\frac{2en}{m}\\left(\\hbar\\nabla\\theta - \\frac{2e}{c}\\mathbf A\\right)$, with Maxwell's equations gives $\\nabla^2\\mathbf B = \\mathbf B/\\lambda^2$ (London). ` +
-      `With $n = 10^{28}\\,{\\rm m}^{-3}$ (model, the book's), $\\lambda^2 = m/\\mu_0n(2e)^2$ gives $\\lambda = ${d(V.q27LondonNm, 2)}$ nm (the page: about 25 nm). The field falls to $1/e$ at $x = \\lambda$.`,
+      `With the charge density $n = 10^{28}\\,{\\rm m}^{-3}$ (model, the book's) and the electron mass $m$, $\\lambda^2 = m/\\mu_0n(2e)^2$ gives $\\lambda = ${d(V.q27LondonNm, 2)}$ nm (the page: about 25 nm). The field falls to $1/e$ at $x = \\lambda$.`,
     caption: 'the field inside against depth in units of λ',
     captionFormal: '$B(x)/B_0 = e^{-x/\\lambda}$ for $x/\\lambda = 0 \\ldots 4$',
     stage: pp(PTS.london, { xLabel: 'x / λ', yLabel: 'B / B₀' }),
@@ -222,7 +222,7 @@ const superconductivity: Beat[] = [
         },
         {
           tex: '\\frac{2e}{\\hbar}\\,\\Phi = 2\\pi p',
-          why: 'The sum of the potential around the loop is the flux through it.',
+          why: 'The sum of the vector potential around the loop is the flux through it.',
           view: pp(PTS.fluxExample, { xLabel: 'Φ / Φ₀', yLabel: 'Φ (10⁻¹⁵ Wb)' }),
           viewCaption: 'an applied flux between them',
         },
@@ -276,10 +276,12 @@ const josephson: Beat[] = [
     phase: 'books',
     text:
       `Two superconductors with a thin insulator between them form a [[qc-josephson-junction|Josephson junction]]. Pairs tunnel across with strength $K$. Each side has a pair density and a phase. ` +
-      `The tunnelling equations give a current $I = I_0\\sin\\theta$ set by the [[relative-phase|relative phase]] $\\theta$ of the two sides, and the phase grows as $\\dot\\theta = 2eV/\\hbar$.`,
+      `The tunnelling equations give a current $I = I_0\\sin\\theta$, where $I_0$, the critical current, is the largest current the junction carries. ` +
+      `The [[relative-phase|relative phase]] $\\theta$ of the two sides grows as $\\dot\\theta = 2eV/\\hbar$.`,
     formal:
       `The equations $i\\hbar\\dot\\psi_1 = U_1\\psi_1 + K\\psi_2$ and $i\\hbar\\dot\\psi_2 = U_2\\psi_2 + K\\psi_1$ are a two-level system (<<qc-l11-two-level|Unit 11.6>>). ` +
       `With $\\psi_j = \\sqrt{n_j}\\,e^{i\\theta_j}$ and the [[relative-phase|relative phase]] $\\theta = \\theta_2 - \\theta_1$ they give $\\dot n_1 = (2K/\\hbar)\\sqrt{n_1n_2}\\sin(\\theta_2 - \\theta_1)$ and, for $n_1 = n_2$, $\\dot\\theta = qV/\\hbar$ with $q = 2e$ (p. 278). ` +
+      `The current is $I = I_0\\sin\\theta$, where $I_0$, the critical current, is the largest current the junction carries. ` +
       `The engine's step of the two-level equations reproduces the first to $10^{-5}$. The AC Josephson frequency is $2eV/h = ${d(V.q27JosephsonMHzPerUV, 1)}$ MHz per microvolt.`,
     caption: 'current against the phase difference: a sine',
     captionFormal: '$I/I_0 = \\sin\\theta$ for $\\theta = -\\pi \\ldots \\pi$',
@@ -333,10 +335,10 @@ const josephson: Beat[] = [
     id: 'q27-josephson:b2',
     phase: 'books',
     text:
-      `From $V = \\frac{\\Phi_0}{2\\pi}\\dot\\theta$ and $\\dot I = I_0\\cos\\theta\\,\\dot\\theta$ the junction acts like an inductor, $L_J = \\frac{\\Phi_0}{2\\pi I_0\\cos\\theta}$. It depends on the phase and becomes infinite at $90^\\circ$. ` +
+      `From $V = \\frac{\\Phi_0}{2\\pi}\\dot\\theta$ and $\\dot I = I_0\\cos\\theta\\,\\dot\\theta$ the junction acts like an inductor of inductance $L_J = \\frac{\\Phi_0}{2\\pi I_0\\cos\\theta}$. It depends on the phase and becomes infinite at $90^\\circ$. ` +
       `That makes it a [[qc-josephson-inductance|Josephson inductance]], and a swinging phase is a swinging frequency.`,
     formal:
-      `$L_J(\\theta) = \\frac{\\Phi_0}{2\\pi I_0\\cos\\theta}$, with $L_{J0} = \\frac{\\Phi_0}{2\\pi I_0}$. Replace the 3 nH of Unit 27.1 by a junction with $I_0 = ${d(V.q27I0nA, 1)}$ nA, so that $L_{J0} = 3$ nH. ` +
+      `The inductance of the junction is $L_J(\\theta) = \\frac{\\Phi_0}{2\\pi I_0\\cos\\theta}$, with $L_{J0} = \\frac{\\Phi_0}{2\\pi I_0}$. Replace the 3 nH of Unit 27.1 by a junction with $I_0 = ${d(V.q27I0nA, 1)}$ nA, so that $L_{J0} = 3$ nH. ` +
       `At $\\theta = 60^\\circ$, $L_J = ${d(V.q27Lj60nH, 0)}$ nH and $f$ falls from ${d(V.q27F0GHz, 3)} to ${d(V.q27F60GHz, 3)} GHz, a factor $1/\\sqrt2$ (model, ours).`,
     caption: 'frequency against the phase: highest at 0°, falling as the phase grows',
     captionFormal: '$f(\\theta)/f(0) = \\sqrt{\\cos\\theta}$ for $\\theta = 0^\\circ \\ldots 80^\\circ$',
@@ -392,7 +394,7 @@ const josephson: Beat[] = [
       text: `The cosine must equal ${d(V.q27SquidQuarter, 2)}, so $\\Phi = ${d(V.q27SquidHalfFlux, 4)}\\,\\Phi_0$.`,
       formal: `$|\\cos(\\pi\\Phi/\\Phi_0)| = ${d(V.q27SquidQuarter, 2)}$, so $\\Phi/\\Phi_0 = \\arccos(${d(V.q27SquidQuarter, 2)})/\\pi = ${d(V.q27SquidHalfFlux, 4)}$.`,
       caption: 'half the frequency needs the cosine at one quarter, near half a flux quantum',
-      captionFormal: 'the line at 0.25 meets the curve at $\\Phi/\\Phi_0 = 0.4196$',
+      captionFormal: `the line at ${d(V.q27SquidQuarter, 2)} meets the curve at $\\Phi/\\Phi_0 = ${d(V.q27SquidHalfFlux, 4)}$`,
       stage: pp(PTS.squid, { xLabel: 'Φ / Φ₀', yLabel: 'E_J scale', yLines: [{ y: V.q27SquidQuarter, label: 'quarter' }] }),
       claims: [
         claim('q27SquidHalfFreq', 'at the answer the frequency factor is 0.5', () => close(V.q27SquidHalfFreq, 0.5, 1e-9)),
@@ -444,7 +446,7 @@ const transmon: Beat[] = [
       `At $n_g = \\tfrac12$ the gap is $E_J$. For $E_C = 1$, $E_J = ${d(V.q27InEJ, 1)}$ and $n_g = ${d(V.q27InNg, 1)}$ the full calculation gives a gap of ${d(V.q27GapFull, 4)}$ and the cut gives ${d(V.q27GapCut, 4)}$.`,
     formal:
       `In the basis $(|1\\rangle, |0\\rangle)$ of charge states, $\\hat H \\simeq -E_C(n_g - \\tfrac12)\\sigma_z - \\frac{E_J}{2}\\sigma_x$ plus a constant, with energies $\\pm U$ and $U = \\sqrt{E_C^2(n_g - \\tfrac12)^2 + \\frac{E_J^2}{4}}$. ` +
-      `The page, Eq. 15.9, prints $+E_C(n_g - \\tfrac12)\\sigma_z$ for that basis: our calculation finds the opposite sign (Correction K1). ` +
+      `The page, Eq. 15.9, prints $+E_C(n_g - \\tfrac12)\\sigma_z$ for that basis, with $|{+}\\rangle$ the state $n = 1$: our calculation finds the opposite sign (Correction K1). ` +
       `At $E_C = 1$, $E_J = ${d(V.q27InEJ, 1)}$ and $n_g = ${d(V.q27InNg, 1)}$ the coefficient is $+${d(V.q27ZcoTrue, 1)}$ and the page's form gives $-${d(V.q27ZcoTrue, 1)}$, and $U = ${d(V.q27UCut, 4)}$. ` +
       `The full charge-basis gap is ${d(V.q27GapFull, 4)} and the cut gives ${d(V.q27GapCut, 4)}. At $n_g = \\tfrac12$ the gap is ${d(V.q27GapDegenerate, 4)} against $E_J = ${d(V.q27InEJ, 1)}$.`,
     caption: 'the gap against the gate charge for E_J = 0.2 E_C: full diagonalisation and the two-level cut',
@@ -653,7 +655,7 @@ const transmon: Beat[] = [
       text: `By ${d(V.q27DispRatio1020, 1)} for the charge dependence, but only by ${d(V.q27AnhRatio1020, 2)} for the anharmonicity. The gain in coherence costs little.`,
       formal: `$\\epsilon_0$: ${d(V.q27DispRatio1020, 1)}. $|\\alpha|$: ${d(V.q27Anh10, 4)}/${d(V.q27Anh20, 4)} = ${d(V.q27AnhRatio1020, 3)} (exact values).`,
       caption: 'a thousandfold gain for about a third of the anharmonicity',
-      captionFormal: '$\\epsilon_0$ falls by a factor of 966.8, $|\\alpha|$ by 1.520',
+      captionFormal: `$\\epsilon_0$ falls by a factor of ${d(V.q27DispRatio1020, 1)}, $|\\alpha|$ by ${d(V.q27AnhRatio1020, 3)}`,
       stage: DISP,
       claims: [
         claim('q27DispRatio1020', 'the dispersion falls by 966.8 from ratio 10 to 20', () => close(V.q27DispRatio1020, 966.8, 5e-2)),
@@ -690,7 +692,7 @@ const cqed: Beat[] = [
     phase: 'books',
     text:
       `Couple the transmon to a microwave resonator: a [[qc-circuit-qed|circuit-QED]] setup, one two-level system and one light mode, as in Chapter Q26's atom and light. ` +
-      `Keep only the terms that conserve energy, the rotating-wave idea of <<qc-l12-driven|Unit 12.7>>. At resonance the dressed levels split by $2g\\sqrt{n+1}$ for $n$ photons. ` +
+      `Keep only the terms that conserve energy, the rotating-wave idea of <<qc-l12-driven|Unit 12.7>>. At resonance, with $g$ the coupling between qubit and resonator, the dressed levels split by $2g\\sqrt{n+1}$ for $n$ photons. ` +
       `For $g/2\\pi = 10$ MHz (model) that is ${d(V.q27VacRabi0, 1)}, ${d(V.q27VacRabi1, 1)} and ${d(V.q27VacRabi2, 1)} MHz.`,
     formal:
       `The quantum Rabi model is $\\hat H = \\frac{E}{2}\\sigma_z + \\hbar\\omega_ra^\\dagger a + \\hbar g\\sigma_x(a + a^\\dagger)$, up to a constant. Dropping the counter-rotating terms leaves ` +
@@ -711,7 +713,7 @@ const cqed: Beat[] = [
     id: 'q27-cqed:b2',
     phase: 'books',
     text:
-      `Coherent exchange needs $g$ to beat both losses: the resonator's decay rate $\\kappa$ and the qubit's decay rate $\\gamma = 1/T_1$. The ratio $C = g^2/\\kappa\\gamma$ is the [[qc-cooperativity|cooperativity]]. ` +
+      `Coherent exchange needs $g$ to beat both losses: the resonator's decay rate $\\kappa$ and the qubit's decay rate $\\gamma = 1/T_1$. Here $T_1$ is the qubit's relaxation time (Chapter Q24). The ratio $C = g^2/\\kappa\\gamma$ is the [[qc-cooperativity|cooperativity]]. ` +
       `Model: $g/2\\pi = 10$ MHz, a resonator quality factor $Q_{\\rm r} = 10^7$ at 10 GHz and $T_1 = 100\\,\\mu$s. Then $\\kappa/2\\pi = ${d(V.q27KappakHz, 1)}$ kHz, $\\gamma/2\\pi = ${d(V.q27GammakHz, 2)}$ kHz and $C = ${d(V.q27Coop, 1)}\\times10^{7}$.`,
     formal:
       `Strong coupling means $\\gamma, \\kappa \\ll g \\ll E, \\omega_r$, and the cooperativity is $C_{\\rm coop} = g^2/\\kappa\\gamma$ (p. 286). ` +
@@ -758,7 +760,7 @@ const cqed: Beat[] = [
         },
         {
           tex: 'E_+ = \\frac{\\Delta}{2} + \\frac{g^2(n+1)}{\\Delta} + \\cdots',
-          why: 'For $|\\Delta| \\gg g$ expand the square root: the first correction is $g^2(n+1)/\\Delta$.',
+          why: 'For $|\\Delta| \\gg g$ expand the square root, as in Chapter Q26: the first correction is $g^2(n+1)/\\Delta$.',
         },
         {
           tex: '\\chi = \\frac{g^2}{\\Delta}',
@@ -834,7 +836,7 @@ const dots: Beat[] = [
     phase: 'books',
     text:
       `An electron's spin in a magnetic field $B$ has two energies, $\\pm\\mu_BB$, so the two levels are $2\\mu_BB$ apart, as in <<qc-l1-quantized|Unit 1.1>>. ` +
-      `In a [[qc-quantum-dot|quantum dot]], a tiny trap for single electrons, this gap is the qubit's frequency. At $B = ${d(V.q27InB, 1)}$ T it is ${d(V.q27Zeeman01GHz, 2)} GHz, close to the circuit's 5 GHz. ` +
+      `In a [[qc-quantum-dot|quantum dot]], a tiny trap for single electrons, this gap is the qubit's frequency. At $B = ${d(V.q27InB, 1)}$ T it is ${d(V.q27Zeeman01GHz, 2)} GHz, of the same order as the circuit's 5 GHz. ` +
       `In temperature that is ${d(V.q27ZeemanTmK, 1)} mK. At ${d(V.q27InB14, 1)} T it is ${d(V.q27Zeeman14GHz, 1)} GHz.`,
     formal:
       `Spin qubit in a [[qc-quantum-dot|quantum dot]]: $|0\\rangle = |{\\uparrow}\\rangle$ and $|1\\rangle = |{\\downarrow}\\rangle$ with energies $+\\mu_BB$ and $-\\mu_BB$ (p. 289). Here $|0\\rangle$ is the upper level; the course keeps its geometric lock $|0\\rangle = |{+z}\\rangle$ elsewhere. ` +
@@ -860,7 +862,7 @@ const dots: Beat[] = [
       `The two-level thermal chance is $P_\\downarrow = 1/(1 + e^{-hf/k_{\\rm B}T})$: ${d(V.q27ZeemanPDown100mK, 4)}$ at 100 mK and ${d(V.q27ZeemanPDown20mK, 5)}$ at 20 mK for $f = ${d(V.q27Zeeman01GHz, 4)}$ GHz (model temperatures, ours). ` +
       `Spin-dependent tunnelling and a nearby charge sensor turn spin into charge, and destroy the state (pp. 290–291). Readout fidelities and the non-destructive variants are described there and not repeated as numbers.`,
     caption: 'chance of the lower level against temperature, log axis',
-    captionFormal: '$P_\\downarrow$ against $T$ for $f = 2.7992$ GHz, log axis',
+    captionFormal: `$P_\\downarrow$ against $T$ for $f = ${d(V.q27Zeeman01GHz, 4)}$ GHz, log axis`,
     stage: pp(PTS.spinThermal, { xLabel: 'T (K)', yLabel: 'P (lower level)', xScale: 'log' }),
     claims: [
       claim('q27ZeemanPDown100mK', 'at 100 mK the lower level has chance 0.7931', () => close(V.q27ZeemanPDown100mK, 0.7931, 5e-5)),
@@ -872,8 +874,8 @@ const dots: Beat[] = [
     id: 'q27-dots:b3',
     phase: 'books',
     text:
-      `A microwave field at the Zeeman frequency turns the spin: Rabi flopping, as in <<qc-l12-driven|Unit 12.7>>. The rate is $\\Omega = \\mu_BB_x/\\hbar$. ` +
-      `For $\\Omega/2\\pi = 10$ MHz you need $B_x = ${d(V.q27RabiBxmT, 4)}$ mT, and a flip takes 50 ns.`,
+      `A microwave field at the Zeeman frequency turns the spin: Rabi flopping, as in <<qc-l12-driven|Unit 12.7>>. The rate is $\\Omega = \\mu_BB_x/\\hbar$, where $B_x$ is the strength of the oscillating field. ` +
+      `For $\\Omega/2\\pi = 10$ MHz (model) you need $B_x = ${d(V.q27RabiBxmT, 4)}$ mT, and a flip takes 50 ns.`,
     formal:
       `The field is $\\mathbf B = B_0\\hat z + B_x\\cos(\\omega_qt)\\,\\hat x$ with $\\omega_q = 2\\mu_BB_0/\\hbar$. In the rotating-wave approximation $\\Omega = \\mu_BB_x/\\hbar$ (p. 291; <<qc-l12-driven|Unit 12.7>>). ` +
       `Rabi's formula, $T_1$, $T_2$ and Ramsey belong to Chapter Q24, and only the $\\pi$-pulse time $t_\\pi = \\pi/\\Omega$ is used here. Model $\\Omega/2\\pi = 10$ MHz: $B_x = ${d(V.q27RabiBxmT, 4)}$ mT and $t_\\pi = ${d(V.q27PiTimeNs, 1)}$ ns.`,
@@ -889,7 +891,7 @@ const dots: Beat[] = [
     id: 'q27-dots:b4',
     phase: 'books',
     text:
-      `Two electrons in neighbouring dots feel the Coulomb force and the Pauli rule. The spin-singlet and spin-triplet states get different energies, $D + K$ and $D - K$. ` +
+      `Two electrons in neighbouring dots feel the Coulomb force and the Pauli rule. The spin-singlet and spin-triplet states get different energies, $D + K$ and $D - K$. Here $D$ is the Coulomb energy of the pair and $K$ the exchange energy. ` +
       `As spin operators this is $-2K\\,\\mathbf s_1\\cdot\\mathbf s_2$, a Heisenberg coupling: the [[qc-exchange-interaction|exchange interaction]] $J = -2K$. ` +
       `The table of $\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2$ shows $-3$ on the singlet and $+1$ on the three triplets, and $\\mathbf s_1\\cdot\\mathbf s_2$ is a quarter of it. ` +
       `With $D = 1$ and $K = ${d(V.q27InK, 1)}$ (model) the two energies are ${d(V.q27ES, 1)} and ${d(V.q27ET, 1)}.`,
@@ -924,6 +926,7 @@ const dots: Beat[] = [
     formal:
       `A pulse with $\\int 2K\\,dt/\\hbar = \\pi$ gives $U = e^{i\\frac{\\pi}{4}\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2} = e^{i\\pi/4}\\,{\\rm SWAP}$ (Eq. 15.13; engine gap $${d(V.q27SwapPulseGap, 0)}$). ` +
       `A pulse of half the angle gives $U = e^{i\\frac{\\pi}{8}\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2}$, the book's [[qc-sqrt-swap|$\\sqrt{\\rm SWAP}$]] with its phase $e^{i\\pi/8}$, and $U^2 = e^{i\\pi/4}\\,{\\rm SWAP}$. ` +
+      `Rosetta: this is the root with the opposite turn, $e^{i\\pi/8}$ times the inverse of the usual $\\sqrt{\\rm SWAP}$ matrix, and only this one makes Eq. 15.14 exact. ` +
       `The chance of $|01\\rangle \\to |10\\rangle$ is $\\sin^2(\\pi/4) = ${d(V.q27HalfSwapP, 1)}$. The evolution is $e^{-iHt/\\hbar}$; the page's first expression has the opposite sign convention, a slip without effect on Eq. 15.13.`,
     caption: 'a full exchange pulse: |01⟩ becomes |10⟩; a half pulse leaves half and half',
     captionFormal: '$e^{i\\varphi\\,\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2/4}$ at $\\varphi = \\pi$ acting on $|01\\rangle$',

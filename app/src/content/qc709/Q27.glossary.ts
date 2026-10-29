@@ -89,7 +89,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-transmon',
     term: 'transmon',
     gloss: 'A charge qubit run with a large ratio $E_J/E_C$, so that charge noise barely matters.',
-    formal: 'The Cooper-pair box with $E_J/E_C \\gg 1$, whose levels are Mathieu eigenvalues (p. 283).',
+    formal: 'The Cooper-pair box with $E_J/E_C \\gg 1$, whose levels are Mathieu eigenvalues (p. 284).',
     first: 'q27-transmon:b4',
   },
   {
@@ -154,7 +154,7 @@ export const GLOSSARY: GlossEntry[] = [
     id: 'qc-sqrt-swap',
     term: '√SWAP',
     gloss: 'The gate that is half a swap and entangles two spins.',
-    formal: 'The gate $e^{i\\pi\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2/8}$, whose square is SWAP up to a phase (eq. 15.13).',
+    formal: 'The gate $e^{i\\pi\\boldsymbol\\sigma_1\\cdot\\boldsymbol\\sigma_2/8}$, whose square is SWAP up to a phase (eq. 15.13); it is the root with the opposite turn to the usual matrix.',
     first: 'q27-dots:b5',
     bridge: 'qc-q4-circuits',
   },
