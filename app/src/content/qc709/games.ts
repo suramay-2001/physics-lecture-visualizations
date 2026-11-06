@@ -178,6 +178,11 @@ const BE24 = Q24x('q24-bloch-eq', 'Q24.3 Driving a qubit that decays')
 const RB24 = Q24x('q24-rabi', 'Q24.4 Pulses that flip, and gates from them')
 const RM24 = Q24x('q24-ramsey', 'Q24.5 Two half-pulses and a wait')
 const DC24 = Q24x('q24-decoupling', 'Q24.6 Undoing slow noise with flips')
+const Q25x = (unit: string, label: string): Trains => ({ lecture: 'Q25', unit, label })
+const CO25 = Q25x('q25-cooling', 'Q25.1 Stopping, cooling and holding an atom')
+const AG25 = Q25x('q25-atom-gates', 'Q25.3 Rotations, Raman light and Rydberg blockade')
+const IT25 = Q25x('q25-ion-trap', 'Q25.4 Holding an ion in the air')
+const IG25 = Q25x('q25-ion-gates', 'Q25.6 Entangling ions through their motion')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1885,6 +1890,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The echo cancels only noise that stays put between the two waits. At correlation time $0.1$ it keeps $0.844$ against $0.827$ for plain Ramsey, hardly better.',
     trains: DC24,
+  },
+  // Chapter Q25 (P-Q25-story §11.2): six spot-the-error rounds, each checked against the engine in Q25.arcade.test.ts
+  {
+    id: 'qc-table-doppler',
+    title: 'The narrow strontium line',
+    steps: [
+      'Cooling beams in optical molasses reach the Doppler temperature $T_D = \\hbar\\gamma/2k_B$, set by the width $\\gamma$ of the cooling line.',
+      'Rubidium, with $\\gamma/2\\pi = 6.07$ MHz, reaches $T_D = 145.7\\,\\mu$K.',
+      'Strontium’s narrow line at 689 nm has $\\gamma/2\\pi = 0.0074$ MHz, so by the same formula it reaches $T_D = 1.02\\,\\mu$K.',
+      'So the narrow line cools to about a microkelvin.',
+    ],
+    wrong: 2,
+    why: 'Our calculation finds $T_D = 0.178\\,\\mu$K for that line. The value near $1\\,\\mu$K is the recoil temperature of strontium’s 461 nm line, $1.03\\,\\mu$K.',
+    trains: CO25,
+  },
+  {
+    id: 'qc-load-full',
+    title: 'Loading a tweezer site',
+    steps: [
+      'A tweezer site catches a random number $N$ of atoms from the cloud, with average $\\mu = 1$.',
+      'Light-assisted collisions remove atoms in pairs, so a site ends with $0$ or $1$ atom.',
+      'A site that catches at least one atom ends with one, so almost every site ends full.',
+      'So loading fills every site with a single atom.',
+    ],
+    wrong: 2,
+    why: 'A site that catches an even number of atoms ends empty. The chance of ending with one atom is $(1 - e^{-2\\mu})/2 = 0.432$ at $\\mu = 1$, and it never exceeds $1/2$.',
+    trains: CO25,
+  },
+  {
+    id: 'qc-blockade-fast',
+    title: 'A stronger blockade',
+    steps: [
+      'In the $\\pi$–$2\\pi$–$\\pi$ gate the control atom’s Rydberg excitation blocks the target, but only up to the blockade strength $B$.',
+      'The Rydberg state decays, so the pulse should be fast, while a leaky blockade calls for a pulse slow compared with $B$.',
+      'Once $B$ is much larger than the Rabi frequency $\\Omega$ the leak is negligible, so a stronger blockade no longer lowers the gate error.',
+      'So the best error stops improving as $B$ grows.',
+    ],
+    wrong: 2,
+    why: 'A stronger blockade lets the pulse be faster, which cuts decay. The best error falls as $(B\\tau)^{-2/3}$: $0.00915$ at $B\\tau = 10^4$ and $0.00199$ at $10^5$, about $0.22$ times as large.',
+    trains: AG25,
+  },
+  {
+    id: 'qc-trap-static',
+    title: 'Holding an ion with a still field',
+    steps: [
+      'In empty space the electric potential $\\phi$ obeys $\\nabla^2\\phi = 0$.',
+      'A trap needs a potential energy that rises in every direction away from a rest point.',
+      'A static quadrupole field has curvatures $2$, $2$ and $-4$, and a strong enough field makes all three positive.',
+      'So a strong enough static field traps an ion.',
+    ],
+    wrong: 2,
+    why: 'The three curvatures always sum to $0$, as $2 + 2 - 4$ does. Whatever the strength, one direction curves downward, so the rest point is a saddle.',
+    trains: IT25,
+  },
+  {
+    id: 'qc-cz-hot',
+    title: 'A warm ion and the Cirac–Zoller gate',
+    steps: [
+      'The Cirac–Zoller gate moves a qubit state onto the shared vibration, applies a phase, and moves it back.',
+      'The pulses are timed for a vibration that starts with no phonon.',
+      'A warm ion starts with a few phonons, and the swap pulses change only slightly, so the gate still works.',
+      'So the gate can run without cooling the ion first.',
+    ],
+    wrong: 2,
+    why: 'With one phonon present the Bell-state chance falls from $1.000$ to $0.254$, and with two to $0.138$. The Mølmer–Sørensen gate keeps $1.000$ even with four phonons.',
+    trains: IG25,
+  },
+  {
+    id: 'qc-ms-time',
+    title: 'When to stop the Mølmer–Sørensen gate',
+    steps: [
+      'In the Mølmer–Sørensen gate the drive makes the motion of the ions trace loops in phase space.',
+      'The ions pick up an entangling phase that grows with the area of the loop.',
+      'A gate stopped part-way round a loop still gives the right phase, so any gate time will do.',
+      'So the gate makes the same Bell state whenever it is stopped.',
+    ],
+    wrong: 2,
+    why: 'The motion must return to its start, so the gate must end after a whole number of loops. Stopped at $17.36$ loops the infidelity is $0.0229$; at $17$ loops it is $2.7 \\times 10^{-4}$.',
+    trains: IG25,
   },
 ]
 
