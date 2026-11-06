@@ -663,3 +663,95 @@ export function boxOverlap(a: BoxEigen, b: BoxEigen): number {
   const sum = cosIntegral(ka + kb, ka * a.lo + kb * b.lo, lo, hi, scale)
   return Math.sqrt(2 / La) * Math.sqrt(2 / Lb) * 0.5 * (diff - sum)
 }
+
+/* ---------------------------------------------------- a packet in a potential (Lecture 17; Lecture 18 reuses it) ---------------------------------------------------- */
+/*
+ * Time evolution with a potential V(x) on the periodic grid, by the Strang split step e^{−iVh/2} e^{−ip̂²h/2} e^{−iVh/2}: exact in the kinetic part (spectral), second order in h
+ * (the commutator of p̂² and V). The numpy twin is a Crank–Nicolson march on a NON-periodic grid with a banded solve (pipeline/claims_448/l17.py), so the two share nothing but
+ * the potential's definition; the stage's tolerance is 2e-3 (fidelity `wavefunction-potential-splitstep`). The potentials are samplers on the grid; a jump sits on a grid point
+ * and takes the mean of its two sides there. The packet and the potential must stay clear of the periodic edge (the stage refuses a packet whose reach passes |x| = 28).
+ */
+/** V = 0 for x < 0 and V₀ for x > 0 (V₀/2 at x = 0). */
+export function stepPotential(g: Grid, V0: number): Float64Array {
+  const v = new Float64Array(g.n)
+  for (let j = 0; j < g.n; j++) v[j] = Math.abs(g.x[j]) < 1e-9 ? V0 / 2 : g.x[j] > 0 ? V0 : 0
+  return v
+}
+
+/** V = V₀ for 0 < x < a and 0 elsewhere (V₀/2 at an edge that lands on a grid point). */
+export function barrierPotential(g: Grid, V0: number, a: number): Float64Array {
+  const v = new Float64Array(g.n)
+  for (let j = 0; j < g.n; j++) {
+    const x = g.x[j]
+    v[j] = x > 1e-9 && x < a - 1e-9 ? V0 : Math.abs(x) < 1e-9 || Math.abs(x - a) < 1e-9 ? V0 / 2 : 0
+  }
+  return v
+}
+
+/** V = Ω²x²/2 (m = 1): the force is −Ω²x. */
+export function harmonicPotential(g: Grid, omega: number): Float64Array {
+  return Float64Array.from(g.x, (x) => (omega * omega * x * x) / 2)
+}
+
+/** V = −Fx: the constant force F. */
+export function forcePotential(g: Grid, F: number): Float64Array {
+  return Float64Array.from(g.x, (x) => -F * x)
+}
+
+/**
+ * e^{−iĤt}ψ for Ĥ = p̂²/2 + V(x̂) (ħ = m = 1): ⌈t/dt⌉ equal Strang steps of at most dt. The half kicks at the two ends are shared with the neighbouring steps, so a step costs
+ * two transforms. V has one value per grid point. t = 0 returns a copy. With dt = 0.005 a step potential agrees with the twin to 1e-3 in the density (the chances to 1e-4);
+ * the error of the split falls like dt² (it is largest at the jump of V).
+ */
+export function evolveV(psi: Wave, g: Grid, V: ArrayLike<number>, t: number, dt = 0.005): Wave {
+  if (V.length !== g.n) throw new Error('evolveV: V needs one value per grid point')
+  if (!(t >= 0) || !Number.isFinite(t) || !(dt > 0)) throw new Error('evolveV: t must be ≥ 0 and dt positive')
+  if (t === 0) return copy(psi)
+  const steps = Math.max(1, Math.ceil(t / dt - 1e-9))
+  const h = t / steps
+  const n = g.n
+  const kr = new Float64Array(n)
+  const ki = new Float64Array(n)
+  const vr = new Float64Array(n)
+  const vi = new Float64Array(n)
+  const hr = new Float64Array(n)
+  const hi = new Float64Array(n)
+  for (let m = 0; m < n; m++) {
+    const kin = -(g.k[m] * g.k[m] * h) / 2
+    kr[m] = Math.cos(kin)
+    ki[m] = Math.sin(kin)
+    vr[m] = Math.cos(-V[m] * h)
+    vi[m] = Math.sin(-V[m] * h)
+    hr[m] = Math.cos((-V[m] * h) / 2)
+    hi[m] = Math.sin((-V[m] * h) / 2)
+  }
+  const re = psi.re.slice()
+  const im = psi.im.slice()
+  const mulBy = (fr: Float64Array, fi: Float64Array) => {
+    for (let m = 0; m < n; m++) {
+      const a = re[m]
+      const b = im[m]
+      re[m] = a * fr[m] - b * fi[m]
+      im[m] = a * fi[m] + b * fr[m]
+    }
+  }
+  mulBy(hr, hi)
+  for (let s = 0; s < steps; s++) {
+    fft(re, im)
+    mulBy(kr, ki)
+    fft(re, im, true)
+    if (s < steps - 1) mulBy(vr, vi)
+  }
+  mulBy(hr, hi)
+  return { re, im }
+}
+
+/** The chance of finding the particle at x < edge (the whole grid to the left): the spline integral of |ψ|². At a step this is the share that went back, once the packet has gone. */
+export function chanceBelow(psi: Wave, g: Grid, edge: number): number {
+  return densitySpline(psi, g).integral(g.x[0], edge)
+}
+
+/** The chance of finding the particle at x > edge (the whole grid to the right). */
+export function chanceAbove(psi: Wave, g: Grid, edge: number): number {
+  return densitySpline(psi, g).integral(edge, g.x[g.n - 1])
+}
