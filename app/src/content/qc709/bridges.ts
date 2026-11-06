@@ -177,7 +177,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l12-driven': { course: 'sl448', lecture: 'L12', unit: 'l12-driven', label: 'a driven two-level atom and its resonance' },
   'qc-l13-plane-wave': { course: 'sl448', lecture: 'L13', unit: 'l13-plane-wave', label: 'the plane wave and its momentum' },
   'qc-l13-generator': { course: 'sl448', lecture: 'L13', unit: 'l13-generator', label: 'momentum generates the shifts' },
-  'qc-l13-stationary': { course: 'sl448', lecture: 'L13', unit: 'l13-stationary', label: 'stationary states of a wave' },
+  'qc-l14-box': { course: 'sl448', lecture: 'L14', unit: 'l14-box', label: 'stationary states of a wave' },
   'qc-l13-flow': { course: 'sl448', lecture: 'L13', unit: 'l13-flow', label: 'the flow of probability' },
   'qc-q5-interferometer': { course: 'qc709', lecture: 'Q5', unit: 'q5-interferometer', label: 'interference as a way to compute' },
   // Chapter Q20 (P-Q20-story §11.3): the three Q13 / Q14 units it builds on

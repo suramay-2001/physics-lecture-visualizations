@@ -111,7 +111,7 @@ export const O4: Lecture = notesLecture({
       summary: 'A heuristic rule for circular orbits and the exact levels of a one-dimensional V-shaped well grow with the same power of the level number, but the prefactors differ.',
       body: [
         {
-          text: `A heuristic quantization sets the orbital angular momentum to $n\\hbar$ for whole $n$. The energy of the $n$th orbit is then three halves of $E_1$ times $n$ to the two-thirds power, where $E_1$ is the cube root of $Ma^2\\hbar^2$ (§4.4, pp. 50–53). For sodium at 1 T/m, $E_1/h$ is ${d(V.o4E1kHz, 2)} kHz. The estimate treats circular orbits in three dimensions, a different problem from the one-dimensional well below, so it guides the growth of the levels and does not predict them (<<qc-l13-stationary|the stationary-wave unit>>).`,
+          text: `A heuristic quantization sets the orbital angular momentum to $n\\hbar$ for whole $n$. The energy of the $n$th orbit is then three halves of $E_1$ times $n$ to the two-thirds power, where $E_1$ is the cube root of $Ma^2\\hbar^2$ (§4.4, pp. 50–53). For sodium at 1 T/m, $E_1/h$ is ${d(V.o4E1kHz, 2)} kHz. The estimate treats circular orbits in three dimensions, a different problem from the one-dimensional well below, so it guides the growth of the levels and does not predict them (<<qc-l14-box|the stationary-wave unit>>).`,
           claims: [claim('o4E1kHz', 'E₁ over h for sodium at 1 T/m is 4.42 kHz', () => near(V.o4E1kHz, 4.42, 0.005))],
         },
         {
