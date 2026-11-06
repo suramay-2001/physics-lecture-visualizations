@@ -203,6 +203,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q19-walker': {
+    name: 'qc-q19-walker',
+    dir: 'films/qc709/qc-q19-walker',
+    ground: STAGE_THEME.qc709.bg['walk-graph'],
+    title: OPENER_TITLES['qc-q19-walker'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Eight upright bars on a line under a dotted line: the leftmost in blue, the other seven in grey. At first all eight are equally short. The blue bar then climbs to nearly the dotted line while the grey ones shrink to slivers, and finally the blue bar drops back and the grey ones rise a little.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'A walker starts spread evenly over the eight spokes of a star, so each bar is a chance of $0.125$. Spoke 1, in blue, is marked. After two steps the marked spoke holds $0.78125$ and each of the other seven spokes $0.03125$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'After four steps the marked spoke holds $0.9453$ and each of the others $0.0078$. That is the chance two Grover steps give on eight strings (Unit 17.4): the walk on the star searches the way Grover’s algorithm does.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Keep walking and it overshoots, as Grover’s search does. After six steps the marked spoke is down to $0.3301$ and each of the others is back up to $0.0957$. Unit 19.3 works out how many steps are best as the star grows.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each bar is the chance of finding the walker on one spoke, from a simulation of the walk on the star after the steps shown.',
+        'The seven grey bars are always equal, and the eight bars add up to 1.',
+      ],
+      distorted: [
+        'Between two pictures the bars glide in a straight line; the walk itself moves in whole steps.',
+        'Only every second step is shown: a step from an even one moves the walker between the centre and the rim without changing the chance on any spoke.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

@@ -11,7 +11,8 @@ import { meanAmplitude } from '../physics/qc/state'
 import { APP_DIR, fs, path } from '../security/node'
 import { KET, Rz, blochVector, samePhysicalState } from '../physics/spin'
 import { GROVER_OPENER, GROVER_TURN_FRAMES, beltOpenerFrame, groverOpenerFrame } from './openerData'
-import { OPENERS } from './openerCopy'
+import { starSpokeChances } from '../physics/qc/walk'
+import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
 
@@ -91,7 +92,7 @@ describe('Grover opener captions: the facts they state', () => {
 })
 
 /** The stage frames the film recorded (public/films/qc709/<id>/manifest.json, written by the scene and checked against the engine by pipeline/films/check_manifest.ts). */
-function filmStages(id: 'qc-q16-cancel' | 'qc-q17-mean'): { from: number; to: number }[] {
+function filmStages(id: OpenerName): { from: number; to: number }[] {
   const m = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'public', OPENERS[id].dir, 'manifest.json'), 'utf8')) as { stages: { frames: { from: number; to: number } }[] }
   return m.stages.map((s) => s.frames)
 }
@@ -181,3 +182,40 @@ describe('film qc-q17-mean: the facts the captions state', () => {
     }
   })
 })
+
+describe('film qc-q19-walker: the facts the captions state', () => {
+  const spokes = (n: number) => starSpokeChances(8, { marked: 1 }, n).spokes
+  const [b1, b2, b3] = OPENERS['qc-q19-walker'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: eight spokes start at 0.125 each; after two steps the marked spoke has 0.78125 and each other 0.03125', () => {
+    has(b1.text, 'eight spokes', '$0.125$', '$0.78125$', '$0.03125$')
+    expect(spokes(0)).toHaveLength(8)
+    spokes(0).forEach((p) => expect(p).toBeCloseTo(0.125, 12))
+    expect(spokes(2)[0]).toBeCloseTo(0.78125, 12)
+    spokes(2).slice(1).forEach((p) => expect(p).toBeCloseTo(0.03125, 12))
+  })
+  it('beat 2: after four steps 0.9453 on the marked spoke and 0.0078 on each other: the chance of two Grover steps', () => {
+    has(b2.text, ...states(spokes(4)[0], spokes(4)[1]), 'Unit 17.4')
+    expect(spokes(4)[0]).toBeCloseTo(groverSuccess(8, 1, 2), 12)
+    spokes(4).slice(1).forEach((p) => expect(p).toBeCloseTo(spokes(4)[1], 12))
+  })
+  it('beat 3: after six steps 0.3301 on the marked spoke (the chance of three Grover steps) and 0.0957 on each other', () => {
+    has(b3.text, ...states(spokes(6)[0], spokes(6)[1]), 'Unit 19.3')
+    expect(spokes(6)[0]).toBeCloseTo(groverSuccess(8, 1, 3), 12)
+    expect(spokes(6)[0]).toBeLessThan(spokes(4)[0])
+    spokes(6).slice(1).forEach((p) => expect(p).toBeCloseTo(spokes(6)[1], 12))
+  })
+  it('the eight chances add to 1, and an odd step leaves them as the even step before it left them', () => {
+    for (let n = 0; n <= 6; n++) expect(spokes(n).reduce((s, p) => s + p, 0)).toBeCloseTo(1, 12)
+    for (const n of [1, 3, 5]) spokes(n).forEach((p, i) => expect(p).toBeCloseTo(spokes(n - 1)[i], 12))
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q19-walker')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+

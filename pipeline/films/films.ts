@@ -19,5 +19,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q16-cancel', poster: 79, publish: 'app/public/films/qc709/qc-q16-cancel' },
   // Q17 unit 17.4: after the first inversion about the mean, each bar has crossed the dashed line along its link
   { id: 'qc-q17-mean', poster: 71, publish: 'app/public/films/qc709/qc-q17-mean' },
+  // Q19 unit 19.5: after four steps of the star walk the marked spoke holds the chance two Grover steps give
+  { id: 'qc-q19-walker', poster: 79, publish: 'app/public/films/qc709/qc-q19-walker' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

@@ -3,7 +3,7 @@
 These films are drawn from the app's physics engine and scrubbed by `app/src/openers/OpenerScrub.tsx`.
 The package is separate: `app/` never imports it, and Motion Canvas never enters the app bundle (W-709-platform §E).
 
-Three films exist. `pipeline/films/films.ts` lists them; each is its own Motion Canvas project (`src/projects/<film>.ts`) with its
+These films exist. `pipeline/films/films.ts` lists them; each is its own Motion Canvas project (`src/projects/<film>.ts`) with its
 scene and data module in `src/scenes/`:
 
 | film | what it draws | where it plays |
@@ -11,9 +11,18 @@ scene and data module in `src/scenes/`:
 | `f1-euler-limit` | the polygons (1 + iφ/n)ⁿ closing in on e^{iφ} | not wired into a chapter yet |
 | `qc-q16-cancel` | eight signed bars and their mean line as f changes, then the last Hadamards | `Unit.opener` of Q16 unit 16.2 (`q16-dj`); frames in `app/public/films/qc709/qc-q16-cancel/` |
 | `qc-q17-mean` | the mark and the inversion about the mean, one step at a time, twice, then the chance | `Unit.opener` of Q17 unit 17.4 (`q17-iterate`); frames in `app/public/films/qc709/qc-q17-mean/` |
+| `qc-q19-walker` | the chance on each of eight spokes of a star graph with one marked spoke, after 0, 2, 4 and 6 steps | `Unit.opener` of Q19 unit 19.3 (`q19-star-search`); frames in `app/public/films/qc709/qc-q19-walker/` |
 
 A film the app plays has its captions in `app/src/openers/openerCopy.ts` (`OPENERS['<film>']`, `dir: 'films/qc709/<film>'`). Each number a
 caption states is checked against the engine in `openerCopy.test.ts`; the frames' files and size budget are checked in `openerFrames.test.ts`.
+
+## The plot-film kit (Q19, Q20 and the films after them)
+The three films above were each written by hand. The later 709 films share one scene, `src/kitScene.tsx`, which lays out a `FilmSpec`
+(`src/kit.ts`): guides, line series revealed up to a sample index stage by stage (with a tip dot), and bar / rung series that glide between
+stages. A film is then its data module `scenes/<film>.data.ts` (every number comes from the engine there) and a one-line scene file
+`export default filmScene(SPEC)`. Its check module is a `Plan` built from the engine alone (`pipeline/films/checks/<film>.ts`) handed to the
+shared `checks/kit.ts`: every revealed sample, every bar height, the stage frames and labels, the guides and the named keys are recomputed,
+and the tampered copies of the manifest (`kitSelfTests`) must fail.
 
 ## The rule
 - A scene imports the engine directly: `app/src/physics/**` by relative path, and the palette from
