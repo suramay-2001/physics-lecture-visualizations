@@ -26,6 +26,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
   { id: 'L12', number: 12, title: 'The position basis and the wavefunction' },
   { id: 'L13', number: 13, title: 'Momentum and the Schrödinger equation' },
+  { id: 'L17', number: 17, title: 'Classical mean motion and quantum reflection' },
 ]
 
 export interface Concept {
@@ -135,7 +136,11 @@ export const CONCEPTS: Concept[] = [
   { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
   { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
   { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L13', unit: 'l13-stationary', needs: ['schrodinger-position'] },
-  { id: 'current-tunnelling', label: 'Current, steps and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['standing-waves'] },
+  { id: 'current-tunnelling', label: 'Below the step and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['standing-waves'] },
+  // L17 (classical mean motion and quantum reflection; every built unit is a station)
+  { id: 'mean-force', label: 'Mean force against force at the mean', lecture: 'L17', unit: 'l17-mean-force', needs: ['position-operator', 'time-parameter'] },
+  { id: 'potential-step', label: 'A wave meets a potential step', lecture: 'L17', unit: 'l17-step', needs: ['stationary-states', 'plane-wave'] },
+  { id: 'probability-current', label: 'Why probability flows: the current, R and T', lecture: 'L17', unit: 'l17-current', needs: ['potential-step', 'schrodinger-position'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

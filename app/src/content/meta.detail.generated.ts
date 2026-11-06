@@ -635,14 +635,36 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
     ]
   },
   "l13-flow": {
-    "question": "How is probability conserved when a particle meets a step or a barrier?",
+    "question": "What happens when the energy is below the top of a step or a barrier?",
     "equations": [
-      "\\partial_t(\\psi^*\\psi) = -\\partial_x j",
-      "j = \\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi' - \\psi\\psi^{*\\prime}\\right)",
-      "R = \\tfrac{j_{\\mathrm{ref}}}{j_{\\mathrm{inc}}},\\quad T = \\tfrac{j_{\\mathrm{trans}}}{j_{\\mathrm{inc}}}",
-      "R = \\left(\\tfrac{k - k_0}{k + k_0}\\right)^2,\\quad T = 1 - R = \\tfrac{4kk_0}{(k + k_0)^2}",
+      "R = 1,\\quad T = 0\\quad (E < V_0)",
       "T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}",
       "T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}"
+    ]
+  },
+  "l17-mean-force": {
+    "question": "When does the centre of a packet obey Newton’s equation?",
+    "equations": [
+      "m\\,\\tfrac{d^2\\langle x\\rangle}{dt^2} = \\langle F(\\hat x)\\rangle",
+      "\\langle F\\rangle = \\alpha + \\beta\\langle x\\rangle = F(\\langle x\\rangle)\\quad (F = \\alpha + \\beta x)",
+      "m\\ddot\\mu = F(\\mu) + \\tfrac{F''(\\mu)}{2}(\\Delta x)^2 + \\dots"
+    ]
+  },
+  "l17-step": {
+    "question": "What do the matching conditions say about an energy eigenstate at a step?",
+    "equations": [
+      "k_1 = \\tfrac{\\sqrt{2mE}}{\\hbar},\\quad k_2 = \\tfrac{\\sqrt{2m(E - V_0)}}{\\hbar}",
+      "A + B = C,\\quad k_1(A - B) = k_2C",
+      "r = \\tfrac{k_1 - k_2}{k_1 + k_2},\\quad \\tau = \\tfrac{2k_1}{k_1 + k_2} = 1 + r"
+    ]
+  },
+  "l17-current": {
+    "question": "How do amplitudes become fractions of the incident flux?",
+    "equations": [
+      "\\partial_t\\rho + \\partial_xj = 0,\\quad j = \\tfrac{\\hbar}{m}\\mathrm{Im}\\left(\\psi^*\\psi'\\right)",
+      "j_{\\mathrm{in}} + j_{\\mathrm{ref}} = j_{\\mathrm{tr}}",
+      "R = |r|^2,\\quad T = \\tfrac{k_2}{k_1}|\\tau|^2",
+      "R = \\tfrac{(k_1 - k_2)^2}{(k_1 + k_2)^2},\\quad T = \\tfrac{4k_1k_2}{(k_1 + k_2)^2}"
     ]
   }
 }

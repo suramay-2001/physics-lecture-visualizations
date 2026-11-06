@@ -115,7 +115,7 @@ export const O4: Lecture = notesLecture({
           claims: [claim('o4E1kHz', 'E₁ over h for sodium at 1 T/m is 4.42 kHz', () => near(V.o4E1kHz, 4.42, 0.005))],
         },
         {
-          text: `In one dimension the V-shaped well, potential $F|x|$ for a force $F$, can be solved exactly. The levels are the zeros of the derivative of the Airy function and of the Airy function itself, taken in turn. For sodium at 1 T/m the first three lie ${d(V.o4AiryE1kHz, 2)}, ${d(V.o4AiryE2kHz, 2)} and ${d(V.o4AiryE3kHz, 2)} kHz above the bottom. The ratio of the second to the first is ${d(V.o4AiryRatio21, 3)}, not the ${d(V.o4HeurRatio21, 3)} of the orbit rule. Both grow with the same power of the level number, and at large $n$ the exact prefactor is about six per cent lower (<<qc-l13-flow|the probability-flow unit>>).`,
+          text: `In one dimension the V-shaped well, potential $F|x|$ for a force $F$, can be solved exactly. The levels are the zeros of the derivative of the Airy function and of the Airy function itself, taken in turn. For sodium at 1 T/m the first three lie ${d(V.o4AiryE1kHz, 2)}, ${d(V.o4AiryE2kHz, 2)} and ${d(V.o4AiryE3kHz, 2)} kHz above the bottom. The ratio of the second to the first is ${d(V.o4AiryRatio21, 3)}, not the ${d(V.o4HeurRatio21, 3)} of the orbit rule. Both grow with the same power of the level number, and at large $n$ the exact prefactor is about six per cent lower (<<qc-l17-current|the probability-flow unit>>).`,
           claims: [
             claim('o4AiryE1kHz', 'the first level of the V-shaped well is 3.57 kHz', () => near(V.o4AiryE1kHz, 3.57, 0.005)),
             claim('o4AiryE2kHz', 'the second level is 8.20 kHz', () => near(V.o4AiryE2kHz, 8.2, 0.005)),

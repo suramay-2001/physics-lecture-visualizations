@@ -136,13 +136,13 @@ put('l13PrWall3', overlap((0.0, 1.0, 1), (0.0, 3.0, 1)) ** 2)
 r2, t2 = step_RT(2.0, 1.0)
 r3, t3 = step_RT(3.0, 1.0)
 rb, tb = step_RT(0.5, 1.0)
-put('l13TStepR2', r2)
-put('l13TStepT2', t2)
-put('l13TStepR3', r3)
-put('l13TStepT3', t3)
+put('l17StepR2', r2)
+put('l17StepT2', t2)
+put('l17StepR3', r3)
+put('l17StepT3', t3)
 r15, t15 = step_RT(1.5, 1.0)
-put('l13PrStepR', r15)
-put('l13PrStepT', t15)
+put('l17PrStepR', r15)
+put('l17PrStepT', t15)
 put('l13TStepRbelow', rb)
 put('l13TStepTbelow', tb)
 put('l13TBookAT', barrier_T(5.0, 10.0, 0.53, HBAR2_2M))  # E = 5 eV, V0 = 10 eV, a = 0.53 angstrom
@@ -164,11 +164,11 @@ kg = 2 * pi * np.fft.fftfreq(NG, d=dxg)
 psi = (2 * pi) ** -0.25 * np.exp(-(xg**2) / 4) * np.exp(1j * 1.5 * xg)
 p1 = np.fft.ifft(kg * np.fft.fft(psi))
 j = np.real(np.conj(psi) * p1)
-put('l13TCurrentMean', np.sum(j) * dxg)
+put('l17CurrentMean', np.sum(j) * dxg)
 psi_t = -0.5j * np.fft.ifft(kg**2 * np.fft.fft(psi))
 rho_t = 2 * np.real(np.conj(psi) * psi_t)
 dj = np.real(np.fft.ifft(1j * kg * np.fft.fft(j)))
-put('l13TContResidual', np.max(np.abs(rho_t + dj)))
+put('l17ContResidualFree', np.max(np.abs(rho_t + dj)))
 
 # ---- Gaussian chirp: the free packet at t = 4 (np.fft evolution), sigma = 1 ----
 psi0 = (2 * pi) ** -0.25 * np.exp(-(xg**2) / 4) + 0j
@@ -256,7 +256,7 @@ cases['boxOverlap'] = [
     )
 ]
 cases['boxEnergy'] = [{'L': L, 'n': n, 'E': (n * pi / L) ** 2 / 2} for (L, n) in ((1.0, 1), (4.0, 3), (2.5, 2))]
-cases['momentum'] = {'meanCurrent': out['l13TCurrentMean'], 'residual': out['l13TContResidual']}
+cases['momentum'] = {'meanCurrent': out['l17CurrentMean'], 'residual': out['l17ContResidualFree']}
 
 (ROOT / 'app/src/physics/__fixtures__/claims-448').mkdir(parents=True, exist_ok=True)
 (ROOT / 'app/src/physics/__fixtures__/claims-448/g4b.json').write_text(

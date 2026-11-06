@@ -343,13 +343,19 @@ const ENTRIES: GlossEntry[] = [
   { id: 'evolution-time', term: 'evolution time $\\Delta t$', gloss: 'How long the average of an observable takes to move by its own spread; it is not the spread of a time observable.', first: 'l13-time:b6b', uses: ['energy-eigenstate'], symbols: ['\\Delta t'] },
   /* Lecture 13, Townsend pass (G4b): the box, current, step and barrier */
   { id: 'infinite-well', term: 'infinite well', gloss: 'A box with infinitely high walls: the wavefunction is zero outside and vanishes at the walls, so only whole numbers of half-waves fit.', first: 'l13-stationary:b3', uses: ['energy-eigenfunction'] },
-  { id: 'probability-current', term: 'probability current', gloss: 'The rate at which chance flows past a point; the chance in a stretch changes only by the current through its ends.', first: 'l13-flow:b1', uses: ['wavefunction'], symbols: ['j'] },
-  { id: 'transmission-coefficient', term: 'reflection and transmission coefficients', gloss: 'The shares $R$ and $T$ of the incident current that come back and go through; they add to 1.', first: 'l13-flow:b2', uses: ['probability-current'] },
+  { id: 'probability-current', term: 'probability current', gloss: 'The rate at which chance flows past a point; the chance in a stretch changes only by the current through its ends.', first: 'l17-current:b2', uses: ['wavefunction'], symbols: ['j'] },
+  { id: 'transmission-coefficient', term: 'reflection and transmission coefficients', gloss: 'The shares $R$ and $T$ of the incident current that come back and go through; they add to 1.', first: 'l17-current:b5', uses: ['probability-current'] },
   { id: 'time-operator', term: 'time operator $\\hat t$', gloss: 'A hypothetical observable with $[\\hat t,H] = i\\hbar$; ordinary quantum mechanics has none, because energies have a lowest value.', first: 'l13-time:b2', uses: ['commutator', 'hamiltonian'], symbols: ['\\hat t'], introduces: 'notation' },
   /* Townsend pass, G2b (Lectures 7-8) */
   { id: 'ladder-operator', term: 'ladder operators $\\hat J_\\pm$', gloss: 'The operators $\\hat J_x \\pm i\\hat J_y$; each steps the value of $\\hat J_z$ up or down by one unit of $\\hbar$ and leaves the squared length alone.', first: 'l7-ladder:b2', uses: ['commutator'], symbols: ['\\hat J_\\pm'] },
   { id: 'spin-j', term: 'spin $j$', gloss: 'The largest value of $J_z/\\hbar$, a whole number or a half of one; the system has $2j + 1$ levels from $+j$ down to $-j$.', first: 'l7-ladder:b3', uses: ['ladder-operator'], symbols: ['j'] },
   { id: 'wave-plate', term: 'wave plate', gloss: 'A slice of crystal whose two axes slow the two linear parts of light differently; it turns linear light into elliptical or circular light.', first: 'l8-photon-spin:b5b', uses: ['circular-states'] },
+  /* Lecture 17: mean motion and the reflection at a step */
+  { id: 'mean-force', term: 'mean force $\\langle F\\rangle$', gloss: 'The average of the force over the probability density; it equals the force at the mean position for a linear force, not in general.', first: 'l17-mean-force:b1', uses: ['expectation', 'probability-density'], symbols: ['\\langle F\\rangle'] },
+  { id: 'potential-step', term: 'potential step', gloss: 'A potential that jumps from one constant value to another at one point; the simplest place where a wave can reflect.', first: 'l17-step:b1', uses: ['wavefunction'] },
+  { id: 'scattering-state', term: 'scattering state', gloss: 'An energy eigenstate that cannot be normalised: an incident, a reflected and a transmitted wave, all of one energy.', first: 'l17-step:b2', uses: ['energy-eigenfunction', 'plane-wave'] },
+  { id: 'reflection-amplitude', term: 'amplitude ratios $r$ and $\\tau$', gloss: 'The ratios of the reflected and transmitted waves to the incident one; they are amplitudes, not probabilities.', first: 'l17-step:b3', uses: ['plane-wave'], symbols: ['r', '\\tau'] },
+  { id: 'continuity-equation', term: 'continuity equation', gloss: 'Probability in a stretch changes only by the current through its two ends; locally the density’s rate plus the current’s slope is zero.', first: 'l17-current:b1', uses: ['probability-density'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

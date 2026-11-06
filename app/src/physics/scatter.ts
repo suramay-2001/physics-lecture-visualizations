@@ -158,6 +158,14 @@ export function harmonicMean(x0: number, p0: number, omega: number, t: number, m
   if (!(omega > 0)) throw new Error('harmonicMean: Ω must be positive')
   return x0 * Math.cos(omega * t) + (p0 / (m * omega)) * Math.sin(omega * t)
 }
+/**
+ * ⟨T̂⟩ = ⟨p̂²⟩/2m for a real block of plateau length L (ψ = 1) with a linear ramp of width ε at each edge (notes App. B; ħ = m = 1): ∫ψ′² = 2/ε and ∫ψ² = L + 2ε/3, so
+ * ⟨T̂⟩ = (1/ε)/(L + 2ε/3). A true jump (ε → 0) costs infinite kinetic energy. The twin sums forward differences on a grid that holds the kinks.
+ */
+export function rampBlockKinetic(L: number, eps: number): number {
+  if (!(L > 0) || !(eps > 0)) throw new Error('rampBlockKinetic: L and ε must be positive')
+  return 1 / eps / (L + (2 * eps) / 3)
+}
 /** Δx(t) in the well Ω for a Gaussian packet of width σ and Δp = ħ/2σ (ħ = m = 1): √(σ²cos²Ωt + sin²Ωt/(4σ²Ω²)). It breathes unless σ² = 1/2Ω. */
 export function harmonicWidth(sigma: number, omega: number, t: number): number {
   if (!(sigma > 0) || !(omega > 0)) throw new Error('harmonicWidth: σ and Ω must be positive')

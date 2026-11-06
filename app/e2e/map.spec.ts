@@ -39,6 +39,10 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L13 .map-station')).toHaveCount(9)
   await expect(page.locator('#map-L13 a.map-station')).toHaveCount(9)
   await expect(page.locator('#map-L13')).not.toContainText('in preparation')
+  // Lecture 17 is built: three stations, one per unit (mean force, the step, the current), all links
+  await expect(page.locator('#map-L17 .map-station')).toHaveCount(3)
+  await expect(page.locator('#map-L17 a.map-station')).toHaveCount(3)
+  await expect(page.locator('#map-L17')).not.toContainText('in preparation')
   // every lecture is built, so the intro no longer promises dashed "in preparation" stations
   await expect(page.locator('.map-page .section-lede')).not.toContainText('in preparation')
   await expectNoErrors(errors)

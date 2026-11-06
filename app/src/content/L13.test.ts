@@ -39,15 +39,15 @@ const beat = (id: string) => beats.find((b) => b.id === id)!
 describe('Lecture 13: shape', () => {
   it('has the seven lecture units in order and the two Townsend units after them, with the planned beats (the notes’ line, the Townsend beats and four Go-deeper beats, §13.10 among them)', () => {
     expect(L13.units.map((u) => u.id)).toEqual(['l13-delta', 'l13-generator', 'l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time', 'l13-stationary', 'l13-flow'])
-    expect(L13.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([6, 5, 7, 7, 7, 7, 8, 5, 5])
-    expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l13-plane-wave:b7', 'l13-two-bases:b8', 'l13-schrodinger:b8', 'l13-flow:b6'])
+    expect(L13.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([6, 5, 7, 7, 7, 7, 8, 5, 3])
+    expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l13-plane-wave:b7', 'l13-two-bases:b8', 'l13-schrodinger:b8', 'l13-flow:b4'])
     expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(9)
-    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(18) // 7 from the notes' pass, 3 added to lecture units and 4 + 4 in the two Townsend units
+    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(16) // 7 from the notes' pass, 3 added to lecture units and 4 + 2 in the two Townsend units (two of l13-flow moved to L17)
     expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual([
       'l13-delta:b2', 'l13-generator:b3', 'l13-plane-wave:b1', 'l13-momentum-space:b2', 'l13-momentum-space:b5b', 'l13-two-bases:b2', 'l13-two-bases:b4', 'l13-schrodinger:b2', 'l13-schrodinger:b4', 'l13-time:b3',
-      'l13-time:b6b', 'l13-stationary:b3', 'l13-flow:b1', 'l13-flow:b2',
+      'l13-time:b6b', 'l13-stationary:b3',
     ])
-    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(32) // 28 from the notes' pass and four Townsend practice questions
+    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(31) // 28 from the notes' pass and three Townsend practice questions (l13-pr-step moved to L17)
     expect(L13.corrections).toHaveLength(1) // R8 stands for the notes; the one Correction is Townsend's p. 231 (ruling T5)
     expect(L13.corrections![0].where).toMatch(/Townsend p\. 231/)
     expect(L13.corrections![0].source).toBe('book')
@@ -70,7 +70,7 @@ describe('Lecture 13: R1 the shared kind', () => {
       const states = (u.story ?? []).flatMap(statesOf)
       const wf = states.filter((s): s is WavefunctionState => s.kind === 'wavefunction')
       const ck = states.filter((s): s is ClocksState => s.kind === 'clocks')
-      expect(wf.length, u.id).toBeGreaterThan(3)
+      expect(wf.length, u.id).toBeGreaterThan(u.id === 'l13-flow' ? 0 : 3) // l13-flow lost its two wavefunction-rich beats to L17 and goes to L18
       if (u.id !== 'l13-time') expect(ck, u.id).toHaveLength(0)
       for (const s of wf) expect(validateWavefunctionStage(s), u.id).toEqual([])
       for (const s of states) expect(['wavefunction', 'clocks', 'complex-plane', 'matrix', 'plot'], `${u.id} ${s.kind}`).toContain(s.kind)
@@ -259,9 +259,9 @@ describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townse
     expect(beat('l13-momentum-space:b5b').phase).toBe('books')
     expect(beat('l13-time:b6b').phase).toBe('books')
   })
-  it('the four practice questions are tagged townsend, name their end-of-chapter problem, carry full walkthroughs and are not assigned (T1)', () => {
+  it('the three practice questions that stayed are tagged townsend, name their end-of-chapter problem, carry full walkthroughs and are not assigned (T1)', () => {
     const qs = townsendUnits.flatMap((id) => unit(id).play)
-    expect(qs.map((q) => q.id)).toEqual(['l13-pr-box-energy', 'l13-pr-wall', 'l13-pr-step', 'l13-pr-tunnel'])
+    expect(qs.map((q) => q.id)).toEqual(['l13-pr-box-energy', 'l13-pr-wall', 'l13-pr-tunnel'])
     for (const q of qs) {
       expect(q.practice, q.id).toBe('townsend')
       expect(q.refs?.[0].where, q.id).toMatch(/^Problem 6\.\d+, end of Ch\. 6/)
@@ -271,7 +271,7 @@ describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townse
       expect(JSON.stringify(q), q.id).not.toMatch(/\bH\d-\d/) // no homework label (T1)
     }
     const tol = Object.fromEntries(qs.map((q) => [q.id, q.kind === 'numeric' ? q.tolerance : -1]))
-    expect(tol).toEqual({ 'l13-pr-box-energy': 0.005, 'l13-pr-wall': 0.005, 'l13-pr-step': 0.005, 'l13-pr-tunnel': 0.02 })
+    expect(tol).toEqual({ 'l13-pr-box-energy': 0.005, 'l13-pr-wall': 0.005, 'l13-pr-tunnel': 0.02 })
   })
   it('the Correction is Townsend p. 231: printed 0.68, our calculation 0.706 (two routes in the twin), checked by the engine (T5)', () => {
     const c = L13.corrections![0]
@@ -297,7 +297,7 @@ describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townse
     const r = resolveWavefunctionStage({ kind: 'wavefunction', source: { box: { L: 4, n: 1 } }, readouts: ['energy'] }, 1)
     expect(r.stats.energy).toBeCloseTo(Math.PI ** 2 / 32, 12)
     const fns = unit('l13-flow').story!.flatMap(statesOf).flatMap((s) => (s.kind === 'plot' && s.curve ? [s.curve.fn, ...(s.curve.vs ? [s.curve.vs] : [])] : []))
-    expect(new Set(fns)).toEqual(new Set(['stepT', 'stepR', 'barrierT', 'barrierThick']))
+    expect(new Set(fns)).toEqual(new Set(['barrierT', 'barrierThick']))
   })
   it('the box numbers: Ex. 6.6 gives 8/3π and 64/9π², the odd levels add to 1, the third gets 64/25π², the even ones 0; halving the box quadruples the energy and doubles the spread', () => {
     expect(V.l13TBoxOverlap).toBeCloseTo(8 / (3 * Math.PI), 12)

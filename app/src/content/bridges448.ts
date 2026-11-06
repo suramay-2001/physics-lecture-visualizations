@@ -50,6 +50,8 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   // Lecture 13 (momentum and the Schrödinger equation): 709's F8 diagonalises the ring shift with the discrete Fourier transform, Q3 proves the uncertainty relation from the commutator
   'sl-f8-dft': { course: 'qc709', lecture: 'F8', unit: 'f8-dft', label: 'The Fourier transform finds the rhythm' },
   'sl-q3-uncertainty': { course: 'qc709', lecture: 'Q3', unit: 'q3-uncertainty', label: 'Commutators and the floor under two spreads' },
+  // Lecture 17 (a wave meets a step): 709's Q26 beam splitter, where the two exits have the same speed
+  'sl-q26-beamsplitter': { course: 'qc709', lecture: 'Q26', unit: 'q26-beamsplitter', label: 'The beam splitter, two exits of equal speed' },
 }
 
 registerBridges(BRIDGES_448)

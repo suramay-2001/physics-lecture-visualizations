@@ -44,8 +44,6 @@ const W = (source: WavefunctionState['source'], o: Omit<WavefunctionState, 'kind
 
 /** Townsend §6.9 with the wall at 0 (his Problem 6.13): a box of width L, level n or an equal pair [n1, n2] (kind wavefunction, source box; ψ = 0 outside the walls). */
 const BOX = (L: number, n: number | [number, number]): WavefunctionState['source'] => ({ box: { L, n } })
-/** The reflected (R) and transmitted (T) shares of the current at a step, against E/V₀ (Eq. 6.135; R = 1 and T = 0 below the step). Dots at E = 2V₀ and 3V₀. */
-const STEP_RT: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'stepT', vs: 'stepR', samples: 120 }, markers: [{ x: 2 }, { x: 3 }] }
 /** The transmission of a barrier with E = V₀/2 against qa (Eq. 6.144); the dot is the book's electron, qa = 0.607. */
 const BARRIER_T: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'barrierT', samples: 120 }, markers: [{ x: 0.607 }] }
 /** The same barrier from qa = 1: the exact transmission beside the thick-barrier form of Eq. 6.146, which it approaches from below. */
@@ -978,102 +976,14 @@ const stationary: Beat[] = [
 ]
 
 /* ---------------------------------------------------------------------------------------------- */
-/* l13-flow — Current, steps and tunnelling (beyond the notes)                                     */
+/* l13-flow — Below the step and tunnelling (beyond the notes; its first two beats moved to L17)       */
 /* ---------------------------------------------------------------------------------------------- */
 
 const flow: Beat[] = [
   {
     id: 'l13-flow:b1',
     phase: 'books',
-    text: `This unit is beyond the lecture notes; it follows Townsend. How does the chance of finding the particle in a stretch $[a, b]$ change (Townsend §6.10, pp. 225–227, Eqs. 6.111–6.116)? Differentiate $\\psi^*\\psi$ with the equation and its conjugate: the terms with $V$ cancel. What is left is $\\partial_t(\\psi^*\\psi) = -\\partial_x j$, with the [[probability-current|probability current]] $j = \\tfrac{\\hbar}{2mi}(\\psi^*\\psi' - \\psi\\psi^{*\\prime})$. So the chance in $[a, b]$ changes only by the current through the two ends. A plane wave $Ae^{ikx}$ carries $j = \\hbar k|A|^2/m$. Our packet with $p_0 = 1.5$ carries a total current of $${d(V.l13TCurrentMean, 1)}\\,\\hbar/\\ell$ per unit mass, which is $\\langle p\\rangle/m$. The continuity equation holds on the grid to rounding error.`,
-    caption: 'the density of a packet with $p_0 = 1.5$ slides to the right: probability flows past each point',
-    stage: W(PK(0, 1, 1.5), { time: sweep(0, 4), show: ['density'], readouts: ['pmean'] }),
-    derivation: {
-      result: '\\frac{d}{dt}\\int_a^b \\psi^*\\psi\\,dx = j(a,t) - j(b,t)',
-      ground: [
-        {
-          tex: '\\partial_t\\psi = \\tfrac{1}{i\\hbar}\\left[-\\tfrac{\\hbar^2}{2m}\\psi\'\' + V\\psi\\right],\\quad \\partial_t\\psi^* = -\\tfrac{1}{i\\hbar}\\left[-\\tfrac{\\hbar^2}{2m}\\psi^{*\\prime\\prime} + V\\psi^*\\right]',
-          why: 'The Schrödinger equation and its complex conjugate; $V$ is real, so it comes through unchanged.',
-          view: W(PK(0, 1), { show: ['density'] }),
-          viewCaption: 'a packet at rest: its density has no net flow',
-        },
-        {
-          tex: '\\partial_t(\\psi^*\\psi) = \\psi\\,\\partial_t\\psi^* + \\psi^*\\partial_t\\psi',
-          why: 'The product rule for the density.',
-        },
-        {
-          tex: '\\partial_t(\\psi^*\\psi) = -\\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi\'\' - \\psi\\,\\psi^{*\\prime\\prime}\\right)',
-          why: 'Put in the two equations; the $V$ terms cancel because they enter with opposite signs.',
-        },
-        {
-          tex: '\\psi^*\\psi\'\' - \\psi\\,\\psi^{*\\prime\\prime} = \\partial_x\\left(\\psi^*\\psi\' - \\psi\\,\\psi^{*\\prime}\\right)',
-          why: 'On the right the cross terms $\\psi^{*\\prime}\\psi\'$ cancel, so the bracket is the derivative of one function.',
-          view: W(PK(0, 1, 1.5), { time: sweep(0, 4), show: ['density'], readouts: ['pmean'] }),
-          viewCaption: 'with $p_0 = 1.5$ the density slides right: the current is positive',
-        },
-        {
-          tex: '\\partial_t(\\psi^*\\psi) = -\\partial_x j,\\qquad j = \\tfrac{\\hbar}{2mi}\\left(\\psi^*\\psi\' - \\psi\\,\\psi^{*\\prime}\\right)',
-          why: 'Name the function inside the derivative: it is the probability current.',
-          claims: [
-            claim('l13TContResidual', 'on the grid, ∂ρ/∂t + ∂j/∂x vanishes to rounding error for the packet with p₀ = 1.5', () => V.l13TContResidual < 1e-9),
-            claim('l13TCurrentMean', 'and its total current is ⟨p⟩/m = 1.5', () => close(V.l13TCurrentMean, 1.5, 1e-9)),
-          ],
-        },
-        {
-          tex: '\\frac{d}{dt}\\int_a^b \\psi^*\\psi\\,dx = j(a,t) - j(b,t)',
-          why: 'Integrate over $[a, b]$: the integral of a derivative is the difference of its ends, so only the current through the ends changes the chance.',
-        },
-      ],
-    },
-    refs: [townsend('§6.10, pp. 225–227 (Eqs. 6.111–6.116, Fig. 6.13)', 'The Schrödinger equation and its conjugate give a continuity equation: the density’s rate is minus the derivative of the probability current.')],
-  },
-  {
-    id: 'l13-flow:b2',
-    phase: 'books',
-    text: `A step has $V = 0$ for $x < 0$ and $V_0$ for $x > 0$. A wave of energy $E > V_0$ comes from the left (Townsend §6.10, pp. 226–229, Eqs. 6.117–6.136, Fig. 6.14). On the left the function is $Ae^{ikx} + Be^{-ikx}$; on the right it is $Ce^{ik_0x}$ with $k_0 = \\sqrt{2m(E - V_0)}/\\hbar$. Continuity of $\\varphi$ and its slope at $x = 0$ gives $A + B = C$ and $k(A - B) = k_0C$. The [[transmission-coefficient|reflection and transmission coefficients]] are ratios of currents, not of squared amplitudes: $R = j_{\\mathrm{ref}}/j_{\\mathrm{inc}}$ and $T = j_{\\mathrm{trans}}/j_{\\mathrm{inc}}$. The result is $R = (k - k_0)^2/(k + k_0)^2$ and $T = 4kk_0/(k + k_0)^2$, and $R + T = 1$. At $E = 2V_0$ they are ${d(V.l13TStepR2, 4)} and ${d(V.l13TStepT2, 4)}. At $E = 3V_0$ they are ${d(V.l13TStepR3, 4)} and ${d(V.l13TStepT3, 4)}.`,
-    caption: 'the share of the current that is reflected (R) and transmitted (T) against $E/V_0$: all reflected below the step, almost all transmitted well above it',
-    stage: STEP_RT,
-    derivation: {
-      result: 'R + T = 1',
-      ground: [
-        {
-          tex: '\\varphi = Ae^{ikx} + Be^{-ikx}\\ (x < 0),\\qquad \\varphi = Ce^{ik_0x}\\ (x > 0)',
-          why: 'On each side $V$ is constant, so the solutions are plane waves; for particles from the left nothing comes back from the right.',
-          view: W(PL(3), { show: ['re'] }),
-          viewCaption: 'the incident wave: a plane wave moving to the right',
-        },
-        {
-          tex: 'A + B = C,\\qquad k(A - B) = k_0C',
-          why: 'Continuity of $\\varphi$ and $\\varphi\'$ at $x = 0$ (Eq. 6.133).',
-        },
-        {
-          tex: 'C = \\tfrac{2k}{k + k_0}A,\\qquad B = \\tfrac{k - k_0}{k + k_0}A',
-          why: 'Add and subtract the two equations to solve for $C$ and $B$ (Eq. 6.134).',
-        },
-        {
-          tex: 'R = \\tfrac{|B|^2}{|A|^2} = \\tfrac{(k - k_0)^2}{(k + k_0)^2},\\qquad T = \\tfrac{k_0|C|^2}{k|A|^2} = \\tfrac{4kk_0}{(k + k_0)^2}',
-          why: 'Each current is $\\hbar k/m$ times a squared amplitude, so $T$ carries the factor $k_0/k$ (Eq. 6.135).',
-          view: STEP_RT,
-          viewCaption: 'the two shares against $E/V_0$',
-        },
-        {
-          tex: 'R + T = \\tfrac{(k - k_0)^2 + 4kk_0}{(k + k_0)^2} = 1',
-          why: 'The numerator is $(k + k_0)^2$, so what is not reflected is transmitted (Eq. 6.136).',
-        },
-      ],
-    },
-    refs: [townsend('§6.10, pp. 226–229 (Eqs. 6.117–6.136, Fig. 6.14)', 'Continuity of the function and its slope at a step fixes the reflected and transmitted amplitudes; $R$ and $T$ are ratios of currents and add to 1.')],
-    claims: [
-      claim('l13TStepR2', 'at E = 2V₀ the step reflects 0.0294', () => close(V.l13TStepR2, 0.0294373, 1e-6)),
-      claim('l13TStepT2', 'and transmits 0.9706', () => close(V.l13TStepT2, 0.9705627, 1e-6)),
-      claim('l13TStepR3', 'at E = 3V₀ it reflects 0.0102', () => close(V.l13TStepR3, 0.0102051, 1e-6)),
-      claim('l13TStepT3', 'and transmits 0.9898', () => close(V.l13TStepT3, 0.9897949, 1e-6)),
-    ],
-  },
-  {
-    id: 'l13-flow:b3',
-    phase: 'books',
-    text: `For $E < V_0$ the wave on the right is $Ce^{-qx}$ with $q = \\sqrt{2m(V_0 - E)}/\\hbar$ (Townsend §6.10, pp. 229–230, Eqs. 6.137–6.140). Matching at $x = 0$ gives $|B| = |A|$, so $R = ${d(V.l13TStepRbelow, 0)}$. Yet $C = 2kA/(k + iq)$ is not zero: the wave enters the step. No current flows there, because $\\varphi^*\\varphi'$ is real for a real exponent, so $T = ${d(V.l13TStepTbelow, 0)}$. This case follows from the one above by $ik_0 \\to -q$, but only for $R$. Do not take $T$ from the formula above by the same substitution: $T$ is a ratio of currents, not a ratio of squared amplitudes.`,
+    text: `This unit is beyond the lecture notes; it follows Townsend. Lecture 17 teaches the current and the step with $E > V_0$. Here the energy is below the step. For $E < V_0$ the wave on the right is $Ce^{-qx}$ with $q = \\sqrt{2m(V_0 - E)}/\\hbar$ (Townsend §6.10, pp. 229–230, Eqs. 6.137–6.140). Matching at $x = 0$ gives $|B| = |A|$, so $R = ${d(V.l13TStepRbelow, 0)}$. Yet $C = 2kA/(k + iq)$ is not zero: the wave enters the step. No current flows there, because $\\varphi^*\\varphi'$ is real for a real exponent, so $T = ${d(V.l13TStepTbelow, 0)}$. This case follows from the one above by $ik_0 \\to -q$, but only for $R$. Do not take $T$ from the formula above by the same substitution: $T$ is a ratio of currents, not a ratio of squared amplitudes.`,
     caption: 'the density to the left of the step when everything is reflected: the incident and reflected waves form a standing ripple',
     stage: W(TW(3, -3), { show: ['density'] }),
     refs: [townsend('§6.10, pp. 229–230 (Eqs. 6.137–6.140)', 'Below the step the reflection is total, yet the function enters it as a decaying exponential; the transmission is zero because that wave carries no current.')],
@@ -1083,7 +993,7 @@ const flow: Beat[] = [
     ],
   },
   {
-    id: 'l13-flow:b4',
+    id: 'l13-flow:b2',
     phase: 'books',
     text: `A barrier of height $V_0$ and width $a$, with $E < V_0$ (Townsend §6.10, pp. 230–233, Eqs. 6.141–6.146, Fig. 6.15). Matching the function and its slope at both edges gives four equations. Solving them gives $T = 1/[1 + ((k^2 + q^2)/2kq)^2\\sinh^2 qa]$. This is not zero: the particle [[tunnelling|tunnels]]. A numerical solution of the four equations agrees with the formula. For a thick barrier, $qa \\gg 1$, it becomes $T \\to (4kq/(k^2 + q^2))^2e^{-2qa}$. An electron with 5 eV meeting a barrier 10 eV high and 53 pm wide has $qa = ${d(V.l13TBookQa, 3)}$ and $T = ${d(V.l13TBookAT, 3)}$. At $E = V_0$ exactly, the function inside is a straight line and $T = 1/(1 + k^2a^2/4)$ (Ex. 6.7), which is ${d(V.l13TEV0T, 1)} for $ka = 2$.`,
     caption: 'the transmission of a barrier with $E = V_0/2$ against $qa$; the dot marks $qa = 0.607$, the electron of the text',
@@ -1096,7 +1006,7 @@ const flow: Beat[] = [
     ],
   },
   {
-    id: 'l13-flow:b5',
+    id: 'l13-flow:b3',
     phase: 'clue',
     text: 'Make a thick barrier wider by one decay length, $1/q$. By what factor does the transmission fall?',
     stage: BARRIER_THICK,
@@ -1108,7 +1018,7 @@ const flow: Beat[] = [
     },
   },
   {
-    id: 'l13-flow:b6',
+    id: 'l13-flow:b4',
     phase: 'deeper',
     text: `Beyond the notes: a smooth barrier is a stack of thin square ones. Each contributes a factor $e^{-2q\\,\\Delta x}$, so $T \\approx \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)$ over the stretch where the root is real (Townsend §6.10, pp. 233–234, Eqs. 6.147–6.149, Fig. 6.17). It fails near the turning points, where $E = V$. For 5 eV against a square barrier 10 eV high and 300 pm wide, the exact transmission is ${d(V.l13TThickRatio, 3)} of the thick-barrier form.`,
     caption: 'the exact transmission and its thick-barrier form meet for large $qa$',

@@ -918,10 +918,51 @@ export const LECTURE_META: LectureIndex[] = [
       },
       {
         "id": "l13-flow",
-        "title": "Current, steps and tunnelling",
+        "title": "Below the step and tunnelling",
         "challenges": [
-          "l13-pr-step",
           "l13-pr-tunnel"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "L17",
+    "number": 17,
+    "title": "Classical mean motion and quantum reflection",
+    "units": [
+      {
+        "id": "l17-mean-force",
+        "title": "Mean force against force at the mean",
+        "challenges": [
+          "l17-mf-exact",
+          "l17-mf-two",
+          "l17-mf-var",
+          "l17-mf-order",
+          "l17-pr-mean"
+        ]
+      },
+      {
+        "id": "l17-step",
+        "title": "A wave meets a potential step",
+        "challenges": [
+          "l17-st-k2",
+          "l17-st-r",
+          "l17-st-t",
+          "l17-st-order"
+        ]
+      },
+      {
+        "id": "l17-current",
+        "title": "Why probability flows, and R and T",
+        "challenges": [
+          "l17-cu-j",
+          "l17-cu-T",
+          "l17-cu-sum",
+          "l17-cu-which",
+          "l17-cu-net",
+          "l17-cu-order",
+          "l17-pr-step",
+          "l17-pr-edge"
         ]
       }
     ]
