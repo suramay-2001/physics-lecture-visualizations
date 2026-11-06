@@ -37,6 +37,7 @@ import type {
   WalkGraphShow,
   WavefunctionOverlay,
   WavefunctionPanel,
+  WavefunctionPotential,
   WavefunctionReadout,
   WavefunctionShow,
   CodeCorner,
@@ -1671,6 +1672,8 @@ export interface WavefunctionInputs {
   boost: number
   shift: number
   time: number
+  /** The potential the packet moves in (Lecture 17), or null. */
+  potential: WavefunctionPotential | null
   panels: WavefunctionPanel[]
   show: WavefunctionShow[]
   overlay: WavefunctionOverlay[]
@@ -1700,6 +1703,21 @@ export interface WavefunctionStats {
   wavelength: number | null
   /** E_n of a box level, or the mean energy of a pair (a box source only; ħ = m = 1) */
   energy: number | null
+  /** The chance at x < 0 (the whole grid) and beyond the last edge of a step or barrier (x > 0 for a step, x > a for a barrier); null without such a potential */
+  reflected: number | null
+  transmitted: number | null
+}
+/** The potential's profile over the position window, drawn on its own scale (Lecture 17). `energy` is ⟨p⟩²/2 of the packet at t = 0 for a step or barrier, else null. */
+export interface WavefunctionProfile {
+  kind: 'step' | 'barrier' | 'harmonic' | 'force'
+  x: number[]
+  v: number[]
+  /** the vertical extent of the drawing, in the units of V (covers 0, V and the energy line) */
+  lo: number
+  hi: number
+  energy: number | null
+  /** the edge(s) where V jumps (step: [0]; barrier: [0, a]), for the thin rules */
+  edges: number[]
 }
 export interface ResolvedWavefunction {
   kind: 'wavefunction'
@@ -1730,6 +1748,8 @@ export interface ResolvedWavefunction {
   stats: WavefunctionStats
   /** The walls [0, L] of a box source, drawn as vertical rules (null for every other source). */
   walls: [number, number] | null
+  /** V(x) over the position window, when the state has a potential. */
+  profile: WavefunctionProfile | null
   readouts: WavefunctionReadout[]
   inputs: WavefunctionInputs
   shot?: WavefunctionShot

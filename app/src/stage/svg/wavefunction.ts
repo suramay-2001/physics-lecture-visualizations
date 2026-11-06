@@ -10,15 +10,15 @@
  * (a bar chart that fuses into the curve is a cross-fade of two pictures of the same density). Every output is recomputed from the interpolated inputs.
  * Lazy chunk (stage/svg/kinds.ts).
  */
-import type { Scrub, WavefunctionState } from '../../content/stage'
+import type { Scrub, WavefunctionPotential, WavefunctionState } from '../../content/stage'
 import { WAVEFUNCTION_CELLS, WAVEFUNCTION_OVERLAYS, WAVEFUNCTION_PANELS, WAVEFUNCTION_READOUTS, WAVEFUNCTION_SHOW } from '../../content/stage'
 import {
-  GRID, type Wave, boost as boostWave, boxEnergy, boxPairEnergy, boxState, densitySpline, meanX, momentumMoments, norm, pOp, packet, peakDensity, planeSamples, shiftAndEvolve,
-  spreadX, toMomentum, windowIndices, xTimes,
+  GRID, type Wave, barrierPotential, boost as boostWave, boxEnergy, boxPairEnergy, boxState, chanceAbove, chanceBelow, densitySpline, evolveV, forcePotential, harmonicPotential,
+  meanX, momentumMoments, norm, pOp, packet, peakDensity, planeSamples, shiftAndEvolve, spreadX, stepPotential, toMomentum, windowIndices, xTimes,
 } from '../../physics/wave'
 import { scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
-import type { ResolvedWavefunction, WaveCurve, WavefunctionInputs, WavefunctionSourceInputs, WavefunctionStats } from '../types'
+import type { ResolvedWavefunction, WaveCurve, WavefunctionInputs, WavefunctionProfile, WavefunctionSourceInputs, WavefunctionStats } from '../types'
 import { fix } from './draw'
 
 /** Validation limits (the grid is [−32, 32): a packet must stay clear of its periodic edge). */
@@ -41,6 +41,82 @@ const L_BOX = { min: 2, max: 16, nMax: 8 } as const
 const DEFAULT_WINDOW = { x: [-8, 8] as [number, number], p: [-8, 8] as [number, number] }
 const MAX_POINTS = 520
 
+/** Limits of the `potential` field (Lecture 17): the packet starts within the window (|x₀| ≤ 12), time runs to 16. */
+export const POTENTIAL_LIMITS = { V0Max: 8, aMin: 0.1, aMax: 4, omegaMin: 0.2, omegaMax: 2, forceMax: 2, timeMax: 16, x0Max: 12 } as const
+
+/* ------------------------------------------------ a packet in a potential ------------------------------------------------ */
+const potentialKind = (p: WavefunctionPotential): 'step' | 'barrier' | 'harmonic' | 'force' => ('step' in p ? 'step' : 'barrier' in p ? 'barrier' : 'harmonic' in p ? 'harmonic' : 'force')
+
+/** V at every grid point (physics/wave.ts samplers). */
+function potentialArray(p: WavefunctionPotential): Float64Array {
+  if ('step' in p) return stepPotential(GRID, p.step.V0)
+  if ('barrier' in p) return barrierPotential(GRID, p.barrier.V0, p.barrier.a)
+  if ('harmonic' in p) return harmonicPotential(GRID, p.harmonic.omega)
+  return forcePotential(GRID, p.force.F)
+}
+
+/** The right-hand edge of the region counted as transmitted: 0 for a step, a for a barrier (null for a harmonic well or a constant force). */
+const farEdge = (p: WavefunctionPotential): number | null => ('step' in p ? 0 : 'barrier' in p ? p.barrier.a : null)
+
+/**
+ * ψ at time t for the packet at t = 0 evolved under V (physics/wave.ts `evolveV`). Frames at multiples of CHECK are cached per (packet, potential) and built in order, so scrubbing
+ * forward or back costs at most one CHECK of steps; a handful of tracks are kept. The returned wave is shared: callers must not change it.
+ */
+const CHECK = 0.5
+const MAX_TRACKS = 4
+const tracks = new Map<string, { V: Float64Array; frames: Wave[] }>()
+export function potentialState(src: { x0: number; sigma: number; p0: number }, pot: WavefunctionPotential, t: number): Wave {
+  const key = JSON.stringify([src.x0, src.sigma, src.p0, pot])
+  let tr = tracks.get(key)
+  if (!tr) {
+    if (tracks.size >= MAX_TRACKS) tracks.delete(tracks.keys().next().value as string)
+    tr = { V: potentialArray(pot), frames: [packet(GRID, src)] }
+    tracks.set(key, tr)
+  }
+  const k = Math.floor(t / CHECK + 1e-9)
+  while (tr.frames.length <= k) tr.frames.push(evolveV(tr.frames[tr.frames.length - 1], GRID, tr.V, CHECK))
+  const rest = t - k * CHECK
+  return rest < 1e-9 ? tr.frames[k] : evolveV(tr.frames[k], GRID, tr.V, rest)
+}
+
+/** V(x) analytically at x (a jump takes its right-hand value; the drawing inserts the vertical rule itself). */
+const vAt = (p: WavefunctionPotential, x: number): number =>
+  'step' in p ? (x > 0 ? p.step.V0 : 0) : 'barrier' in p ? (x > 0 && x < p.barrier.a ? p.barrier.V0 : 0) : 'harmonic' in p ? (p.harmonic.omega * p.harmonic.omega * x * x) / 2 : -p.force.F * x
+
+/** The profile over the position window: 401 even samples plus both sides of every jump, and the vertical extent that covers 0, V and the energy line. */
+function profileOf(p: WavefunctionPotential, p0: number, lo: number, hi: number): WavefunctionProfile {
+  const kind = potentialKind(p)
+  const edges = 'step' in p ? [0] : 'barrier' in p ? [0, p.barrier.a] : []
+  const pts: { x: number; v: number }[] = Array.from({ length: 401 }, (_, j) => {
+    const x = lo + ((hi - lo) * j) / 400
+    return { x, v: vAt(p, x) }
+  }).filter((o) => !edges.some((e) => Math.abs(o.x - e) < 1e-9))
+  for (const e of edges) if (e > lo && e < hi) pts.push({ x: e, v: vAt(p, e - 1e-9) }, { x: e, v: vAt(p, e + 1e-9) })
+  pts.sort((a, b) => a.x - b.x)
+  const energy = (kind === 'step' || kind === 'barrier') && p0 !== 0 ? (p0 * p0) / 2 : null
+  const vs = pts.map((o) => o.v)
+  return { kind, x: pts.map((o) => o.x), v: vs, lo: Math.min(0, ...vs), hi: Math.max(1e-9, ...vs, energy ?? 0), energy, edges: edges.filter((e) => e >= lo && e <= hi) }
+}
+
+/** How much taller than the unmoved packet the density can get, so one density scale holds for the whole run (a step or barrier doubles it where waves overlap; a well squeezes it). */
+function densityHeadroom(src: { sigma: number }, p: WavefunctionPotential): number {
+  if ('step' in p || 'barrier' in p) return 2
+  if ('harmonic' in p) {
+    const s2 = 1 / (2 * src.sigma * p.harmonic.omega)
+    return Math.max(1, src.sigma / Math.min(src.sigma, s2))
+  }
+  return 1
+}
+
+/** The farthest a packet can reach from the origin under a potential, for the periodic-box check (a conservative bound, centre plus five widths). */
+export function potentialReach(x0: number, sigma: number, p0: number, time: number, pot: WavefunctionPotential): number {
+  const width = sigma * Math.sqrt(1 + (time / (2 * sigma * sigma)) ** 2)
+  if ('harmonic' in pot) return Math.abs(x0) + Math.abs(p0) / pot.harmonic.omega + 5 * Math.max(sigma, 1 / (2 * sigma * pot.harmonic.omega))
+  // a step or barrier only reflects (the mirror image of the incident centre) or slows the packet, so every piece stays within max(|x₀|, |x₀ + p₀t|)
+  if ('step' in pot || 'barrier' in pot) return Math.max(Math.abs(x0), Math.abs(x0 + p0 * time)) + 5 * width
+  return Math.abs(x0) + Math.abs(p0) * time + (Math.abs(pot.force.F) * time * time) / 2 + 5 * width
+}
+
 /* ------------------------------------------------ inputs ------------------------------------------------ */
 export function wavefunctionInputs(st: WavefunctionState, s: number): WavefunctionInputs {
   const src = st.source
@@ -54,6 +130,7 @@ export function wavefunctionInputs(st: WavefunctionState, s: number): Wavefuncti
     boost: st.boost === undefined ? 0 : scrub(st.boost, s),
     shift: st.shift === undefined ? 0 : scrub(st.shift, s),
     time: st.time === undefined ? 0 : scrub(st.time, s),
+    potential: st.potential ?? null,
     panels: [...(st.panels ?? ['position'])],
     show: [...(st.show ?? ['re', 'im', 'density'])],
     overlay: [...(st.overlay ?? [])],
@@ -106,7 +183,8 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
   const [plo, phi] = inp.window.p
   const wantP = inp.panels.includes('momentum')
   const src = inp.source
-  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null, energy: null }
+  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null, energy: null, reflected: null, transmitted: null }
+  let profile: WavefunctionProfile | null = null
   let position: WaveCurve
   let momentum: WaveCurve | null = null
   let momentumSpikes: number[] | null = null
@@ -122,7 +200,14 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
     // a packet moves freely (boost, shift, time); a box state keeps its levels and only turns each by its own phase e^{-iE_n t} (boost, shift and overlays are refused)
     const w0 = src.kind === 'packet' ? packet(GRID, { x0: src.x0, sigma: src.sigma, p0: src.p0 }) : boxState(GRID, src.L, src.n, 0)
     let w: Wave
-    if (src.kind === 'packet') {
+    if (src.kind === 'packet' && inp.potential) {
+      // Lecture 17: the packet at t = 0 evolved under p̂²/2 + V (cached frames); the potential's profile and the chances beyond its edges are read off the same state
+      w = potentialState(src, inp.potential, inp.time)
+      profile = profileOf(inp.potential, src.p0, xlo, xhi)
+      const far = farEdge(inp.potential)
+      if (far !== null && inp.readouts.includes('reflected')) stats.reflected = chanceBelow(w, GRID, 0)
+      if (far !== null && inp.readouts.includes('transmitted')) stats.transmitted = chanceAbove(w, GRID, far)
+    } else if (src.kind === 'packet') {
       w = inp.boost !== 0 ? boostWave(w0, GRID, inp.boost) : w0
       if (inp.shift !== 0 || inp.time !== 0) w = shiftAndEvolve(w, GRID, inp.shift, inp.time)
     } else {
@@ -173,8 +258,9 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
     }
     // the scales come from the UNMOVED source: spreading in time then shows as a lower, wider curve
     if (src.kind === 'packet') {
-      scale.amp = Math.pow(2 * Math.PI * src.sigma * src.sigma, -0.25)
-      scale.dens = 1 / (src.sigma * Math.sqrt(2 * Math.PI))
+      const head = inp.potential ? densityHeadroom(src, inp.potential) : 1
+      scale.amp = Math.pow(2 * Math.PI * src.sigma * src.sigma, -0.25) * Math.sqrt(head)
+      scale.dens = (1 / (src.sigma * Math.sqrt(2 * Math.PI))) * head
     } else {
       // the tallest a level (the root of 2/L) or an equal pair (root 2 times that, the two crests together) can be
       const pair = typeof src.n !== 'number'
@@ -244,6 +330,7 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
     readouts: inp.readouts,
     inputs: inp,
     walls,
+    profile,
     shot: inp.shot,
   }
 }
@@ -298,6 +385,38 @@ const scrubFinite = (v: Scrub): boolean => (typeof v === 'number' ? Number.isFin
 const scrubEnds = (v: Scrub): number[] => (typeof v === 'number' ? [v] : [v.from, v.to])
 const isCell = (n: unknown): boolean => (WAVEFUNCTION_CELLS as readonly unknown[]).includes(n)
 
+/** The potential's own numbers are all finite and inside the limits (the reach check needs them). */
+function potentialShapeOk(p: WavefunctionPotential): boolean {
+  return validatePotentialShape(p).length === 0
+}
+function validatePotentialShape(p: WavefunctionPotential): string[] {
+  const P = POTENTIAL_LIMITS
+  const errs: string[] = []
+  const num = (name: string, v: unknown, lo: number, hi: number, open = false) => {
+    if (typeof v !== 'number' || !Number.isFinite(v)) errs.push(`wavefunction potential ${name}: a finite number`)
+    else if (v > hi + 1e-12 || v < lo - 1e-12 || (open && v <= lo)) errs.push(`wavefunction potential ${name}: ${open ? 'above' : 'between'} ${lo}${open ? ' and at most' : ' and'} ${hi} (got ${v})`)
+  }
+  const names = ['step', 'barrier', 'harmonic', 'force'].filter((k) => k in (p as object))
+  if (names.length !== 1) return ["wavefunction potential: exactly one of 'step', 'barrier', 'harmonic' and 'force'"]
+  if ('step' in p) num('step V0', p.step.V0, 0, P.V0Max, true)
+  else if ('barrier' in p) {
+    num('barrier V0', p.barrier.V0, 0, P.V0Max, true)
+    num('barrier a', p.barrier.a, P.aMin, P.aMax)
+  } else if ('harmonic' in p) num('harmonic omega', p.harmonic.omega, P.omegaMin, P.omegaMax)
+  else num('force F', p.force.F, -P.forceMax, P.forceMax)
+  return errs
+}
+/** A potential needs a packet source and none of boost, shift, overlay, cells or interval (the messages name the field). */
+function validatePotential(st: WavefunctionState, p: WavefunctionPotential, kind: string): string[] {
+  const errs = validatePotentialShape(p)
+  if (kind !== 'packet') errs.push('wavefunction potential: needs a packet source (a plane wave, two waves or a box state has no packet to evolve under V)')
+  for (const f of ['boost', 'shift'] as const) if (st[f] !== undefined) errs.push(`wavefunction ${f}: refused with a potential (the packet starts as given and 'time' runs the evolution under V)`)
+  if (st.overlay !== undefined && st.overlay.length) errs.push('wavefunction overlay: refused with a potential')
+  if (st.cells !== undefined) errs.push('wavefunction cells: refused with a potential')
+  if (st.interval !== undefined) errs.push('wavefunction interval: refused with a potential')
+  return errs
+}
+
 export function validateWavefunctionStage(st: WavefunctionState): string[] {
   const errs: string[] = []
   const L = WAVEFUNCTION_LIMITS
@@ -314,18 +433,25 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
   }
   limit('boost', st.boost, L.boostMax)
   limit('shift', st.shift, L.shiftMax)
-  limit('time', st.time, L.timeMax, 0)
+  limit('time', st.time, st.potential ? POTENTIAL_LIMITS.timeMax : L.timeMax, 0)
   const kind = kinds[0]
+  const pot = st.potential
+  if (pot !== undefined) errs.push(...validatePotential(st, pot, kind))
   if ('packet' in st.source) {
     const { x0, sigma, p0 } = st.source.packet
     limit('packet sigma', sigma, L.sigmaMax, L.sigmaMin)
-    limit('packet x0', x0, L.x0Max)
+    limit('packet x0', x0, pot ? POTENTIAL_LIMITS.x0Max : L.x0Max)
     limit('packet p0', p0, L.p0Max)
     // a packet that wraps round the periodic box would draw a false picture: keep its centre and five widths inside |x| ≤ edge
     if ([x0, sigma, p0 ?? 0, st.boost ?? 0, st.shift ?? 0, st.time ?? 0].every(scrubFinite)) {
       const ends = (v: Scrub | undefined) => (v === undefined ? [0] : scrubEnds(v))
-      for (const a of ends(x0)) for (const sg of ends(sigma)) for (const pp of ends(p0)) for (const b of ends(st.boost)) for (const sh of ends(st.shift)) for (const tm of ends(st.time))
-        if (packetReach(a, sg, pp, b, sh, tm) > L.edge) errs.push(`wavefunction packet: with x0 ${a}, sigma ${sg}, p0 ${pp}, boost ${b}, shift ${sh}, time ${tm} the packet reaches the edge of the periodic box (centre + 5 widths must stay within ±${L.edge})`)
+      if (pot && potentialShapeOk(pot)) {
+        for (const a of ends(x0)) for (const sg of ends(sigma)) for (const pp of ends(p0)) for (const tm of ends(st.time))
+          if (potentialReach(a, sg, pp, tm, pot) > L.edge) errs.push(`wavefunction packet: with x0 ${a}, sigma ${sg}, p0 ${pp}, time ${tm} the packet can reach the edge of the periodic box (its reach plus 5 widths must stay within ±${L.edge})`)
+      } else if (!pot) {
+        for (const a of ends(x0)) for (const sg of ends(sigma)) for (const pp of ends(p0)) for (const b of ends(st.boost)) for (const sh of ends(st.shift)) for (const tm of ends(st.time))
+          if (packetReach(a, sg, pp, b, sh, tm) > L.edge) errs.push(`wavefunction packet: with x0 ${a}, sigma ${sg}, p0 ${pp}, boost ${b}, shift ${sh}, time ${tm} the packet reaches the edge of the periodic box (centre + 5 widths must stay within ±${L.edge})`)
+      }
     }
   } else if ('box' in st.source) {
     const { L, n } = st.source.box
@@ -383,6 +509,8 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
     if (kind !== 'packet' && kind !== 'box' && !['pmean', 'pspread', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" needs a packet source (a plane wave is not normalisable)`)
     if (kind === 'box' && ['interval', 'cell', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" is not defined for a box source`)
     if (r === 'energy' && kind !== 'box') errs.push("wavefunction readouts: 'energy' needs a box source")
+    if ((r === 'reflected' || r === 'transmitted') && !(pot && ('step' in pot || 'barrier' in pot)))
+      errs.push(`wavefunction readouts: "${r}" needs a step or barrier potential (the chance beyond an edge; a harmonic well or a constant force has none)`)
     if (r === 'wavelength' && kind !== 'plane') errs.push("wavefunction readouts: 'wavelength' needs a plane source")
     if (r === 'interval' && st.interval === undefined) errs.push("wavefunction readouts: 'interval' needs an interval")
     if (r === 'cell' && st.cells === undefined) errs.push("wavefunction readouts: 'cell' needs cells")
@@ -433,6 +561,12 @@ export function wavefunctionReadouts(r: ResolvedWavefunction): SvgReadout[] {
         break
       case 'energy':
         if (s.energy !== null) put(name, `${r.source.kind === 'box' && typeof r.source.n !== 'number' ? '⟨E⟩' : 'E'} = ${fix(s.energy, 3)} ħ²/mℓ²`)
+        break
+      case 'reflected':
+        if (s.reflected !== null) put(name, `P(x < 0) = ${fix(s.reflected, 3)}`)
+        break
+      case 'transmitted':
+        if (s.transmitted !== null) put(name, `P(x > ${fix(r.inputs.potential && 'barrier' in r.inputs.potential ? r.inputs.potential.barrier.a : 0, r.inputs.potential && 'barrier' in r.inputs.potential ? 2 : 0)}) = ${fix(s.transmitted, 3)}`)
         break
     }
   }

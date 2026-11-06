@@ -420,6 +420,10 @@ SVG_FIDELITY.wavefunction = {
       id: 'wavefunction-box-walls',
       text: 'A box state is the engine’s exact sine inside the two walls and exactly zero outside them. The curve has a corner at each wall: the slope may jump only where the potential is infinite.',
     },
+    {
+      id: 'wavefunction-potential-splitstep',
+      text: 'With a potential, the packet at time t is the engine’s split-step evolution of the packet at t = 0 on its fine grid. It agrees with an independent Crank–Nicolson march to 0.002 in the density, and the chances left and right of an edge to 0.001. The profile of V(x) has its own vertical scale.',
+    },
   ],
   schematic: [
     {

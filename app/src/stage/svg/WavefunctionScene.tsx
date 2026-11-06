@@ -86,6 +86,13 @@ export function WavefunctionScene({ state: r, mode, width, height, focus, bare, 
     if (isPos && r.overlay.includes('original')) swatches.push({ key: 'o', text: 'original', cls: 'fg-sil3', dash: '5 4' })
     if (isPos && r.overlay.includes('xpsi')) swatches.push({ key: 'x', text: 'x̂ψ', cls: 'fg-sil', dash: '6 3' })
     if (isPos && r.overlay.includes('ppsi')) swatches.push({ key: 'p', text: 'p̂ψ', cls: 'fg-sil', dash: '2 3' })
+    if (isPos && r.profile) swatches.push({ key: 'v', text: 'V(x)', cls: 'fg-sil2', dash: '1 0' })
+    // the potential profile (Lecture 17): its own vertical scale, the zero of V on the baseline; the packet's kinetic energy ⟨p⟩²/2 as a dashed line for a step or barrier
+    const prof = isPos ? r.profile : null
+    const yPot = (v: number) => {
+      const span = (prof ? prof.hi - prof.lo : 1) || 1
+      return bottom - ((v - (prof ? prof.lo : 0)) / span) * (bottom - top) * 0.82
+    }
 
     return (
       <g key={which} data-panel={which} data-anchor={isPos ? undefined : 'momentum-panel'} className={isPos ? undefined : f('momentum-panel')}>
@@ -119,6 +126,25 @@ export function WavefunctionScene({ state: r, mode, width, height, focus, bare, 
           {isPos ? 'x (ℓ)' : 'p (ħ/ℓ)'}
         </Label>
 
+        {/* the potential: a thin profile on its own scale; a jump is drawn as a vertical stroke at its edge; the dashed line marks the packet's kinetic energy ⟨p⟩²/2 (step and barrier) */}
+        {prof && (
+          <g data-anchor="potential" className={f('potential')}>
+            {prof.energy !== null && (
+              <g>
+                <line x1={left} y1={yPot(prof.energy)} x2={right} y2={yPot(prof.energy)} className="fg-sil3" strokeWidth={1.2} strokeDasharray="4 4" />
+                <Label at={{ x: left + 2, y: yPot(prof.energy) - 4 }} cls="fg-lbl">
+                  ⟨p⟩²/2
+                </Label>
+              </g>
+            )}
+            <path d={poly(prof.x, prof.v.map(yPot))} fill="none" className="fg-sil2" strokeWidth={2} />
+            {prof.kind !== 'harmonic' && prof.kind !== 'force' && (
+              <Label at={{ x: px(prof.edges[prof.edges.length - 1] ?? 0) + 5, y: yPot(prof.hi) - 3 }} cls="fg-lbl">
+                V₀
+              </Label>
+            )}
+          </g>
+        )}
         {/* cells: one bar per cell, its height the chance ÷ the cell width, so the bar tops follow the density */}
         {isPos && r.cells && (
           <g data-anchor="cell-bar" className={f('cell-bar')} opacity={r.cells.alpha}>
