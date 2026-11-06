@@ -172,6 +172,12 @@ const CC23 = Q23x('q23-classical-compare', 'Q23.1 Comparing two chance tables')
 const EP23 = Q23x('q23-entropy-props', 'Q23.3 What entropy can and cannot do')
 const QM23 = Q23x('q23-quantum-mutual', 'Q23.5 Quantum correlations that noise cannot raise')
 const HO23 = Q23x('q23-holevo', 'Q23.6 How much can one particle carry?')
+const Q24x = (unit: string, label: string): Trains => ({ lecture: 'Q24', unit, label })
+const LI24 = Q24x('q24-lindblad', 'Q24.2 Why a qubit slowly forgets')
+const BE24 = Q24x('q24-bloch-eq', 'Q24.3 Driving a qubit that decays')
+const RB24 = Q24x('q24-rabi', 'Q24.4 Pulses that flip, and gates from them')
+const RM24 = Q24x('q24-ramsey', 'Q24.5 Two half-pulses and a wait')
+const DC24 = Q24x('q24-decoupling', 'Q24.6 Undoing slow noise with flips')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1800,6 +1806,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Along $z$ Bob tells $|0\\rangle$ from $|1\\rangle$, but $|{+}\\rangle$ and $|{-}\\rangle$ read $0$ or $1$ at random. He learns $0.5$ bit, and no axis does better.',
     trains: HO23,
+  },
+  // Chapter Q24 (P-Q24-story §11.2): six spot-the-error rounds, each checked against the engine in Q24.arcade.test.ts
+  {
+    id: 'qc-t2-longer',
+    title: 'A phase that outlives the population',
+    steps: [
+      'A decaying qubit loses its population over a time $T_1$ and its phase signal over a time $T_2$.',
+      'With pure decay the phase signal lasts $T_2 = 2T_1$.',
+      'The environment might also protect the phase while the population still decays, so $T_2 = 3T_1$ is allowed.',
+      'So some qubits keep their phase three times longer than their population.',
+    ],
+    wrong: 2,
+    why: 'At $T_2 = 3T_1$ the smaller eigenvalue of the state dips to $-0.0096$ near $3.2\\,T_1$, a negative chance. Positivity forces $T_2 \\le 2T_1$.',
+    trains: LI24,
+  },
+  {
+    id: 'qc-steady-invert',
+    title: 'Driving until the qubit is inverted',
+    steps: [
+      'A resonant drive lifts the qubit toward the excited state, and decay pulls it back toward the ground state.',
+      'Wait long enough and drive and decay balance, and a stronger drive moves the balance toward the excited state.',
+      'So a strong enough drive leaves the qubit fully excited in the steady state.',
+      'So steady light can invert a qubit.',
+    ],
+    wrong: 2,
+    why: 'The balance never passes one half. On resonance the excited share is $s/(2(1+s))$ with $s = T_1T_2\\Omega^2$, only $0.495$ at $s = 100$.',
+    trains: BE24,
+  },
+  {
+    id: 'qc-rabi-sign',
+    title: 'Which way a real drive turns',
+    steps: [
+      'A resonant drive $\\Omega$ turns the qubit about an axis in the $xy$ plane, and the phase of $\\Omega$ picks the axis.',
+      'A real $\\Omega$ turns the qubit about $x$, and an imaginary $\\Omega$ turns it about $y$.',
+      'For $\\Omega$ real and positive the pulse of angle $\\theta$ is $R_x(\\theta)$, which takes $|0\\rangle$ toward $-y$.',
+      'So a quarter pulse leaves the arrow pointing along $-y$.',
+    ],
+    wrong: 2,
+    why: 'Our calculation finds that a real positive $\\Omega$ gives $R_x(-\\theta)$, which takes $|0\\rangle$ to $|{+y}\\rangle$. At a quarter pulse it is $1.414$ away from $R_x(\\theta)$.',
+    trains: RB24,
+  },
+  {
+    id: 'qc-composite-zero',
+    title: 'A composite pulse',
+    steps: [
+      'A pulse a little too long or too short turns by $\\pi(1 + \\epsilon)$, so it leaves an error of order $\\epsilon$.',
+      'The four-pulse sequence $R_z(-\\pi)R_x(\\tfrac\\pi2)R_y(\\pi)R_x(\\tfrac\\pi2)$ equals a plain $\\pi$ pulse about $x$ when every angle is exact.',
+      'With the same fractional error $\\epsilon$ in every angle, the four pulses cancel one another’s errors exactly.',
+      'So a composite pulse removes the error.',
+    ],
+    wrong: 2,
+    why: 'The error does not vanish: it shrinks to order $\\epsilon^2$. At $\\epsilon = 0.01$ the composite error is $0.000247$, against $0.0157$ for the plain pulse.',
+    trains: RB24,
+  },
+  {
+    id: 'qc-fast-noise',
+    title: 'Noise that changes quickly',
+    steps: [
+      'Noise of size $\\sigma = 1$ has a correlation time $\\tau_c$, the time over which it forgets itself.',
+      'Slow noise, with $\\tau_c = 10$, makes the signal fall in a bell shape with decay time $T_2^* = 1.45$.',
+      'Noise that forgets itself faster changes more often, so it dephases the qubit faster and $T_2^*$ shrinks.',
+      'So at $\\tau_c = 0.1$ the decay time is shorter than $1.45$.',
+    ],
+    wrong: 2,
+    why: 'Fast noise averages itself out. At $\\tau_c = 0.1$ the decay time is $T_2^* = 10.1$, almost seven times longer than the $1.448$ of slow noise.',
+    trains: RM24,
+  },
+  {
+    id: 'qc-echo-any',
+    title: 'What the echo cancels',
+    steps: [
+      'An echo waits a time $\\tau$, flips the qubit with a $\\pi$ pulse, waits $\\tau$ again, and flips it back.',
+      'A fixed frequency error adds a phase in the first wait and the opposite phase in the second, so they cancel.',
+      'Noise that changes during the waits is cancelled the same way, so the echo cancels any noise.',
+      'So the echo restores the signal whatever the correlation time of the noise.',
+    ],
+    wrong: 2,
+    why: 'The echo cancels only noise that stays put between the two waits. At correlation time $0.1$ it keeps $0.844$ against $0.827$ for plain Ramsey, hardly better.',
+    trains: DC24,
   },
 ]
 
