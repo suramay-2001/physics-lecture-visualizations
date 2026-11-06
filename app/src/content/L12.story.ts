@@ -174,7 +174,7 @@ const law: Beat[] = [
       result: '\\frac{d}{dt}\\langle A\\rangle = \\tfrac{i}{\\hbar}\\langle[H, A]\\rangle + \\langle\\partial A/\\partial t\\rangle',
       ground: [
         {
-          tex: '\\frac{d}{dt}\\langle A\\rangle = \\left(\\tfrac{d}{dt}\\langle\\psi|\\right)A|\\psi\\rangle + \\langle\\psi|A\\left(\\tfrac{d}{dt}|\\psi\\rangle\\right) + \\langle\\psi|\\tfrac{\\partial A}{\\partial t}|\\psi\\rangle',
+          tex: '\\frac{d}{dt}\\langle A\\rangle = \\langle\\psi|\\tfrac{\\partial A}{\\partial t}|\\psi\\rangle + \\left(\\tfrac{d}{dt}\\langle\\psi|\\right)A|\\psi\\rangle + \\langle\\psi|A\\left(\\tfrac{d}{dt}|\\psi\\rangle\\right)',
           why: 'Apply the product rule to the bra, the operator and the ket; the operator may also depend on time itself.',
           view: K(30, { show: ['clocks'] }),
           viewCaption: 'the two energy parts of a state: their sizes stay fixed while the hands turn',
