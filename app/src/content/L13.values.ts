@@ -17,14 +17,14 @@
  * This file imports physics modules (wave, ring, constants) but no stage module: a lecture chunk must not pull in stage/svg.
  */
 import { abs, add, c } from '../physics/complex'
-import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, YEAR_S, boxEnergyEv, deBroglie, fringeSpacing, spreadTime } from '../physics/constants'
+import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, YEAR_S, deBroglie, fringeSpacing, spreadTime } from '../physics/constants'
 import { ammoniaH, ammoniaPeriod, energySpread, evolveKet } from '../physics/dynamics'
 import { type Mat, commutator, identity, mat, mscale, vec } from '../physics/linalg'
 import { barrierT, barrierThick, continuityResidual, decayConstant, stepRT, totalCurrent } from '../physics/scatter'
 import { KET, SX, SZ, sandwich, variance } from '../physics/spin'
 import { ringEigenphases, ringOffDiagonal, ringUnitaryGap, traceCommutator } from '../physics/ring'
 import {
-  GRID, boost, boxEnergy, boxMomentumSpread, boxNodes, boxOverlap, boxState, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanX, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
+  GRID, boost, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanX, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
   planeSamples, spreadP, spreadX, toMomentum, wavelength, xTimes,
 } from '../physics/wave'
 import { keyedClaim } from './claimKit'
@@ -37,8 +37,6 @@ const plane = (p: number, x: number, o: { shift?: number; time?: number } = {}) 
 const phaseOf = (w: { re: Float64Array; im: Float64Array }) => Math.atan2(w.im[0], w.re[0])
 
 /* Townsend pass G4b: the box, the step and the barrier */
-const BOX_OLD = { lo: -0.5, hi: 0.5, n: 1 } // Ex. 6.6: the ground state of a box that is then widened on both sides to twice its width, about the same centre
-const boxNew = (n: number) => ({ lo: -1, hi: 1, n })
 const eV = E_CHARGE
 const BOOK_E = 5 * eV
 const BOOK_V0 = 10 * eV
@@ -246,19 +244,6 @@ export const V = {
   l13TChirpProduct: spreadX(free4, GRID) * spreadP(free4, GRID), // 1.118: ΔxΔp of the unit packet after t = 4 (more than ħ/2: it is no longer a minimum-uncertainty state)
   l13TTimeBound: timeBound, // 0.5: ΔE·Δt for a precessing spin, at every instant
   l13TAmmDtRatio: ammonia, // 0.3183 = 1/π
-  /* l13-stationary */
-  l13TBoxE1Ev: boxEnergyEv(0.4e-9, M_ELECTRON), // 2.350 eV: an electron in a well 0.4 nm wide
-  l13TBoxNodes4: boxNodes(boxState(GRID, 4, 4), GRID, 0, 4), // 3
-  l13TBoxOverlap: Math.abs(boxOverlap(BOX_OLD, boxNew(1))), // 0.8488 = 8/3π
-  l13TBoxP1: boxOverlap(BOX_OLD, boxNew(1)) ** 2, // 0.7205
-  l13TBoxP2: boxOverlap(BOX_OLD, boxNew(2)) ** 2, // 0
-  l13TBoxP3: boxOverlap(BOX_OLD, boxNew(3)) ** 2, // 0.2594 = 64/25π²
-  l13TBoxSumOdd: Array.from({ length: 399 }, (_, i) => boxOverlap(BOX_OLD, boxNew(i + 1)) ** 2).reduce((a, b) => a + b, 0), // 1 (to 2e-8)
-  l13TWall2P1: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 2, n: 1 }) ** 2, // 0.3603: one wall moves out to twice the width
-  l13TBoxEnergyRatio: boxEnergy(2, 1) / boxEnergy(4, 1), // 4: half the width
-  l13TBoxDpRatio: boxMomentumSpread(2, 1) / boxMomentumSpread(4, 1), // 2
-  l13PrE1Ev: boxEnergyEv(0.55e-9, M_ELECTRON), // 1.243 eV
-  l13PrWall3: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 3, n: 1 }) ** 2, // 0.1282
   /* l13-flow */
   l13TContResidual: continuityResidual(pk15, GRID), // 0 (rounding error)
   l13TCurrentMean: totalCurrent(pk15, GRID), // 1.5 = ⟨p⟩/m

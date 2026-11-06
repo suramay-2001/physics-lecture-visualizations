@@ -255,6 +255,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         id: 'qc-plot-engine-curve',
         text: 'Every point of the curve, and every marker on it, is computed by the engine from the named function; none is drawn by hand.',
       },
+      {
+        id: 'plot-free-omega',
+        text: 'The two dispersion curves are exact for ħ = m = c = 1: ω = k²/2 for a matter wave and ω = |k| for light. They cross at k = 2, where the two waves turn at the same rate; the picture is not a measurement.',
+      },
     ],
     schematic: [
       {

@@ -909,19 +909,74 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       },
       {
-        "id": "l13-stationary",
-        "title": "Standing waves in a box",
-        "challenges": [
-          "l13-pr-box-energy",
-          "l13-pr-wall"
-        ]
-      },
-      {
         "id": "l13-flow",
         "title": "Current, steps and tunnelling",
         "challenges": [
           "l13-pr-step",
           "l13-pr-tunnel"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "L14",
+    "number": 14,
+    "title": "The Schrödinger equation, time and stationary states",
+    "units": [
+      {
+        "id": "l14-components",
+        "title": "Components: discrete first, then continuous",
+        "challenges": [
+          "l14-co-amp",
+          "l14-co-cell",
+          "l14-co-units"
+        ]
+      },
+      {
+        "id": "l14-schrodinger",
+        "title": "The Schrödinger equation: what is assumed",
+        "challenges": [
+          "l14-sc-tkin",
+          "l14-sc-v",
+          "l14-sc-order"
+        ]
+      },
+      {
+        "id": "l14-dispersion",
+        "title": "From matter-wave dispersion to the equation",
+        "challenges": [
+          "l14-di-omega",
+          "l14-di-double",
+          "l14-di-tophat",
+          "l14-pr-kinetic"
+        ]
+      },
+      {
+        "id": "l14-time",
+        "title": "Time as a parameter, and no energy-shifter",
+        "challenges": [
+          "l14-ti-noether",
+          "l14-ti-shift",
+          "l14-ti-gap"
+        ]
+      },
+      {
+        "id": "l14-stationary",
+        "title": "Energy eigenstates and the time-independent equation",
+        "challenges": [
+          "l14-st-which",
+          "l14-st-mean",
+          "l14-st-order",
+          "l14-pr-period",
+          "l14-pr-mean-energy"
+        ]
+      },
+      {
+        "id": "l14-box",
+        "title": "Standing waves in a box",
+        "challenges": [
+          "l14-pr-box-energy",
+          "l14-pr-wall"
         ]
       }
     ]

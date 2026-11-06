@@ -1017,7 +1017,7 @@ const dots: Beat[] = [
       `Why is a dot one electron in a box? Take a box 100 nm wide and an effective electron mass of ${d(V.q27DotMass, 3)} electron masses (model, ours). The levels are ${d(V.q27DotE1meV, 3)} and ${d(V.q27DotE2meV, 3)} meV, a gap of ${d(V.q27DotGapmeV, 3)} meV, which is ${d(V.q27DotGapK, 1)} K. ` +
       `At 100 mK, $k_{\\rm B}T$ is ${d(V.q27DotKT100mKueV, 1)} $\\mu$eV, so higher orbitals stay empty.`,
     formal:
-      `Physics 448's box (<<qc-l13-stationary|Unit 13.8>>) has $E_n = \\frac{n^2h^2}{8m^*L^2}$. Here $E_1 = ${d(V.q27DotE1meV, 4)}$ meV and $E_2 - E_1 = 3E_1 = ${d(V.q27DotGapmeV, 3)}$ meV, which is ${d(V.q27DotGapK, 2)} K, for $L = 100$ nm and $m^* = ${d(V.q27DotMass, 3)}\\,m_e$ (model; the engine's box-energy function). ` +
+      `Physics 448's box (<<qc-l14-box|Unit 14.6>>) has $E_n = \\frac{n^2h^2}{8m^*L^2}$. Here $E_1 = ${d(V.q27DotE1meV, 4)}$ meV and $E_2 - E_1 = 3E_1 = ${d(V.q27DotGapmeV, 3)}$ meV, which is ${d(V.q27DotGapK, 2)} K, for $L = 100$ nm and $m^* = ${d(V.q27DotMass, 3)}\\,m_e$ (model; the engine's box-energy function). ` +
       `At 100 mK, $k_{\\rm B}T = ${d(V.q27DotKT100mKueV, 3)}\\,\\mu$eV: the book's condition $\\delta U \\gg k_{\\rm B}T$ (p. 292). Coherence times, isotope effects and donor qubits (pp. 295–297) are in the book in words, and we do not repeat them.`,
     caption: 'the two lowest box states',
     captionFormal: 'the box levels $n = 1, 2$ in units with $\\hbar = m = 1$',

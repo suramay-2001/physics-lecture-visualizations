@@ -42,8 +42,6 @@ const PL = (p: number): WavefunctionState['source'] => ({ plane: { p } })
 const TW = (p1: number, p2: number): WavefunctionState['source'] => ({ twoWaves: { p1, p2 } })
 const W = (source: WavefunctionState['source'], o: Omit<WavefunctionState, 'kind' | 'source'> = {}): WavefunctionState => ({ kind: 'wavefunction', source, shot: 'W-STD', ...o })
 
-/** Townsend §6.9 with the wall at 0 (his Problem 6.13): a box of width L, level n or an equal pair [n1, n2] (kind wavefunction, source box; ψ = 0 outside the walls). */
-const BOX = (L: number, n: number | [number, number]): WavefunctionState['source'] => ({ box: { L, n } })
 /** The reflected (R) and transmitted (T) shares of the current at a step, against E/V₀ (Eq. 6.135; R = 1 and T = 0 below the step). Dots at E = 2V₀ and 3V₀. */
 const STEP_RT: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'stepT', vs: 'stepR', samples: 120 }, markers: [{ x: 2 }, { x: 3 }] }
 /** The transmission of a barrier with E = V₀/2 against qa (Eq. 6.144); the dot is the book's electron, qa = 0.607. */
@@ -739,7 +737,7 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b8',
     phase: 'deeper',
-    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Beyond the notes: two energies make a moving pattern. The plane waves $p = 2$ and $p = 4$, with $m = 1$, give fringes ${d(V.l13FringeSpacing, 3)} $\\ell$ apart. They travel at ${d(V.l13FringeSpeed, 1)} $\\ell$ per unit time, which equals $(p_1 + p_2)/2m$.`,
+    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Beyond the notes: two energies make a moving pattern. The plane waves $p = 2$ and $p = 4$, with $m = 1$, give fringes ${d(V.l13FringeSpacing, 3)} $\\ell$ apart. They travel at ${d(V.l13FringeSpeed, 1)} $\\ell$ per unit time, which equals $(p_1 + p_2)/2m$. The energy equation along $x$ is taken up in Unit 14.5, and the box that follows from it is Unit 14.6.`,
     caption: 'two plane waves: the fringes of the density travel to the right',
     stage: W(TW(2, 4), { time: sweep(0, 2), show: ['density'] }),
     refs: [susskind('Lecture 9, §9.3', 'The time-independent equation for free particles; any solution is a sum of energy eigenstates, and only phases change.')],
@@ -874,105 +872,6 @@ const time: Beat[] = [
       caption: 'the momentum curve of a packet: it reaches down to $p = 0$ and beyond, but the energy $\\tfrac{p^2}{2m}$ never goes below zero',
       stage: W(PK(0, 1), { panels: ['momentum'], readouts: ['pmean'] }),
       claims: [claim('l13MinFreeEnergy', 'the lowest free energy is 0', () => Math.abs(V.l13MinFreeEnergy) < 1e-12)],
-    },
-  },
-]
-
-/* ---------------------------------------------------------------------------------------------- */
-/* l13-stationary — Standing waves: the energy equation in position space (beyond the notes)       */
-/* ---------------------------------------------------------------------------------------------- */
-
-const stationary: Beat[] = [
-  {
-    id: 'l13-stationary:b1',
-    phase: 'books',
-    text: 'This unit is beyond the lecture notes; it follows Townsend. Project the energy eigen-equation $\\hat H|E\\rangle = E|E\\rangle$ on $\\langle x|$ (Townsend §6.8, pp. 213–214, Eqs. 6.78–6.86). The potential acts by multiplication, and $\\hat p^2$ acts as $-\\hbar^2\\,d^2/dx^2$. The time factor $e^{-iEt/\\hbar}$ splits off, and what is left is an ordinary equation in $x$: $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi_E(x) = E\\,\\varphi_E(x)$. This is the position form of Unit 13.6 for a state of one energy. Townsend calls the function $\\psi_E(x)$ and then drops the subscript.',
-    caption: 'an energy eigenfunction of a box: an ordinary function of $x$ between two walls',
-    stage: W(BOX(4, 1), { show: ['re', 'density'], readouts: ['energy'] }),
-    refs: [townsend('§6.8, pp. 213–214 (Eqs. 6.78–6.86)', 'Projecting the Schrödinger equation on $\\langle x|$ gives the time-dependent form; for one energy the time factor splits off and the rest is an ordinary equation in $x$.')],
-  },
-  {
-    id: 'l13-stationary:b2',
-    phase: 'books',
-    text: `Where $E > V$ the curvature has the opposite sign to the function, so it oscillates: $\\varphi\'\' = -k^2(x)\\,\\varphi$ with $k^2 = 2m(E - V)/\\hbar^2$ (Townsend §6.8, pp. 217–218, Eq. 6.97). The larger $E - V$ is, the faster it oscillates. Where $E < V$ the curvature has the same sign and the function is exponential: $\\varphi'' = q^2(x)\\,\\varphi$ (Eq. 6.98). At a finite jump of $V$ the function and its slope stay continuous. The slope may jump only where $V$ is infinite (Eq. 6.96). For a particle held between walls or in a well, a solution that stays finite fits only at special energies, which are therefore quantised. Level $n$ has $n - 1$ nodes: level 4 of a box has ${d(V.l13TBoxNodes4, 0)} nodes.`,
-    caption: 'level 4 of a box: three nodes inside the walls, and every hump is curved back down toward the zero line',
-    stage: W(BOX(4, 4), { show: ['re'], readouts: ['energy'] }),
-    refs: [townsend('§6.8, pp. 214–218 (Eqs. 6.96–6.98, Figs. 6.8–6.9)', 'Where $E > V$ the function oscillates, where $E < V$ it is exponential; only special energies match, and the number of nodes grows with the energy.')],
-    claims: [claim('l13TBoxNodes4', 'level 4 of the box has 3 nodes (counted on the grid)', () => V.l13TBoxNodes4 === 3)],
-  },
-  {
-    id: 'l13-stationary:b3',
-    phase: 'books',
-    text: `Now let $V$ be infinite outside $0 < x < L$ (Townsend §6.9, pp. 219–221, Eqs. 6.99–6.110). The function vanishes at both walls. Between them it is $A\\sin kx + B\\cos kx$ with $k = \\sqrt{2mE}/\\hbar$. Two conditions on two unknowns have a nonzero solution only when a determinant vanishes. That gives $\\sin kL = 0$, so $k_nL = n\\pi$. The energies are $E_n = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}$, and the normalised functions are $\\sqrt{2/L}\\,\\sin(n\\pi x/L)$. An electron in a [[infinite-well|well]] 4 Å wide has $E_1 = ${d(V.l13TBoxE1Ev, 2)}$ eV. Townsend centres the box, so his functions alternate cosine and sine. Here one wall is at 0, his Problem 6.13 choice: one formula for every $n$, the same energies.`,
-    caption: 'level 1 in position (top) and momentum (bottom): the momentum curve has two lobes, near $\\pm\\pi\\hbar/L$',
-    stage: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
-    derivation: {
-      result: 'E_n = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}',
-      ground: [
-        {
-          tex: '\\varphi(x) = A\\sin kx + B\\cos kx',
-          why: 'Inside the walls $V = 0$, so $\\varphi\'\' = -k^2\\varphi$ with $k = \\sqrt{2mE}/\\hbar$: a sine and a cosine.',
-          view: W(BOX(4, 3), { show: ['re'] }),
-          viewCaption: 'a candidate inside the box: level 3 is a sine that fits three half-waves',
-        },
-        {
-          tex: '\\varphi(0) = B = 0,\\qquad \\varphi(L) = A\\sin kL + B\\cos kL = 0',
-          why: 'The infinite walls force the function to vanish at both ends (Eq. 6.101).',
-        },
-        {
-          tex: '\\begin{pmatrix} 0 & 1 \\\\ \\sin kL & \\cos kL \\end{pmatrix}\\begin{pmatrix} A \\\\ B \\end{pmatrix} = 0',
-          why: 'Two linear equations for $A$ and $B$ have a nonzero solution only if the determinant of this matrix is zero (Eqs. 6.102–6.103).',
-        },
-        {
-          tex: '-\\sin kL = 0 \\;\\Rightarrow\\; k_nL = n\\pi',
-          why: 'The determinant is $-\\sin kL$, and a sine vanishes only at whole multiples of $\\pi$ (Eq. 6.105).',
-          view: W(BOX(4, 2), { show: ['re', 'density'] }),
-          viewCaption: 'the walls leave room for a whole number of half-waves',
-        },
-        {
-          tex: '\\int_0^L \\varphi_n^2\\,dx = \\tfrac{A^2L}{2} = 1 \\;\\Rightarrow\\; \\varphi_n = \\sqrt{\\tfrac{2}{L}}\\,\\sin\\tfrac{n\\pi x}{L}',
-          why: 'Normalise: the average of $\\sin^2$ over the box is one half, so $A = \\sqrt{2/L}$ (Eqs. 6.107–6.108).',
-        },
-        {
-          tex: 'E_n = \\dfrac{\\hbar^2k_n^2}{2m} = \\dfrac{\\hbar^2\\pi^2n^2}{2mL^2}',
-          why: 'Put $k_n = n\\pi/L$ into $E = \\dfrac{\\hbar^2k^2}{2m}$ (Eq. 6.110).',
-          view: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
-          viewCaption: 'level 1: its energy and its momentum spread',
-          claims: [claim('l13TBoxE1Ev', 'an electron in a well 0.4 nm wide has E₁ = 2.35 eV', () => close(V.l13TBoxE1Ev, 2.3502, 5e-4))],
-        },
-      ],
-    },
-    refs: [townsend('§6.9, pp. 219–221 (Eqs. 6.99–6.110, Fig. 6.10)', 'An infinite well forces nodes at the walls; a determinant condition gives $k_na = n\\pi$, and $E_n = \\hbar^2\\pi^2n^2/2ma^2$. He centres the box, so his functions alternate cosine and sine; here one wall is at 0 (his Problem 6.13).')],
-    fidelity: ['wavefunction-box-walls'],
-  },
-  {
-    id: 'l13-stationary:b4',
-    phase: 'books',
-    text: `A wall that moves away: Townsend’s Ex. 6.6 (pp. 221–224). Measure the energy, so the state is the ground state of a box of width $a$. Then pull both walls out at once, so the width doubles about the same centre. The state cannot change that fast, but it is no longer stationary. The chance of the new ground state is the squared overlap: the overlap is ${d(V.l13TBoxOverlap, 3)} ($8/(3\\pi)$), so the chance is ${d(V.l13TBoxP1, 2)}. The new third level gets ${d(V.l13TBoxP3, 2)}. The even levels get ${d(V.l13TBoxP2, 0)} by parity. The odd levels share all the rest, and their chances add to ${d(V.l13TBoxSumOdd, 0)}.`,
-    caption: 'two levels mixed are not stationary: the density sloshes (two levels stand in for the many that the wider box produces)',
-    stage: W(BOX(4, [1, 2]), { time: sweep(0, 2), show: ['density'], readouts: ['energy'] }),
-    refs: [townsend('§6.9, pp. 221–224 (Ex. 6.6, Fig. 6.11)', 'The ground state of a box, widened suddenly to twice its width, overlaps the new ground state with $8/3\\pi$, so the chance of the new ground energy is $64/9\\pi^2$.')],
-    claims: [
-      claim('l13TBoxOverlap', 'the overlap of the old ground state with the new one is 8/3π = 0.849', () => close(V.l13TBoxOverlap, 8 / (3 * Math.PI), 1e-9)),
-      claim('l13TBoxP1', 'so the chance of the new ground state is 64/9π² = 0.72', () => close(V.l13TBoxP1, 64 / (9 * Math.PI ** 2), 1e-9)),
-      claim('l13TBoxP3', 'the new third level gets 64/25π² = 0.26', () => close(V.l13TBoxP3, 64 / (25 * Math.PI ** 2), 1e-9)),
-      claim('l13TBoxP2', 'the even levels get 0 by parity', () => close(V.l13TBoxP2, 0, 1e-12)),
-      claim('l13TBoxSumOdd', 'and the odd levels’ chances add to 1 (399 levels summed)', () => close(V.l13TBoxSumOdd, 1, 1e-6)),
-    ],
-  },
-  {
-    id: 'l13-stationary:b5',
-    phase: 'clue',
-    text: 'Squeeze the box to half its width. What happens to the lowest energy, and to the momentum spread of the state?',
-    stage: W(BOX(4, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
-    reveal: {
-      text: `The energy goes as $1/L^2$, so it is multiplied by ${d(V.l13TBoxEnergyRatio, 0)}. The momentum spread is $\\pi\\hbar/L$, so it is multiplied by ${d(V.l13TBoxDpRatio, 0)}. The walls pin the particle more tightly, and a tighter position costs momentum.`,
-      caption: 'a box half as wide: the energy readout is four times larger and the momentum spread twice as large',
-      stage: W(BOX(2, 1), { panels: ['position', 'momentum'], show: ['re', 'density'], readouts: ['energy', 'pspread'] }),
-      claims: [
-        claim('l13TBoxEnergyRatio', 'half the width gives four times the energy', () => close(V.l13TBoxEnergyRatio, 4, 1e-9)),
-        claim('l13TBoxDpRatio', 'and twice the momentum spread', () => close(V.l13TBoxDpRatio, 2, 1e-9)),
-      ],
     },
   },
 ]
@@ -1126,7 +1025,6 @@ export const L13_STORY: Record<string, Beat[]> = {
   'l13-two-bases': twoBases,
   'l13-schrodinger': schrodinger,
   'l13-time': time,
-  'l13-stationary': stationary,
   'l13-flow': flow,
 }
 

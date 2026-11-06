@@ -77,7 +77,7 @@ export const O5: Lecture = notesLecture({
           claims: [claim('o5DeBroglieHalf', 'an atom with momentum 2ħk has a wavelength of 0.5 of the light wavelength', () => near(V.o5DeBroglieHalf, 0.5, 1e-12))],
         },
         {
-          text: `Atoms vibrate in the wells with a quantum $\\hbar\\omega = 2\\sqrt{U_bE_R}$ for the modulation depth $U_b$ and the recoil energy $E_R$. For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, with the hill height of page O3, it is ${d(V.o5LatticeVibkHz, 1)} kHz, or ${d(V.o5LatticeVibER, 1)} recoil energies. The levels appear as Raman sidebands of the atomic line. An array of such atoms is an optical crystal, and cooling in it is optical pumping among the vibrational states (<<qc-l13-stationary|the stationary-wave unit>>).`,
+          text: `Atoms vibrate in the wells with a quantum $\\hbar\\omega = 2\\sqrt{U_bE_R}$ for the modulation depth $U_b$ and the recoil energy $E_R$. For rubidium at $\\delta = -4\\gamma$ and saturation one half per beam, with the hill height of page O3, it is ${d(V.o5LatticeVibkHz, 1)} kHz, or ${d(V.o5LatticeVibER, 1)} recoil energies. The levels appear as Raman sidebands of the atomic line. An array of such atoms is an optical crystal, and cooling in it is optical pumping among the vibrational states (<<qc-l14-box|the stationary-wave unit>>).`,
           claims: [
             claim('o5LatticeVibkHz', 'the vibrational quantum of the rubidium lattice is 61.3 kHz', () => near(V.o5LatticeVibkHz, 61.3, 0.05)),
             claim('o5LatticeVibER', 'the vibrational quantum is 16.2 recoil energies', () => near(V.o5LatticeVibER, 16.2, 0.05)),
