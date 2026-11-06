@@ -183,6 +183,10 @@ const CO25 = Q25x('q25-cooling', 'Q25.1 Stopping, cooling and holding an atom')
 const AG25 = Q25x('q25-atom-gates', 'Q25.3 Rotations, Raman light and Rydberg blockade')
 const IT25 = Q25x('q25-ion-trap', 'Q25.4 Holding an ion in the air')
 const IG25 = Q25x('q25-ion-gates', 'Q25.6 Entangling ions through their motion')
+const Q26x = (unit: string, label: string): Trains => ({ lecture: 'Q26', unit, label })
+const HM26 = Q26x('q26-hom', 'Q26.3 Two photons that leave together')
+const NS26 = Q26x('q26-ns-cz', 'Q26.4 A sign flip from a heralded photon')
+const NL26 = Q26x('q26-nonlinear', 'Q26.6 Photons that talk through matter')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1969,6 +1973,59 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The motion must return to its start, so the gate must end after a whole number of loops. Stopped at $17.36$ loops the infidelity is $0.0229$; at $17$ loops it is $2.7 \\times 10^{-4}$.',
     trains: IG25,
+  },
+  // Chapter Q26 (P-Q26-story §11.2): four spot-the-error rounds, each checked against the engine in Q26.arcade.test.ts
+  {
+    id: 'qc-hom-add-chances',
+    title: 'Two photons at a splitter',
+    steps: [
+      'One photon enters each input port of a 50:50 splitter.',
+      'Alone, each photon leaves by either exit with chance $1/2$, and neither one knows about the other.',
+      'So the chances just add up: with chance $1/2$ the photons leave one by each exit.',
+      'So the output is spread over $|20\\rangle$, $|11\\rangle$ and $|02\\rangle$, with $|11\\rangle$ the likeliest.',
+    ],
+    wrong: 2,
+    why: 'The two ways to leave one by each exit are arrows of equal length and opposite direction, and they cancel: the chance is $0$. The photons leave together, $|20\\rangle$ or $|02\\rangle$, one half each.',
+    trains: HM26,
+  },
+  {
+    id: 'qc-ns-average',
+    title: 'The chance of the sign gate',
+    steps: [
+      'The nonlinear sign gate flips the sign of the two-photon part, using one ancilla photon and two detectors.',
+      'It is accepted only when the detectors give the agreed reading, and then it succeeds with chance $0.2265$.',
+      'This $0.2265$ is an average over inputs, so some inputs succeed far more often than others.',
+      'So a well chosen input state could make the gate succeed much more often.',
+    ],
+    wrong: 2,
+    why: 'The chance is $\\cos^2\\varphi = 0.2265$ for every input of at most two photons. The amplitudes for 0, 1 and 2 photons are all the same size after the gate.',
+    trains: NS26,
+  },
+  {
+    id: 'qc-klm-repeat',
+    title: 'Three gates in a row',
+    steps: [
+      'A photonic CZ gate succeeds with chance $0.0513$, and its detectors tell us whether it worked.',
+      'A program needs three such gates one after another on the same photons.',
+      'Since failures are announced, each gate can be repeated on the same photons until it succeeds.',
+      'So the three gates together succeed with a chance close to $1$.',
+    ],
+    wrong: 2,
+    why: 'A failed gate has already measured the photons, so nothing is left to repeat on. All three must succeed in one run: $0.0513^3 = 1.35 \\times 10^{-4}$, about one run in $7400$.',
+    trains: NS26,
+  },
+  {
+    id: 'qc-cat-orthogonal',
+    title: 'Two laser states as a qubit',
+    steps: [
+      'A laser beam in a coherent state $|\\alpha\\rangle$ has a photon number that varies around $\\alpha^2$.',
+      'The states $|\\alpha\\rangle$ and $|{-\\alpha}\\rangle$ differ in the sign of the amplitude.',
+      'Opposite signs make them orthogonal, so for any $\\alpha$ they are an exact $0$ and $1$ of a qubit.',
+      'So two coherent states of opposite sign never overlap.',
+    ],
+    wrong: 2,
+    why: 'Their overlap in chance is $e^{-4\\alpha^2}$: $0.0183$ at $\\alpha = 1$ and $1.1 \\times 10^{-7}$ at $\\alpha = 2$. It is never exactly $0$, but the even and odd cat states are exactly orthogonal.',
+    trains: NL26,
   },
 ]
 
