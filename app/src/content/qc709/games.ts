@@ -161,6 +161,12 @@ const SS19 = Q19x('q19-star-search', 'Q19.3 Finding the marked spoke')
 const EE19 = Q19x('q19-extra-edge', 'Q19.4 Finding an extra edge')
 const SM19 = Q19x('q19-simulation', 'Q19.5 Imitating a spin chain with gates')
 const QA19 = Q19x('q19-qaoa', 'Q19.6 Quantum circuit, classical tuner')
+const Q20x = (unit: string, label: string): Trains => ({ lecture: 'Q20', unit, label })
+const CL20 = Q20x('q20-cloner', 'Q20.1 A copier that loses quality')
+const UN20 = Q20x('q20-unot', 'Q20.2 The best quantum NOT')
+const NG20 = Q20x('q20-no-go', 'Q20.3 No machine runs every program')
+const PB20 = Q20x('q20-probabilistic', 'Q20.4 A machine that sometimes fails')
+const DI20 = Q20x('q20-discriminator', 'Q20.6 A discriminator that is told the states')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1631,6 +1637,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'An average of $3$ is a mix of different cuts. The largest cut of $4$ comes up with chance $0.531$ and a cut of $2$ with chance $0.4375$, against $0.125$ for a random pattern.',
     trains: QA19,
+  },
+  // Chapter Q20 (P-Q20-story §11.2): six spot-the-error rounds, each checked against the engine in Q20.arcade.test.ts
+  {
+    id: 'qc-clone-perfect',
+    title: 'Tuning the cloner',
+    steps: [
+      'The cloner has one dial, the program angle $u$, which sets how well each of its two output wires matches the input.',
+      'At $u = 0$ wire 1 is a perfect copy, and at $u = 60^\\circ$ wire 2 is a perfect copy.',
+      'So some angle between them makes both wires perfect copies.',
+      'So a quantum machine can clone a qubit if its dial is tuned right.',
+    ],
+    wrong: 2,
+    why: 'Quality trades between the wires. At the equal setting $u = 30^\\circ$ each wire has fidelity $5/6 = 0.833$, the best both wires can have together.',
+    trains: CL20,
+  },
+  {
+    id: 'qc-unot-gate',
+    title: 'The universal NOT as a gate',
+    steps: [
+      'A universal NOT should send every state to the state exactly opposite it on the Bloch sphere.',
+      'The gate $\\sigma_y$ sends $|{+z}\\rangle$ to $|{-z}\\rangle$ and $|{+x}\\rangle$ to $|{-x}\\rangle$, up to a phase.',
+      'So $\\sigma_y$ sends every state to its opposite, and the U-NOT is the gate $\\sigma_y$.',
+      'So a perfect U-NOT can be built from one unitary gate.',
+    ],
+    wrong: 2,
+    why: 'The gate $\\sigma_y$ leaves $|{+y}\\rangle$ where it is: a gate turns the sphere, and no turn sends every point to its opposite. The best machine sends each arrow to the opposite direction, one third as long.',
+    trains: UN20,
+  },
+  {
+    id: 'qc-clone-both',
+    title: 'Measure and prepare, as a pair',
+    steps: [
+      'Measure-and-prepare cloning reads the input in a random direction and prepares two copies of the result.',
+      'Each single copy matches the input with fidelity $2/3$.',
+      'The pair matches the ideal two-copy state $|\\psi\\rangle|\\psi\\rangle$ equally well, with fidelity $2/3$.',
+      'So for the pair, measure-and-prepare matches the cloner circuit, which also gives $2/3$.',
+    ],
+    wrong: 2,
+    why: 'The pair’s overlap with $|\\psi\\psi\\rangle$ is only $1/2$, below the cloner circuit’s $2/3$. The value $2/3$ belongs to a single copy, where the circuit gives $5/6$.',
+    trains: UN20,
+  },
+  {
+    id: 'qc-proc-universal',
+    title: 'Programs for every gate',
+    steps: [
+      'A processor has a data wire and a program register, and the program picks the gate the data gets.',
+      'Gates that differ by more than a phase need programs that are orthogonal.',
+      'A program can be any superposition of basis states, so two program wires are enough to name every gate.',
+      'So a two-wire program can run every one-qubit gate with certainty.',
+    ],
+    wrong: 2,
+    why: 'Orthogonal programs need one dimension each, and $n$ program wires have $2^n$ dimensions: 4 for two wires, $1024$ for ten. Infinitely many gates need infinitely many dimensions.',
+    trains: NG20,
+  },
+  {
+    id: 'qc-rus-sure',
+    title: 'Trying again',
+    steps: [
+      'The CNOT processor succeeds with chance $1/2$, and a failure leaves the data turned the wrong way.',
+      'After a failure, a second run with a doubled program angle again succeeds with chance $1/2$ of what is left.',
+      'So after $k$ rounds the chance of success is $1 - 2^{-k}$.',
+      'So after 7 rounds the machine succeeds with certainty.',
+    ],
+    wrong: 3,
+    why: 'The failure chance $2^{-k}$ halves each round but never reaches 0. After 7 rounds the chance is $0.992$; it takes 7 rounds to pass $0.99$ and 10 to pass $0.999$.',
+    trains: PB20,
+  },
+  {
+    id: 'qc-disc-orth',
+    title: 'Orthogonal examples',
+    steps: [
+      'A programmable discriminator gets one example of each of two unknown states, and a data qubit equal to one of them.',
+      'A machine told that the two states are orthogonal tells them apart every time.',
+      'The examples here are orthogonal, so the programmable machine also tells them apart every time.',
+      'So with orthogonal examples the programmable machine succeeds with chance 1.',
+    ],
+    wrong: 2,
+    why: 'The programmable machine is not told the states are orthogonal. It can only test for the antisymmetric part, so at overlap $0$ its success chance is $1/3$, against $1$ for a machine told the states.',
+    trains: DI20,
   },
 ]
 
