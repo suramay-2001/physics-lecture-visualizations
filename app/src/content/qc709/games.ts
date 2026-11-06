@@ -154,6 +154,44 @@ const CS22 = Q22x('q22-css', 'Q22.4 Two classical codes that fit together')
 const DC22 = Q22x('q22-decode', 'Q22.5 From syndrome to correction')
 const CF22 = Q22x('q22-clifford', 'Q22.6 Gates that move Pauli labels around')
 const GK22 = Q22x('q22-gottesman-knill', 'Q22.7 When a quantum computer is easy to fake')
+const Q19x = (unit: string, label: string): Trains => ({ lecture: 'Q19', unit, label })
+const RW19 = Q19x('q19-random-walk', 'Q19.1 A walker that flips a coin')
+const SC19 = Q19x('q19-scatter', 'Q19.2 A particle that lives on the edges')
+const SS19 = Q19x('q19-star-search', 'Q19.3 Finding the marked spoke')
+const EE19 = Q19x('q19-extra-edge', 'Q19.4 Finding an extra edge')
+const SM19 = Q19x('q19-simulation', 'Q19.5 Imitating a spin chain with gates')
+const QA19 = Q19x('q19-qaoa', 'Q19.6 Quantum circuit, classical tuner')
+const Q20x = (unit: string, label: string): Trains => ({ lecture: 'Q20', unit, label })
+const CL20 = Q20x('q20-cloner', 'Q20.1 A copier that loses quality')
+const UN20 = Q20x('q20-unot', 'Q20.2 The best quantum NOT')
+const NG20 = Q20x('q20-no-go', 'Q20.3 No machine runs every program')
+const PB20 = Q20x('q20-probabilistic', 'Q20.4 A machine that sometimes fails')
+const DI20 = Q20x('q20-discriminator', 'Q20.6 A discriminator that is told the states')
+const Q23x = (unit: string, label: string): Trains => ({ lecture: 'Q23', unit, label })
+const CC23 = Q23x('q23-classical-compare', 'Q23.1 Comparing two chance tables')
+const EP23 = Q23x('q23-entropy-props', 'Q23.3 What entropy can and cannot do')
+const QM23 = Q23x('q23-quantum-mutual', 'Q23.5 Quantum correlations that noise cannot raise')
+const HO23 = Q23x('q23-holevo', 'Q23.6 How much can one particle carry?')
+const Q24x = (unit: string, label: string): Trains => ({ lecture: 'Q24', unit, label })
+const LI24 = Q24x('q24-lindblad', 'Q24.2 Why a qubit slowly forgets')
+const BE24 = Q24x('q24-bloch-eq', 'Q24.3 Driving a qubit that decays')
+const RB24 = Q24x('q24-rabi', 'Q24.4 Pulses that flip, and gates from them')
+const RM24 = Q24x('q24-ramsey', 'Q24.5 Two half-pulses and a wait')
+const DC24 = Q24x('q24-decoupling', 'Q24.6 Undoing slow noise with flips')
+const Q25x = (unit: string, label: string): Trains => ({ lecture: 'Q25', unit, label })
+const CO25 = Q25x('q25-cooling', 'Q25.1 Stopping, cooling and holding an atom')
+const AG25 = Q25x('q25-atom-gates', 'Q25.3 Rotations, Raman light and Rydberg blockade')
+const IT25 = Q25x('q25-ion-trap', 'Q25.4 Holding an ion in the air')
+const IG25 = Q25x('q25-ion-gates', 'Q25.6 Entangling ions through their motion')
+const Q26x = (unit: string, label: string): Trains => ({ lecture: 'Q26', unit, label })
+const HM26 = Q26x('q26-hom', 'Q26.3 Two photons that leave together')
+const NS26 = Q26x('q26-ns-cz', 'Q26.4 A sign flip from a heralded photon')
+const NL26 = Q26x('q26-nonlinear', 'Q26.6 Photons that talk through matter')
+const Q27x = (unit: string, label: string): Trains => ({ lecture: 'Q27', unit, label })
+const LC27 = Q27x('q27-lc', 'Q27.1 A circuit that rings')
+const SC27 = Q27x('q27-superconductivity', 'Q27.2 Pairs, a flux quantum, no resistance')
+const TM27 = Q27x('q27-transmon', 'Q27.4 From charge qubit to transmon')
+const DT27 = Q27x('q27-dots', 'Q27.6 One electron spin in a gated dot')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1545,6 +1583,507 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: '$|\\bar 0\\rangle$ is named by just 7 checks, however entangled it is, and a tableau of those checks holds it. Hardness needs a non-Clifford gate such as $T$.',
     trains: GK22,
+  },
+  // Chapter Q19 (P-Q19-story §11.2): six spot-the-error rounds, each checked against the engine in Q19.arcade.test.ts
+  {
+    id: 'qc-walk-spread',
+    title: 'A quantum walker’s spread',
+    steps: [
+      'A classical walker steps left or right on a fair coin, and after $n$ steps its spread is $\\sqrt n$.',
+      'A quantum walker flips a Hadamard coin each step and keeps every path at once.',
+      'Its paths only interfere, and interference moves chances around without changing the width, so its spread is also $\\sqrt n$.',
+      'So at $n = 100$ both walkers spread to $10$, and the quantum walker is no faster.',
+    ],
+    wrong: 2,
+    why: 'Interference does change the width. The quantum walker’s spread grows in proportion to $n$, about $0.54\\,n$, so it reaches $54.1$ at $n = 100$ while the classical walker reaches $10$.',
+    trains: RW19,
+  },
+  {
+    id: 'qc-vertex-equal',
+    title: 'The centre of a star',
+    steps: [
+      'A walker travels along the edges of a star and arrives at the centre, where 8 edges meet.',
+      'The centre must send it out along the 8 edges so that the total chance stays 1.',
+      'The fairest rule gives each of the 8 edges the same amplitude, $1/8$.',
+      'So the walker is equally likely to leave along any edge.',
+    ],
+    wrong: 2,
+    why: 'Eight amplitudes of $1/8$ carry total chance $8 \\times (1/8)^2 = 1/8$, not 1. The centre gives the arrival edge $-0.75$ and each of the other seven $0.25$, and these squares add to 1.',
+    trains: SC19,
+  },
+  {
+    id: 'qc-walk-slow',
+    title: 'How long the star walk takes',
+    steps: [
+      'A star has $N = 1024$ outer spokes, and one of them is marked.',
+      'A classical search tries the spokes one by one and looks at about $512.5$ of them on average.',
+      'A walker also visits the spokes one at a time, so the quantum walk needs about $N = 1024$ steps too.',
+      'So the quantum walk gives no advantage over the classical search.',
+    ],
+    wrong: 2,
+    why: 'The walk piles chance onto the marked spoke by interference, so it does not visit the spokes one by one. Its first peak is at step $50$, close to $\\tfrac\\pi2\\sqrt N = 50.27$, with chance $0.9995$.',
+    trains: SS19,
+  },
+  {
+    id: 'qc-extra-plus',
+    title: 'Starting with a plus sign',
+    steps: [
+      'Spokes 1 and 2 share an extra edge, and the walker must find that pair.',
+      'The start has a minus sign between its leaving and arriving edges, and at $N = 64$ it reaches chance $0.70$ on spokes 1 and 2.',
+      'A sign is only a phase and a phase cannot change a chance, so a plus start finds the pair equally well.',
+      'So with the plus sign the chance on spokes 1 and 2 also reaches about $0.70$.',
+    ],
+    wrong: 2,
+    why: 'The sign is a relative phase between pieces of the start, and it decides whether the pieces add up. With a plus sign the chance on spokes 1 and 2 never exceeds $0.083$ at $N = 64$.',
+    trains: EE19,
+  },
+  {
+    id: 'qc-trotter-exact',
+    title: 'Two bond gates in a row',
+    steps: [
+      'A chain of three spins has two bonds, with Hamiltonians $H_1$ and $H_2$, and $H = H_1 + H_2$.',
+      'Each bond has its own gate, $e^{-iH_1t}$ and $e^{-iH_2t}$, in closed form.',
+      'So the two gates in a row multiply to exactly $e^{-iHt}$.',
+      'So one piece, $M = 1$, imitates the chain at $t = 2$ with no error.',
+    ],
+    wrong: 2,
+    why: 'The two bonds share a spin, so $H_1$ and $H_2$ do not commute: $\\|[H_1, H_2]\\| = 0.433$. One piece misses the chain by $0.733$ at $t = 2$, and $M = 8$ pieces cut the miss to $0.0911$.',
+    trains: SM19,
+  },
+  {
+    id: 'qc-qaoa-sure',
+    title: 'One layer of QAOA',
+    steps: [
+      'QAOA on a four-cycle starts from an equal mix of all 16 patterns, whose average cut is $2$.',
+      'One layer at the best angles lifts the average cut to $3$, and the largest cut is $4$.',
+      'An average of $3$ out of $4$ means the layer reads the largest cut every time.',
+      'So one layer finds the best cut on every run.',
+    ],
+    wrong: 2,
+    why: 'An average of $3$ is a mix of different cuts. The largest cut of $4$ comes up with chance $0.531$ and a cut of $2$ with chance $0.4375$, against $0.125$ for a random pattern.',
+    trains: QA19,
+  },
+  // Chapter Q20 (P-Q20-story §11.2): six spot-the-error rounds, each checked against the engine in Q20.arcade.test.ts
+  {
+    id: 'qc-clone-perfect',
+    title: 'Tuning the cloner',
+    steps: [
+      'The cloner has one dial, the program angle $u$, which sets how well each of its two output wires matches the input.',
+      'At $u = 0$ wire 1 is a perfect copy, and at $u = 60^\\circ$ wire 2 is a perfect copy.',
+      'So some angle between them makes both wires perfect copies.',
+      'So a quantum machine can clone a qubit if its dial is tuned right.',
+    ],
+    wrong: 2,
+    why: 'Quality trades between the wires. At the equal setting $u = 30^\\circ$ each wire has fidelity $5/6 = 0.833$, the best both wires can have together.',
+    trains: CL20,
+  },
+  {
+    id: 'qc-unot-gate',
+    title: 'The universal NOT as a gate',
+    steps: [
+      'A universal NOT should send every state to the state exactly opposite it on the Bloch sphere.',
+      'The gate $\\sigma_y$ sends $|{+z}\\rangle$ to $|{-z}\\rangle$ and $|{+x}\\rangle$ to $|{-x}\\rangle$, up to a phase.',
+      'So $\\sigma_y$ sends every state to its opposite, and the U-NOT is the gate $\\sigma_y$.',
+      'So a perfect U-NOT can be built from one unitary gate.',
+    ],
+    wrong: 2,
+    why: 'The gate $\\sigma_y$ leaves $|{+y}\\rangle$ where it is: a gate turns the sphere, and no turn sends every point to its opposite. The best machine sends each arrow to the opposite direction, one third as long.',
+    trains: UN20,
+  },
+  {
+    id: 'qc-clone-both',
+    title: 'Measure and prepare, as a pair',
+    steps: [
+      'Measure-and-prepare cloning reads the input in a random direction and prepares two copies of the result.',
+      'Each single copy matches the input with fidelity $2/3$.',
+      'The pair matches the ideal two-copy state $|\\psi\\rangle|\\psi\\rangle$ equally well, with fidelity $2/3$.',
+      'So for the pair, measure-and-prepare matches the cloner circuit, which also gives $2/3$.',
+    ],
+    wrong: 2,
+    why: 'The pair’s overlap with $|\\psi\\psi\\rangle$ is only $1/2$, below the cloner circuit’s $2/3$. The value $2/3$ belongs to a single copy, where the circuit gives $5/6$.',
+    trains: UN20,
+  },
+  {
+    id: 'qc-proc-universal',
+    title: 'Programs for every gate',
+    steps: [
+      'A processor has a data wire and a program register, and the program picks the gate the data gets.',
+      'Gates that differ by more than a phase need programs that are orthogonal.',
+      'A program can be any superposition of basis states, so two program wires are enough to name every gate.',
+      'So a two-wire program can run every one-qubit gate with certainty.',
+    ],
+    wrong: 2,
+    why: 'Orthogonal programs need one dimension each, and $n$ program wires have $2^n$ dimensions: 4 for two wires, $1024$ for ten. Infinitely many gates need infinitely many dimensions.',
+    trains: NG20,
+  },
+  {
+    id: 'qc-rus-sure',
+    title: 'Trying again',
+    steps: [
+      'The CNOT processor succeeds with chance $1/2$, and a failure leaves the data turned the wrong way.',
+      'After a failure, a second run with a doubled program angle again succeeds with chance $1/2$ of what is left.',
+      'So after $k$ rounds the chance of success is $1 - 2^{-k}$.',
+      'So after 7 rounds the machine succeeds with certainty.',
+    ],
+    wrong: 3,
+    why: 'The failure chance $2^{-k}$ halves each round but never reaches 0. After 7 rounds the chance is $0.992$; it takes 7 rounds to pass $0.99$ and 10 to pass $0.999$.',
+    trains: PB20,
+  },
+  {
+    id: 'qc-disc-orth',
+    title: 'Orthogonal examples',
+    steps: [
+      'A programmable discriminator gets one example of each of two unknown states, and a data qubit equal to one of them.',
+      'A machine told that the two states are orthogonal tells them apart every time.',
+      'The examples here are orthogonal, so the programmable machine also tells them apart every time.',
+      'So with orthogonal examples the programmable machine succeeds with chance 1.',
+    ],
+    wrong: 2,
+    why: 'The programmable machine is not told the states are orthogonal. It can only test for the antisymmetric part, so at overlap $0$ its success chance is $1/3$, against $1$ for a machine told the states.',
+    trains: DI20,
+  },
+  // Chapter Q23 (P-Q23-story §11.2): six spot-the-error rounds, each checked against the engine in Q23.arcade.test.ts
+  {
+    id: 'qc-rel-distance',
+    title: 'Relative entropy as a distance',
+    steps: [
+      'The relative entropy $H(p\\|q)$ is $0$ when the two chance tables are equal and positive otherwise, as a distance should be.',
+      'For the fair coin $p = (0.5, 0.5)$ and the biased coin $q = (0.9, 0.1)$ it is $0.737$ bits.',
+      'Reading the pair from the other end changes nothing, so $H(q\\|p)$ is also $0.737$ bits.',
+      'So the relative entropy is a distance between chance tables.',
+    ],
+    wrong: 2,
+    why: 'The other way round, $H(q\\|p) = 0.531$ bits. A distance reads the same from both ends, so the relative entropy is not one.',
+    trains: CC23,
+  },
+  {
+    id: 'qc-fid-metric',
+    title: 'Fidelity as a distance',
+    steps: [
+      'The square roots of a table’s chances form an arrow of length 1. The fidelity $F(p, q)$ is the dot product of two such arrows.',
+      'Equal tables have $F = 1$, so $1 - F$ is $0$ for equal tables and grows as the tables differ.',
+      'So $1 - F$ is a distance: a detour through a third table $r$ is never shorter.',
+      'So going from $p = (0.5, 0.5)$ to $q = (0.9, 0.1)$ directly is never longer than going through $r = (0.7, 0.3)$.',
+    ],
+    wrong: 2,
+    why: 'The direct $1 - F(p, q)$ is $0.106$, but the detour totals $0.054$. It is the angle $\\theta = \\cos^{-1}F$ that obeys the rule: $26.57^\\circ = 11.79^\\circ + 14.78^\\circ$.',
+    trains: CC23,
+  },
+  {
+    id: 'qc-whole-part',
+    title: 'The whole and its part',
+    steps: [
+      'For two coins the pair is never less uncertain than one coin alone: $H(X, Y) \\ge H(X)$.',
+      'A quantum pair has an entropy $S(AB)$, and its part $A$ has an entropy $S(A)$.',
+      'The same rule holds for quantum states, so $S(AB) \\ge S(A)$ always.',
+      'So a Bell pair has at least as much entropy as one of its qubits.',
+    ],
+    wrong: 2,
+    why: 'A Bell pair is a pure state, so $S(AB) = 0$, while either qubit alone has $S(A) = 1$ bit. A quantum part can be more uncertain than its whole.',
+    trains: EP23,
+  },
+  {
+    id: 'qc-local-noise',
+    title: 'Noise on one half',
+    steps: [
+      'The mutual information $S(A{:}B) = S(A) + S(B) - S(AB)$ counts the correlations between two parts.',
+      'Bob may apply any noisy operation to his half $B$ and leave $A$ alone.',
+      'Noise adds randomness to $B$, and randomness is correlation with something, so the pair can end up sharing more.',
+      'So Bob can raise $S(A{:}B)$ by adding noise to his half.',
+    ],
+    wrong: 2,
+    why: 'Noise on one half can only keep or lower $S(A{:}B)$. For a Bell pair with a phase-error chance of $0.1$ on Bob’s half it falls from $2$ to $1.531$, a fall of $0.469$.',
+    trains: QM23,
+  },
+  {
+    id: 'qc-holevo-reach',
+    title: 'Reaching the Holevo number',
+    steps: [
+      'Alice sends $|0\\rangle$ or $|{+}\\rangle$ with chance $1/2$ each, and the Holevo number for this pair is $\\chi = 0.601$ bit.',
+      'No measurement of Bob’s can give him more than $\\chi$.',
+      'Measuring along $z$ gives him $0.311$ bit, which is less than $\\chi$.',
+      'So some better measurement along a tilted axis must give him the full $0.601$ bit.',
+    ],
+    wrong: 3,
+    why: 'The Holevo number is only an upper bound. For two states that are not orthogonal, even Bob’s best measurement gives $0.399$ bit.',
+    trains: HO23,
+  },
+  {
+    id: 'qc-bb84-full',
+    title: 'A full bit per qubit',
+    steps: [
+      'Alice sends one of the four BB84 states, $|0\\rangle$, $|1\\rangle$, $|{+}\\rangle$ or $|{-}\\rangle$, each with chance $1/4$.',
+      'Their average is $I/2$, so the Holevo number is $\\chi = 1$ bit, the most a qubit can carry.',
+      'Bob measures along $z$, which reaches the Holevo number, so he learns $1$ bit.',
+      'So a BB84 receiver learns a full bit about every state sent.',
+    ],
+    wrong: 2,
+    why: 'Along $z$ Bob tells $|0\\rangle$ from $|1\\rangle$, but $|{+}\\rangle$ and $|{-}\\rangle$ read $0$ or $1$ at random. He learns $0.5$ bit, and no axis does better.',
+    trains: HO23,
+  },
+  // Chapter Q24 (P-Q24-story §11.2): six spot-the-error rounds, each checked against the engine in Q24.arcade.test.ts
+  {
+    id: 'qc-t2-longer',
+    title: 'A phase that outlives the population',
+    steps: [
+      'A decaying qubit loses its population over a time $T_1$ and its phase signal over a time $T_2$.',
+      'With pure decay the phase signal lasts $T_2 = 2T_1$.',
+      'The environment might also protect the phase while the population still decays, so $T_2 = 3T_1$ is allowed.',
+      'So some qubits keep their phase three times longer than their population.',
+    ],
+    wrong: 2,
+    why: 'At $T_2 = 3T_1$ the smaller eigenvalue of the state dips to $-0.0096$ near $3.2\\,T_1$, a negative chance. Positivity forces $T_2 \\le 2T_1$.',
+    trains: LI24,
+  },
+  {
+    id: 'qc-steady-invert',
+    title: 'Driving until the qubit is inverted',
+    steps: [
+      'A resonant drive lifts the qubit toward the excited state, and decay pulls it back toward the ground state.',
+      'Wait long enough and drive and decay balance, and a stronger drive moves the balance toward the excited state.',
+      'So a strong enough drive leaves the qubit fully excited in the steady state.',
+      'So steady light can invert a qubit.',
+    ],
+    wrong: 2,
+    why: 'The balance never passes one half. On resonance the excited share is $s/(2(1+s))$ with $s = T_1T_2\\Omega^2$, only $0.495$ at $s = 100$.',
+    trains: BE24,
+  },
+  {
+    id: 'qc-rabi-sign',
+    title: 'Which way a real drive turns',
+    steps: [
+      'A resonant drive $\\Omega$ turns the qubit about an axis in the $xy$ plane, and the phase of $\\Omega$ picks the axis.',
+      'A real $\\Omega$ turns the qubit about $x$, and an imaginary $\\Omega$ turns it about $y$.',
+      'For $\\Omega$ real and positive the pulse of angle $\\theta$ is $R_x(\\theta)$, which takes $|0\\rangle$ toward $-y$.',
+      'So a quarter pulse leaves the arrow pointing along $-y$.',
+    ],
+    wrong: 2,
+    why: 'Our calculation finds that a real positive $\\Omega$ gives $R_x(-\\theta)$, which takes $|0\\rangle$ to $|{+y}\\rangle$. At a quarter pulse it is $1.414$ away from $R_x(\\theta)$.',
+    trains: RB24,
+  },
+  {
+    id: 'qc-composite-zero',
+    title: 'A composite pulse',
+    steps: [
+      'A pulse a little too long or too short turns by $\\pi(1 + \\epsilon)$, so it leaves an error of order $\\epsilon$.',
+      'The four-pulse sequence $R_z(-\\pi)R_x(\\tfrac\\pi2)R_y(\\pi)R_x(\\tfrac\\pi2)$ equals a plain $\\pi$ pulse about $x$ when every angle is exact.',
+      'With the same fractional error $\\epsilon$ in every angle, the four pulses cancel one another’s errors exactly.',
+      'So a composite pulse removes the error.',
+    ],
+    wrong: 2,
+    why: 'The error does not vanish: it shrinks to order $\\epsilon^2$. At $\\epsilon = 0.01$ the composite error is $0.000247$, against $0.0157$ for the plain pulse.',
+    trains: RB24,
+  },
+  {
+    id: 'qc-fast-noise',
+    title: 'Noise that changes quickly',
+    steps: [
+      'Noise of size $\\sigma = 1$ has a correlation time $\\tau_c$, the time over which it forgets itself.',
+      'Slow noise, with $\\tau_c = 10$, makes the signal fall in a bell shape with decay time $T_2^* = 1.45$.',
+      'Noise that forgets itself faster changes more often, so it dephases the qubit faster and $T_2^*$ shrinks.',
+      'So at $\\tau_c = 0.1$ the decay time is shorter than $1.45$.',
+    ],
+    wrong: 2,
+    why: 'Fast noise averages itself out. At $\\tau_c = 0.1$ the decay time is $T_2^* = 10.1$, almost seven times longer than the $1.448$ of slow noise.',
+    trains: RM24,
+  },
+  {
+    id: 'qc-echo-any',
+    title: 'What the echo cancels',
+    steps: [
+      'An echo waits a time $\\tau$, flips the qubit with a $\\pi$ pulse, waits $\\tau$ again, and flips it back.',
+      'A fixed frequency error adds a phase in the first wait and the opposite phase in the second, so they cancel.',
+      'Noise that changes during the waits is cancelled the same way, so the echo cancels any noise.',
+      'So the echo restores the signal whatever the correlation time of the noise.',
+    ],
+    wrong: 2,
+    why: 'The echo cancels only noise that stays put between the two waits. At correlation time $0.1$ it keeps $0.844$ against $0.827$ for plain Ramsey, hardly better.',
+    trains: DC24,
+  },
+  // Chapter Q25 (P-Q25-story §11.2): six spot-the-error rounds, each checked against the engine in Q25.arcade.test.ts
+  {
+    id: 'qc-table-doppler',
+    title: 'The narrow strontium line',
+    steps: [
+      'Cooling beams in optical molasses reach the Doppler temperature $T_D = \\hbar\\gamma/2k_B$, set by the width $\\gamma$ of the cooling line.',
+      'Rubidium, with $\\gamma/2\\pi = 6.07$ MHz, reaches $T_D = 145.7\\,\\mu$K.',
+      'Strontium’s narrow line at 689 nm has $\\gamma/2\\pi = 0.0074$ MHz, so by the same formula it reaches $T_D = 1.02\\,\\mu$K.',
+      'So the narrow line cools to about a microkelvin.',
+    ],
+    wrong: 2,
+    why: 'Our calculation finds $T_D = 0.178\\,\\mu$K for that line. The value near $1\\,\\mu$K is the recoil temperature of strontium’s 461 nm line, $1.03\\,\\mu$K.',
+    trains: CO25,
+  },
+  {
+    id: 'qc-load-full',
+    title: 'Loading a tweezer site',
+    steps: [
+      'A tweezer site catches a random number $N$ of atoms from the cloud, with average $\\mu = 1$.',
+      'Light-assisted collisions remove atoms in pairs, so a site ends with $0$ or $1$ atom.',
+      'A site that catches at least one atom ends with one, so almost every site ends full.',
+      'So loading fills every site with a single atom.',
+    ],
+    wrong: 2,
+    why: 'A site that catches an even number of atoms ends empty. The chance of ending with one atom is $(1 - e^{-2\\mu})/2 = 0.432$ at $\\mu = 1$, and it never exceeds $1/2$.',
+    trains: CO25,
+  },
+  {
+    id: 'qc-blockade-fast',
+    title: 'A stronger blockade',
+    steps: [
+      'In the $\\pi$–$2\\pi$–$\\pi$ gate the control atom’s Rydberg excitation blocks the target, but only up to the blockade strength $B$.',
+      'The Rydberg state decays, so the pulse should be fast, while a leaky blockade calls for a pulse slow compared with $B$.',
+      'Once $B$ is much larger than the Rabi frequency $\\Omega$ the leak is negligible, so a stronger blockade no longer lowers the gate error.',
+      'So the best error stops improving as $B$ grows.',
+    ],
+    wrong: 2,
+    why: 'A stronger blockade lets the pulse be faster, which cuts decay. The best error falls as $(B\\tau)^{-2/3}$: $0.00915$ at $B\\tau = 10^4$ and $0.00199$ at $10^5$, about $0.22$ times as large.',
+    trains: AG25,
+  },
+  {
+    id: 'qc-trap-static',
+    title: 'Holding an ion with a still field',
+    steps: [
+      'In empty space the electric potential $\\phi$ obeys $\\nabla^2\\phi = 0$.',
+      'A trap needs a potential energy that rises in every direction away from a rest point.',
+      'A static quadrupole field has curvatures $2$, $2$ and $-4$, and a strong enough field makes all three positive.',
+      'So a strong enough static field traps an ion.',
+    ],
+    wrong: 2,
+    why: 'The three curvatures always sum to $0$, as $2 + 2 - 4$ does. Whatever the strength, one direction curves downward, so the rest point is a saddle.',
+    trains: IT25,
+  },
+  {
+    id: 'qc-cz-hot',
+    title: 'A warm ion and the Cirac–Zoller gate',
+    steps: [
+      'The Cirac–Zoller gate moves a qubit state onto the shared vibration, applies a phase, and moves it back.',
+      'The pulses are timed for a vibration that starts with no phonon.',
+      'A warm ion starts with a few phonons, and the swap pulses change only slightly, so the gate still works.',
+      'So the gate can run without cooling the ion first.',
+    ],
+    wrong: 2,
+    why: 'With one phonon present the Bell-state chance falls from $1.000$ to $0.254$, and with two to $0.138$. The Mølmer–Sørensen gate keeps $1.000$ even with four phonons.',
+    trains: IG25,
+  },
+  {
+    id: 'qc-ms-time',
+    title: 'When to stop the Mølmer–Sørensen gate',
+    steps: [
+      'In the Mølmer–Sørensen gate the drive makes the motion of the ions trace loops in phase space.',
+      'The ions pick up an entangling phase that grows with the area of the loop.',
+      'A gate stopped part-way round a loop still gives the right phase, so any gate time will do.',
+      'So the gate makes the same Bell state whenever it is stopped.',
+    ],
+    wrong: 2,
+    why: 'The motion must return to its start, so the gate must end after a whole number of loops. Stopped at $17.36$ loops the infidelity is $0.0229$; at $17$ loops it is $2.7 \\times 10^{-4}$.',
+    trains: IG25,
+  },
+  // Chapter Q26 (P-Q26-story §11.2): four spot-the-error rounds, each checked against the engine in Q26.arcade.test.ts
+  {
+    id: 'qc-hom-add-chances',
+    title: 'Two photons at a splitter',
+    steps: [
+      'One photon enters each input port of a 50:50 splitter.',
+      'Alone, each photon leaves by either exit with chance $1/2$, and neither one knows about the other.',
+      'So the chances just add up: with chance $1/2$ the photons leave one by each exit.',
+      'So the output is spread over $|20\\rangle$, $|11\\rangle$ and $|02\\rangle$, with $|11\\rangle$ the likeliest.',
+    ],
+    wrong: 2,
+    why: 'The two ways to leave one by each exit are arrows of equal length and opposite direction, and they cancel: the chance is $0$. The photons leave together, $|20\\rangle$ or $|02\\rangle$, one half each.',
+    trains: HM26,
+  },
+  {
+    id: 'qc-ns-average',
+    title: 'The chance of the sign gate',
+    steps: [
+      'The nonlinear sign gate negates the amplitude of the two-photon part, using one ancilla photon and two detectors.',
+      'It is accepted only when the detectors give the agreed reading, and then it succeeds with chance $0.2265$.',
+      'This $0.2265$ is an average over inputs, so some inputs succeed far more often than others.',
+      'So a well chosen input state could make the gate succeed much more often.',
+    ],
+    wrong: 2,
+    why: 'The chance is $\\cos^2\\varphi = 0.2265$ for every input of at most two photons. The amplitudes for 0, 1 and 2 photons are all the same size after the gate.',
+    trains: NS26,
+  },
+  {
+    id: 'qc-klm-repeat',
+    title: 'Three gates in a row',
+    steps: [
+      'A photonic CZ gate succeeds with chance $0.0513$, and its detectors tell us whether it worked.',
+      'A program needs three such gates one after another on the same photons.',
+      'Since failures are announced, each gate can be repeated on the same photons until it succeeds.',
+      'So the three gates together succeed with a chance close to $1$.',
+    ],
+    wrong: 2,
+    why: 'A failed gate has already measured the photons, so nothing is left to repeat on. All three must succeed in one run: $0.0513^3 = 1.35 \\times 10^{-4}$, about one run in $7400$.',
+    trains: NS26,
+  },
+  {
+    id: 'qc-cat-orthogonal',
+    title: 'Two laser states as a qubit',
+    steps: [
+      'A laser beam in a coherent state $|\\alpha\\rangle$ has a photon number that varies around $\\alpha^2$.',
+      'The states $|\\alpha\\rangle$ and $|{-\\alpha}\\rangle$ differ in the sign of the amplitude.',
+      'Opposite signs make them orthogonal, so for any $\\alpha$ they are an exact $0$ and $1$ of a qubit.',
+      'So two coherent states of opposite sign never overlap.',
+    ],
+    wrong: 2,
+    why: 'Their overlap in chance is $e^{-4\\alpha^2}$: $0.0183$ at $\\alpha = 1$ and $1.1 \\times 10^{-7}$ at $\\alpha = 2$. It is never exactly $0$, but the even and odd cat states are exactly orthogonal.',
+    trains: NL26,
+  },
+  // Chapter Q27 (P-Q27-story §11.2): four spot-the-error rounds, each checked against the engine in Q27.arcade.test.ts
+  {
+    id: 'qc-lc-qubit',
+    title: 'An LC circuit as a qubit',
+    steps: [
+      'An LC circuit has levels $\\hbar\\omega(n + \\tfrac12)$, so its two lowest levels form a two-level system.',
+      'Cooled to a few millikelvin, the circuit sits in its lowest level, so it starts in a definite state.',
+      'A pulse at the frequency of the $0 \\to 1$ step drives only that step, so the two lowest levels act as a clean qubit.',
+      'So an LC circuit is a good qubit.',
+    ],
+    wrong: 2,
+    why: 'The rungs are equally spaced, so the same pulse also fits the $1 \\to 2$ step, and drives it $\\sqrt2 = 1.414$ times more strongly. The circuit leaks out of the qubit.',
+    trains: LC27,
+  },
+  {
+    id: 'qc-flux-h-over-e',
+    title: 'The flux quantum',
+    steps: [
+      'The wave function of the paired electrons must come back to itself after one trip round a superconducting ring.',
+      'So its phase turns by a whole number of turns, and the flux through the ring is a whole number of flux quanta.',
+      'The carrier is an electron of charge $e$, so one flux quantum is $\\Phi_0 = h/e$.',
+      'So the ring holds flux in steps of $h/e$.',
+    ],
+    wrong: 2,
+    why: 'The carriers are Cooper pairs, with charge $2e$. So $\\Phi_0 = h/2e = 2.068 \\times 10^{-15}$ Wb, half of $h/e$.',
+    trains: SC27,
+  },
+  {
+    id: 'qc-transmon-anharm',
+    title: 'How much anharmonicity a transmon needs',
+    steps: [
+      'A transmon is a charge qubit run at a large ratio $E_J/E_C$, so that charge noise barely moves its levels.',
+      'Its rungs are not quite equal, and the second gap is shorter than the first by the relative anharmonicity $\\alpha$.',
+      'To address the $0 \\to 1$ step alone, $|\\alpha|$ must be large, tens of percent.',
+      'So doubling $E_J/E_C$ from 10 to 20, which shrinks $|\\alpha|$, would ruin the qubit.',
+    ],
+    wrong: 2,
+    why: 'At $E_J/E_C = 20$ the anharmonicity is only $-0.0457$, and that is enough. Doubling the ratio cuts $|\\alpha|$ by just $1.52$, but cuts the charge dependence $967$ times.',
+    trains: TM27,
+  },
+  {
+    id: 'qc-dot-dipole',
+    title: 'What couples two dot spins',
+    steps: [
+      'Two electrons sit in neighbouring dots, and each carries a spin.',
+      'Each spin is a tiny magnet, and two magnets feel each other through their dipole fields.',
+      'So the singlet and triplet states differ in energy because of the magnetic dipole force between the spins.',
+      'So the coupling is magnetic, and a magnetic field could switch it.',
+    ],
+    wrong: 2,
+    why: 'The splitting comes from the Coulomb force and the Pauli rule. In the model the singlet state has energy $1.1$ and the triplet $0.9$, and the gap $2K$ gives the coupling $-2K\\,\\mathbf s_1\\cdot\\mathbf s_2$.',
+    trains: DT27,
   },
 ]
 
