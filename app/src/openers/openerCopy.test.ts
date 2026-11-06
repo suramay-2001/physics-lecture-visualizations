@@ -12,6 +12,7 @@ import { APP_DIR, fs, path } from '../security/node'
 import { KET, Rz, blochVector, samePhysicalState } from '../physics/spin'
 import { GROVER_OPENER, GROVER_TURN_FRAMES, beltOpenerFrame, groverOpenerFrame } from './openerData'
 import { starSpokeChances } from '../physics/qc/walk'
+import { clonerFidelities } from '../physics/qc/machines'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -219,3 +220,39 @@ describe('film qc-q19-walker: the facts the captions state', () => {
   })
 })
 
+describe('film qc-q20-cloner: the facts the captions state', () => {
+  const F = (u: number, theta = 60, phi = 90) => clonerFidelities(u, theta, phi)
+  const [b1, b2, b3] = OPENERS['qc-q20-cloner'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+  const grid = Array.from({ length: 61 }, (_, u) => F(u))
+
+  it('beat 1: at 0° the copies have fidelity 1 and 0.5; at 15° they have 0.9553 and 0.6667', () => {
+    has(b1.text, ...states(F(0).f1, F(0).f2, F(15).f1, F(15).f2))
+    expect(F(0).f1).toBeCloseTo(1, 12)
+    expect(F(0).f2).toBeCloseTo(0.5, 12)
+  })
+  it('beat 2: at 30° both copies have fidelity 5/6, the curves cross once, and every input state gives the same numbers', () => {
+    has(b2.text, ...states(F(30).f1), '$5/6$')
+    expect(F(30).f1).toBeCloseTo(5 / 6, 12)
+    expect(F(30).f2).toBeCloseTo(5 / 6, 12)
+    const signs = grid.map((g) => Math.sign(g.f1 - g.f2 + 1e-12))
+    expect(signs.filter((s, i) => i > 0 && s !== signs[i - 1])).toHaveLength(1)
+    for (const [t, p] of [[20, 30], [130, 250], [0, 0], [90, 10]]) for (const u of [0, 15, 30, 60]) {
+      expect(F(u, t, p).f1).toBeCloseTo(F(u).f1, 9)
+      expect(F(u, t, p).f2).toBeCloseTo(F(u).f2, 9)
+    }
+  })
+  it('beat 3: at 60° the first copy has 0.5 and the second 1; the worse of the two copies is never better than 0.8333', () => {
+    has(b3.text, ...states(F(60).f1, F(60).f2, F(30).f1))
+    expect(F(60).f1).toBeCloseTo(0.5, 12)
+    expect(F(60).f2).toBeCloseTo(1, 12)
+    expect(Math.max(...grid.map((g) => Math.min(g.f1, g.f2)))).toBeCloseTo(F(30).f1, 12)
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q20-cloner')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})

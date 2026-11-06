@@ -21,5 +21,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q17-mean', poster: 71, publish: 'app/public/films/qc709/qc-q17-mean' },
   // Q19 unit 19.5: after four steps of the star walk the marked spoke holds the chance two Grover steps give
   { id: 'qc-q19-walker', poster: 79, publish: 'app/public/films/qc709/qc-q19-walker' },
+  // Q20 unit 20.2: at 30° of program angle the two copies are equally good
+  { id: 'qc-q20-cloner', poster: 79, publish: 'app/public/films/qc709/qc-q20-cloner' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

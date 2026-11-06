@@ -239,6 +239,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q20-cloner': {
+    name: 'qc-q20-cloner',
+    dir: 'films/qc709/qc-q20-cloner',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q20-cloner'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line, one white and one blue. The white curve starts at the dotted line and slopes down; the blue curve starts halfway up and slopes up. They cross about a third of the way along, and the blue curve ends at the dotted line while the white one ends at half the height.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'The program angle $u$ sets how the cloner splits the information between its two copies. At $u = 0°$ the first copy is perfect, fidelity $1$, and the second is a coin toss, $0.5$. By $u = 15°$ the first has slipped to $0.9553$ and the second has risen to $0.6667$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At $u = 30°$ the two curves cross: each copy has fidelity $0.8333$, which is $5/6$. This is the symmetric cloner of Unit 20.1, with both copies equally good. The same numbers come out for every input state.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Turn on to $u = 60°$ and the roles swap: the first copy falls to $0.5$ and the second is perfect, $1$. A better first copy always costs a worse second one. All along the turn the worse of the two copies is never better than $0.8333$.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each curve is the fidelity of one output wire with the input state, from a simulation of the cloning circuit at every whole degree of $u$.',
+        'The dot at the end of each curve is that wire’s fidelity at the angle shown.',
+      ],
+      distorted: [
+        'Between two whole degrees the curve is a straight line; only the sampled angles come from the circuit.',
+        'The picture shows fidelities only; it does not show how the information is split between the copies and the third wire.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */
