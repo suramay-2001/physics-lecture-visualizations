@@ -1997,7 +1997,7 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     id: 'qc-ns-average',
     title: 'The chance of the sign gate',
     steps: [
-      'The nonlinear sign gate flips the sign of the two-photon part, using one ancilla photon and two detectors.',
+      'The nonlinear sign gate negates the amplitude of the two-photon part, using one ancilla photon and two detectors.',
       'It is accepted only when the detectors give the agreed reading, and then it succeeds with chance $0.2265$.',
       'This $0.2265$ is an average over inputs, so some inputs succeed far more often than others.',
       'So a well chosen input state could make the gate succeed much more often.',
