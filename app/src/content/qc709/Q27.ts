@@ -436,6 +436,10 @@ export const Q27: Lecture = {
     },
     {
       id: 'q27-transmon',
+      opener: {
+        film: 'qc-q27-transmon',
+        lede: 'A film of the ladder of energy levels: first evenly spaced, as in a circuit with a coil and a capacitor, then bent by the Josephson junction, and then the first gap against the offset charge. The words beside it give the numbers.',
+      },
       story: Q27_STORY['q27-transmon'],
       review: Q27_REVIEW['q27-transmon'],
       claims: Q27_UNIT_CLAIMS_BY_ID['q27-transmon'],

@@ -419,6 +419,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q27-transmon': {
+    name: 'qc-q27-transmon',
+    dir: 'films/qc709/qc-q27-transmon',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q27-transmon'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Five short horizontal bars stacked in a column near the top, white over grey, at first evenly spaced; then the upper white bars sink a little below their grey twins. Below them two curves over a flat line: a blue one that swings from high on the left down to the line in the middle and back up, and a white one that stays flat on the line.',
+    beats: [
+      {
+        from: 0,
+        to: 29,
+        text: 'The energy levels of a circuit with only an inductor and a capacitor are evenly spaced: in units of the first gap the rungs sit at $0$, $1$, $2$, $3$, $4$. Every step is the same size, so nothing singles out the first two levels as a qubit.',
+      },
+      {
+        from: 30,
+        to: 69,
+        text: 'The Josephson junction bends the ladder. For $E_J/E_C = 20$ the rungs move to $1$, $1.9543$, $2.8588$ and $3.7082$: each step is a little smaller than the one below, and the second is smaller than the first by $0.0457$ of the first. The grey rungs show where an evenly spaced ladder would put them.',
+      },
+      {
+        from: 70,
+        to: 119,
+        text: 'The levels also move with the offset charge $n_g$. The curves show the first gap over one period of $n_g$, in units of its value at $n_g = 1/2$. At $E_J/E_C = 1$ it swings up to $1.3757$ times that value; at $E_J/E_C = 20$ it stays within $0.0001$ of $1$, so the qubit frequency hardly depends on the charge.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each rung is an energy level in units of the first gap, from the matrix of the circuit: the inductor-capacitor circuit at the start, the junction circuit after the bend.',
+        'Each curve is the first gap at one value of the offset charge, from the matrix of the junction circuit, in units of its value at $n_g = 1/2$.',
+      ],
+      distorted: [
+        'Only the lowest five levels are drawn, and between two pictures the rungs glide in a straight line.',
+        'The two panels use different vertical scales: the rungs are in units of the first gap, the curves in units of the gap at $n_g = 1/2$.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

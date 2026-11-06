@@ -31,5 +31,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q25-blockade', poster: 119, publish: 'app/public/films/qc709/qc-q25-blockade' },
   // Q24 unit 24.4: the arrow turns and shrinks, a spiral inside the Bloch ball
   { id: 'qc-q24-rabi-ball', poster: 119, publish: 'app/public/films/qc709/qc-q24-rabi-ball' },
+  // Q27 unit 27.4: the junction bends the ladder and the first gap stops depending on the offset charge
+  { id: 'qc-q27-transmon', poster: 119, publish: 'app/public/films/qc709/qc-q27-transmon' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

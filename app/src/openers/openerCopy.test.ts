@@ -18,6 +18,7 @@ import { bsReal, distinguishable, homDip, twoPhoton } from '../physics/qc/photon
 import { rydbergError } from '../physics/qc/atoms'
 import { blochOf, lindbladSolve, qubitJump } from '../physics/qc/blocheq'
 import { piPulseTime } from '../physics/qc/pulses'
+import { anharmonicity, f01Band, f01Spread, oscillatorLevels, transmonLadder } from '../physics/qc/solid'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -390,6 +391,38 @@ describe('film qc-q24-rabi-ball: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q24-rabi-ball')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q27-transmon: the facts the captions state', () => {
+  const levels = oscillatorLevels(1, 1).slice(0, 5)
+  const even = levels.map((e) => (e - levels[0]) / (levels[1] - levels[0]))
+  const T = transmonLadder(20)
+  const ngs = Array.from({ length: 41 }, (_, k) => k / 40)
+  const [b1, b2, b3] = OPENERS['qc-q27-transmon'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: the circuit’s rungs sit at 0, 1, 2, 3, 4 in units of the first gap', () => {
+    has(b1.text, '$0$, $1$, $2$, $3$, $4$')
+    even.forEach((x, i) => expect(x).toBeCloseTo(i, 12))
+  })
+  it('beat 2: at E_J/E_C = 20 the rungs are 1, 1.9543, 2.8588, 3.7082; each step is smaller than the one below, and the second is smaller than the first by 0.0457 of it', () => {
+    has(b2.text, ...states(T[2], T[3], T[4], Math.abs(anharmonicity(20))))
+    expect(T[1]).toBeCloseTo(1, 12)
+    for (let i = 1; i < 4; i++) expect(T[i + 1] - T[i]).toBeLessThan(T[i] - T[i - 1])
+    expect(T[2] - 2).toBeCloseTo(anharmonicity(20), 12) // (E21 − E10)/E10 with the first gap 1
+  })
+  it('beat 3: the first gap swings up to 1.3757 times its value at n_g = 1/2 at E_J/E_C = 1 and stays within 0.0001 of it at 20', () => {
+    has(b3.text, ...states(f01Spread(1)), '$0.0001$')
+    expect(Math.max(...ngs.map((ng) => f01Band(1, ng)))).toBeCloseTo(f01Spread(1), 12)
+    ngs.forEach((ng) => expect(Math.abs(f01Band(20, ng) - 1), `n_g = ${ng}`).toBeLessThan(1e-4))
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q27-transmon')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)
