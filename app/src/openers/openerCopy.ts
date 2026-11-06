@@ -383,6 +383,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q24-rabi-ball': {
+    name: 'qc-q24-rabi-ball',
+    dir: 'films/qc709/qc-q24-rabi-ball',
+    ground: STAGE_THEME.qc709.bg['bloch-ball'],
+    title: OPENER_TITLES['qc-q24-rabi-ball'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'A circle with a dotted horizontal line and a dotted vertical line through its centre. A white path starts at the top of the circle and winds twice round, each loop a little smaller than the one before, ending with a dot inside the inner loop.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'The qubit starts at the top of the Bloch ball, $z = 1$, in the ground state. The picture is the ball seen from the side, with the drive turning the arrow about the axis that points out of the page: $\\Omega = 2\\pi$, so a half turn takes $0.5$, and the qubit decays with $T_1 = 4$ in the same time unit. After the half turn the arrow is near the bottom: its vertical part is $-0.909$ and not $-1$, because some of it decayed on the way.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'After a full turn, at time $1$, the arrow is back near the top, but its vertical part is $0.8292$ and not $1$. Each turn ends a little short of the last one, and the arrow itself has shrunk: it is shorter than the radius of the ball.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Two turns on, at time $2$, its vertical part is $0.6875$, and the arrow’s length has fallen from $0.8292$ at time $1$ to $0.6876$. The tip spirals inward: the drive keeps turning the arrow and decay keeps shrinking it.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each point is the qubit’s Bloch vector at one time, from the decaying-qubit equation solved exactly for that time, with the drive on resonance.',
+        'The circle is the surface of the Bloch ball: a state that stayed pure would stay on it, and the path moves inside it once the qubit decays.',
+      ],
+      distorted: [
+        'Only two of the three Bloch components are drawn: the drive turns the arrow about the axis out of the page, so the third part stays $0$ throughout.',
+        'Between two sampled times the path is a straight line.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

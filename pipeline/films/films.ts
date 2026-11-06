@@ -29,5 +29,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q26-hom', poster: 79, publish: 'app/public/films/qc709/qc-q26-hom' },
   // Q25 unit 25.3: with a strong blockade the three-pulse gate is nearly ideal
   { id: 'qc-q25-blockade', poster: 119, publish: 'app/public/films/qc709/qc-q25-blockade' },
+  // Q24 unit 24.4: the arrow turns and shrinks, a spiral inside the Bloch ball
+  { id: 'qc-q24-rabi-ball', poster: 119, publish: 'app/public/films/qc709/qc-q24-rabi-ball' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

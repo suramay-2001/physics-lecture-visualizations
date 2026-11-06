@@ -16,6 +16,8 @@ import { clonerFidelities } from '../physics/qc/machines'
 import { accessibleInfoPair, holevoChiPair } from '../physics/qc/infoq'
 import { bsReal, distinguishable, homDip, twoPhoton } from '../physics/qc/photons'
 import { rydbergError } from '../physics/qc/atoms'
+import { blochOf, lindbladSolve, qubitJump } from '../physics/qc/blocheq'
+import { piPulseTime } from '../physics/qc/pulses'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -352,6 +354,42 @@ describe('film qc-q25-blockade: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q25-blockade')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q24-rabi-ball: the facts the captions state', () => {
+  const H = [[{ re: 0, im: 0 }, { re: Math.PI, im: 0 }], [{ re: Math.PI, im: 0 }, { re: 0, im: 0 }]] // (Ω/2) X, Ω = 2π
+  const RHO0 = [[{ re: 1, im: 0 }, { re: 0, im: 0 }], [{ re: 0, im: 0 }, { re: 0, im: 0 }]]
+  const bloch = (t: number) => blochOf(lindbladSolve(RHO0, H, [qubitJump(1 / 4)], t))
+  const len = (t: number) => Math.hypot(...bloch(t))
+  const [b1, b2, b3] = OPENERS['qc-q24-rabi-ball'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: the start is the north pole; the half turn takes 0.5 and leaves the arrow’s vertical part at −0.909, not −1', () => {
+    has(b1.text, ...states(bloch(0.5)[2]))
+    expect(bloch(0)[2]).toBeCloseTo(1, 12)
+    expect(piPulseTime(2 * Math.PI)).toBeCloseTo(0.5, 12) // π/Ω with Ω = 2π
+    expect(bloch(0.5)[2]).toBeGreaterThan(-1 + 1e-3)
+  })
+  it('beat 2: after a full turn z = 0.8292, short of 1, and the arrow is shorter than the radius', () => {
+    has(b2.text, ...states(bloch(1)[2]))
+    expect(bloch(1)[2]).toBeLessThan(1 - 1e-3)
+    expect(len(1)).toBeLessThan(1 - 1e-3)
+  })
+  it('beat 3: at time 2 z = 0.6875 and the length fell from 0.8292 to 0.6876', () => {
+    has(b3.text, ...states(bloch(2)[2], len(1), len(2)))
+    expect(len(2)).toBeLessThan(len(1))
+  })
+  it('the path moves inside the ball’s surface once the qubit decays, and the third Bloch component stays 0', () => {
+    for (let k = 20; k <= 160; k++) expect(len(k / 80), `t = ${k / 80}`).toBeLessThan(1 - 1e-3)
+    for (let k = 0; k <= 160; k++) expect(Math.abs(bloch(k / 80)[0]), `t = ${k / 80}`).toBeLessThan(1e-9)
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q24-rabi-ball')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)

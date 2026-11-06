@@ -66,6 +66,16 @@ interface Manifest {
 }
 
 export const TOL = 1e-9
+/** A guide that is one vertical segment at u from v0 to v1. */
+export const vsegment =
+  (u: number, v0: number, v1: number) =>
+  (pts: Pt[]): string | null =>
+    pts.length === 2 && pts.every((p) => Math.abs(p[0] - u) < TOL) && Math.abs(pts[0][1] - v0) < TOL && Math.abs(pts[1][1] - v1) < TOL ? null : `not the segment u = ${u}, v = ${v0}…${v1} (${JSON.stringify(pts)})`
+/** A guide that is a closed circle of radius r about the origin, drawn through at least 8 points. */
+export const circle =
+  (r: number) =>
+  (pts: Pt[]): string | null =>
+    pts.length >= 8 && pts.every((p) => Math.abs(Math.hypot(p[0], p[1]) - r) < TOL) ? null : `not a circle of radius ${r} (${pts.length} points)`
 /** A guide that is one horizontal segment at height v from u0 to u1. */
 export const segment =
   (v: number, u0: number, u1: number) =>
