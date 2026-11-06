@@ -4,7 +4,7 @@
  * the fidelity lists and the frame table ride with the lazy player (openers/OpenerByName.tsx), not with the first paint.
  * openerCopy.ts takes each `title` from here, so the words live in one place.
  */
-export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel' | 'qc-q17-mean' | 'qc-q19-walker' | 'qc-q20-cloner' | 'qc-q23-holevo-gap'
+export type OpenerName = 'hopf' | 'belt' | 'grover' | 'qc-q16-cancel' | 'qc-q17-mean' | 'qc-q19-walker' | 'qc-q20-cloner' | 'qc-q23-holevo-gap' | 'qc-q26-hom'
 
 export const OPENER_TITLES: Record<OpenerName, string> = {
   hopf: 'Every point of the Bloch sphere is a circle',
@@ -15,4 +15,5 @@ export const OPENER_TITLES: Record<OpenerName, string> = {
   'qc-q19-walker': 'A walker finds the marked spoke',
   'qc-q20-cloner': 'Cloning splits the information',
   'qc-q23-holevo-gap': 'The Holevo gap for two states',
+  'qc-q26-hom': 'Two photons, one exit',
 }

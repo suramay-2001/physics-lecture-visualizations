@@ -14,6 +14,7 @@ scene and data module in `src/scenes/`:
 | `qc-q19-walker` | the chance on each of eight spokes of a star graph with one marked spoke, after 0, 2, 4 and 6 steps | `Unit.opener` of Q19 unit 19.3 (`q19-star-search`); frames in `app/public/films/qc709/qc-q19-walker/` |
 | `qc-q20-cloner` | the two copies' fidelities as the cloner's program angle turns from 0° to 60° | `Unit.opener` of Q20 unit 20.1 (`q20-cloner`); frames in `app/public/films/qc709/qc-q20-cloner/` |
 | `qc-q23-holevo-gap` | the Holevo quantity and the best projective reading for two states, as their overlap sweeps from 0 to 1 | `Unit.opener` of Q23 unit 23.6 (`q23-holevo`); frames in `app/public/films/qc709/qc-q23-holevo-gap/` |
+| `qc-q26-hom` | the chance of one photon at each exit of a beam splitter against its reflectivity, for photons that cannot be told apart and for photons that can | `Unit.opener` of Q26 unit 26.3 (`q26-hom`); frames in `app/public/films/qc709/qc-q26-hom/` |
 
 A film the app plays has its captions in `app/src/openers/openerCopy.ts` (`OPENERS['<film>']`, `dir: 'films/qc709/<film>'`). Each number a
 caption states is checked against the engine in `openerCopy.test.ts`; the frames' files and size budget are checked in `openerFrames.test.ts`.

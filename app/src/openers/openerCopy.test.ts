@@ -14,6 +14,7 @@ import { GROVER_OPENER, GROVER_TURN_FRAMES, beltOpenerFrame, groverOpenerFrame }
 import { starSpokeChances } from '../physics/qc/walk'
 import { clonerFidelities } from '../physics/qc/machines'
 import { accessibleInfoPair, holevoChiPair } from '../physics/qc/infoq'
+import { bsReal, distinguishable, homDip, twoPhoton } from '../physics/qc/photons'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -283,6 +284,39 @@ describe('film qc-q23-holevo-gap: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q23-holevo-gap')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q26-hom: the facts the captions state', () => {
+  const rs = Array.from({ length: 101 }, (_, i) => i / 100)
+  const same = (r: number) => homDip(r)
+  const apart = (r: number) => distinguishable(bsReal(r))
+  const [b1, b2, b3] = OPENERS['qc-q26-hom'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: at R = 0 both chances are 1; at R = 0.25 the distinguishable ones give 0.625 and the others 0.25', () => {
+    has(b1.text, ...states(apart(0.25), same(0.25)))
+    expect(same(0)).toBeCloseTo(1, 12)
+    expect(apart(0)).toBeCloseTo(1, 12)
+  })
+  it('beat 2: at R = 0.5 the distinguishable photons give 0.5 and the others 0, and then both photons leave by the same exit', () => {
+    has(b2.text, ...states(apart(0.5), same(0.5)))
+    expect(same(0.5)).toBeCloseTo(0, 12)
+    const two = twoPhoton(bsReal(0.5))
+    expect(abs(two.a20) ** 2 + abs(two.a02) ** 2).toBeCloseTo(1, 12)
+  })
+  it('beat 3: at R = 1 both chances are 1 again, and the white curve is 0 only at R = 0.5', () => {
+    has(b3.text, ...states(same(1)))
+    expect(same(1)).toBeCloseTo(1, 12)
+    expect(apart(1)).toBeCloseTo(1, 12)
+    expect(rs.filter((r) => same(r) < 1e-9)).toEqual([0.5])
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q26-hom')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)

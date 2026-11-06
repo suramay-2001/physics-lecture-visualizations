@@ -311,6 +311,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q26-hom': {
+    name: 'qc-q26-hom',
+    dir: 'films/qc709/qc-q26-hom',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q26-hom'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line: a white one that starts at the dotted line, falls to the flat line in the middle and climbs back, and a dashed grey one that dips only to half the height in the middle. Both start and end at the dotted line.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'One photon enters each side of a beam splitter of reflectivity $R$. The curves show the chance that they leave one by each exit. At $R = 0$ the splitter lets everything through and both curves are $1$. At $R = 0.25$ photons that can be told apart give $0.625$ (the dashed curve), but photons that cannot be told apart give only $0.25$ (the white one).',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At the balanced splitter, $R = 0.5$, photons that can be told apart still leave one by each exit half the time, $0.5$. Photons that cannot be told apart never do: the chance is $0$, and both always leave by the same exit. This is the Hong-Ou-Mandel dip (Unit 26.3).',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Past the balanced splitter the white curve climbs again. At $R = 1$ the splitter is a mirror, the photons swap sides, and both curves are $1$ again. The white curve touches $0$ only at $R = 0.5$.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each white point is the chance of one photon at each exit for two photons that cannot be told apart, from the two-photon amplitude of the beam splitter, and each dashed point is the same chance for two that can.',
+        'The photons enter one per side, and only the reflectivity changes along the curves.',
+      ],
+      distorted: [
+        'Between two sampled reflectivities the curves are straight lines; only the samples come from the engine.',
+        'In the laboratory the dip is usually measured against the delay between the photons at a balanced splitter; here the splitter changes and the photons stay perfectly overlapped.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

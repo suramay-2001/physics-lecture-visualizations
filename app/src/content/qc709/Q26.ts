@@ -269,6 +269,10 @@ export const Q26: Lecture = {
     },
     {
       id: 'q26-hom',
+      opener: {
+        film: 'qc-q26-hom',
+        lede: 'A film of two photons meeting at a beam splitter: the white curve is the chance that they leave by different exits when they cannot be told apart, the dashed curve when they can. The words beside it give the numbers.',
+      },
       story: Q26_STORY['q26-hom'],
       review: Q26_REVIEW['q26-hom'],
       claims: Q26_UNIT_CLAIMS_BY_ID['q26-hom'],
