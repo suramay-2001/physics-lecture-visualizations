@@ -15,6 +15,7 @@ scene and data module in `src/scenes/`:
 | `qc-q20-cloner` | the two copies' fidelities as the cloner's program angle turns from 0° to 60° | `Unit.opener` of Q20 unit 20.1 (`q20-cloner`); frames in `app/public/films/qc709/qc-q20-cloner/` |
 | `qc-q23-holevo-gap` | the Holevo quantity and the best projective reading for two states, as their overlap sweeps from 0 to 1 | `Unit.opener` of Q23 unit 23.6 (`q23-holevo`); frames in `app/public/films/qc709/qc-q23-holevo-gap/` |
 | `qc-q26-hom` | the chance of one photon at each exit of a beam splitter against its reflectivity, for photons that cannot be told apart and for photons that can | `Unit.opener` of Q26 unit 26.3 (`q26-hom`); frames in `app/public/films/qc709/qc-q26-hom/` |
+| `qc-q25-blockade` | the error of the three-pulse Rydberg gate against the blockade shift, from 1 to 100 times the drive, on logarithmic axes | `Unit.opener` of Q25 unit 25.3 (`q25-atom-gates`); frames in `app/public/films/qc709/qc-q25-blockade/` |
 
 A film the app plays has its captions in `app/src/openers/openerCopy.ts` (`OPENERS['<film>']`, `dir: 'films/qc709/<film>'`). Each number a
 caption states is checked against the engine in `openerCopy.test.ts`; the frames' files and size budget are checked in `openerFrames.test.ts`.

@@ -27,5 +27,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q23-holevo-gap', poster: 79, publish: 'app/public/films/qc709/qc-q23-holevo-gap' },
   // Q26 unit 26.3: at a balanced splitter two photons that cannot be told apart never leave by different exits
   { id: 'qc-q26-hom', poster: 79, publish: 'app/public/films/qc709/qc-q26-hom' },
+  // Q25 unit 25.3: with a strong blockade the three-pulse gate is nearly ideal
+  { id: 'qc-q25-blockade', poster: 119, publish: 'app/public/films/qc709/qc-q25-blockade' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

@@ -6,6 +6,7 @@
 import * as euler from './scenes/f1-euler-limit.data'
 import * as cancel from './scenes/qc-q16-cancel.data'
 import * as mean from './scenes/qc-q17-mean.data'
+import * as blockade from './scenes/qc-q25-blockade.data'
 import * as hom from './scenes/qc-q26-hom.data'
 import * as holevo from './scenes/qc-q23-holevo-gap.data'
 import * as walker from './scenes/qc-q19-walker.data'
@@ -24,6 +25,7 @@ export const FILM_INFO: Record<string, FilmInfo> = Object.fromEntries(
     { id: mean.FILM_ID, format: mean.FORMAT, ground: mean.COLORS.ground },
     { id: walker.FILM_ID, format: walker.FORMAT, ground: walker.COLORS.ground },
     { id: cloner.FILM_ID, format: cloner.FORMAT, ground: cloner.COLORS.ground },
+    { id: blockade.FILM_ID, format: blockade.FORMAT, ground: blockade.COLORS.ground },
     { id: hom.FILM_ID, format: hom.FORMAT, ground: hom.COLORS.ground },
     { id: holevo.FILM_ID, format: holevo.FORMAT, ground: holevo.COLORS.ground },
   ].map((f) => [f.id, f]),

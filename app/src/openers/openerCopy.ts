@@ -347,6 +347,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q25-blockade': {
+    name: 'qc-q25-blockade',
+    dir: 'films/qc709/qc-q25-blockade',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q25-blockade'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'A single white curve on a dark ground, starting near the top left and sloping down with small ripples to the bottom right, with four dotted horizontal lines behind it and a solid line below. A dot rides the end of the curve.',
+    beats: [
+      {
+        from: 0,
+        to: 29,
+        text: 'Two Rydberg atoms and three pulses make a controlled-phase gate, as long as the blockade keeps both atoms from being excited at once. The blockade shift $B$ is measured in units of the drive $\\Omega$. The curve is the gate error on logarithmic axes: each dotted line is ten times lower than the one above. At $B = 1$ the error is $0.2666$.',
+      },
+      {
+        from: 30,
+        to: 69,
+        text: 'At $B = 10$ the error is $0.0037$. A stronger blockade makes the gate error smaller, with small ripples on the way down.',
+      },
+      {
+        from: 70,
+        to: 119,
+        text: 'At $B = 100$ the error is $0.000037$, about a hundred times smaller than at $B = 10$. Averaged over this last decade the slope on these axes is $-2$: ten times the blockade, a hundred times less error.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each point is the error of the three-pulse gate against the ideal gate, from a simulation of the two atoms and the pulses at that blockade shift, with no decay.',
+        'The dotted lines are factors of ten in the error, and the horizontal axis is logarithmic too, from $B = \\Omega$ to $B = 100\\,\\Omega$.',
+      ],
+      distorted: [
+        'Between two sampled shifts the curve is a straight line on the logarithmic axes; only the samples come from the engine.',
+        'Atom decay is left out, so the error keeps falling as the blockade grows; with decay the error would stop falling.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

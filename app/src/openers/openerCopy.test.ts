@@ -15,6 +15,7 @@ import { starSpokeChances } from '../physics/qc/walk'
 import { clonerFidelities } from '../physics/qc/machines'
 import { accessibleInfoPair, holevoChiPair } from '../physics/qc/infoq'
 import { bsReal, distinguishable, homDip, twoPhoton } from '../physics/qc/photons'
+import { rydbergError } from '../physics/qc/atoms'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -317,6 +318,40 @@ describe('film qc-q26-hom: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q26-hom')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q25-blockade: the facts the captions state', () => {
+  const err = (B: number) => rydbergError(1, B, 0)
+  const ks = Array.from({ length: 41 }, (_, k) => k / 20)
+  const [b1, b2, b3] = OPENERS['qc-q25-blockade'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: at B = 1 the error is 0.2666', () => {
+    has(b1.text, ...states(err(1)))
+  })
+  it('beat 2: at B = 10 the error is 0.0037; it falls over every half decade of the sweep, with small ripples between (some single steps rise)', () => {
+    has(b2.text, ...states(err(10)))
+    const e = ks.map((u) => err(10 ** u))
+    e.slice(10).forEach((x, i) => expect(x, `half decade from step ${i}`).toBeLessThan(e[i]))
+    expect(e.slice(1).some((x, i) => x > e[i])).toBe(true) // the ripples
+  })
+  it('beat 3: at B = 100 the error is 0.000037, about 100 times less than at B = 10, and the average log-log slope over 10…100 is −2', () => {
+    has(b3.text, '$0.000037$')
+    expect(Math.abs(err(100) - 3.7e-5)).toBeLessThan(1e-7)
+    expect(err(10) / err(100)).toBeGreaterThan(95)
+    expect(err(10) / err(100)).toBeLessThan(105)
+    expect(Math.abs(Math.log10(err(100)) - Math.log10(err(10)) + 2)).toBeLessThan(0.01)
+  })
+  it('decay would stop the fall: at B = 100 a small decay already costs far more than the error shown', () => {
+    expect(rydbergError(1, 100, 0.001)).toBeGreaterThan(10 * err(100))
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q25-blockade')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)
