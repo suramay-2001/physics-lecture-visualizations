@@ -187,6 +187,11 @@ const Q26x = (unit: string, label: string): Trains => ({ lecture: 'Q26', unit, l
 const HM26 = Q26x('q26-hom', 'Q26.3 Two photons that leave together')
 const NS26 = Q26x('q26-ns-cz', 'Q26.4 A sign flip from a heralded photon')
 const NL26 = Q26x('q26-nonlinear', 'Q26.6 Photons that talk through matter')
+const Q27x = (unit: string, label: string): Trains => ({ lecture: 'Q27', unit, label })
+const LC27 = Q27x('q27-lc', 'Q27.1 A circuit that rings')
+const SC27 = Q27x('q27-superconductivity', 'Q27.2 Pairs, a flux quantum, no resistance')
+const TM27 = Q27x('q27-transmon', 'Q27.4 From charge qubit to transmon')
+const DT27 = Q27x('q27-dots', 'Q27.6 One electron spin in a gated dot')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -2026,6 +2031,59 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Their overlap in chance is $e^{-4\\alpha^2}$: $0.0183$ at $\\alpha = 1$ and $1.1 \\times 10^{-7}$ at $\\alpha = 2$. It is never exactly $0$, but the even and odd cat states are exactly orthogonal.',
     trains: NL26,
+  },
+  // Chapter Q27 (P-Q27-story §11.2): four spot-the-error rounds, each checked against the engine in Q27.arcade.test.ts
+  {
+    id: 'qc-lc-qubit',
+    title: 'An LC circuit as a qubit',
+    steps: [
+      'An LC circuit has levels $\\hbar\\omega(n + \\tfrac12)$, so its two lowest levels form a two-level system.',
+      'Cooled to a few millikelvin, the circuit sits in its lowest level, so it starts in a definite state.',
+      'A pulse at the frequency of the $0 \\to 1$ step drives only that step, so the two lowest levels act as a clean qubit.',
+      'So an LC circuit is a good qubit.',
+    ],
+    wrong: 2,
+    why: 'The rungs are equally spaced, so the same pulse also fits the $1 \\to 2$ step, and drives it $\\sqrt2 = 1.414$ times more strongly. The circuit leaks out of the qubit.',
+    trains: LC27,
+  },
+  {
+    id: 'qc-flux-h-over-e',
+    title: 'The flux quantum',
+    steps: [
+      'The wave function of the paired electrons must come back to itself after one trip round a superconducting ring.',
+      'So its phase turns by a whole number of turns, and the flux through the ring is a whole number of flux quanta.',
+      'The carrier is an electron of charge $e$, so one flux quantum is $\\Phi_0 = h/e$.',
+      'So the ring holds flux in steps of $h/e$.',
+    ],
+    wrong: 2,
+    why: 'The carriers are Cooper pairs, with charge $2e$. So $\\Phi_0 = h/2e = 2.068 \\times 10^{-15}$ Wb, half of $h/e$.',
+    trains: SC27,
+  },
+  {
+    id: 'qc-transmon-anharm',
+    title: 'How much anharmonicity a transmon needs',
+    steps: [
+      'A transmon is a charge qubit run at a large ratio $E_J/E_C$, so that charge noise barely moves its levels.',
+      'Its rungs are not quite equal, and the second gap is shorter than the first by the relative anharmonicity $\\alpha$.',
+      'To address the $0 \\to 1$ step alone, $|\\alpha|$ must be large, tens of percent.',
+      'So doubling $E_J/E_C$ from 10 to 20, which shrinks $|\\alpha|$, would ruin the qubit.',
+    ],
+    wrong: 2,
+    why: 'At $E_J/E_C = 20$ the anharmonicity is only $-0.0457$, and that is enough. Doubling the ratio cuts $|\\alpha|$ by just $1.52$, but cuts the charge dependence $967$ times.',
+    trains: TM27,
+  },
+  {
+    id: 'qc-dot-dipole',
+    title: 'What couples two dot spins',
+    steps: [
+      'Two electrons sit in neighbouring dots, and each carries a spin.',
+      'Each spin is a tiny magnet, and two magnets feel each other through their dipole fields.',
+      'So the singlet and triplet states differ in energy because of the magnetic dipole force between the spins.',
+      'So the coupling is magnetic, and a magnetic field could switch it.',
+    ],
+    wrong: 2,
+    why: 'The splitting comes from the Coulomb force and the Pauli rule. In the model the singlet state has energy $1.1$ and the triplet $0.9$, and the gap $2K$ gives the coupling $-2K\\,\\mathbf s_1\\cdot\\mathbf s_2$.',
+    trains: DT27,
   },
 ]
 
