@@ -23,5 +23,7 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q19-walker', poster: 79, publish: 'app/public/films/qc709/qc-q19-walker' },
   // Q20 unit 20.2: at 30° of program angle the two copies are equally good
   { id: 'qc-q20-cloner', poster: 79, publish: 'app/public/films/qc709/qc-q20-cloner' },
+  // Q23 unit 23.6: the Holevo quantity stays above what the best reading gets for every overlap between 0 and 1
+  { id: 'qc-q23-holevo-gap', poster: 79, publish: 'app/public/films/qc709/qc-q23-holevo-gap' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

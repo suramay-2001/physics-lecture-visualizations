@@ -275,6 +275,42 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q23-holevo-gap': {
+    name: 'qc-q23-holevo-gap',
+    dir: 'films/qc709/qc-q23-holevo-gap',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q23-holevo-gap'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line, one white and one blue, both starting at the dotted line on the left. As they run right, both slope down to the flat line at the far end, the blue curve always below the white one, the two furthest apart a little past the middle.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'Two equally likely states, and the overlap $s$ between them. The white curve is the Holevo quantity $\\chi$, the most that any reading could tell about which state was sent. The blue curve is the best projective reading, found by trying measurement directions. At $s = 0$ the states are orthogonal and both are $1$ bit. At $s = 0.5$ the bound is $0.8113$ but the best reading gets only $0.6454$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At $s = 0.8$ both have fallen: the bound to $0.469$ and the best reading to $0.2781$. At every overlap between the two ends the blue curve lies below the white one, so the reading falls short of the bound.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'At $s = 1$ the two states are the same state and nothing can tell them apart, so both curves are $0$. The gap between them is widest near $s = 0.7$, where it is $0.2017$ bit.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each white point is the Holevo quantity of the two states at that overlap, and each blue point is the largest information a projective reading gets, from a scan of measurement directions.',
+        'The two states and their equal chances are the same all along the sweep; only the overlap changes.',
+      ],
+      distorted: [
+        'Between two sampled overlaps the curves are straight lines; only the samples come from the engine.',
+        'The blue curve is the best of the readings that were tried, projective ones; it does not search every measurement there is.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

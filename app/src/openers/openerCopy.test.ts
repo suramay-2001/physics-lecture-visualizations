@@ -13,6 +13,7 @@ import { KET, Rz, blochVector, samePhysicalState } from '../physics/spin'
 import { GROVER_OPENER, GROVER_TURN_FRAMES, beltOpenerFrame, groverOpenerFrame } from './openerData'
 import { starSpokeChances } from '../physics/qc/walk'
 import { clonerFidelities } from '../physics/qc/machines'
+import { accessibleInfoPair, holevoChiPair } from '../physics/qc/infoq'
 import { OPENERS, type OpenerName } from './openerCopy'
 
 const plusZ = KET['+z']
@@ -250,6 +251,38 @@ describe('film qc-q20-cloner: the facts the captions state', () => {
   })
   it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
     const stages = filmStages('qc-q20-cloner')
+    for (const b of [b1, b2, b3]) {
+      expect(stages.map((s) => s.from)).toContain(b.from)
+      expect(stages.map((s) => s.to)).toContain(b.to)
+    }
+  })
+})
+
+describe('film qc-q23-holevo-gap: the facts the captions state', () => {
+  const ss = Array.from({ length: 51 }, (_, i) => i / 50)
+  const chi = (s: number) => holevoChiPair(s)
+  const best = (s: number) => accessibleInfoPair(s)
+  const [b1, b2, b3] = OPENERS['qc-q23-holevo-gap'].beats
+  const has = (text: string, ...parts: string[]) => parts.forEach((p) => expect(text, p).toContain(p))
+
+  it('beat 1: both are 1 bit at s = 0; at s = 0.5 the bound is 0.8113 and the best reading 0.6454', () => {
+    has(b1.text, ...states(chi(0.5), best(0.5)))
+    expect(chi(0)).toBeCloseTo(1, 12)
+    expect(best(0)).toBeCloseTo(1, 9)
+  })
+  it('beat 2: at s = 0.8 the bound is 0.469 and the best reading 0.2781; the reading is below the bound at every interior overlap', () => {
+    has(b2.text, ...states(chi(0.8), best(0.8)))
+    ss.slice(1, -1).forEach((s) => expect(chi(s) - best(s), `s = ${s}`).toBeGreaterThan(1e-9))
+  })
+  it('beat 3: at s = 1 both are 0; the widest gap on the grid is at s = 0.7 and is 0.2017', () => {
+    has(b3.text, ...states(chi(0.7) - best(0.7)))
+    expect(chi(1)).toBeCloseTo(0, 12)
+    expect(best(1)).toBeCloseTo(0, 12)
+    const gaps = ss.map((s) => chi(s) - best(s))
+    expect(ss[gaps.indexOf(Math.max(...gaps))]).toBeCloseTo(0.7, 12)
+  })
+  it('the beats start and end on the film’s own stage boundaries (read from its checked manifest)', () => {
+    const stages = filmStages('qc-q23-holevo-gap')
     for (const b of [b1, b2, b3]) {
       expect(stages.map((s) => s.from)).toContain(b.from)
       expect(stages.map((s) => s.to)).toContain(b.to)

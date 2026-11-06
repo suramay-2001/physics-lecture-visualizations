@@ -457,6 +457,10 @@ export const Q23: Lecture = {
     },
     {
       id: 'q23-holevo',
+      opener: {
+        film: 'qc-q23-holevo-gap',
+        lede: 'A film of two states sliding together: the white curve is the most any reading could learn about which one was sent, the blue curve is what the best reading actually gets. The words beside it give the numbers.',
+      },
       story: Q23_STORY['q23-holevo'],
       review: Q23_REVIEW['q23-holevo'],
       claims: Q23_UNIT_CLAIMS_BY_ID['q23-holevo'],
