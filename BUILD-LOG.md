@@ -57,6 +57,14 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-11-06): 448 L14–L18, then Arcade and films for 709 Q19–Q27.** Owner: build the new 448 notes
+(`~/Documents/Physics 448 notes/Lecture_14–18.pdf`, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
+states; free particles, wavepackets, group velocity, dispersion; Gaussian packets and Ehrenfest; classical mean motion
+and quantum reflection; reflection and tunnelling), then Arcade rounds and films for Q19–Q27. 448 HW6/HW7 submitted
+(`homework-status.md`). Budget 35 points (meter 3 % at start; weekly reset Fri 11-06 19:00 UTC). Overlap to resolve: the
+Townsend pass put books-only units in L13 (`l13-stationary`, `l13-flow`, step/barrier tunnelling with the p. 231
+Correction) that L14–L18's notes now teach — the notes lectures own them; plan the moves or link-backs.
+
 **709 COMPLETE (2026-10-29): every chapter in `outline.ts` is written (F1–F8, Q1–Q27).** Q20, Q23, Q24, Q25, Q26, Q27
 built (one Sonnet builder per chapter, engine + content), reviewed in pairs (`audits/P-Q20Q23-review.md`,
 `P-Q24Q25-review.md`, `P-Q26Q27-review.md`) and fixed; every Correction re-read on the page images before shipping

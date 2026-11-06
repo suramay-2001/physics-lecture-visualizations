@@ -43,6 +43,31 @@
     },
     {
       "id": "L13"
+    },
+    {
+      "id": "L14",
+      "render_all": true,
+      "title": "Lecture 14"
+    },
+    {
+      "id": "L15",
+      "render_all": true,
+      "title": "Lecture 15"
+    },
+    {
+      "id": "L16",
+      "render_all": true,
+      "title": "Lecture 16"
+    },
+    {
+      "id": "L17",
+      "render_all": true,
+      "title": "Lecture 17"
+    },
+    {
+      "id": "L18",
+      "render_all": true,
+      "title": "Lecture 18"
     }
   ],
   "books": [
@@ -137,6 +162,16 @@
       "id": "sets",
       "role": "logic-background",
       "title": "Sets and Functions (Ch. 1)"
+    },
+    {
+      "id": "sl448-hw6",
+      "role": "homework",
+      "title": "Physics 448 Homework 6"
+    },
+    {
+      "id": "sl448-hw7",
+      "role": "homework",
+      "title": "Physics 448 Homework 7"
     }
   ],
   "reference_only": [
