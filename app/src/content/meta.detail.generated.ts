@@ -622,18 +622,6 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert"
     ]
   },
-  "l13-stationary": {
-    "question": "What does an energy eigenstate look like along x, and why are the energies in a box quantised?",
-    "equations": [
-      "\\varphi_E(x,t) = \\langle x|E\\rangle\\,e^{-iEt/\\hbar}",
-      "\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi = E\\varphi",
-      "\\varphi'' = -k^2(x)\\varphi\\ (E > V),\\quad \\varphi'' = q^2(x)\\varphi\\ (E < V)",
-      "\\Delta\\varphi' = \\int\\tfrac{2m}{\\hbar^2}(V - E)\\varphi\\,dx",
-      "k_nL = n\\pi",
-      "E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}",
-      "\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)"
-    ]
-  },
   "l13-flow": {
     "question": "How is probability conserved when a particle meets a step or a barrier?",
     "equations": [
@@ -643,6 +631,55 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "R = \\left(\\tfrac{k - k_0}{k + k_0}\\right)^2,\\quad T = 1 - R = \\tfrac{4kk_0}{(k + k_0)^2}",
       "T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}",
       "T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}"
+    ]
+  },
+  "l14-components": {
+    "question": "What is new in ψ(x) compared with ψ(a), and what is not?",
+    "equations": [
+      "\\psi(a) = \\langle a|\\psi\\rangle,\\qquad \\psi(x) = \\langle x|\\psi\\rangle",
+      "\\int da\\,|\\langle a|\\psi\\rangle|^2 = 1",
+      "da\\,|\\langle a|\\psi\\rangle|^2"
+    ]
+  },
+  "l14-schrodinger": {
+    "question": "Which steps of the position-space equation are assumptions, and which are proved?",
+    "equations": [
+      "H = \\tfrac{\\hat p^2}{2m} + V(\\hat x)",
+      "\\langle x|V(\\hat x) = \\langle x|V(x)",
+      "\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{\\partial^2}{\\partial x^2} + V(x)\\right]\\psi(x,t) = i\\hbar\\tfrac{\\partial}{\\partial t}\\psi(x,t)"
+    ]
+  },
+  "l14-dispersion": {
+    "question": "Which equation makes every plane wave turn at ω(k)?",
+    "equations": [
+      "\\omega(k) = \\tfrac{\\hbar k^2}{2m}",
+      "i\\,\\partial_t\\psi_k = \\omega\\,\\psi_k,\\qquad -\\partial_x^2\\psi_k = k^2\\,\\psi_k",
+      "\\omega = c\\,|k|"
+    ]
+  },
+  "l14-time": {
+    "question": "Why is time a parameter, and what would a time operator have to do?",
+    "equations": [
+      "T(a) = e^{-ia\\hat p/\\hbar},\\qquad U(\\tau) = e^{-iH\\tau/\\hbar}",
+      "W\\,H\\,W^\\dagger = H + \\epsilon",
+      "c_E(t) = e^{-iEt/\\hbar}\\,c_E(0)"
+    ]
+  },
+  "l14-stationary": {
+    "question": "What does H|E⟩ = E|E⟩ become along x, and what does \"stationary\" mean?",
+    "equations": [
+      "\\psi_E(x,t) = \\langle x|E\\rangle\\,e^{-iEt/\\hbar}",
+      "\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\psi_E = E\\psi_E",
+      "\\psi'' = -k^2(x)\\,\\psi\\ (E > V),\\qquad \\psi'' = q^2(x)\\,\\psi\\ (E < V)",
+      "|\\psi|^2 = |c_1\\varphi_1|^2 + |c_2\\varphi_2|^2 + 2\\,\\mathrm{Re}\\!\\left[c_1^*c_2\\varphi_1^*\\varphi_2\\,e^{-i(E_2 - E_1)t/\\hbar}\\right]"
+    ]
+  },
+  "l14-box": {
+    "question": "What does an energy eigenstate look like along x, and why are the energies in a box quantised?",
+    "equations": [
+      "k_nL = n\\pi",
+      "E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}",
+      "\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)"
     ]
   }
 }

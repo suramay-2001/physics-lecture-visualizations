@@ -26,6 +26,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L11', number: 11, title: 'Quantum dynamics: the Hamiltonian and the Schrödinger equation' },
   { id: 'L12', number: 12, title: 'The position basis and the wavefunction' },
   { id: 'L13', number: 13, title: 'Momentum and the Schrödinger equation' },
+  { id: 'L14', number: 14, title: 'The Schrödinger equation, time and stationary states' },
 ]
 
 export interface Concept {
@@ -134,8 +135,14 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutator-bases', label: 'Position in the momentum basis', lecture: 'L13', unit: 'l13-two-bases', needs: ['momentum-space', 'uncertainty'] },
   { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
   { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
-  { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L13', unit: 'l13-stationary', needs: ['schrodinger-position'] },
-  { id: 'current-tunnelling', label: 'Current, steps and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['standing-waves'] },
+  { id: 'current-tunnelling', label: 'Current, steps and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['schrodinger-position'] },
+  // L14 (the Schrödinger equation, time and stationary states; every built unit is a station). The box was Unit 13.8 (l13-stationary) and moved here (ruling M2).
+  { id: 'components', label: 'Discrete and continuous components of one ket', lecture: 'L14', unit: 'l14-components', needs: ['wavefunction'] },
+  { id: 'schrodinger-assumed', label: 'What the position-space equation assumes', lecture: 'L14', unit: 'l14-schrodinger', needs: ['schrodinger-position', 'components'] },
+  { id: 'matter-dispersion', label: 'Matter-wave dispersion and the free equation', lecture: 'L14', unit: 'l14-dispersion', needs: ['schrodinger-position'] },
+  { id: 'no-time-operator', label: 'Time as a parameter and no energy-shifting operator', lecture: 'L14', unit: 'l14-time', needs: ['time-parameter', 'dynamical-law'] },
+  { id: 'tise', label: 'The time-independent equation and stationary states', lecture: 'L14', unit: 'l14-stationary', needs: ['schrodinger-assumed', 'stationary-states'] },
+  { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L14', unit: 'l14-box', needs: ['tise'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

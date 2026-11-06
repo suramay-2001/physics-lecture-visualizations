@@ -136,6 +136,7 @@ put('l14PrTentT', tent(2.0))
 
 # ---- l14-time ----
 p15 = pk(0, 1, 1.5)
+put('l14MeanP15', mean_p(p15))
 put('l14ShiftThenWait', mean_x(evolve(pk(3, 1, 1.5), 2)))
 put('l14WaitThenShift', mean_x(shift(evolve(p15, 2), 3)))
 c = np.array([1, 1]) / sqrt(2)

@@ -52,6 +52,7 @@ const RULINGS = {
   P1: [...PAPERS_STANDING, 'papers-P1.md'],
   L8: ['448-L8L11.md'], L9: ['448-L8L11.md'], L10: ['448-L8L11.md'], L11: ['448-L8L11.md'],
   L12: ['448-L12L13.md'], L13: ['448-L12L13.md'],
+  L14: ['448-L14L18.md', '448-townsend.md'],
 }
 /** Rulings of a chapter id: the table above, else the notes' for any lecture-notes id (N1 ... N11, docs/roles/decisions/qc709-notes.md) and, for an Optics Lab page (O1 ...), the notes' plus the lab's own when it exists. */
 const rulingsFor = (id) =>
