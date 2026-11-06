@@ -167,6 +167,11 @@ const UN20 = Q20x('q20-unot', 'Q20.2 The best quantum NOT')
 const NG20 = Q20x('q20-no-go', 'Q20.3 No machine runs every program')
 const PB20 = Q20x('q20-probabilistic', 'Q20.4 A machine that sometimes fails')
 const DI20 = Q20x('q20-discriminator', 'Q20.6 A discriminator that is told the states')
+const Q23x = (unit: string, label: string): Trains => ({ lecture: 'Q23', unit, label })
+const CC23 = Q23x('q23-classical-compare', 'Q23.1 Comparing two chance tables')
+const EP23 = Q23x('q23-entropy-props', 'Q23.3 What entropy can and cannot do')
+const QM23 = Q23x('q23-quantum-mutual', 'Q23.5 Quantum correlations that noise cannot raise')
+const HO23 = Q23x('q23-holevo', 'Q23.6 How much can one particle carry?')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1716,6 +1721,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The programmable machine is not told the states are orthogonal. It can only test for the antisymmetric part, so at overlap $0$ its success chance is $1/3$, against $1$ for a machine told the states.',
     trains: DI20,
+  },
+  // Chapter Q23 (P-Q23-story §11.2): six spot-the-error rounds, each checked against the engine in Q23.arcade.test.ts
+  {
+    id: 'qc-rel-distance',
+    title: 'Relative entropy as a distance',
+    steps: [
+      'The relative entropy $H(p\\|q)$ is $0$ when the two chance tables are equal and positive otherwise, as a distance should be.',
+      'For the fair coin $p = (0.5, 0.5)$ and the biased coin $q = (0.9, 0.1)$ it is $0.737$ bits.',
+      'Reading the pair from the other end changes nothing, so $H(q\\|p)$ is also $0.737$ bits.',
+      'So the relative entropy is a distance between chance tables.',
+    ],
+    wrong: 2,
+    why: 'The other way round, $H(q\\|p) = 0.531$ bits. A distance reads the same from both ends, so the relative entropy is not one.',
+    trains: CC23,
+  },
+  {
+    id: 'qc-fid-metric',
+    title: 'Fidelity as a distance',
+    steps: [
+      'The square roots of a table’s chances form an arrow of length 1. The fidelity $F(p, q)$ is the dot product of two such arrows.',
+      'Equal tables have $F = 1$, so $1 - F$ is $0$ for equal tables and grows as the tables differ.',
+      'So $1 - F$ is a distance: a detour through a third table $r$ is never shorter.',
+      'So going from $p = (0.5, 0.5)$ to $q = (0.9, 0.1)$ directly is never longer than going through $r = (0.7, 0.3)$.',
+    ],
+    wrong: 2,
+    why: 'The direct $1 - F(p, q)$ is $0.106$, but the detour totals $0.054$. It is the angle $\\theta = \\cos^{-1}F$ that obeys the rule: $26.57^\\circ = 11.79^\\circ + 14.78^\\circ$.',
+    trains: CC23,
+  },
+  {
+    id: 'qc-whole-part',
+    title: 'The whole and its part',
+    steps: [
+      'For two coins the pair is never less uncertain than one coin alone: $H(X, Y) \\ge H(X)$.',
+      'A quantum pair has an entropy $S(AB)$, and its part $A$ has an entropy $S(A)$.',
+      'The same rule holds for quantum states, so $S(AB) \\ge S(A)$ always.',
+      'So a Bell pair has at least as much entropy as one of its qubits.',
+    ],
+    wrong: 2,
+    why: 'A Bell pair is a pure state, so $S(AB) = 0$, while either qubit alone has $S(A) = 1$ bit. A quantum part can be more uncertain than its whole.',
+    trains: EP23,
+  },
+  {
+    id: 'qc-local-noise',
+    title: 'Noise on one half',
+    steps: [
+      'The mutual information $S(A{:}B) = S(A) + S(B) - S(AB)$ counts the correlations between two parts.',
+      'Bob may apply any noisy operation to his half $B$ and leave $A$ alone.',
+      'Noise adds randomness to $B$, and randomness is correlation with something, so the pair can end up sharing more.',
+      'So Bob can raise $S(A{:}B)$ by adding noise to his half.',
+    ],
+    wrong: 2,
+    why: 'Noise on one half can only keep or lower $S(A{:}B)$. For a Bell pair with a phase-error chance of $0.1$ on Bob’s half it falls from $2$ to $1.531$, a fall of $0.469$.',
+    trains: QM23,
+  },
+  {
+    id: 'qc-holevo-reach',
+    title: 'Reaching the Holevo number',
+    steps: [
+      'Alice sends $|0\\rangle$ or $|{+}\\rangle$ with chance $1/2$ each, and the Holevo number for this pair is $\\chi = 0.601$ bit.',
+      'No measurement of Bob’s can give him more than $\\chi$.',
+      'Measuring along $z$ gives him $0.311$ bit, which is less than $\\chi$.',
+      'So some better measurement along a tilted axis must give him the full $0.601$ bit.',
+    ],
+    wrong: 3,
+    why: 'The Holevo number is only an upper bound. For two states that are not orthogonal, even Bob’s best measurement gives $0.399$ bit.',
+    trains: HO23,
+  },
+  {
+    id: 'qc-bb84-full',
+    title: 'A full bit per qubit',
+    steps: [
+      'Alice sends one of the four BB84 states, $|0\\rangle$, $|1\\rangle$, $|{+}\\rangle$ or $|{-}\\rangle$, each with chance $1/4$.',
+      'Their average is $I/2$, so the Holevo number is $\\chi = 1$ bit, the most a qubit can carry.',
+      'Bob measures along $z$, which reaches the Holevo number, so he learns $1$ bit.',
+      'So a BB84 receiver learns a full bit about every state sent.',
+    ],
+    wrong: 2,
+    why: 'Along $z$ Bob tells $|0\\rangle$ from $|1\\rangle$, but $|{+}\\rangle$ and $|{-}\\rangle$ read $0$ or $1$ at random. He learns $0.5$ bit, and no axis does better.',
+    trains: HO23,
   },
 ]
 
