@@ -6,6 +6,13 @@
 import * as euler from './scenes/f1-euler-limit.data'
 import * as cancel from './scenes/qc-q16-cancel.data'
 import * as mean from './scenes/qc-q17-mean.data'
+import * as transmon from './scenes/qc-q27-transmon.data'
+import * as rabiball from './scenes/qc-q24-rabi-ball.data'
+import * as blockade from './scenes/qc-q25-blockade.data'
+import * as hom from './scenes/qc-q26-hom.data'
+import * as holevo from './scenes/qc-q23-holevo-gap.data'
+import * as walker from './scenes/qc-q19-walker.data'
+import * as cloner from './scenes/qc-q20-cloner.data'
 
 export interface FilmInfo {
   id: string
@@ -18,5 +25,12 @@ export const FILM_INFO: Record<string, FilmInfo> = Object.fromEntries(
     { id: euler.FILM_ID, format: euler.FORMAT, ground: euler.COLORS.ground },
     { id: cancel.FILM_ID, format: cancel.FORMAT, ground: cancel.COLORS.ground },
     { id: mean.FILM_ID, format: mean.FORMAT, ground: mean.COLORS.ground },
+    { id: walker.FILM_ID, format: walker.FORMAT, ground: walker.COLORS.ground },
+    { id: cloner.FILM_ID, format: cloner.FORMAT, ground: cloner.COLORS.ground },
+    { id: transmon.FILM_ID, format: transmon.FORMAT, ground: transmon.COLORS.ground },
+    { id: rabiball.FILM_ID, format: rabiball.FORMAT, ground: rabiball.COLORS.ground },
+    { id: blockade.FILM_ID, format: blockade.FORMAT, ground: blockade.COLORS.ground },
+    { id: hom.FILM_ID, format: hom.FORMAT, ground: hom.COLORS.ground },
+    { id: holevo.FILM_ID, format: holevo.FORMAT, ground: holevo.COLORS.ground },
   ].map((f) => [f.id, f]),
 )

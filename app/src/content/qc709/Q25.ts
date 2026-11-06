@@ -343,6 +343,10 @@ export const Q25: Lecture = {
     },
     {
       id: 'q25-atom-gates',
+      opener: {
+        film: 'qc-q25-blockade',
+        lede: 'A film of the Rydberg gate before it is worked out: one curve, the gate error against the strength of the blockade, falling as the blockade grows. The words beside it give the numbers.',
+      },
       story: Q25_STORY['q25-atom-gates'],
       review: Q25_REVIEW['q25-atom-gates'],
       claims: Q25_UNIT_CLAIMS_BY_ID['q25-atom-gates'],

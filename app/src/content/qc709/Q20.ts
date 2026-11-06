@@ -178,6 +178,10 @@ export const Q20: Lecture = {
   units: [
     {
       id: 'q20-cloner',
+      opener: {
+        film: 'qc-q20-cloner',
+        lede: 'A film of the two copies a cloner makes: one curve is how good the first copy is, the other how good the second is, as the program angle turns. The words beside it give the numbers.',
+      },
       story: Q20_STORY['q20-cloner'],
       review: Q20_REVIEW['q20-cloner'],
       claims: Q20_UNIT_CLAIMS_BY_ID['q20-cloner'],

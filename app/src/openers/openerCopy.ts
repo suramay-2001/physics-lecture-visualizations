@@ -203,6 +203,258 @@ export const OPENERS: Record<OpenerName, OpenerSpec> = {
       ],
     },
   },
+  'qc-q19-walker': {
+    name: 'qc-q19-walker',
+    dir: 'films/qc709/qc-q19-walker',
+    ground: STAGE_THEME.qc709.bg['walk-graph'],
+    title: OPENER_TITLES['qc-q19-walker'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Eight upright bars on a line under a dotted line: the leftmost in blue, the other seven in grey. At first all eight are equally short. The blue bar then climbs to nearly the dotted line while the grey ones shrink to slivers, and finally the blue bar drops back and the grey ones rise a little.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'A walker starts spread evenly over the eight spokes of a star, so each bar is a chance of $0.125$. Spoke 1, in blue, is marked. After two steps the marked spoke holds $0.78125$ and each of the other seven spokes $0.03125$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'After four steps the marked spoke holds $0.9453$ and each of the others $0.0078$. That is the chance two Grover steps give on eight strings (Unit 17.4): the walk on the star searches the way Grover’s algorithm does.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Keep walking and it overshoots, as Grover’s search does. After six steps the marked spoke is down to $0.3301$ and each of the others is back up to $0.0957$. Unit 19.3 works out how many steps are best as the star grows.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each bar is the chance of finding the walker on one spoke, from a simulation of the walk on the star after the steps shown.',
+        'The seven grey bars are always equal, and the eight bars add up to 1.',
+      ],
+      distorted: [
+        'Between two pictures the bars glide in a straight line; the walk itself moves in whole steps.',
+        'Only every second step is shown: a step from an even one moves the walker between the centre and the rim without changing the chance on any spoke.',
+      ],
+    },
+  },
+  'qc-q20-cloner': {
+    name: 'qc-q20-cloner',
+    dir: 'films/qc709/qc-q20-cloner',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q20-cloner'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line, one white and one blue. The white curve starts at the dotted line and slopes down; the blue curve starts halfway up and slopes up. They cross about a third of the way along, and the blue curve ends at the dotted line while the white one ends at half the height.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'The program angle $u$ sets how the cloner splits the information between its two copies. At $u = 0°$ the first copy is perfect, fidelity $1$, and the second is a coin toss, $0.5$. By $u = 15°$ the first has slipped to $0.9553$ and the second has risen to $0.6667$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At $u = 30°$ the two curves cross: each copy has fidelity $0.8333$, which is $5/6$. This is the symmetric cloner of Unit 20.1, with both copies equally good. The same numbers come out for every input state.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Turn on to $u = 60°$ and the roles swap: the first copy falls to $0.5$ and the second is perfect, $1$. A better first copy always costs a worse second one. All along the turn the worse of the two copies is never better than $0.8333$.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each curve is the fidelity of one output wire with the input state, from a simulation of the cloning circuit at every whole degree of $u$.',
+        'The dot at the end of each curve is that wire’s fidelity at the angle shown.',
+      ],
+      distorted: [
+        'Between two whole degrees the curve is a straight line; only the sampled angles come from the circuit.',
+        'The picture shows fidelities only; it does not show how the information is split between the copies and the third wire.',
+      ],
+    },
+  },
+  'qc-q23-holevo-gap': {
+    name: 'qc-q23-holevo-gap',
+    dir: 'films/qc709/qc-q23-holevo-gap',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q23-holevo-gap'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line, one white and one blue, both starting at the dotted line on the left. As they run right, both slope down to the flat line at the far end, the blue curve always below the white one, the two furthest apart a little past the middle.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'Two equally likely states, and the overlap $s$ between them. The white curve is the Holevo quantity $\\chi$, the most that any reading could tell about which state was sent. The blue curve is the best projective reading, found by trying measurement directions. At $s = 0$ the states are orthogonal and both are $1$ bit. At $s = 0.5$ the bound is $0.8113$ but the best reading gets only $0.6454$.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At $s = 0.8$ both have fallen: the bound to $0.469$ and the best reading to $0.2781$. At every overlap between the two ends the blue curve lies below the white one, so the reading falls short of the bound.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'At $s = 1$ the two states are the same state and nothing can tell them apart, so both curves are $0$. The gap between them is widest near $s = 0.7$, where it is $0.2017$ bit.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each white point is the Holevo quantity of the two states at that overlap, and each blue point is the largest information a projective reading gets, from a scan of measurement directions.',
+        'The two states and their equal chances are the same all along the sweep; only the overlap changes.',
+      ],
+      distorted: [
+        'Between two sampled overlaps the curves are straight lines; only the samples come from the engine.',
+        'The blue curve is the best of the readings that were tried, projective ones; it does not search every measurement there is.',
+      ],
+    },
+  },
+  'qc-q26-hom': {
+    name: 'qc-q26-hom',
+    dir: 'films/qc709/qc-q26-hom',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q26-hom'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Two curves above a flat line and under a dotted line: a white one that starts at the dotted line, falls to the flat line in the middle and climbs back, and a dashed grey one that dips only to half the height in the middle. Both start and end at the dotted line.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'One photon enters each side of a beam splitter of reflectivity $R$. The curves show the chance that they leave one by each exit. At $R = 0$ the splitter lets everything through and both curves are $1$. At $R = 0.25$ photons that can be told apart give $0.625$ (the dashed curve), but photons that cannot be told apart give only $0.25$ (the white one).',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'At the balanced splitter, $R = 0.5$, photons that can be told apart still leave one by each exit half the time, $0.5$. Photons that cannot be told apart never do: the chance is $0$, and both always leave by the same exit. This is the Hong-Ou-Mandel dip (Unit 26.3).',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Past the balanced splitter the white curve climbs again. At $R = 1$ the splitter is a mirror, the photons swap sides, and both curves are $1$ again. The white curve touches $0$ only at $R = 0.5$.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each white point is the chance of one photon at each exit for two photons that cannot be told apart, from the two-photon amplitude of the beam splitter, and each dashed point is the same chance for two that can.',
+        'The photons enter one per side, and only the reflectivity changes along the curves.',
+      ],
+      distorted: [
+        'Between two sampled reflectivities the curves are straight lines; only the samples come from the engine.',
+        'In the laboratory the dip is usually measured against the delay between the photons at a balanced splitter; here the splitter changes and the photons stay perfectly overlapped.',
+      ],
+    },
+  },
+  'qc-q25-blockade': {
+    name: 'qc-q25-blockade',
+    dir: 'films/qc709/qc-q25-blockade',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q25-blockade'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'A single white curve on a dark ground, starting near the top left and sloping down with small ripples to the bottom right, with four dotted horizontal lines behind it and a solid line below. A dot rides the end of the curve.',
+    beats: [
+      {
+        from: 0,
+        to: 29,
+        text: 'Two Rydberg atoms and three pulses make a controlled-phase gate, as long as the blockade keeps both atoms from being excited at once. The blockade shift $B$ is measured in units of the drive $\\Omega$. The curve is the gate error on logarithmic axes: each dotted line is ten times lower than the one above. At $B = 1$ the error is $0.2666$.',
+      },
+      {
+        from: 30,
+        to: 69,
+        text: 'At $B = 10$ the error is $0.0037$. A stronger blockade makes the gate error smaller, with small ripples on the way down.',
+      },
+      {
+        from: 70,
+        to: 119,
+        text: 'At $B = 100$ the error is $0.000037$, about a hundred times smaller than at $B = 10$. Averaged over this last decade the slope on these axes is $-2$: ten times the blockade, a hundred times less error.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each point is the error of the three-pulse gate against the ideal gate, from a simulation of the two atoms and the pulses at that blockade shift, with no decay.',
+        'The dotted lines are factors of ten in the error, and the horizontal axis is logarithmic too, from $B = \\Omega$ to $B = 100\\,\\Omega$.',
+      ],
+      distorted: [
+        'Between two sampled shifts the curve is a straight line on the logarithmic axes; only the samples come from the engine.',
+        'Atom decay is left out, so the error keeps falling as the blockade grows; with decay the error would stop falling.',
+      ],
+    },
+  },
+  'qc-q24-rabi-ball': {
+    name: 'qc-q24-rabi-ball',
+    dir: 'films/qc709/qc-q24-rabi-ball',
+    ground: STAGE_THEME.qc709.bg['bloch-ball'],
+    title: OPENER_TITLES['qc-q24-rabi-ball'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'A circle with a dotted horizontal line and a dotted vertical line through its centre. A white path starts at the top of the circle and winds twice round, each loop a little smaller than the one before, ending with a dot inside the inner loop.',
+    beats: [
+      {
+        from: 0,
+        to: 39,
+        text: 'The qubit starts at the top of the Bloch ball, $z = 1$, in the ground state. The picture is the ball seen from the side, with the drive turning the arrow about the axis that points out of the page: $\\Omega = 2\\pi$, so a half turn takes $0.5$, and the qubit decays with $T_1 = 4$ in the same time unit. After the half turn the arrow is near the bottom: its vertical part is $-0.909$ and not $-1$, because some of it decayed on the way.',
+      },
+      {
+        from: 40,
+        to: 79,
+        text: 'After a full turn, at time $1$, the arrow is back near the top, but its vertical part is $0.8292$ and not $1$. Each turn ends a little short of the last one, and the arrow itself has shrunk: it is shorter than the radius of the ball.',
+      },
+      {
+        from: 80,
+        to: 119,
+        text: 'Two turns on, at time $2$, its vertical part is $0.6875$, and the arrow’s length has fallen from $0.8292$ at time $1$ to $0.6876$. The tip spirals inward: the drive keeps turning the arrow and decay keeps shrinking it.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each point is the qubit’s Bloch vector at one time, from the decaying-qubit equation solved exactly for that time, with the drive on resonance.',
+        'The circle is the surface of the Bloch ball: a state that stayed pure would stay on it, and the path moves inside it once the qubit decays.',
+      ],
+      distorted: [
+        'Only two of the three Bloch components are drawn: the drive turns the arrow about the axis out of the page, so the third part stays $0$ throughout.',
+        'Between two sampled times the path is a straight line.',
+      ],
+    },
+  },
+  'qc-q27-transmon': {
+    name: 'qc-q27-transmon',
+    dir: 'films/qc709/qc-q27-transmon',
+    ground: STAGE_THEME.qc709.bg.plot,
+    title: OPENER_TITLES['qc-q27-transmon'],
+    frames: 120,
+    poster: 'poster.webp',
+    alt: 'Five short horizontal bars stacked in a column near the top, white over grey, at first evenly spaced; then the upper white bars sink a little below their grey twins. Below them two curves over a flat line: a blue one that swings from high on the left down to the line in the middle and back up, and a white one that stays flat on the line.',
+    beats: [
+      {
+        from: 0,
+        to: 29,
+        text: 'The energy levels of a circuit with only an inductor and a capacitor are evenly spaced: in units of the first gap the rungs sit at $0$, $1$, $2$, $3$, $4$. Every step is the same size, so nothing singles out the first two levels as a qubit.',
+      },
+      {
+        from: 30,
+        to: 69,
+        text: 'The Josephson junction bends the ladder. For $E_J/E_C = 20$ the rungs move to $1$, $1.9543$, $2.8588$ and $3.7082$: each step is a little smaller than the one below, and the second is smaller than the first by $0.0457$ of the first. The grey rungs show where an evenly spaced ladder would put them.',
+      },
+      {
+        from: 70,
+        to: 119,
+        text: 'The levels also move with the offset charge $n_g$. The curves show the first gap over one period of $n_g$, in units of its value at $n_g = 1/2$. At $E_J/E_C = 1$ it swings up to $1.3757$ times that value; at $E_J/E_C = 20$ it stays within $0.0001$ of $1$, so the qubit frequency hardly depends on the charge.',
+      },
+    ],
+    fidelity: {
+      exact: [
+        'Each rung is an energy level in units of the first gap, from the matrix of the circuit: the inductor-capacitor circuit at the start, the junction circuit after the bend.',
+        'Each curve is the first gap at one value of the offset charge, from the matrix of the junction circuit, in units of its value at $n_g = 1/2$.',
+      ],
+      distorted: [
+        'Only the lowest five levels are drawn, and between two pictures the rungs glide in a straight line.',
+        'The two panels use different vertical scales: the rungs are in units of the first gap, the curves in units of the gap at $n_g = 1/2$.',
+      ],
+    },
+  },
 }
 
 /** Public URL of one frame (Vite `base` is relative, so the built site works from any static path). */

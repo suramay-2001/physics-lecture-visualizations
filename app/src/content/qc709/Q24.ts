@@ -314,6 +314,10 @@ export const Q24: Lecture = {
     },
     {
       id: 'q24-rabi',
+      opener: {
+        film: 'qc-q24-rabi-ball',
+        lede: 'A film of a driven qubit that also decays, drawn inside the [[qc-bloch-ball|Bloch ball]]: the arrow turns about a horizontal axis while decay shrinks it. The words beside it give the numbers.',
+      },
       story: Q24_STORY['q24-rabi'],
       review: Q24_REVIEW['q24-rabi'],
       claims: Q24_UNIT_CLAIMS_BY_ID['q24-rabi'],

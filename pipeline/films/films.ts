@@ -19,5 +19,19 @@ export const FILMS: readonly FilmEntry[] = [
   { id: 'qc-q16-cancel', poster: 79, publish: 'app/public/films/qc709/qc-q16-cancel' },
   // Q17 unit 17.4: after the first inversion about the mean, each bar has crossed the dashed line along its link
   { id: 'qc-q17-mean', poster: 71, publish: 'app/public/films/qc709/qc-q17-mean' },
+  // Q19 unit 19.5: after four steps of the star walk the marked spoke holds the chance two Grover steps give
+  { id: 'qc-q19-walker', poster: 79, publish: 'app/public/films/qc709/qc-q19-walker' },
+  // Q20 unit 20.2: at 30° of program angle the two copies are equally good
+  { id: 'qc-q20-cloner', poster: 79, publish: 'app/public/films/qc709/qc-q20-cloner' },
+  // Q23 unit 23.6: the Holevo quantity stays above what the best reading gets for every overlap between 0 and 1
+  { id: 'qc-q23-holevo-gap', poster: 79, publish: 'app/public/films/qc709/qc-q23-holevo-gap' },
+  // Q26 unit 26.3: at a balanced splitter two photons that cannot be told apart never leave by different exits
+  { id: 'qc-q26-hom', poster: 79, publish: 'app/public/films/qc709/qc-q26-hom' },
+  // Q25 unit 25.3: with a strong blockade the three-pulse gate is nearly ideal
+  { id: 'qc-q25-blockade', poster: 119, publish: 'app/public/films/qc709/qc-q25-blockade' },
+  // Q24 unit 24.4: the arrow turns and shrinks, a spiral inside the Bloch ball
+  { id: 'qc-q24-rabi-ball', poster: 119, publish: 'app/public/films/qc709/qc-q24-rabi-ball' },
+  // Q27 unit 27.4: the junction bends the ladder and the first gap stops depending on the offset charge
+  { id: 'qc-q27-transmon', poster: 119, publish: 'app/public/films/qc709/qc-q27-transmon' },
 ]
 export const FILM_IDS: readonly string[] = FILMS.map((f) => f.id)

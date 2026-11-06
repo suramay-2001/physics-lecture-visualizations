@@ -267,6 +267,10 @@ export const Q19: Lecture = {
     },
     {
       id: 'q19-star-search',
+      opener: {
+        film: 'qc-q19-walker',
+        lede: 'A film of the walker on a star, before the search is worked out: eight bars are the chances on the eight spokes, and one spoke is marked. The words beside it give the numbers.',
+      },
       story: Q19_STORY['q19-star-search'],
       review: Q19_REVIEW['q19-star-search'],
       claims: Q19_UNIT_CLAIMS_BY_ID['q19-star-search'],
