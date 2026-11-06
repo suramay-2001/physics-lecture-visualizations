@@ -977,5 +977,75 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L15",
+    "number": 15,
+    "title": "Free particles and packets: group velocity and dispersion",
+    "units": [
+      {
+        "id": "l15-puzzle",
+        "title": "Stationary states do not move",
+        "challenges": [
+          "l15-pz-v",
+          "l15-pz-which",
+          "l15-pz-mean"
+        ]
+      },
+      {
+        "id": "l15-free-eigenstate",
+        "title": "A free momentum state is an energy state",
+        "challenges": [
+          "l15-fe-energy",
+          "l15-fe-period",
+          "l15-fe-flat",
+          "l15-fe-count"
+        ]
+      },
+      {
+        "id": "l15-packet-evolution",
+        "title": "Evolve each momentum component",
+        "challenges": [
+          "l15-pe-phase",
+          "l15-pe-dp",
+          "l15-pe-order",
+          "l15-pr-dp"
+        ]
+      },
+      {
+        "id": "l15-group-velocity",
+        "title": "How fast does a packet move?",
+        "challenges": [
+          "l15-gv-env",
+          "l15-gv-carrier",
+          "l15-gv-phase",
+          "l15-gv-order",
+          "l15-gv-fringe",
+          "l15-gv-fspeed",
+          "l15-gv-electron",
+          "l15-pr-boost"
+        ]
+      },
+      {
+        "id": "l15-dispersion",
+        "title": "Why does the packet spread?",
+        "challenges": [
+          "l15-di-curv",
+          "l15-di-dv",
+          "l15-di-lin",
+          "l15-di-order"
+        ]
+      },
+      {
+        "id": "l15-gaussian",
+        "title": "The Gaussian: uncertainty meets dynamics",
+        "challenges": [
+          "l15-ga-dp",
+          "l15-ga-t",
+          "l15-ga-ratio",
+          "l15-pr-spread"
+        ]
+      }
+    ]
   }
 ]

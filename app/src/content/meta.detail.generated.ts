@@ -681,5 +681,52 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}",
       "\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)"
     ]
+  },
+  "l15-puzzle": {
+    "question": "If energy eigenstates stand still, how can a particle move?",
+    "equations": [
+      "|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle"
+    ]
+  },
+  "l15-free-eigenstate": {
+    "question": "What do the energy eigenstates of p̂²/2m look like, and why is none a particle?",
+    "equations": [
+      "E_p = \\tfrac{p^2}{2m}",
+      "\\langle x|p\\rangle = \\tfrac{e^{ipx/\\hbar}}{\\sqrt{2\\pi\\hbar}}",
+      "|\\langle x|p\\rangle|^2dx = \\tfrac{dx}{2\\pi\\hbar}"
+    ]
+  },
+  "l15-packet-evolution": {
+    "question": "How does any free packet evolve?",
+    "equations": [
+      "\\tilde\\psi(p,t) = e^{-ip^2t/2m\\hbar}\\,\\tilde\\psi(p,0)",
+      "\\psi(x,t) = \\tfrac{1}{\\sqrt{2\\pi\\hbar}}\\int dp\\,\\tilde\\psi(p,0)\\,e^{i(px-p^2t/2m)/\\hbar}",
+      "|\\tilde\\psi(p,t)|^2 = |\\tilde\\psi(p,0)|^2"
+    ]
+  },
+  "l15-group-velocity": {
+    "question": "What speed does the moving envelope have?",
+    "equations": [
+      "\\psi\\propto 2e^{i(k_0x-\\bar\\omega t)}\\cos\\tfrac{\\Delta k\\,x-\\Delta\\omega\\,t}{2}",
+      "v_g = \\tfrac{d\\omega}{dk} = \\tfrac{p}{m}",
+      "v_{\\rm phase} = \\tfrac{\\omega}{k} = \\tfrac{p}{2m}",
+      "\\tfrac{d\\langle x\\rangle}{dt} = \\tfrac{\\langle p\\rangle}{m}"
+    ]
+  },
+  "l15-dispersion": {
+    "question": "What makes a free packet broaden, and what would stop it?",
+    "equations": [
+      "\\omega(k) = \\omega_0 + \\omega_0'\\,q + \\tfrac12\\omega_0''q^2 + \\cdots",
+      "\\omega'' = \\hbar/m"
+    ]
+  },
+  "l15-gaussian": {
+    "question": "How fast does a Gaussian spread, from a scaling argument?",
+    "equations": [
+      "\\Delta x = a/\\sqrt2",
+      "\\Delta p = \\hbar/\\sqrt2\\,a",
+      "T = ma^2/\\hbar",
+      "t_{\\rm spread}\\sim 2m\\sigma^2/\\hbar"
+    ]
   }
 }
