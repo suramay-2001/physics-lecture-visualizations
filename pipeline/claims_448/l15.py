@@ -165,6 +165,7 @@ put('l15QuadWidth6', sd_x(ev6))
 # ---- l15-gaussian ----
 g08 = pk(0, 0.8)
 put('l15Dx08', sd_x(g08))
+put('l15Dx04', sd_x(pk(0, 0.4)))
 put('l15Dp08', pmom(g08)[1])
 put('l15Prod08', sd_x(g08) * pmom(g08)[1])
 put('l15Dv08', pmom(g08)[1] / 1.0)
