@@ -154,6 +154,13 @@ const CS22 = Q22x('q22-css', 'Q22.4 Two classical codes that fit together')
 const DC22 = Q22x('q22-decode', 'Q22.5 From syndrome to correction')
 const CF22 = Q22x('q22-clifford', 'Q22.6 Gates that move Pauli labels around')
 const GK22 = Q22x('q22-gottesman-knill', 'Q22.7 When a quantum computer is easy to fake')
+const Q19x = (unit: string, label: string): Trains => ({ lecture: 'Q19', unit, label })
+const RW19 = Q19x('q19-random-walk', 'Q19.1 A walker that flips a coin')
+const SC19 = Q19x('q19-scatter', 'Q19.2 A particle that lives on the edges')
+const SS19 = Q19x('q19-star-search', 'Q19.3 Finding the marked spoke')
+const EE19 = Q19x('q19-extra-edge', 'Q19.4 Finding an extra edge')
+const SM19 = Q19x('q19-simulation', 'Q19.5 Imitating a spin chain with gates')
+const QA19 = Q19x('q19-qaoa', 'Q19.6 Quantum circuit, classical tuner')
 const F7x = (unit: string, label: string): Trains => ({ lecture: 'F7', unit, label })
 const BO7 = F7x('f7-boolean', 'F7.1 Functions of bits as truth tables')
 const RE7 = F7x('f7-reversible', 'F7.2 Gates that can run backwards')
@@ -1545,6 +1552,85 @@ export const QC_ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: '$|\\bar 0\\rangle$ is named by just 7 checks, however entangled it is, and a tableau of those checks holds it. Hardness needs a non-Clifford gate such as $T$.',
     trains: GK22,
+  },
+  // Chapter Q19 (P-Q19-story §11.2): six spot-the-error rounds, each checked against the engine in Q19.arcade.test.ts
+  {
+    id: 'qc-walk-spread',
+    title: 'A quantum walker’s spread',
+    steps: [
+      'A classical walker steps left or right on a fair coin, and after $n$ steps its spread is $\\sqrt n$.',
+      'A quantum walker flips a Hadamard coin each step and keeps every path at once.',
+      'Its paths only interfere, and interference moves chances around without changing the width, so its spread is also $\\sqrt n$.',
+      'So at $n = 100$ both walkers spread to $10$, and the quantum walker is no faster.',
+    ],
+    wrong: 2,
+    why: 'Interference does change the width. The quantum walker’s spread grows in proportion to $n$, about $0.54\\,n$, so it reaches $54.1$ at $n = 100$ while the classical walker reaches $10$.',
+    trains: RW19,
+  },
+  {
+    id: 'qc-vertex-equal',
+    title: 'The centre of a star',
+    steps: [
+      'A walker travels along the edges of a star and arrives at the centre, where 8 edges meet.',
+      'The centre must send it out along the 8 edges so that the total chance stays 1.',
+      'The fairest rule gives each of the 8 edges the same amplitude, $1/8$.',
+      'So the walker is equally likely to leave along any edge.',
+    ],
+    wrong: 2,
+    why: 'Eight amplitudes of $1/8$ carry total chance $8 \\times (1/8)^2 = 1/8$, not 1. The centre gives the arrival edge $-0.75$ and each of the other seven $0.25$, and these squares add to 1.',
+    trains: SC19,
+  },
+  {
+    id: 'qc-walk-slow',
+    title: 'How long the star walk takes',
+    steps: [
+      'A star has $N = 1024$ outer spokes, and one of them is marked.',
+      'A classical search tries the spokes one by one and looks at about $512.5$ of them on average.',
+      'A walker also visits the spokes one at a time, so the quantum walk needs about $N = 1024$ steps too.',
+      'So the quantum walk gives no advantage over the classical search.',
+    ],
+    wrong: 2,
+    why: 'The walk piles chance onto the marked spoke by interference, so it does not visit the spokes one by one. Its first peak is at step $50$, close to $\\tfrac\\pi2\\sqrt N = 50.27$, with chance $0.9995$.',
+    trains: SS19,
+  },
+  {
+    id: 'qc-extra-plus',
+    title: 'Starting with a plus sign',
+    steps: [
+      'Spokes 1 and 2 share an extra edge, and the walker must find that pair.',
+      'The start has a minus sign between its leaving and arriving edges, and at $N = 64$ it reaches chance $0.70$ on spokes 1 and 2.',
+      'A sign is only a phase and a phase cannot change a chance, so a plus start finds the pair equally well.',
+      'So with the plus sign the chance on spokes 1 and 2 also reaches about $0.70$.',
+    ],
+    wrong: 2,
+    why: 'The sign is a relative phase between pieces of the start, and it decides whether the pieces add up. With a plus sign the chance on spokes 1 and 2 never exceeds $0.083$ at $N = 64$.',
+    trains: EE19,
+  },
+  {
+    id: 'qc-trotter-exact',
+    title: 'Two bond gates in a row',
+    steps: [
+      'A chain of three spins has two bonds, with Hamiltonians $H_1$ and $H_2$, and $H = H_1 + H_2$.',
+      'Each bond has its own gate, $e^{-iH_1t}$ and $e^{-iH_2t}$, in closed form.',
+      'So the two gates in a row multiply to exactly $e^{-iHt}$.',
+      'So one piece, $M = 1$, imitates the chain at $t = 2$ with no error.',
+    ],
+    wrong: 2,
+    why: 'The two bonds share a spin, so $H_1$ and $H_2$ do not commute: $\\|[H_1, H_2]\\| = 0.433$. One piece misses the chain by $0.733$ at $t = 2$, and $M = 8$ pieces cut the miss to $0.0911$.',
+    trains: SM19,
+  },
+  {
+    id: 'qc-qaoa-sure',
+    title: 'One layer of QAOA',
+    steps: [
+      'QAOA on a four-cycle starts from an equal mix of all 16 patterns, whose average cut is $2$.',
+      'One layer at the best angles lifts the average cut to $3$, and the largest cut is $4$.',
+      'An average of $3$ out of $4$ means the layer reads the largest cut every time.',
+      'So one layer finds the best cut on every run.',
+    ],
+    wrong: 2,
+    why: 'An average of $3$ is a mix of different cuts. The largest cut of $4$ comes up with chance $0.531$ and a cut of $2$ with chance $0.4375$, against $0.125$ for a random pattern.',
+    trains: QA19,
   },
 ]
 
