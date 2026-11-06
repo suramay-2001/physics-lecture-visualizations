@@ -47,7 +47,7 @@ describe('Lecture 13: shape', () => {
       'l13-delta:b2', 'l13-generator:b3', 'l13-plane-wave:b1', 'l13-momentum-space:b2', 'l13-momentum-space:b5b', 'l13-two-bases:b2', 'l13-two-bases:b4', 'l13-schrodinger:b2', 'l13-schrodinger:b4', 'l13-time:b3',
       'l13-time:b6b', 'l13-flow:b1', 'l13-flow:b2',
     ])
-    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(30) // 28 from the notes' pass and two Townsend practice questions (the box's two moved to l14-box)
+    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(27) // 25 from the notes' pass and two Townsend practice questions (the box's two moved to l14-box; the free-centre and the two fringe questions moved to Lecture 15, ruling M2)
     expect(L13.corrections).toHaveLength(1) // R8 stands for the notes; the one Correction is Townsend's p. 231 (ruling T5)
     expect(L13.corrections![0].where).toMatch(/Townsend p\. 231/)
     expect(L13.corrections![0].source).toBe('book')

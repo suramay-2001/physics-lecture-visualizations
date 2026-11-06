@@ -24,7 +24,7 @@ import { barrierT, barrierThick, continuityResidual, decayConstant, stepRT, tota
 import { KET, SX, SZ, sandwich, variance } from '../physics/spin'
 import { ringEigenphases, ringOffDiagonal, ringUnitaryGap, traceCommutator } from '../physics/ring'
 import {
-  GRID, boost, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanX, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
+  GRID, boost, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
   planeSamples, spreadP, spreadX, toMomentum, wavelength, xTimes,
 } from '../physics/wave'
 import { keyedClaim } from './claimKit'
@@ -146,23 +146,6 @@ const ehrenfest = (() => {
   return -innerProduct(psi, C, GRID).im // Re(i·z) = −Im z
 })()
 
-/* unit 6 (Go deeper, §13.10): two plane waves p = 2 and 4, m = 1. The brightest fringe is where the two phases agree: Im(ψ₁*ψ₂) changes sign there. */
-const relSin = (x: number, t: number) => {
-  const a = plane(2, x, { time: t })
-  const b = plane(4, x, { time: t })
-  return a.re[0] * b.im[0] - a.im[0] * b.re[0] // sin(θ₂ − θ₁)
-}
-const fringeAt = (lo: number, hi: number, t: number) => {
-  let a = lo
-  let b = hi
-  for (let i = 0; i < 100; i++) {
-    const m = (a + b) / 2
-    if (relSin(a, t) * relSin(m, t) <= 0) b = m
-    else a = m
-  }
-  return (a + b) / 2
-}
-
 export const V = {
   /* l13-delta */
   l13Peak1: peakDensity(U1), // 0.3989
@@ -216,7 +199,6 @@ export const V = {
   l13TraceIdentity: abs(iI3.reduce((s, row, i) => add(s, row[i]), c(0))), // 3
   /* l13-schrodinger */
   l13SchroOk: schroOk, // 1: (ψ(t + h) − ψ(t))/h = −iĤψ to 1e−4 at h = 1e−6
-  l13FreeMean2: meanX(freeEvolve(PK(0, 1, 3), GRID, 2), GRID), // 6
   l13OmegaK2: -phaseOf(plane(2, 0, { time: 0.5 })) / 0.5, // 2: the phase of e^{ikx} runs at ħk²/2m
   l13PlanePhaseDegMag: Math.abs(phaseOf(plane(2, 0, { time: 1 }))) * RAD, // 114.59
   l13FreeDp4: spreadP(F3, GRID), // 0.5
@@ -235,9 +217,6 @@ export const V = {
   l13EhrenfestDpDt: ehrenfest, // −2
   l13MinFreeEnergy: Math.min(...Array.from(GRID.k, (k) => (k * k) / 2)), // 0
   /* l13-schrodinger, Go deeper (§13.10) */
-  l13FringeSpacing: fringeAt(Math.PI - 0.5, Math.PI + 0.5, 0) - fringeAt(-0.5, 0.5, 0), // 3.142 = π
-  l13FringeSpeed: (fringeAt(1, 2, 0.5) - fringeAt(-0.5, 0.5, 0)) / 0.5, // 3.0: the tracked fringe
-  l13FringeSpeedFormula: (2 + 4) / 2, // 3: (p₁ + p₂)/2m
   /* Townsend pass G4b: l13-plane-wave, l13-momentum-space, l13-time */
   l13THeFringeUrad: ((heLambda / 8e-6) * 1e6), // 5.664 micro-radians: the fringe angle λ/d (helium at 2200 m/s, slits 8 μm apart)
   l13TWhichWayUrad: ((2 * heLambda) / 8e-6) * 1e6, // 11.329 micro-radians: the angular blur 2λ/d of a which-slit measurement

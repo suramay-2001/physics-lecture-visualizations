@@ -890,12 +890,9 @@ export const LECTURE_META: LectureIndex[] = [
         "title": "The Schrödinger equation of a particle",
         "challenges": [
           "l13-sc-omega",
-          "l13-sc-mean",
           "l13-sc-sd",
           "l13-sc-order",
-          "l13-sc-electron",
-          "l13-ee-space",
-          "l13-ee-speed"
+          "l13-sc-electron"
         ]
       },
       {

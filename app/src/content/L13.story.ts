@@ -653,10 +653,9 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b3',
     phase: 'lecture',
-    text: `What did and did not happen. Kinetic energy entered through $\\hat p$, potential energy through $\\hat x$, and the position basis turned the abstract law into a differential equation. The wavefunction $\\psi(x,t)$ is an amplitude, not a displacement. The scope is one spinless particle, one dimension and a potential that depends on position and time. For $p_0 = 3$ and $V = 0$ the centre of the packet is at ${d(V.l13FreeMean2, 1)} $\\ell$ when $t = 2$, which is $p_0t/m$.`,
+    text: `What did and did not happen. Kinetic energy entered through $\\hat p$, potential energy through $\\hat x$, and the position basis turned the abstract law into a differential equation. The wavefunction $\\psi(x,t)$ is an amplitude, not a displacement. The scope is one spinless particle, one dimension and a potential that depends on position and time. Unit 15.1 follows this packet and asks where its centre goes.`,
     caption: 'the free packet runs to the right at $p_0/m$',
     stage: W(PK(0, 1, 3), { time: sweep(0, 2), show: ['density'] }),
-    claims: [claim('l13FreeMean2', 'the free packet’s centre is at 6 ℓ at t = 2', () => close(V.l13FreeMean2, 6, 1e-9))],
   },
   {
     id: 'l13-schrodinger:b4',
@@ -737,15 +736,10 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b8',
     phase: 'deeper',
-    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Beyond the notes: two energies make a moving pattern. The plane waves $p = 2$ and $p = 4$, with $m = 1$, give fringes ${d(V.l13FringeSpacing, 3)} $\\ell$ apart. They travel at ${d(V.l13FringeSpeed, 1)} $\\ell$ per unit time, which equals $(p_1 + p_2)/2m$. The energy equation along $x$ is taken up in Unit 14.5, and the box that follows from it is Unit 14.6.`,
-    caption: 'two plane waves: the fringes of the density travel to the right',
-    stage: W(TW(2, 4), { time: sweep(0, 2), show: ['density'] }),
+    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Two energies together make a moving pattern: the two-wave fringes are Unit 15.4. The energy equation along $x$ is taken up in Unit 14.5, and the box that follows from it is Unit 14.6.`,
+    caption: 'one plane wave, one energy: the crests run to the right and the density stays flat',
+    stage: W(PL(2), { time: sweep(0, 2), show: ['re', 'density'] }),
     refs: [susskind('Lecture 9, §9.3', 'The time-independent equation for free particles; any solution is a sum of energy eigenstates, and only phases change.')],
-    claims: [
-      claim('l13FringeSpacing', 'the fringes of p = 2 and 4 are π ℓ apart', () => close(V.l13FringeSpacing, Math.PI, 1e-9)),
-      claim('l13FringeSpeed', 'the tracked fringe moves at 3.0 ℓ per unit time', () => close(V.l13FringeSpeed, 3, 1e-9)),
-      claim('l13FringeSpeedFormula', 'which equals (p₁ + p₂)/2m', () => close(V.l13FringeSpeedFormula, V.l13FringeSpeed, 1e-9)),
-    ],
   },
 ]
 
