@@ -1478,7 +1478,6 @@
   "l13TraceComm": 0.0,
   "l13TraceIdentity": 3.0,
   "l13SchroOk": 1.0,
-  "l13FreeMean2": 5.999999999999998,
   "l13OmegaK2": 2.0,
   "l13PlanePhaseDegMag": 114.59155902616465,
   "l13FreeDp4": 0.5,
@@ -1494,9 +1493,6 @@
   "l13BoostSd": 0.4999999999999999,
   "l13WpWdag": 2.0978239865921778e-14,
   "l13EhrenfestDpDt": -1.9999999999999998,
-  "l13MinFreeEnergy": 0.0,
-  "l13FringeSpacing": 3.141592653589793,
-  "l13FringeSpeed": 2.9999999999999996,
-  "l13FringeSpeedFormula": 3.0
+  "l13MinFreeEnergy": 0.0
  }
 }

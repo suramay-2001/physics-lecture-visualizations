@@ -2682,7 +2682,6 @@ values.update({
 # CubicSpline, the free evolution is an explicit phase e^{-ik^2 t/2} on np.fft, the ring's phases are np.linalg.eig of np.roll(I), the trace is
 # np.trace, the fringes are scipy.optimize.brentq roots of the analytic derivative of the density, the SI inputs are the same constants the
 # engine reads (a 1e-12 comparison needs identical inputs; the rebuilt-constants check is in physics/wave.test.ts).
-from scipy.optimize import brentq as _brentq  # noqa: E402
 
 PK13 = gauss12
 DK13 = 2 * np.pi / LG
@@ -2749,17 +2748,6 @@ C_EHR13 = V_EHR13 * pop13(P2_12) - pop13(V_EHR13 * P2_12)
 FREE_H13 = lambda w: np.fft.ifft(0.5 * KG**2 * np.fft.fft(w))  # noqa: E731
 
 
-def fringe_root13(lo, hi, t):
-    """The brightest fringe: a zero of d|psi|^2/dx = 2 Re(conj(psi) psi'), psi = (e^{i th1} + e^{i th2})/sqrt 2, th = p x - p^2 t / 2."""
-    def f(x):
-        th = lambda p: p * x - p * p * t / 2  # noqa: E731
-        psi = (np.exp(1j * th(2)) + np.exp(1j * th(4))) / np.sqrt(2)
-        dpsi = (1j * 2 * np.exp(1j * th(2)) + 1j * 4 * np.exp(1j * th(4))) / np.sqrt(2)
-        return float(2 * np.real(np.conj(psi) * dpsi))
-
-    return _brentq(f, lo, hi, xtol=1e-15, rtol=1e-15)
-
-
 values.update({
     # l13-delta
     "l13Peak1": float(np.max(np.abs(PK13(0, 1)) ** 2)),
@@ -2810,7 +2798,6 @@ values.update({
     "l13TraceIdentity": float(abs(np.trace(1j * np.eye(3)))),
     # l13-schrodinger
     "l13SchroOk": float(sch_res < 1e-4),
-    "l13FreeMean2": float(np.sum(XG * np.abs(free13(psiS13, 2)) ** 2) * DXG),
     "l13OmegaK2": float(-np.angle(np.exp(-1j * (2.0**2) * 0.5 / 2)) / 0.5),
     "l13PlanePhaseDegMag": float(abs(np.degrees(np.angle(np.exp(-1j * (2.0**2) * 1.0 / 2))))),
     "l13FreeDp4": mom13(free13(psiS13, 4))[1],
@@ -2829,9 +2816,6 @@ values.update({
     "l13EhrenfestDpDt": float(-np.imag(np.sum(np.conj(P2_12) * C_EHR13) * DXG)),
     "l13MinFreeEnergy": float(np.min(0.5 * KG**2)),
     # l13-schrodinger, Go deeper
-    "l13FringeSpacing": float(fringe_root13(np.pi - 0.5, np.pi + 0.5, 0.0) - fringe_root13(-0.5, 0.5, 0.0)),
-    "l13FringeSpeed": float((fringe_root13(1.0, 2.0, 0.5) - fringe_root13(-0.5, 0.5, 0.0)) / 0.5),
-    "l13FringeSpeedFormula": float(np.mean([2.0, 4.0])),
 })
 
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "claims.json"

@@ -27,6 +27,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L12', number: 12, title: 'The position basis and the wavefunction' },
   { id: 'L13', number: 13, title: 'Momentum and the Schrödinger equation' },
   { id: 'L14', number: 14, title: 'The Schrödinger equation, time and stationary states' },
+  { id: 'L15', number: 15, title: 'Free particles and packets: group velocity and dispersion' },
 ]
 
 export interface Concept {
@@ -143,6 +144,13 @@ export const CONCEPTS: Concept[] = [
   { id: 'no-time-operator', label: 'Time as a parameter and no energy-shifting operator', lecture: 'L14', unit: 'l14-time', needs: ['time-parameter', 'dynamical-law'] },
   { id: 'tise', label: 'The time-independent equation and stationary states', lecture: 'L14', unit: 'l14-stationary', needs: ['schrodinger-assumed', 'stationary-states'] },
   { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L14', unit: 'l14-box', needs: ['tise'] },
+  // L15 (free particles, wavepackets, group velocity and dispersion; every built unit is a station)
+  { id: 'motion-puzzle', label: 'Why a stationary state cannot move a particle', lecture: 'L15', unit: 'l15-puzzle', needs: ['tise'] },
+  { id: 'free-states', label: 'Free momentum states are energy states', lecture: 'L15', unit: 'l15-free-eigenstate', needs: ['tise'] },
+  { id: 'evolve-components', label: 'Evolve a packet one momentum at a time', lecture: 'L15', unit: 'l15-packet-evolution', needs: ['free-states', 'momentum-space'] },
+  { id: 'group-velocity', label: 'Group velocity: how fast a packet moves', lecture: 'L15', unit: 'l15-group-velocity', needs: ['evolve-components'] },
+  { id: 'dispersion-spreading', label: 'Dispersion: why a packet spreads', lecture: 'L15', unit: 'l15-dispersion', needs: ['group-velocity'] },
+  { id: 'gaussian-spreading', label: 'The Gaussian and its spreading time', lecture: 'L15', unit: 'l15-gaussian', needs: ['dispersion-spreading', 'commutator-bases'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)
