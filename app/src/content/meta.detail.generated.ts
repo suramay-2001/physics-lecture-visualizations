@@ -622,14 +622,6 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert"
     ]
   },
-  "l13-flow": {
-    "question": "What happens when the energy is below the top of a step or a barrier?",
-    "equations": [
-      "R = 1,\\quad T = 0\\quad (E < V_0)",
-      "T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}",
-      "T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}"
-    ]
-  },
   "l14-components": {
     "question": "What is new in ψ(x) compared with ψ(a), and what is not?",
     "equations": [
@@ -780,6 +772,39 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "j_{\\mathrm{in}} + j_{\\mathrm{ref}} = j_{\\mathrm{tr}}",
       "R = |r|^2,\\quad T = \\tfrac{k_2}{k_1}|\\tau|^2",
       "R = \\tfrac{(k_1 - k_2)^2}{(k_1 + k_2)^2},\\quad T = \\tfrac{4k_1k_2}{(k_1 + k_2)^2}"
+    ]
+  },
+  "l18-packet": {
+    "question": "What do R and T mean for an actual packet?",
+    "equations": [
+      "1 + r = \\tau",
+      "R + T = 1",
+      "R = \\int_{-\\infty}^{0}|\\psi|^2dx,\\quad T = \\int_{0}^{\\infty}|\\psi|^2dx"
+    ]
+  },
+  "l18-detector": {
+    "question": "How much probability crosses a detector per second?",
+    "equations": [
+      "j \\simeq v_0\\,\\rho(x_d,t)",
+      "j_{\\mathrm{in}} = v_1|A|^2,\\quad j_{\\mathrm{ref}} = -v_1|B|^2,\\quad j_{\\mathrm{tr}} = v_2|C|^2",
+      "R = |r|^2,\\quad T = \\tfrac{k_2}{k_1}|\\tau|^2"
+    ]
+  },
+  "l18-below": {
+    "question": "What happens when E is below V₀?",
+    "equations": [
+      "\\kappa = \\tfrac{\\sqrt{2m(V_0 - E)}}{\\hbar}",
+      "r = \\tfrac{k - i\\kappa}{k + i\\kappa},\\quad |r| = 1",
+      "\\rho_R = |C|^2e^{-2\\kappa x}"
+    ]
+  },
+  "l18-tunnel": {
+    "question": "Why can a wave get through a barrier it cannot climb?",
+    "equations": [
+      "T = \\left[1 + \\tfrac{V_0^2}{4E(V_0 - E)}\\sinh^2\\kappa a\\right]^{-1}",
+      "T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}\\quad (\\kappa a \\gg 1)",
+      "j = \\tfrac{2\\hbar\\kappa}{m}\\,\\mathrm{Im}(D^*C)",
+      "T \\simeq \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)"
     ]
   }
 }

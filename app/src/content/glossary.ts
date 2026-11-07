@@ -371,6 +371,10 @@ const ENTRIES: GlossEntry[] = [
   { id: 'scattering-state', term: 'scattering state', gloss: 'An energy eigenstate that cannot be normalised: an incident, a reflected and a transmitted wave, all of one energy.', first: 'l17-step:b2', uses: ['energy-eigenfunction', 'plane-wave'] },
   { id: 'reflection-amplitude', term: 'amplitude ratios $r$ and $\\tau$', gloss: 'The ratios of the reflected and transmitted waves to the incident one; they are amplitudes, not probabilities.', first: 'l17-step:b3', uses: ['plane-wave'], symbols: ['r', '\\tau'] },
   { id: 'continuity-equation', term: 'continuity equation', gloss: 'Probability in a stretch changes only by the current through its two ends; locally the density’s rate plus the current’s slope is zero.', first: 'l17-current:b1', uses: ['probability-density'] },
+  /* Lecture 18: the flux, the tail below a step and the decay length */
+  { id: 'probability-flux', term: 'probability flux', gloss: 'The probability crossing a point per unit time, positive to the right; for a travelling packet it is the speed times the density.', first: 'l18-detector:b2', uses: ['probability-current'] },
+  { id: 'evanescent-wave', term: 'evanescent wave', gloss: 'A wave that falls off as $e^{-\\kappa x}$ where the energy is below the potential; it has density but carries no current.', first: 'l18-below:b1', uses: ['potential-step'] },
+  { id: 'penetration-depth', term: 'decay length', gloss: 'The distance over which the density of an evanescent wave falls by a factor $e$: $1/2\\kappa$, against $1/\\kappa$ for the amplitude.', first: 'l18-below:b3', uses: ['evanescent-wave'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))
