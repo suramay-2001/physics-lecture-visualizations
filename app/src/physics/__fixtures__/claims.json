@@ -1480,19 +1480,11 @@
   "l13SchroOk": 1.0,
   "l13OmegaK2": 2.0,
   "l13PlanePhaseDegMag": 114.59155902616465,
-  "l13FreeDp4": 0.5,
-  "l13FreeSd2": 1.4142135623730951,
-  "l13FreeSd4": 2.23606797749979,
-  "l13SpreadElectronMant": 8.637992737026185,
-  "l13SpreadElectronLog10": -16.063587165450684,
-  "l13SpreadMarbleMant": 9.482521562467289,
-  "l13SpreadMarbleYearsMant": 3.0048297596988647,
   "l13FreeNorm4": 1.0,
   "l13FreeCommutatorOk": 1.0,
   "l13BoostMean": 1.4999999999999998,
   "l13BoostSd": 0.4999999999999999,
   "l13WpWdag": 2.0978239865921778e-14,
-  "l13EhrenfestDpDt": -1.9999999999999998,
   "l13MinFreeEnergy": 0.0
  }
 }

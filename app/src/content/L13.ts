@@ -1,6 +1,5 @@
 import type { Lecture } from './schema'
 import { V, claim, close, d } from './L13.values'
-import { HBAR, M_ELECTRON } from '../physics/constants'
 import { L13_STORY, L13_UNIT_CLAIMS } from './L13.story'
 import { L13_REVIEW } from './L13.review'
 import './bridges448'
@@ -106,7 +105,7 @@ export const L13: Lecture = {
     'A': 'l13-schrodinger:b4',
     '\\omega': 'l13-schrodinger:b4',
     'E': 'l13-schrodinger:b4',
-    '|E\\rangle': 'l13-schrodinger:b8',
+    '|E\\rangle': 'l13-schrodinger:b6',
     'U': 'l13-time:b2',
     '\\hat T': 'l13-time:b2',
     '\\epsilon': 'l13-time:b3',
@@ -651,7 +650,7 @@ export const L13: Lecture = {
         equations: ['i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\,\\partial_x^2\\psi + V\\psi'],
       },
       books: [
-        { source: 'townsend', where: '§6.6, pp. 208–210; §4.1, p. 112', adds: 'A free Gaussian spreads as $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$, with the spreading time $m a^2/\\hbar$; Schrödinger first wrote a wave equation.' },
+        { source: 'townsend', where: '§4.1, p. 112', adds: 'Schrödinger first wrote the equation as a wave equation; the exact free Gaussian, §6.6, is Unit 16.3.' },
         { source: 'susskind', where: 'Lecture 9, §9.1–9.3', adds: 'The Schrödinger equation of a particle on a line and the time-independent equation for free particles.' },
       ],
       visual: {
@@ -689,25 +688,6 @@ export const L13: Lecture = {
           ],
         },
         {
-          id: 'l13-sc-sd',
-          kind: 'numeric',
-          tier: 'core',
-          title: 'A spreading packet',
-          prompt: 'A free packet starts with $\\sigma = 1\\ell$ and $m = 1$. What is $\\Delta x$ at $t = 4$, in $\\ell$?',
-          answer: V.l13FreeSd4,
-          tolerance: 0.005,
-          unit: 'ℓ',
-          hints: [
-            { text: 'The width grows as $\\sigma\\sqrt{1 + (\\hbar t/2m\\sigma^2)^2}$.' },
-            { text: 'Here $\\hbar t/2m\\sigma^2 = 4/2 = 2$.' },
-            { text: 'Compute $\\sqrt{1 + 4}$.' },
-          ],
-          walkthrough: [
-            { text: '$\\Delta x = \\sqrt{1 + 2^2} = \\sqrt5$.' },
-            { text: `That is ${d(V.l13FreeSd4, 3)} $\\ell$, while $\\Delta p$ stays $0.5\\,\\hbar/\\ell$.` },
-          ],
-        },
-        {
           id: 'l13-sc-order',
           kind: 'order',
           tier: 'core',
@@ -729,24 +709,6 @@ export const L13: Lecture = {
             { text: 'Adding them gives the equation.' },
           ],
         },
-        {
-          id: 'l13-sc-electron',
-          kind: 'numeric',
-          tier: 'stretch',
-          title: 'How fast an electron spreads',
-          prompt: 'An electron is in a packet with Townsend’s parameter $a = 10^{-10}$ m, where $a = \\sqrt2\\,\\sigma$. It spreads in a time $m a^2/\\hbar$. What is $\\log_{10}$ of that time in seconds?',
-          answer: V.l13SpreadElectronLog10,
-          tolerance: 0.1,
-          hints: [
-            { text: `Use $m = ${d(M_ELECTRON / 1e-31, 1)}\\times10^{-31}$ kg and $\\hbar = ${d(HBAR / 1e-34, 2)}\\times10^{-34}$ J s.` },
-            { text: 'Then $a^2 = 10^{-20}$ m².' },
-            { text: `The time is about $${d(V.l13SpreadElectronMant, 1)}\\times10^{-17}$ s.` },
-          ],
-          walkthrough: [
-            { text: `The time is $m a^2/\\hbar = ${d(M_ELECTRON / 1e-31, 1)}\\times10^{-31}\\times10^{-20}/${d(HBAR / 1e-34, 2)}\\times10^{-34}$ seconds.` },
-            { text: `That is about $${d(V.l13SpreadElectronMant, 1)}\\times10^{-17}$ s, whose logarithm is ${d(V.l13SpreadElectronLog10, 1)}.` },
-          ],
-        },
       ],
     },
     {
@@ -763,7 +725,6 @@ export const L13: Lecture = {
         equations: ['WHW^\\dagger = H + \\epsilon', '\\Delta E\\,\\Delta t \\ge \\hbar/2', '\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert'],
       },
       books: [
-        { source: 'townsend', where: '§6.3, pp. 199–200', adds: 'Momentum is conserved exactly when $H$ commutes with $\\hat p$, and Ehrenfest’s relations for $\\langle x\\rangle$ and $\\langle p\\rangle$.' },
         { source: 'townsend', where: '§4.6, pp. 134–136', adds: 'Time is a parameter: for an observable without explicit time, $\\Delta E\\,\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert \\ge \\hbar/2$, and the evolution time is $\\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert$.' },
       ],
       visual: {
@@ -839,24 +800,6 @@ export const L13: Lecture = {
           walkthrough: [
             { text: '$E = p^2/2m \\ge 0$ with equality at $p = 0$.' },
             { text: 'So a shift of every energy by $-1$ would need states that do not exist.' },
-          ],
-        },
-        {
-          id: 'l13-ti-ehren',
-          kind: 'numeric',
-          tier: 'stretch',
-          title: 'The force on a packet',
-          prompt: 'A packet centred at $x_0 = 2\\ell$ feels the potential $V = x^2/2$. What is $d\\langle p\\rangle/dt = -\\langle V\'\\rangle$, in $\\hbar/\\ell$ per unit time?',
-          answer: V.l13EhrenfestDpDt,
-          tolerance: 0.01,
-          hints: [
-            { text: 'Here $V\' = x$.' },
-            { text: 'Then $-\\langle V\'\\rangle = -\\langle x\\rangle$.' },
-            { text: 'The mean position is the centre of the packet, 2.' },
-          ],
-          walkthrough: [
-            { text: 'The force is $-V\' = -x$, so the average force is $-\\langle x\\rangle = -2$.' },
-            { text: 'The mean momentum falls at a steady rate while the packet stays near 2.' },
           ],
         },
       ],

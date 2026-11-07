@@ -108,7 +108,7 @@ describe('Lecture 15: M2 what moved here from Lecture 13', () => {
     expect(beat('l15-group-velocity:b1').claims!.map((c) => claimKey(c))).toEqual(['l15FringeSpacing', 'l15FringeSpeed', 'l15FringeSpeedFormula'])
     const l13 = L13.units.flatMap((u) => u.story ?? [])
     expect(l13.find((b) => b.id === 'l13-schrodinger:b3')!.text).toMatch(/Unit 15\.1/)
-    expect(l13.find((b) => b.id === 'l13-schrodinger:b8')!.text).toMatch(/Unit 15\.4/)
+    expect(l13.find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Unit 15\.4/)
     expect(Object.keys(V13).filter((k) => /FreeMean2|Fringe(Spacing|Speed)/.test(k))).toEqual([])
     const l13ids = L13.units.flatMap((u) => u.play.map((q) => q.id))
     for (const old of ['l13-sc-mean', 'l13-ee-space', 'l13-ee-speed']) expect(l13ids).not.toContain(old)

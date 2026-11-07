@@ -257,7 +257,7 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
       },
       {
         id: 'plot-packet-width',
-        text: 'The width curves are exact for ħ = m = 1 and σ = 1: Δx(t) = σ√(1 + (t/t_s)²) for the plain Gaussian, and the sum of squares σ² + 2tC/m + t²(Δp)²/m² for the chirped one. The picture shows the spread of the density, not a path.',
+        text: 'Both curves are exact for ħ = m = 1 and σ = 1: the plain Gaussian and the chirped one with β = −0.2. They show the spread of the density, not a path.',
       },
       {
         id: 'plot-free-omega',

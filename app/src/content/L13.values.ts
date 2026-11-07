@@ -17,7 +17,7 @@
  * This file imports physics modules (wave, ring, constants) but no stage module: a lecture chunk must not pull in stage/svg.
  */
 import { abs, add, c } from '../physics/complex'
-import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, YEAR_S, deBroglie, fringeSpacing, spreadTime } from '../physics/constants'
+import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, deBroglie, fringeSpacing } from '../physics/constants'
 import { ammoniaH, ammoniaPeriod, energySpread, evolveKet } from '../physics/dynamics'
 import { type Mat, commutator, identity, mat, mscale, vec } from '../physics/linalg'
 import { barrierT, barrierThick, continuityResidual, decayConstant, stepRT, totalCurrent } from '../physics/scatter'
@@ -25,7 +25,7 @@ import { KET, SX, SZ, sandwich, variance } from '../physics/spin'
 import { ringEigenphases, ringOffDiagonal, ringUnitaryGap, traceCommutator } from '../physics/ring'
 import {
   GRID, boost, commutatorXP, dpdx, freeEvolve, innerProduct, interval, meanP, meanXFromMomentum, momentumMean, momentumNorm, momentumPeak, norm, pOp, packet, peakDensity,
-  planeSamples, spreadP, spreadX, toMomentum, wavelength, xTimes,
+  planeSamples, spreadP, spreadX, toMomentum, wavelength,
 } from '../physics/wave'
 import { keyedClaim } from './claimKit'
 
@@ -108,8 +108,6 @@ const schroOk = (() => {
   return m / s < 1e-4 ? 1 : 0
 })()
 const F3 = freeEvolve(PK(0, 1, 3), GRID, 4)
-const tMarbleMant = spreadTime(1e-3, 1e-3) // seconds: a gram, a tenth of a centimetre
-const tElectron = spreadTime(M_ELECTRON, 1e-10) // seconds: an atom-sized packet
 
 /* unit 7: the boost twin of the energy shift, Ehrenfest and momentum conservation */
 const U15 = boost(U1, GRID, 1.5)
@@ -133,18 +131,7 @@ const freeComm = (() => {
   for (let j = 0; j < GRID.n; j++) m = Math.max(m, Math.hypot(a.re[j] - b.re[j], a.im[j] - b.im[j]))
   return m
 })()
-const ehrenfest = (() => {
-  // d⟨p̂⟩/dt = (i/ħ)⟨[Ĥ, p̂]⟩ for V = x²/2 (the kinetic part commutes with p̂): ⟨ψ|(V p̂ − p̂ V)ψ⟩ with V = x²/2
-  const psi = PK(2, 1)
-  const half = (w: typeof psi) => {
-    const x2 = xTimes(xTimes(w, GRID), GRID)
-    return { re: x2.re.map((v) => 0.5 * v), im: x2.im.map((v) => 0.5 * v) }
-  }
-  const a = half(pOp(psi, GRID))
-  const b = pOp(half(psi), GRID)
-  const C = { re: a.re.map((v, j) => v - b.re[j]), im: a.im.map((v, j) => v - b.im[j]) }
-  return -innerProduct(psi, C, GRID).im // Re(i·z) = −Im z
-})()
+/* the Ehrenfest rate d⟨p⟩/dt for V = x²/2 moved to Lecture 16 (ruling M2), with the free packet's width and the spreading times of Townsend Ex. 6.4 */
 
 export const V = {
   /* l13-delta */
@@ -201,20 +188,12 @@ export const V = {
   l13SchroOk: schroOk, // 1: (ψ(t + h) − ψ(t))/h = −iĤψ to 1e−4 at h = 1e−6
   l13OmegaK2: -phaseOf(plane(2, 0, { time: 0.5 })) / 0.5, // 2: the phase of e^{ikx} runs at ħk²/2m
   l13PlanePhaseDegMag: Math.abs(phaseOf(plane(2, 0, { time: 1 }))) * RAD, // 114.59
-  l13FreeDp4: spreadP(F3, GRID), // 0.5
-  l13FreeSd2: spreadX(freeEvolve(PK(0, 1), GRID, 2), GRID), // 1.414
-  l13FreeSd4: spreadX(freeEvolve(PK(0, 1), GRID, 4), GRID), // 2.236
-  l13SpreadElectronMant: tElectron / 1e-17, // 8.64 (× 10⁻¹⁷ s)
-  l13SpreadElectronLog10: Math.log10(tElectron), // −16.06
-  l13SpreadMarbleMant: tMarbleMant / 1e24, // 9.48 (× 10²⁴ s)
-  l13SpreadMarbleYearsMant: tMarbleMant / YEAR_S / 1e17, // 3.0 (× 10¹⁷ years)
   /* l13-time */
   l13FreeNorm4: norm(F3, GRID), // 1
   l13FreeCommutatorOk: freeComm < 1e-9 ? 1 : 0, // 1: [Ĥ_free, p̂]ψ vanishes (a residual of rounding size)
   l13BoostMean: meanP(U15, GRID), // 1.5
   l13BoostSd: spreadP(U15, GRID), // 0.5
   l13WpWdag: wpw, // 0 (a rounding error)
-  l13EhrenfestDpDt: ehrenfest, // −2
   l13MinFreeEnergy: Math.min(...Array.from(GRID.k, (k) => (k * k) / 2)), // 0
   /* l13-schrodinger, Go deeper (§13.10) */
   /* Townsend pass G4b: l13-plane-wave, l13-momentum-space, l13-time */
