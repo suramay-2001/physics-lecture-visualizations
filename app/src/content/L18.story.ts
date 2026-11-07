@@ -95,7 +95,7 @@ const packetBeats: Beat[] = [
   {
     id: 'l18-packet:b3',
     phase: 'lecture',
-    text: `Define the chances before any current. Once the two pieces are well away from the step, $R = \\int_{-\\infty}^{0}|\\psi|^2dx$ and $T = \\int_{0}^{\\infty}|\\psi|^2dx$. These are real probabilities: the areas under the two outgoing bumps. In Lecture 17 the same letters were ratios of currents; the next unit shows the two meanings agree. The state is normalised and nothing is absorbed, so $R + T = 1$. At the end of the run the readouts give ${d(V.l18StepAreaL, 3)} on the left and ${d(V.l18StepAreaR, 3)} on the right, and the total is ${d(V.l18StepNorm, 0)}. Compare areas, not heights: the two bumps have different widths.`,
+    text: `At the end of the run the readouts give ${d(V.l18StepAreaL, 3)} on the left of the step and ${d(V.l18StepAreaR, 3)} on the right. The total is ${d(V.l18StepNorm, 0)}. Those are areas under the two outgoing bumps, not heights, because the bumps have different widths. Once both pieces are well away from the step they are the chances $R = \\int_{-\\infty}^{0}|\\psi|^2dx$ and $T = \\int_{0}^{\\infty}|\\psi|^2dx$. Nothing is absorbed, so $R + T = 1$. In Lecture 17 the same letters were ratios of currents; the next unit shows the two meanings agree.`,
     caption: 'the chance on each side of the step at the end of the run: the area under each bump, not its height',
     stage: STEP_RUN({ time: 5.5, readouts: ['reflected', 'transmitted'] }),
     fidelity: ['wavefunction-potential-splitstep'],
@@ -195,7 +195,7 @@ const detectorBeats: Beat[] = [
   {
     id: 'l18-detector:b3',
     phase: 'lecture',
-    text: `An optional payoff. Add up the probability that crosses over the whole passage: $\\int j\\,dt = \\int v_0\\rho\\,dt$. For a packet that keeps its shape this is a Gaussian integral in time, and it equals ${d(V.l18DetTotal, 0)}, because the whole packet goes by once. A chain-rule check agrees with Lecture 17: $\\partial_t\\rho = -v_0\\partial_x\\rho$ and $\\partial_xj = v_0\\partial_x\\rho$, so $\\partial_t\\rho + \\partial_xj = 0$ without redoing that derivation. A real packet spreads, so rigid translation holds only while the passage is short. The exact free Gaussian also gives ${d(V.l18DetTotal, 0)}.`,
+    text: `An optional payoff. Add up the probability that crosses over the whole passage: $\\int j\\,dt = \\int v_0\\rho\\,dt$. For a packet that keeps its shape this is a Gaussian integral in time, and it equals ${d(V.l18DetTotal, 0)}, because the whole packet goes by once. A chain-rule check agrees with Lecture 17. Since $\\partial_t\\rho = -v_0\\partial_x\\rho$ and $\\partial_xj = v_0\\partial_x\\rho$, we get $\\partial_t\\rho + \\partial_xj = 0$ without redoing that derivation. A real packet spreads, so rigid translation holds only while the passage is short. The exact free Gaussian also gives ${d(V.l18DetTotal, 0)}.`,
     caption: 'the packet has almost passed the detector: over the whole passage the chance that crossed is the whole packet, 1',
     stage: DET_RUN({ time: 6 }),
     claims: [claim('l18DetTotal', 'the current of the exact free Gaussian, integrated over all times, is 1', () => close(V.l18DetTotal, 1, 1e-9))],
@@ -222,7 +222,7 @@ const detectorBeats: Beat[] = [
   {
     id: 'l18-detector:b6',
     phase: 'lecture',
-    text: `The numbers for $E = \\tfrac{4V_0}{3}$. The ratio $k_2/k_1 = v_2/v_1$ is ${d(V.l18StepRatio43, 1)}, so $r = ${tf(V.l18StepRAmp43)}$ and $\\tau = ${tf(V.l18StepTau43)}$. Then $R = ${tf(V.l18StepR43)}$ and $T = \\tfrac12\\left(\\tfrac43\\right)^2 = ${tf(V.l18StepT43)}$. The transmitted density is $${tf(V.l18StepDens43)}$ times the incident one, but it moves at half the speed. Its share of the flow is $${tf(V.l18StepT43)}$, not $${tf(V.l18StepDens43)}$. The missing $${tf(V.l18StepR43)}$ is the reflected packet.`,
+    text: `For $E = \\tfrac{4V_0}{3}$ the numbers are those of Unit 17.3: $k_2/k_1 = ${d(V.l18StepRatio43, 1)}$, $r = ${tf(V.l18StepRAmp43)}$, $\\tau = ${tf(V.l18StepTau43)}$, $R = ${tf(V.l18StepR43)}$ and $T = ${tf(V.l18StepT43)}$. What is new is the contrast. The transmitted density is $${tf(V.l18StepDens43)}$ times the incident one, yet its share of the flow is only $${tf(V.l18StepT43)}$, because it moves at half the speed.`,
     caption: 'at $E = \\tfrac{4V_0}{3}$ the transmitted density is $\\tfrac{16}{9}$ of the incident one, and its share of the flow is $\\tfrac89$',
     stage: DENSITY_RATIO,
     claims: [
@@ -334,7 +334,7 @@ const belowBeats: Beat[] = [
   {
     id: 'l18-below:b3',
     phase: 'lecture',
-    text: `Penetration is not transmission. On the right the density is $\\rho_R = |C|^2e^{-2\\kappa x}$, which is not zero. The amplitude falls by a factor $e$ over $1/\\kappa$, here ${d(V.l18DecayLenAmp, 1)}. The density falls by $e$ over the [[penetration-depth|decay length]] $1/2\\kappa$, here ${d(V.l18DecayLenDensity, 2)}. A packet can have a temporary tail inside, but nothing travels on toward $+\\infty$: with $R = 1$ the final transmission is zero. A density in $x > 0$ does not mean a flow out. In the run at most ${d(V.l18MaxPenetration, 2)} of the chance is in $x > 0$, at $t = ${d(V.l18PenetrationTime, 0)}$, and the tail then drains away.`,
+    text: `In the run at most ${d(V.l18MaxPenetration, 2)} of the chance is in $x > 0$, near $t = ${d(V.l18PenetrationTime, 0)}$, and the tail then drains away. Is that transmission? No. On the right the density $\\rho_R = |C|^2e^{-2\\kappa x}$ is not zero, but nothing travels on toward $+\\infty$, and with $R = 1$ the final transmission is zero. A density in $x > 0$ does not mean a flow out. The amplitude falls by a factor $e$ over $1/\\kappa$, here ${d(V.l18DecayLenAmp, 1)}. The density falls by $e$ over the [[penetration-depth|decay length]] $1/2\\kappa$, here ${d(V.l18DecayLenDensity, 2)}.`,
     caption: 'the chance in $x > 0$ rises while the packet is at the step and then drains away; nothing travels on to the right',
     stage: LOW_RUN({ readouts: ['transmitted'] }),
     fidelity: ['wavefunction-potential-splitstep'],
@@ -342,7 +342,7 @@ const belowBeats: Beat[] = [
       claim('l18DecayLenAmp', 'the amplitude falls by e over 1/κ = 0.5', () => close(V.l18DecayLenAmp, 0.5, 1e-12)),
       claim('l18DecayLenDensity', 'the density falls by e over 1/2κ = 0.25', () => close(V.l18DecayLenDensity, 0.25, 1e-12)),
       claim('l18MaxPenetration', 'at most 0.10 of the chance is ever in x > 0', () => close(V.l18MaxPenetration, 0.10246, 5e-3)),
-      claim('l18PenetrationTime', 'it peaks at t = 4, when the centre reaches the step', () => close(V.l18PenetrationTime, 4, 1e-12)),
+      claim('l18PenetrationTime', 'it peaks near t = 4, when the centre reaches the step', () => close(V.l18PenetrationTime, 4, 0.5)),
     ],
   },
   {

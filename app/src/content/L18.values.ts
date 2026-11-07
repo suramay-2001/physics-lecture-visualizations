@@ -84,6 +84,7 @@ export const V = {
   /* l18-detector */
   l18DetPeakRigid: detRigid, // 0.2660: v₀ρ at the centre of a rigid packet (σ = 3, p₀ = 2)
   l18ChJ: planeCurrent(2, Math.sqrt(0.2)), // 0.4: ρ = 0.2 and v₀ = 2
+  l18DeT: stepRT(8, 7.5).T, // 0.64: the challenge l18-de-T, k₂/k₁ = ¼ (E = 8, V₀ = 7.5), T = ¼ · 64/25
   l18DetTotal: detectorTotal(DET.sigma, DET.p0, DET.x0, DET.xd), // 1: the whole passage
   l18CurrentFactorR: Math.abs(planeCurrent(-st43.k1, st43.r.re)) / planeCurrent(st43.k1, 1) / abs2(st43.r), // 1: R carries no speed factor
   l18CurrentFactorT: planeCurrent(st43.k2, st43.tau.re) / planeCurrent(st43.k1, 1) / abs2(st43.tau), // 0.5 = k₂/k₁
