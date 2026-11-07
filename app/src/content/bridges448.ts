@@ -52,6 +52,8 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-q3-uncertainty': { course: 'qc709', lecture: 'Q3', unit: 'q3-uncertainty', label: 'Commutators and the floor under two spreads' },
   // Lecture 14 (time and stationary states): 709's Q24 drives a two-level system, whose energy is not conserved (a time-dependent Hamiltonian)
   'sl-q24-rabi': { course: 'qc709', lecture: 'Q24', unit: 'q24-rabi', label: 'Rabi oscillations and the rotating frame' },
+  // Lecture 16 (Gaussian packets and Ehrenfest): 709's Q24 refocuses spread-out phases with a spin echo, the idea behind a chirped packet that narrows first
+  'sl-q24-decoupling': { course: 'qc709', lecture: 'Q24', unit: 'q24-decoupling', label: 'Undoing dephasing: the echo and dynamical decoupling' },
 }
 
 registerBridges(BRIDGES_448)

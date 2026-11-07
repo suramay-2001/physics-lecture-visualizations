@@ -136,7 +136,7 @@ describe('Lecture 15: recaps, Rosetta line, glossary and bridges', () => {
   it('the seven new glossary ids are first used where the plan puts them; spreading-time belongs to this lecture (M5)', () => {
     const firsts = { 'free-particle': 'l15-free-eigenstate:b1', envelope: 'l15-group-velocity:b2', 'group-velocity': 'l15-group-velocity:b3', 'phase-velocity': 'l15-group-velocity:b5', dispersion: 'l15-dispersion:b1', 'gaussian-packet': 'l15-gaussian:b1', 'spreading-time': 'l15-gaussian:b3' }
     for (const [id, first] of Object.entries(firsts)) expect(GLOSSARY.get(id)!.first, id).toBe(first)
-    expect(GLOSSARY.get('chirp')).toBeUndefined() // the word is Lecture 16's; here it is said in plain words
+    expect(GLOSSARY.get('chirp')?.first).toMatch(/^l16-/) // the word is Lecture 16's (l16-spread:b8); here it is said in plain words
     expect(textsOf(beat('l15-dispersion:b4')).join(' ')).not.toContain('[[chirp')
   })
   it('one chip into 709 (the uncertainty relation) sits in the Gaussian unit, and its table row exists', () => {
