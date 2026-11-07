@@ -890,9 +890,7 @@ export const LECTURE_META: LectureIndex[] = [
         "title": "The Schrödinger equation of a particle",
         "challenges": [
           "l13-sc-omega",
-          "l13-sc-sd",
-          "l13-sc-order",
-          "l13-sc-electron"
+          "l13-sc-order"
         ]
       },
       {
@@ -901,8 +899,7 @@ export const LECTURE_META: LectureIndex[] = [
         "challenges": [
           "l13-ti-which",
           "l13-ti-boost",
-          "l13-ti-min",
-          "l13-ti-ehren"
+          "l13-ti-min"
         ]
       },
       {
@@ -1044,6 +1041,57 @@ export const LECTURE_META: LectureIndex[] = [
           "l15-ga-t",
           "l15-ga-ratio",
           "l15-pr-spread"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "L16",
+    "number": 16,
+    "title": "Gaussian packets and Ehrenfest",
+    "units": [
+      {
+        "id": "l16-start",
+        "title": "A Gaussian packet to evolve",
+        "challenges": [
+          "l16-st-dp",
+          "l16-st-fixed",
+          "l16-st-centre",
+          "l16-pr-width"
+        ]
+      },
+      {
+        "id": "l16-evolve",
+        "title": "The free Gaussian at time t",
+        "challenges": [
+          "l16-ev-ts",
+          "l16-ev-centre",
+          "l16-ev-order"
+        ]
+      },
+      {
+        "id": "l16-spread",
+        "title": "Moving, spreading, and the uncertainty bound",
+        "challenges": [
+          "l16-sp-dx",
+          "l16-sp-peak",
+          "l16-sp-sd",
+          "l16-sp-electron",
+          "l16-sp-prod",
+          "l16-sp-which",
+          "l16-pr-double"
+        ]
+      },
+      {
+        "id": "l16-ehrenfest",
+        "title": "The centre obeys Ehrenfest’s equations",
+        "challenges": [
+          "l16-eh-dx",
+          "l16-eh-ehren",
+          "l16-eh-order",
+          "l16-eh-which",
+          "l16-pr-quartic",
+          "l16-pr-spin"
         ]
       }
     ]

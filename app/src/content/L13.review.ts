@@ -58,11 +58,10 @@ export const L13_REVIEW: Record<string, ReviewCard> = {
     points: [
       'With $H = \\hat p^2/(2m) + V(\\hat x,t)$ the abstract law becomes $i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\partial_x^2\\psi + V\\psi$.',
       'A plane wave solves it for $V = 0$, with $E = \\hbar\\omega = \\hbar^2k^2/2m$. Superpositions of plane waves also solve it.',
-      `A free packet moves at $p_0/m$ and spreads, while $\\Delta p$ never changes: $\\Delta x$ grows from 1 to ${d(V.l13FreeSd4, 2)} $\\ell$ by $t = 4$.`,
+      'A free packet moves at $p_0/m$ and spreads, while $\\Delta p$ never changes. Lecture 16 finds exactly how wide it gets.',
     ],
     equations: 'i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\,\\partial_x^2\\psi + V\\psi',
     trap: 'Reading $\\psi$ as a displacement. It is an amplitude, not something you can see in space.',
-    claims: [claim('l13FreeSd4', 'Δx = 2.24 ℓ at t = 4', () => close(V.l13FreeSd4, Math.sqrt(5), 1e-9))],
   },
   'l13-time': {
     points: [

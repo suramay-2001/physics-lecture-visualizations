@@ -167,7 +167,7 @@ const law: Beat[] = [
   {
     id: 'l12-law:b7b',
     phase: 'books',
-    text: 'Townsend §4.2 asks how the average of any observable $A$ changes in time (Townsend §4.2, p. 114, Eq. 4.16). Differentiate $\\langle A\\rangle$ with the equation and its adjoint. The rate is $i/\\hbar$ times the average of the commutator $[H, A]$, plus a term for any explicit time dependence of $A$. With no explicit time, $A$ is a [[constant-of-motion|constant of the motion]] if and only if $[H, A] = 0$. Energy is one when $H$ has no explicit time. A drive that oscillates in time breaks that, so it pumps energy in and out. Mind the order: the commutator is $[H, A]$, not $[A, H]$. Lecture 13 uses this law for position and momentum.',
+    text: 'Townsend §4.2 asks how the average of any observable $A$ changes in time (Townsend §4.2, p. 114, Eq. 4.16). Differentiate $\\langle A\\rangle$ with the equation and its adjoint. The rate is $i/\\hbar$ times the average of the commutator $[H, A]$, plus a term for any explicit time dependence of $A$. With no explicit time, $A$ is a [[constant-of-motion|constant of the motion]] if and only if $[H, A] = 0$. Energy is one when $H$ has no explicit time. A drive that oscillates in time breaks that, so it pumps energy in and out. Mind the order: the commutator is $[H, A]$, not $[A, H]$. Lecture 16 uses this law for position and momentum.',
     caption: 'for a constant $H$ the hands keep their speeds: the energy weights stay put while the gap between the hands grows',
     stage: K(sweep(0, 90), { readouts: ['phases'] }),
     derivation: {

@@ -2723,13 +2723,9 @@ def free13(w, t):
 
 
 H13 = 6.62607015e-34
-HBAR13 = H13 / (2 * np.pi)
 M_HE13 = 4.00260325413 * 1.6605390666e-27
-M_E13 = 9.1093837015e-31
 LAM_HE13 = H13 / (M_HE13 * 2200.0)
 XS13 = np.array([-8, -3.1, 0, 0.7, 2.5, 8.0])
-T_ELECTRON13 = M_E13 * (1e-10) ** 2 / HBAR13
-T_MARBLE13 = 1e-3 * (1e-3) ** 2 / HBAR13
 X3_13 = np.array([[1, 2j, 0], [0, 1, 3], [2, 0, -1j]])
 P3_13 = np.array([[0, 1, 1j], [1, 2, 0], [-1j, 1, 3]])
 RING13 = sorted(set(round(float(abs(np.degrees(np.angle(z)))), 9) for z in np.linalg.eigvals(np.roll(np.eye(6), 1, axis=0))))  # 0, 60, 120, 180
@@ -2743,8 +2739,6 @@ sch_d2 = np.fft.ifft(-(KG**2) * np.fft.fft(sch_a))
 sch_res = np.max(np.abs((sch_b - sch_a) / 1e-6 - 0.5j * sch_d2)) / np.max(np.abs(sch_d2))
 U15_13 = PK13(0, 1) * np.exp(1j * 1.5 * XG)
 C_COMM13 = XG * pop13(P2_12) - pop13(XG * P2_12)
-V_EHR13 = 0.5 * XG**2
-C_EHR13 = V_EHR13 * pop13(P2_12) - pop13(V_EHR13 * P2_12)
 FREE_H13 = lambda w: np.fft.ifft(0.5 * KG**2 * np.fft.fft(w))  # noqa: E731
 
 
@@ -2800,20 +2794,12 @@ values.update({
     "l13SchroOk": float(sch_res < 1e-4),
     "l13OmegaK2": float(-np.angle(np.exp(-1j * (2.0**2) * 0.5 / 2)) / 0.5),
     "l13PlanePhaseDegMag": float(abs(np.degrees(np.angle(np.exp(-1j * (2.0**2) * 1.0 / 2))))),
-    "l13FreeDp4": mom13(free13(psiS13, 4))[1],
-    "l13FreeSd2": sd13(free13(PK13(0, 1), 2)),
-    "l13FreeSd4": sd13(free13(PK13(0, 1), 4)),
-    "l13SpreadElectronMant": T_ELECTRON13 / 1e-17,
-    "l13SpreadElectronLog10": float(np.log10(T_ELECTRON13)),
-    "l13SpreadMarbleMant": T_MARBLE13 / 1e24,
-    "l13SpreadMarbleYearsMant": T_MARBLE13 / 3.15576e7 / 1e17,
     # l13-time
     "l13FreeNorm4": msum12(free13(psiS13, 4), 1.0),
     "l13FreeCommutatorOk": float(np.max(np.abs(FREE_H13(pop13(psiS13)) - pop13(FREE_H13(psiS13)))) < 1e-9),
     "l13BoostMean": mom13(U15_13)[0],
     "l13BoostSd": mom13(U15_13)[1],
     "l13WpWdag": float(np.max(np.abs(np.exp(-1j * 1.5 * XG) * pop13(U15_13) - (pop13(PK13(0, 1)) + 1.5 * PK13(0, 1))))),
-    "l13EhrenfestDpDt": float(-np.imag(np.sum(np.conj(P2_12) * C_EHR13) * DXG)),
     "l13MinFreeEnergy": float(np.min(0.5 * KG**2)),
     # l13-schrodinger, Go deeper
 })

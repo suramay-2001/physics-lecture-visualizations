@@ -108,7 +108,7 @@ describe('Lecture 15: M2 what moved here from Lecture 13', () => {
     expect(beat('l15-group-velocity:b1').claims!.map((c) => claimKey(c))).toEqual(['l15FringeSpacing', 'l15FringeSpeed', 'l15FringeSpeedFormula'])
     const l13 = L13.units.flatMap((u) => u.story ?? [])
     expect(l13.find((b) => b.id === 'l13-schrodinger:b3')!.text).toMatch(/Unit 15\.1/)
-    expect(l13.find((b) => b.id === 'l13-schrodinger:b8')!.text).toMatch(/Unit 15\.4/)
+    expect(l13.find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Unit 15\.4/)
     expect(Object.keys(V13).filter((k) => /FreeMean2|Fringe(Spacing|Speed)/.test(k))).toEqual([])
     const l13ids = L13.units.flatMap((u) => u.play.map((q) => q.id))
     for (const old of ['l13-sc-mean', 'l13-ee-space', 'l13-ee-speed']) expect(l13ids).not.toContain(old)
@@ -136,7 +136,7 @@ describe('Lecture 15: recaps, Rosetta line, glossary and bridges', () => {
   it('the seven new glossary ids are first used where the plan puts them; spreading-time belongs to this lecture (M5)', () => {
     const firsts = { 'free-particle': 'l15-free-eigenstate:b1', envelope: 'l15-group-velocity:b2', 'group-velocity': 'l15-group-velocity:b3', 'phase-velocity': 'l15-group-velocity:b5', dispersion: 'l15-dispersion:b1', 'gaussian-packet': 'l15-gaussian:b1', 'spreading-time': 'l15-gaussian:b3' }
     for (const [id, first] of Object.entries(firsts)) expect(GLOSSARY.get(id)!.first, id).toBe(first)
-    expect(GLOSSARY.get('chirp')).toBeUndefined() // the word is Lecture 16's; here it is said in plain words
+    expect(GLOSSARY.get('chirp')?.first).toMatch(/^l16-/) // the word is Lecture 16's (l16-spread:b8); here it is said in plain words
     expect(textsOf(beat('l15-dispersion:b4')).join(' ')).not.toContain('[[chirp')
   })
   it('one chip into 709 (the uncertainty relation) sits in the Gaussian unit, and its table row exists', () => {

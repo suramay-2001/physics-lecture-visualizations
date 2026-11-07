@@ -256,6 +256,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         text: 'Every point of the curve, and every marker on it, is computed by the engine from the named function; none is drawn by hand.',
       },
       {
+        id: 'plot-packet-width',
+        text: 'Both curves are exact for ħ = m = 1 and σ = 1: the plain Gaussian and the chirped one with β = −0.2. They show the spread of the density, not a path.',
+      },
+      {
         id: 'plot-free-omega',
         text: 'The two dispersion curves are exact for ħ = m = c = 1: ω = k²/2 for a matter wave and ω = |k| for light. They cross at k = 2, where the two waves turn at the same rate; the picture is not a measurement.',
       },

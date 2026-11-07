@@ -35,6 +35,8 @@ import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/en
 import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
 import { barrierT, barrierThick, stepRT } from '../../physics/scatter'
 import { omegaFree, omegaLinear } from '../../physics/wave14'
+import { chirpWidth } from '../../physics/wave16'
+import { gaussianWidth } from '../../physics/wave'
 import type { PlotCurveName, PlotPointsState, PlotSeries, PlotSeriesState, PlotState } from '../../content/stage'
 import { PLOT_PRESETS, PLOT_SERIES_FNS } from '../../content/stage'
 import type { SvgReadout } from '../svgKinds'
@@ -164,6 +166,9 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   // Lecture 14 (physics/wave14.ts): the dispersion relations against the wave number k, ħ = m = c = 1: a matter wave's ω = k²/2 and light's ω = |k| (they meet at k = 2)
   freeOmega: (x) => omegaFree(x),
   linearOmega: (x) => omegaLinear(x),
+  // Lecture 16 (physics/wave.ts gaussianWidth, physics/wave16.ts chirpWidth): the width Δx(t) of a free packet of σ = 1 against the time t, ħ = m = 1; plain Gaussian and the chirp β = −0.2
+  packetWidth: (x) => gaussianWidth(1, x),
+  packetWidthChirp: (x) => chirpWidth(1, -0.2, x),
   // Townsend pass G2b: N polarizers with a total turn of 90 degrees (physics/polarization.ts), N read as a real number between the whole ones
   polChain: (n) => chainTransmission(n, 90),
   // Chapter Q19 (physics/qc/walk.ts, trotter.ts, variational.ts): the walks and the Trotter errors are drawn at whole x only; the QAOA slices are smooth in the angle (degrees)
@@ -245,6 +250,8 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   barrierThick: { from: 0, to: 4 },
   freeOmega: { from: -4, to: 4 },
   linearOmega: { from: -4, to: 4 },
+  packetWidth: { from: 0, to: 4 },
+  packetWidthChirp: { from: 0, to: 4 },
   polChain: { from: 1, to: 60 },
   randomWalkSigma: { from: 0, to: 100 },
   coinWalkSigma: { from: 0, to: 100 },
@@ -315,6 +322,8 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   barrierThick: 'thick form',
   freeOmega: 'matter wave, k²/2m',
   linearOmega: 'light, c|k|',
+  packetWidth: 'plain Gaussian',
+  packetWidthChirp: 'chirped, β = −0.2',
   polChain: 'chain of N',
   randomWalkSigma: 'coin flips',
   coinWalkSigma: 'quantum coin',
@@ -353,7 +362,7 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   mathieuBetaApprox: 'effective potential',
   twoIonPotential: 'two-ion energy',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', packetWidth: 't', packetWidthChirp: 't', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3, homDip: 2, homDistinguishable: 2, transmonF01r1: 3, transmonF01r20: 3, mathieuBeta: 2, mathieuBetaApprox: 2, twoIonPotential: 2 }
 
@@ -389,6 +398,9 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   // Lecture 14: an angular frequency is never negative
   freeOmega: { min: 0, max: Infinity },
   linearOmega: { min: 0, max: Infinity },
+  // Lecture 16: a width is never negative
+  packetWidth: { min: 0, max: Infinity },
+  packetWidthChirp: { min: 0, max: Infinity },
   // a chance: between 0 and 1
   polChain: { min: 0, max: 1 },
   // Chapter Q19: the spreads and the errors are never negative; the walk chances are chances; F is an average cut of the 4-cycle (0 to 4)

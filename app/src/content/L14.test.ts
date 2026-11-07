@@ -181,7 +181,7 @@ describe('Lecture 14: M2 the box moved here (Townsend pass T1–T6)', () => {
     expect(story.filter((b) => b.phase === 'lecture')).toHaveLength(0)
     expect(unit('l14-box').lecture.pages).toMatch(/^not in the lecture notes/)
     expect(L14.units.slice(-1).map((u) => u.id)).toEqual(['l14-box'])
-    expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b8')!.text).toMatch(/Unit 14\.5.*Unit 14\.6/)
+    expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Unit 14\.5.*Unit 14\.6/)
   })
   it('the six practice questions (five numeric, the top-hat choice) are tagged, name their source, carry full walkthroughs and are not assigned (T1); no homework label appears', () => {
     const qs = L14.units.flatMap((u) => u.play).filter((q) => q.practice)
