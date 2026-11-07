@@ -728,5 +728,36 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "T = ma^2/\\hbar",
       "t_{\\rm spread}\\sim 2m\\sigma^2/\\hbar"
     ]
+  },
+  "l16-start": {
+    "question": "Which numbers fix the packet, and what does free evolution leave alone?",
+    "equations": [
+      "\\Delta x\\,\\Delta p = \\hbar/2",
+      "\\tilde\\psi(p,t) = e^{-ip^2t/2m\\hbar}\\,\\tilde\\psi(p,0)"
+    ]
+  },
+  "l16-evolve": {
+    "question": "What is ψ(x, t) exactly?",
+    "equations": [
+      "\\psi(x,t) = (2\\pi\\sigma^2)^{-1/4}\\,(1+i\\tau)^{-1/2}\\,e^{-X^2/4\\sigma^2(1+i\\tau)}\\,e^{i[\\cdots]}",
+      "\\tau = \\hbar t/2m\\sigma^2 = t/t_s"
+    ]
+  },
+  "l16-spread": {
+    "question": "What do the centre, the width and ΔxΔp do?",
+    "equations": [
+      "\\Delta x(t) = \\sigma\\sqrt{1+(t/t_s)^2}",
+      "\\Delta x\\,\\Delta p = \\tfrac{\\hbar}{2}\\sqrt{1+(t/t_s)^2}",
+      "(\\Delta x_t)^2 = (\\Delta x_0)^2 + 2tC_{xp}/m + t^2(\\Delta p)^2/m^2"
+    ]
+  },
+  "l16-ehrenfest": {
+    "question": "How does an average change, and what do ⟨x⟩ and ⟨p⟩ obey?",
+    "equations": [
+      "\\tfrac{d}{dt}\\langle x\\rangle = \\langle p\\rangle/m",
+      "\\tfrac{d}{dt}\\langle p\\rangle = -\\langle V'\\rangle",
+      "[\\hat p^2,\\hat x] = -2i\\hbar\\,\\hat p",
+      "[V,\\hat p] = i\\hbar V'"
+    ]
   }
 }

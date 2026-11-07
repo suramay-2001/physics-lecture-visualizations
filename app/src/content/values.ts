@@ -19,6 +19,7 @@ import { V as V12 } from './L12.values'
 import { V as V13 } from './L13.values'
 import { V as V14 } from './L14.values'
 import { V as V15 } from './L15.values'
+import { V as V16 } from './L16.values'
 import { mergeValues } from './claimKit'
 import { QC_VALUES } from './qc709/values'
 // the 709 lecture notes' computed claims (qc709/notes/N*.values.ts, merged by file name); tests only, like this file
@@ -31,7 +32,7 @@ import { PAPER_VALUES } from './papers/index'
 export { mergeValues }
 
 /** Physics 448's values (the claim ledger's 448 twins live in physics/__fixtures__/claims.json). */
-export const VALUES_448 = mergeValues(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15)
+export const VALUES_448 = mergeValues(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16)
 
 /** Every course: one key space, so no chapter can shadow another course's number. */
 export const ALL_VALUES = mergeValues(VALUES_448, QC_VALUES, PAPER_VALUES, NOTES_VALUES, OPTICS_VALUES)

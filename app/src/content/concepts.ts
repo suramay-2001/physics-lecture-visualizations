@@ -28,6 +28,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L13', number: 13, title: 'Momentum and the Schrödinger equation' },
   { id: 'L14', number: 14, title: 'The Schrödinger equation, time and stationary states' },
   { id: 'L15', number: 15, title: 'Free particles and packets: group velocity and dispersion' },
+  { id: 'L16', number: 16, title: 'Gaussian packets and Ehrenfest' },
 ]
 
 export interface Concept {
@@ -151,6 +152,11 @@ export const CONCEPTS: Concept[] = [
   { id: 'group-velocity', label: 'Group velocity: how fast a packet moves', lecture: 'L15', unit: 'l15-group-velocity', needs: ['evolve-components'] },
   { id: 'dispersion-spreading', label: 'Dispersion: why a packet spreads', lecture: 'L15', unit: 'l15-dispersion', needs: ['group-velocity'] },
   { id: 'gaussian-spreading', label: 'The Gaussian and its spreading time', lecture: 'L15', unit: 'l15-gaussian', needs: ['dispersion-spreading', 'commutator-bases'] },
+  // L16 (Gaussian packets and Ehrenfest; every built unit is a station)
+  { id: 'gaussian-start', label: 'The Gaussian to evolve: what free evolution leaves alone', lecture: 'L16', unit: 'l16-start', needs: ['gaussian-spreading', 'momentum-space'] },
+  { id: 'gaussian-evolution', label: 'The exact free Gaussian at time t', lecture: 'L16', unit: 'l16-evolve', needs: ['gaussian-start'] },
+  { id: 'width-law', label: 'Centre, width and the uncertainty bound', lecture: 'L16', unit: 'l16-spread', needs: ['gaussian-evolution', 'uncertainty'] },
+  { id: 'ehrenfest', label: 'Ehrenfest’s equations for the averages', lecture: 'L16', unit: 'l16-ehrenfest', needs: ['dynamical-law', 'position-operator', 'momentum-generator'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)
