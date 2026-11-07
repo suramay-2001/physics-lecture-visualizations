@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1793240304.0373056,
-    "ast_hash": "d2be404763e77107e11c69302e1a4757",
+    "mtime": 1794026827.6111891,
+    "ast_hash": "b276142c273e9c21445237440833d0fe",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -25,8 +25,8 @@
     "semantic_hash": ""
   },
   "app/e2e/story.spec.ts": {
-    "mtime": 1793246179.3806052,
-    "ast_hash": "fb53d9744841351251e06c522f7f2798",
+    "mtime": 1794030890.561399,
+    "ast_hash": "0f1d78a99f7118a931541324d6b2ac51",
     "semantic_hash": ""
   },
   "app/e2e/workbench.spec.ts": {
@@ -155,13 +155,13 @@
     "semantic_hash": ""
   },
   "app/src/content/glossary.ts": {
-    "mtime": 1792473690.422476,
-    "ast_hash": "013bd2901104d96997b27421363ab81a",
+    "mtime": 1794029021.8484938,
+    "ast_hash": "46200d38abdaf86c51d58af69cbbffdb",
     "semantic_hash": ""
   },
   "app/src/content/index.ts": {
-    "mtime": 1792096977.2755435,
-    "ast_hash": "c6f40ecf31b333a7f60a1d3c2b4759f4",
+    "mtime": 1794026827.6151998,
+    "ast_hash": "4275cca61f19ab9ca0c0ee568640e471",
     "semantic_hash": ""
   },
   "app/src/content/models.test.ts": {
@@ -185,13 +185,13 @@
     "semantic_hash": ""
   },
   "app/src/content/stage.ts": {
-    "mtime": 1793240290.730128,
-    "ast_hash": "21cdb5bc53dfc9a6ad5c33d4009a7b93",
+    "mtime": 1794022602.2542417,
+    "ast_hash": "71c1055da79adb5bc6e24392956deb88",
     "semantic_hash": ""
   },
   "app/src/content/stageVocab.ts": {
-    "mtime": 1793037652.5118744,
-    "ast_hash": "85e49ecab606ea9672888d6a94391e67",
+    "mtime": 1794022563.6847057,
+    "ast_hash": "a4268e2e7152475ed518e53a859ba421",
     "semantic_hash": ""
   },
   "app/src/content/symbols.test.ts": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims.json": {
-    "mtime": 1792096977.278355,
-    "ast_hash": "d341acde4989c4a2e689a5d51f8f2bc7",
+    "mtime": 1794022960.4181278,
+    "ast_hash": "3298c27a916635b525b40b92266f7d86",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/numpy.json": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/types.ts": {
-    "mtime": 1793224166.2271268,
-    "ast_hash": "b46a87f49e7edaf7082217d51638018a",
+    "mtime": 1794022563.6914623,
+    "ast_hash": "0475430a14bf60b465dfbd7544f99c23",
     "semantic_hash": ""
   },
   "app/src/stage/useLiveStage.ts": {
@@ -840,8 +840,8 @@
     "semantic_hash": ""
   },
   "pipeline/course.config.json": {
-    "mtime": 1792443075.3987255,
-    "ast_hash": "f71c1737c771740233011ecba3895043",
+    "mtime": 1793988796.6779406,
+    "ast_hash": "116970e7dc179ee388848cb672d21c0b",
     "semantic_hash": ""
   },
   "pipeline/course.config.local.example.json": {
@@ -855,8 +855,8 @@
     "semantic_hash": ""
   },
   "pipeline/make_claim_fixtures.py": {
-    "mtime": 1792115080.9845848,
-    "ast_hash": "5b7eff3302eb4e0fb66161baa41927d3",
+    "mtime": 1794022446.2581334,
+    "ast_hash": "a6e9814c0cf50d57cc1049a4b403a637",
     "semantic_hash": ""
   },
   "pipeline/make_fixtures.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1793244025.7051284,
-    "ast_hash": "b72ac4f7db51f3e1a046d563a58f2736",
+    "mtime": 1794030912.348863,
+    "ast_hash": "8eb479f1a0dc1832cd0679af0066cefd",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -1000,13 +1000,13 @@
     "semantic_hash": ""
   },
   "app/src/openers/openerCopy.test.ts": {
-    "mtime": 1791731792.4846272,
-    "ast_hash": "7335779a8bcfc24b6981f853a4ba89ea",
+    "mtime": 1793992548.9451072,
+    "ast_hash": "14b9640b48ca0404b4b6b2b98c537264",
     "semantic_hash": ""
   },
   "app/src/openers/openerCopy.ts": {
-    "mtime": 1793224501.0654907,
-    "ast_hash": "8e9174282a39d81c882ec76d1c776553",
+    "mtime": 1793992548.945665,
+    "ast_hash": "1dd5e5d5db74f8d037720ef9c2418461",
     "semantic_hash": ""
   },
   "app/src/openers/openerData.test.ts": {
@@ -2295,13 +2295,13 @@
     "semantic_hash": ""
   },
   "app/e2e/map.spec.ts": {
-    "mtime": 1792455128.407826,
-    "ast_hash": "c011a16b544604554e524c3b582264b4",
+    "mtime": 1794026827.6106296,
+    "ast_hash": "95ea68b23ad4c04f2250d7a320563721",
     "semantic_hash": ""
   },
   "app/e2e/nav.spec.ts": {
-    "mtime": 1792474149.5949426,
-    "ast_hash": "12794a2ffcd0a30ddd942550c812a942",
+    "mtime": 1794026827.6108801,
+    "ast_hash": "dfd66e6da4dc1b47a8f7416731d9db2d",
     "semantic_hash": ""
   },
   "app/src/arcade/GamePage.tsx": {
@@ -2330,8 +2330,8 @@
     "semantic_hash": ""
   },
   "app/src/components/LectureFork.tsx": {
-    "mtime": 1792096977.2713802,
-    "ast_hash": "59cdd35c86491c396bfd9b3d3a4c26f6",
+    "mtime": 1794026827.61179,
+    "ast_hash": "74f264825a3076cc7af82d18e81fb4f5",
     "semantic_hash": ""
   },
   "app/src/components/ReadModeToggle.tsx": {
@@ -2365,8 +2365,8 @@
     "semantic_hash": ""
   },
   "app/src/content/concepts.ts": {
-    "mtime": 1792455054.2395983,
-    "ast_hash": "1bb50024fb5f26e9c7d22a680686fae9",
+    "mtime": 1794026827.6146429,
+    "ast_hash": "9a4458d1b99829d481651ad4a7baf0de",
     "semantic_hash": ""
   },
   "app/src/ui/motionPref.test.ts": {
@@ -2420,8 +2420,8 @@
     "semantic_hash": ""
   },
   "app/src/content/values.ts": {
-    "mtime": 1793220640.8067803,
-    "ast_hash": "b1e55a4112ce51bff8163da9f3c14530",
+    "mtime": 1794026827.6169035,
+    "ast_hash": "5cae7ca29f73ea8d1bad759d01dff74a",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/BlochScene.tsx": {
@@ -2650,13 +2650,13 @@
     "semantic_hash": ""
   },
   "app/src/content/load.ts": {
-    "mtime": 1793224926.7661152,
-    "ast_hash": "2b80e51f3017e3ffb7a4ccf6a867c1a1",
+    "mtime": 1794026827.6153853,
+    "ast_hash": "c07d9c4096674ec410f73498c8a59bac",
     "semantic_hash": ""
   },
   "app/src/content/meta.generated.ts": {
-    "mtime": 1793244025.338524,
-    "ast_hash": "9d0fedc11329d892df512a350fe2c43b",
+    "mtime": 1794029036.17207,
+    "ast_hash": "39c707b6fa9124c47cdcee253f4aa486",
     "semantic_hash": ""
   },
   "app/src/content/meta.test.ts": {
@@ -3080,7 +3080,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1793244025.340281,
+    "mtime": 1794029036.1734083,
     "ast_hash": "724c0d1334acd9583853afb16be91fda",
     "semantic_hash": ""
   },
@@ -3310,8 +3310,8 @@
     "semantic_hash": ""
   },
   "films/README.md": {
-    "mtime": 1791731792.4878986,
-    "ast_hash": "c0ae72def4111782be7845a720b17817",
+    "mtime": 1793992548.947031,
+    "ast_hash": "1bb60df862088b1c675f782492bc5555",
     "semantic_hash": ""
   },
   "films/render/editor.html": {
@@ -3370,8 +3370,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1793240290.7273269,
-    "ast_hash": "25fe08f23d5f5886b04a802585373b48",
+    "mtime": 1794026827.6162238,
+    "ast_hash": "4d895fc13fb7e691d3ef86e398c0cce6",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -3735,8 +3735,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/games.ts": {
-    "mtime": 1792084771.6464057,
-    "ast_hash": "bf0179594e7ed40ffb23f1937ed72f58",
+    "mtime": 1793990617.0749645,
+    "ast_hash": "d6ab3e5a278cdb16450951e613ac08ee",
     "semantic_hash": ""
   },
   "docs/patterns/beat-two-track.md": {
@@ -3780,8 +3780,8 @@
     "semantic_hash": ""
   },
   "docs/roles/decisions/homework-status.md": {
-    "mtime": 1792443102.651855,
-    "ast_hash": "163b1f5ac6e2f4e9bb9277e0fd50272d",
+    "mtime": 1793988815.570403,
+    "ast_hash": "53aafb6e2b96f32e78bfcd92d25bb650",
     "semantic_hash": ""
   },
   "docs/specs/content-model-two-track.md": {
@@ -4385,8 +4385,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/plot.ts": {
-    "mtime": 1793240283.0441232,
-    "ast_hash": "c2965bd1b8154e8aa455d70ff45aff60",
+    "mtime": 1794022602.2535334,
+    "ast_hash": "546bdb91ca7234436e5926f7c027b6da",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q8.glossary.ts": {
@@ -5160,8 +5160,8 @@
     "semantic_hash": ""
   },
   "app/src/content/L12.story.ts": {
-    "mtime": 1792473690.4109285,
-    "ast_hash": "3a68a5b751df70bf0f6609911325cb09",
+    "mtime": 1794022446.243991,
+    "ast_hash": "e3d088146b6139bb3e76b767290151c1",
     "semantic_hash": ""
   },
   "app/src/content/L12.test.ts": {
@@ -5180,28 +5180,28 @@
     "semantic_hash": ""
   },
   "app/src/content/L13.review.ts": {
-    "mtime": 1792115080.9471004,
-    "ast_hash": "e81a59116150b57fb1548c2e88122a20",
+    "mtime": 1794022446.2447066,
+    "ast_hash": "5d46a82e1dce5588f44d4c67f4a1744c",
     "semantic_hash": ""
   },
   "app/src/content/L13.story.ts": {
-    "mtime": 1792473690.412388,
-    "ast_hash": "a6f5804cd38707097934e6246643215c",
+    "mtime": 1794029021.841593,
+    "ast_hash": "15a0e987913eeabeb1acee2d0a5f72a6",
     "semantic_hash": ""
   },
   "app/src/content/L13.test.ts": {
-    "mtime": 1792473690.412853,
-    "ast_hash": "1c76b5e154491d071c07fa4cc6e6f6b0",
+    "mtime": 1794026827.612441,
+    "ast_hash": "09c2803523f489d5df59b57ecf6f8b8f",
     "semantic_hash": ""
   },
   "app/src/content/L13.ts": {
-    "mtime": 1792473690.413743,
-    "ast_hash": "8cbd03ece0b1d230a0612f0aa6541e55",
+    "mtime": 1794026827.6127036,
+    "ast_hash": "4ed04140a98a94fa8dfc013d6e9c3294",
     "semantic_hash": ""
   },
   "app/src/content/L13.values.ts": {
-    "mtime": 1792473690.414341,
-    "ast_hash": "83b557ffac440148ad20808a083e4244",
+    "mtime": 1794026827.6129365,
+    "ast_hash": "bf00a646f2b8bb71f1c25fcd1d8d454b",
     "semantic_hash": ""
   },
   "app/src/content/L8.review.ts": {
@@ -5270,8 +5270,8 @@
     "semantic_hash": ""
   },
   "app/src/content/bridges448.ts": {
-    "mtime": 1792449469.6803157,
-    "ast_hash": "59c64ca7cd13ed1c5b3aec783ea17a9f",
+    "mtime": 1794026827.6143703,
+    "ast_hash": "37cab3c58f046ab9bc99d2ed12502f72",
     "semantic_hash": ""
   },
   "app/src/content/fidelity.sl448.ts": {
@@ -5280,18 +5280,18 @@
     "semantic_hash": ""
   },
   "app/src/content/fidelity.svg.ts": {
-    "mtime": 1793037652.5093524,
-    "ast_hash": "b4d5ab097c47d33ccf0b2b9dec2a27bc",
+    "mtime": 1794022563.679338,
+    "ast_hash": "f37407e2bf1c4b3a0bedd8d61836e4da",
     "semantic_hash": ""
   },
   "app/src/content/meta.detail.generated.ts": {
-    "mtime": 1793244025.3394225,
-    "ast_hash": "a3284c431f3d01cecd36e389bf77c79c",
+    "mtime": 1794029036.1726248,
+    "ast_hash": "a830510c15d8684383b5bc90580cadfa",
     "semantic_hash": ""
   },
   "app/src/content/notation.classes.test.ts": {
-    "mtime": 1793229745.0372717,
-    "ast_hash": "0f1f4b24cd7a13080ce3d15aba0209c5",
+    "mtime": 1794022446.2520835,
+    "ast_hash": "a0c1bbf845698c2d176a1b85f115dc51",
     "semantic_hash": ""
   },
   "app/src/content/notation.context.test.ts": {
@@ -5410,7 +5410,7 @@
     "semantic_hash": ""
   },
   "app/src/content/papers/meta.generated.ts": {
-    "mtime": 1793244025.3405962,
+    "mtime": 1794029036.1736717,
     "ast_hash": "106015c16774b1324a0400d5365e3216",
     "semantic_hash": ""
   },
@@ -5815,7 +5815,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/meta.generated.ts": {
-    "mtime": 1793244025.343198,
+    "mtime": 1794029036.175876,
     "ast_hash": "fcc7ca22c946452715c9bc3c08c08c34",
     "semantic_hash": ""
   },
@@ -6565,8 +6565,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/wave.ts": {
-    "mtime": 1792455049.0689766,
-    "ast_hash": "321f5ab9316cce4a9b5e592d1cb6c2b7",
+    "mtime": 1794022563.6880257,
+    "ast_hash": "00cbcec2f5cc61109a16dcc9f7e855e5",
     "semantic_hash": ""
   },
   "app/src/physics/wave13.test.ts": {
@@ -6685,8 +6685,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/WavefunctionScene.tsx": {
-    "mtime": 1792455049.069613,
-    "ast_hash": "d2ef2b047c5ea22fd6f7b29b742f6363",
+    "mtime": 1794022563.6889377,
+    "ast_hash": "822ca0eecea169797208399a64212b6f",
     "semantic_hash": ""
   },
   "app/src/stage/svg/ampKeepWires.test.tsx": {
@@ -6920,13 +6920,13 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/wavefunction.test.tsx": {
-    "mtime": 1792455049.0710568,
-    "ast_hash": "bd77adca6aef36d8c0a2af3c95ded0d2",
+    "mtime": 1794022563.6896825,
+    "ast_hash": "72c0863c9b03385d6732c20333a6192a",
     "semantic_hash": ""
   },
   "app/src/stage/svg/wavefunction.ts": {
-    "mtime": 1792455049.0714512,
-    "ast_hash": "237d1ebc604ce72de5ae667da8b33a0b",
+    "mtime": 1794022563.6901815,
+    "ast_hash": "f5248e2d9ae8e8989a48c1c623aa7b55",
     "semantic_hash": ""
   },
   "app/src/test/setup.ts": {
@@ -7090,8 +7090,8 @@
     "semantic_hash": ""
   },
   "films/src/registry.ts": {
-    "mtime": 1791731792.4896812,
-    "ast_hash": "bb211377f4a38b619a9ae97a2e2b220e",
+    "mtime": 1793992548.9508042,
+    "ast_hash": "b55be6d48b38558f3b1fd9ab312c1321",
     "semantic_hash": ""
   },
   "films/src/scenes/qc-q16-cancel.data.ts": {
@@ -7210,8 +7210,8 @@
     "semantic_hash": ""
   },
   "pipeline/context/build_context.mjs": {
-    "mtime": 1793220640.8310757,
-    "ast_hash": "f7c6346873ded29e46c56c7b43438fa7",
+    "mtime": 1794026827.619996,
+    "ast_hash": "60252c674450a50900f52ec4861cf430",
     "semantic_hash": ""
   },
   "pipeline/course.papers.json": {
@@ -7240,8 +7240,8 @@
     "semantic_hash": ""
   },
   "pipeline/films/films.ts": {
-    "mtime": 1791731792.4937763,
-    "ast_hash": "2646766f1df5c50e17738bde3476fc73",
+    "mtime": 1793992548.9583704,
+    "ast_hash": "88fd04a6caf180c68e9518b4a8c70c04",
     "semantic_hash": ""
   },
   "pipeline/make_b3_fixtures.py": {
@@ -7380,8 +7380,8 @@
     "semantic_hash": ""
   },
   "docs/context/cards/qc-engine.md": {
-    "mtime": 1793240290.7285838,
-    "ast_hash": "3e07273c33657cb8d78bb6acf5ac99ac",
+    "mtime": 1794026827.6182811,
+    "ast_hash": "fdbcc260cac0f5f6985827e5a0129b4a",
     "semantic_hash": ""
   },
   "docs/context/cards/qec-engine.md": {
@@ -7390,8 +7390,8 @@
     "semantic_hash": ""
   },
   "docs/context/cards/stage-kinds.md": {
-    "mtime": 1793240296.0842414,
-    "ast_hash": "fbef92a701a78d4be67699667fed7622",
+    "mtime": 1794026827.618625,
+    "ast_hash": "351cdaa54b425df67e1b6504098d8c90",
     "semantic_hash": ""
   },
   "docs/context/cards/tests-and-gate.md": {
@@ -9755,8 +9755,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims-448/g4b.json": {
-    "mtime": 1792473690.4242387,
-    "ast_hash": "83ef87eb92db87591f219d14c5823b2e",
+    "mtime": 1794026827.617156,
+    "ast_hash": "26aa5566d6c647871f62c69ef4954db1",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/dynamics-g4a.json": {
@@ -9765,7 +9765,7 @@
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/scatter-g4b.json": {
-    "mtime": 1792455049.067735,
+    "mtime": 1794022949.15306,
     "ast_hash": "bb08139a911e83931b046ffa3d0ffef8",
     "semantic_hash": ""
   },
@@ -9785,8 +9785,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/scatter.ts": {
-    "mtime": 1792455049.0683465,
-    "ast_hash": "07696fc1a870e707740ebd5a165e99c3",
+    "mtime": 1794022563.6868834,
+    "ast_hash": "7f49cddfc72ed83d26430cbc0028b202",
     "semantic_hash": ""
   },
   "app/src/physics/scatterG4b.test.ts": {
@@ -9885,8 +9885,8 @@
     "semantic_hash": ""
   },
   "pipeline/claims_448/g4b.py": {
-    "mtime": 1792473690.4273686,
-    "ast_hash": "aa45b32e64434cf6ff0fbcef11eef728",
+    "mtime": 1794026827.619506,
+    "ast_hash": "d8821a5229bae7a62754140903e00d98",
     "semantic_hash": ""
   },
   "docs/context/relay/2026-10-20-448-townsend-G3.md": {
@@ -9995,8 +9995,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q19.ts": {
-    "mtime": 1793042756.7383428,
-    "ast_hash": "24496e344d4318959b22e8f63d158db3",
+    "mtime": 1793992548.939739,
+    "ast_hash": "e93c107ca10c03dfc9032ba64c4a9c91",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q19.values.ts": {
@@ -10140,8 +10140,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.ts": {
-    "mtime": 1793236605.118699,
-    "ast_hash": "28d69c096bb450e46ce17cd88f6b72d4",
+    "mtime": 1793992548.9409988,
+    "ast_hash": "72751a30c82b04c91991c7870ea5e586",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q20.values.ts": {
@@ -10190,8 +10190,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O4.ts": {
-    "mtime": 1793226474.5355937,
-    "ast_hash": "826380c369218dd6b1fa9ee28f0c6383",
+    "mtime": 1794029021.8489761,
+    "ast_hash": "39320f1a4831f110c4eab25d77bd7f09",
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O4.values.ts": {
@@ -10200,8 +10200,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O5.ts": {
-    "mtime": 1793226474.5360012,
-    "ast_hash": "3198ecbc7291ec7d68e774e73b6c794c",
+    "mtime": 1793993376.1098084,
+    "ast_hash": "ecbeb8ce0fdc25051c48dd55c52d7e71",
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O5.values.ts": {
@@ -10210,8 +10210,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O6.ts": {
-    "mtime": 1793226474.5364504,
-    "ast_hash": "33ccaf4b2ff5bd50a2e16bab683c82c6",
+    "mtime": 1794026827.6167057,
+    "ast_hash": "2921b99b91299c9857d77e93294d8282",
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/O6.values.ts": {
@@ -10240,7 +10240,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/optics/meta.generated.ts": {
-    "mtime": 1793244025.3444145,
+    "mtime": 1794029036.1767974,
     "ast_hash": "eea61b445503193b6bd2b908846adf49",
     "semantic_hash": ""
   },
@@ -10260,8 +10260,8 @@
     "semantic_hash": ""
   },
   "app/src/openers/openerTitles.ts": {
-    "mtime": 1793224501.0658414,
-    "ast_hash": "a286b2ac29963428f7c7825d25bfc66a",
+    "mtime": 1793992548.946195,
+    "ast_hash": "7a5520b2725c258020981a2568d7fb67",
     "semantic_hash": ""
   },
   "app/src/pages/OpticsPages.test.tsx": {
@@ -10530,8 +10530,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q23.ts": {
-    "mtime": 1793236605.1214547,
-    "ast_hash": "3318478c72b4d30621a49cd3d3abbb19",
+    "mtime": 1793992548.9420228,
+    "ast_hash": "78bd8a90d80d107c8d3073b8c4f6c430",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q23.values.ts": {
@@ -10565,8 +10565,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q24.ts": {
-    "mtime": 1793244011.3928175,
-    "ast_hash": "61e7d92f3e0a7d472610b87681cb9924",
+    "mtime": 1793992548.9426987,
+    "ast_hash": "48fb34005d3ffc59cd5e6d5a57d555e7",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q24.values.ts": {
@@ -10600,8 +10600,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q25.ts": {
-    "mtime": 1793244011.3964124,
-    "ast_hash": "2157c05f9905e00edf1bcbe42760b6c1",
+    "mtime": 1793992548.9432228,
+    "ast_hash": "86a57c173b04e7ba5792ca843211fc0d",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q25.values.ts": {
@@ -10635,8 +10635,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q26.ts": {
-    "mtime": 1793239523.96909,
-    "ast_hash": "a50516b9911e7651c01d8e55bb779e15",
+    "mtime": 1793992548.9437706,
+    "ast_hash": "81e22f42094f58e02fc759d9873a2aa2",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q26.values.ts": {
@@ -10655,8 +10655,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q27.story.ts": {
-    "mtime": 1793239523.9710941,
-    "ast_hash": "13118acbe45f4f59fa5c51c38e4bb0bf",
+    "mtime": 1793993376.108187,
+    "ast_hash": "fff30d83864af12cbb1e976708ffd2a4",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q27.test.ts": {
@@ -10670,8 +10670,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q27.ts": {
-    "mtime": 1793239523.9718533,
-    "ast_hash": "6b238a6517fadcc8fb5a3d6226da8c2b",
+    "mtime": 1793992548.9444656,
+    "ast_hash": "369c5fad70c7002b9e05644dd38fe646",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q27.values.ts": {
@@ -10952,6 +10952,4811 @@
   "docs/roles/audits/P-Q26Q27-review.md": {
     "mtime": 1793238551.6739583,
     "ast_hash": "16f9a3a8e2346a843309dce450116066",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/manifest.json": {
+    "mtime": 1793992548.703486,
+    "ast_hash": "9f268f07ac2ebcdf34fe652cde9e7f2a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/manifest.json": {
+    "mtime": 1793992548.7433515,
+    "ast_hash": "e1f059a305b8c54f4f5fb47eb1353a1d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/manifest.json": {
+    "mtime": 1793992548.7830534,
+    "ast_hash": "1e6bf0a5c5bcbc450e6f158c607b5140",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/manifest.json": {
+    "mtime": 1793992548.8293395,
+    "ast_hash": "827b8f415ebd612d8f5ec100d1b0b968",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/manifest.json": {
+    "mtime": 1793992548.865926,
+    "ast_hash": "e4196f12ac898c4b1712bce64a2867b8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/manifest.json": {
+    "mtime": 1793992548.9045076,
+    "ast_hash": "cb47c493e6609f92ad6b212e39c8192b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/manifest.json": {
+    "mtime": 1793992548.9388397,
+    "ast_hash": "2e6ed38f5157576be7de6e02815512de",
+    "semantic_hash": ""
+  },
+  "app/src/content/L14.review.ts": {
+    "mtime": 1793993376.0996,
+    "ast_hash": "3600a0cb7ad332004f53d862b7c2dcec",
+    "semantic_hash": ""
+  },
+  "app/src/content/L14.story.ts": {
+    "mtime": 1794021578.734434,
+    "ast_hash": "4408081c6a61b4b977bff918467bd35b",
+    "semantic_hash": ""
+  },
+  "app/src/content/L14.test.ts": {
+    "mtime": 1794026827.6132166,
+    "ast_hash": "bcc3b1f6c3cdb22ee9608c0b7676e8a3",
+    "semantic_hash": ""
+  },
+  "app/src/content/L14.ts": {
+    "mtime": 1794021578.7352946,
+    "ast_hash": "783aeb203b82732858c540c833b9f925",
+    "semantic_hash": ""
+  },
+  "app/src/content/L14.values.ts": {
+    "mtime": 1794021578.7357879,
+    "ast_hash": "08f5359ccc037472070ef717ba0098fd",
+    "semantic_hash": ""
+  },
+  "app/src/content/L15.review.ts": {
+    "mtime": 1794021578.736101,
+    "ast_hash": "17a646a90c5c5387d5bb51072af70df7",
+    "semantic_hash": ""
+  },
+  "app/src/content/L15.story.ts": {
+    "mtime": 1794021578.736451,
+    "ast_hash": "25d53221b4a4cda0638118a6b2769f89",
+    "semantic_hash": ""
+  },
+  "app/src/content/L15.test.ts": {
+    "mtime": 1794022446.2472968,
+    "ast_hash": "de322adec4dbc70ccc290f5db8411085",
+    "semantic_hash": ""
+  },
+  "app/src/content/L15.ts": {
+    "mtime": 1794021578.7367837,
+    "ast_hash": "9c2485e81fc7b50a4a6a83bece25f721",
+    "semantic_hash": ""
+  },
+  "app/src/content/L15.values.ts": {
+    "mtime": 1794009074.947636,
+    "ast_hash": "08130341c15ebcd6df76fa41acfaf67d",
+    "semantic_hash": ""
+  },
+  "app/src/content/L16.review.ts": {
+    "mtime": 1794022446.2474782,
+    "ast_hash": "d65f9a7ff12ec43e1f9f325fd326df66",
+    "semantic_hash": ""
+  },
+  "app/src/content/L16.story.ts": {
+    "mtime": 1794029021.8422687,
+    "ast_hash": "7d6465e0a587aa26fb8bf3a0783dc2ac",
+    "semantic_hash": ""
+  },
+  "app/src/content/L16.test.ts": {
+    "mtime": 1794029021.842865,
+    "ast_hash": "dc89bc41c2fb7a7d478ba18e08b34a2e",
+    "semantic_hash": ""
+  },
+  "app/src/content/L16.ts": {
+    "mtime": 1794029021.8433542,
+    "ast_hash": "0781aeaf5fccb5817892b02ee10a51fb",
+    "semantic_hash": ""
+  },
+  "app/src/content/L16.values.ts": {
+    "mtime": 1794029021.8440013,
+    "ast_hash": "c76ab67d62d3de0b98217917bb00d7ca",
+    "semantic_hash": ""
+  },
+  "app/src/content/L17.review.ts": {
+    "mtime": 1794022563.6769788,
+    "ast_hash": "e46aacedfbbf03a555644fb5885e7adb",
+    "semantic_hash": ""
+  },
+  "app/src/content/L17.story.ts": {
+    "mtime": 1794029021.8444896,
+    "ast_hash": "a1ee041f2f1f663abf335fc337a62930",
+    "semantic_hash": ""
+  },
+  "app/src/content/L17.test.ts": {
+    "mtime": 1794029021.8448954,
+    "ast_hash": "87765eabdadefb3152357b0efc369def",
+    "semantic_hash": ""
+  },
+  "app/src/content/L17.ts": {
+    "mtime": 1794029021.8454573,
+    "ast_hash": "9cdf7144bdaf0e4b00c4e56db308cccd",
+    "semantic_hash": ""
+  },
+  "app/src/content/L17.values.ts": {
+    "mtime": 1794029021.8460298,
+    "ast_hash": "a71566998beaf3ed2361adce96e93351",
+    "semantic_hash": ""
+  },
+  "app/src/content/L18.review.ts": {
+    "mtime": 1794026827.6133912,
+    "ast_hash": "b4dc3ee984379d57cd4202f85b7c242d",
+    "semantic_hash": ""
+  },
+  "app/src/content/L18.story.ts": {
+    "mtime": 1794029021.8465118,
+    "ast_hash": "4db943afb1b88b4d215f77d6b96e46c5",
+    "semantic_hash": ""
+  },
+  "app/src/content/L18.test.ts": {
+    "mtime": 1794029021.846956,
+    "ast_hash": "be413810bbeaa4eef6d181884f2f2a4e",
+    "semantic_hash": ""
+  },
+  "app/src/content/L18.ts": {
+    "mtime": 1794029021.847399,
+    "ast_hash": "da294d087a54e50fd2f27fe8ff0b39bb",
+    "semantic_hash": ""
+  },
+  "app/src/content/L18.values.ts": {
+    "mtime": 1794029021.847883,
+    "ast_hash": "d29f6ffb9b6d507b224aa8f2097a5aae",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q19.arcade.test.ts": {
+    "mtime": 1793990617.071073,
+    "ast_hash": "023cc9fbe0001a4a3487015d4697e312",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.arcade.test.ts": {
+    "mtime": 1793990617.0714326,
+    "ast_hash": "679b8335251f9a7a7b5c6bcbb307e750",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q23.arcade.test.ts": {
+    "mtime": 1793990617.0717847,
+    "ast_hash": "ecd4423f566dfdd27858b79a7a312fd4",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q24.arcade.test.ts": {
+    "mtime": 1793990617.07223,
+    "ast_hash": "1294bdedf3926436e417b222b9fb7a49",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q25.arcade.test.ts": {
+    "mtime": 1793990617.0726674,
+    "ast_hash": "f4551f37387cd6c3ad1fbe4e1616a031",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q26.arcade.test.ts": {
+    "mtime": 1793990617.073143,
+    "ast_hash": "a53e5f74de347ef9360de2222b6710bf",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q27.arcade.test.ts": {
+    "mtime": 1793990617.0735571,
+    "ast_hash": "ed82cdd93b05b65d179513384b8402a0",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-448/l14.json": {
+    "mtime": 1794022950.4776578,
+    "ast_hash": "af316605d7e309008b7e3771c88bf755",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-448/l15.json": {
+    "mtime": 1794022950.916827,
+    "ast_hash": "e9e9ed9ddda547de44d90a5be7cb7622",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-448/l16.json": {
+    "mtime": 1794029021.8494945,
+    "ast_hash": "0bd607b1eb354abe062ed5d24582ae3f",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-448/l17.json": {
+    "mtime": 1794029021.8498862,
+    "ast_hash": "48d313368b44a6a81304fd5d1d9abe33",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-448/l18.json": {
+    "mtime": 1794029021.8502574,
+    "ast_hash": "8d22bda36387ee19742e2e267c3a0102",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/scatter-l17.json": {
+    "mtime": 1794022959.5281541,
+    "ast_hash": "4cac3241bcbab418f9320220c813940b",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/wave14-cases.json": {
+    "mtime": 1794022950.4781752,
+    "ast_hash": "33ceb69fcbc82bf441eddef2e3963e69",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/wave15-cases.json": {
+    "mtime": 1794022950.9171872,
+    "ast_hash": "a59ca5120fc0a8786d381477826318bb",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/wave16-cases.json": {
+    "mtime": 1794029021.8507524,
+    "ast_hash": "333867ea97e3a5fc233c5fd2dbc766b3",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/wave18-cases.json": {
+    "mtime": 1794026827.6174965,
+    "ast_hash": "0c1e1466de0cc6ac9b905a08275ad1b3",
+    "semantic_hash": ""
+  },
+  "app/src/physics/scatterL17.test.ts": {
+    "mtime": 1794022563.687339,
+    "ast_hash": "75be6de8fe1e17d04a501d8e0b61bda5",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave14.test.ts": {
+    "mtime": 1793993376.1130326,
+    "ast_hash": "9b9c810e3a7d3a6177975470bf05aeef",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave14.ts": {
+    "mtime": 1793993376.113315,
+    "ast_hash": "ac2c193f703ffdcc8a6a37cfce844ed0",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave15.test.ts": {
+    "mtime": 1794009074.9543736,
+    "ast_hash": "0bcd4bca15a27c2fdd57aacc4d96d3c3",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave15.ts": {
+    "mtime": 1794009074.954711,
+    "ast_hash": "63c59f66bcaeea855370ce3a6ed31fe0",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave16.test.ts": {
+    "mtime": 1794022446.2541597,
+    "ast_hash": "901fbc563e8a305b3531d3cc3d838dd5",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave16.ts": {
+    "mtime": 1794029021.8511195,
+    "ast_hash": "d947d619ed5b0574486924f142c4e02a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave18.test.ts": {
+    "mtime": 1794026827.6176429,
+    "ast_hash": "21c82b00cdf47b42295f35e28b95e746",
+    "semantic_hash": ""
+  },
+  "app/src/physics/wave18.ts": {
+    "mtime": 1794026827.617811,
+    "ast_hash": "70b2a01dc28ad78615f9525f6f7aa2db",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/wave14Plot.test.tsx": {
+    "mtime": 1793993376.1142635,
+    "ast_hash": "2249384341bf8b0a26fd528075cf6b64",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/wave16Plot.test.tsx": {
+    "mtime": 1794022446.2550676,
+    "ast_hash": "30cbf8bb6b90a4c29a6a41a8ab4511c4",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/wavefunctionPotential.test.tsx": {
+    "mtime": 1794022563.690632,
+    "ast_hash": "fc2bb0118e68129c5d2e2d9a751ca745",
+    "semantic_hash": ""
+  },
+  "films/src/kit.ts": {
+    "mtime": 1793992548.9473176,
+    "ast_hash": "03a51a25d3c2b701c2c87735d179bd03",
+    "semantic_hash": ""
+  },
+  "films/src/kitScene.tsx": {
+    "mtime": 1793992548.9475951,
+    "ast_hash": "5bfee08f0f7419ab096599ac4c4e5d4e",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q19-walker.ts": {
+    "mtime": 1793992548.9481928,
+    "ast_hash": "c891411755c0fd1e392e408e945c268a",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q20-cloner.ts": {
+    "mtime": 1793992548.9486346,
+    "ast_hash": "f18c9d8d131cbf0368261853065110ad",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q23-holevo-gap.ts": {
+    "mtime": 1793992548.9489815,
+    "ast_hash": "cddd738f831945ec3f0764c6cc76b7ff",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q24-rabi-ball.ts": {
+    "mtime": 1793992548.9493089,
+    "ast_hash": "47554611339a35bc11b80fcda15b7302",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q25-blockade.ts": {
+    "mtime": 1793992548.9496408,
+    "ast_hash": "ce9f1fcfa542929282c0b66e9aadad88",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q26-hom.ts": {
+    "mtime": 1793992548.949965,
+    "ast_hash": "74e9866afb5775b675f53ba9d5e3dae5",
+    "semantic_hash": ""
+  },
+  "films/src/projects/qc-q27-transmon.ts": {
+    "mtime": 1793992548.950309,
+    "ast_hash": "c65e09b01326dd55c3615c1bc0ca6e45",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q19-walker.data.ts": {
+    "mtime": 1793992548.951082,
+    "ast_hash": "3dd2494b2cd725a76fd36c4a9cb1b86f",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q19-walker.tsx": {
+    "mtime": 1793992548.9515696,
+    "ast_hash": "685c79a20d7184f1de23679ca2ff6d05",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q20-cloner.data.ts": {
+    "mtime": 1793992548.9518185,
+    "ast_hash": "1ddf5db6f44a93905503c487f250f4ed",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q20-cloner.tsx": {
+    "mtime": 1793992548.9522974,
+    "ast_hash": "cafc37298391f312e0086a7742ff56a6",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q23-holevo-gap.data.ts": {
+    "mtime": 1793992548.9525533,
+    "ast_hash": "e588b667c6b8db45e0bbf9bbea660a14",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q23-holevo-gap.tsx": {
+    "mtime": 1793992548.953035,
+    "ast_hash": "59bf79ca035e6fa3d0c677313ce93a02",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q24-rabi-ball.data.ts": {
+    "mtime": 1793992548.9532824,
+    "ast_hash": "f2424b4f05ef51ce1ac2985d99efdec0",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q24-rabi-ball.tsx": {
+    "mtime": 1793992548.9537442,
+    "ast_hash": "c534c6fbfb0427fed78f3a2776507242",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q25-blockade.data.ts": {
+    "mtime": 1793992548.9540162,
+    "ast_hash": "a786fe2a34b7c88bf7e9a84ae220ceb3",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q25-blockade.tsx": {
+    "mtime": 1793992548.9545074,
+    "ast_hash": "824ff70a1bb85f8885e17b7238f2ca72",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q26-hom.data.ts": {
+    "mtime": 1793992548.9547515,
+    "ast_hash": "d073953ad45cff6e29ef0370d49fea5b",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q26-hom.tsx": {
+    "mtime": 1793992548.955193,
+    "ast_hash": "688c676b43571043b9e2264bf46c1f74",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q27-transmon.data.ts": {
+    "mtime": 1793992548.9554684,
+    "ast_hash": "6797df6cb335d93542632e884424b986",
+    "semantic_hash": ""
+  },
+  "films/src/scenes/qc-q27-transmon.tsx": {
+    "mtime": 1793992548.955915,
+    "ast_hash": "6fc0191f7de70ce013daa2b92dbe1219",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_448/l14.py": {
+    "mtime": 1794021578.738003,
+    "ast_hash": "272ec3cb02c2f3f0ce462c0a52cac13e",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_448/l15.py": {
+    "mtime": 1794009074.9579966,
+    "ast_hash": "f47372ce2845ac4ae793afe668241c66",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_448/l16.py": {
+    "mtime": 1794029021.8519156,
+    "ast_hash": "d36c213d65698be95057a3c410b535a5",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_448/l17.py": {
+    "mtime": 1794029021.8524432,
+    "ast_hash": "fe67603b8b390dcfb681fdd98ab2bb7a",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_448/l18.py": {
+    "mtime": 1794029021.85297,
+    "ast_hash": "0f2d6fb6c7a4d38d1e38d8284dce9280",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/kit.ts": {
+    "mtime": 1793992548.9562483,
+    "ast_hash": "61b87afb9c9958d7ca8cb8fa94219d3f",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q19-walker.ts": {
+    "mtime": 1793992548.9565036,
+    "ast_hash": "6cd24b3fc192f75e4e8153c4b864d178",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q20-cloner.ts": {
+    "mtime": 1793992548.9567518,
+    "ast_hash": "07acff055853c0b3b1d314c2fae63769",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q23-holevo-gap.ts": {
+    "mtime": 1793992548.9569948,
+    "ast_hash": "c0ed3e3d8516cc4d52bd5f5eef6d2ae7",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q24-rabi-ball.ts": {
+    "mtime": 1793992548.9572358,
+    "ast_hash": "5e569721912d20f9618293f9246aff5f",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q25-blockade.ts": {
+    "mtime": 1793992548.9575238,
+    "ast_hash": "2f3ea35f23fb1c10f0b3ec11da2e0746",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q26-hom.ts": {
+    "mtime": 1793992548.9577823,
+    "ast_hash": "c90c4a35fd630f4b5fd7f0bfe2025604",
+    "semantic_hash": ""
+  },
+  "pipeline/films/checks/qc-q27-transmon.ts": {
+    "mtime": 1793992548.958047,
+    "ast_hash": "c57c214470f93a5e88fcab55d00dd941",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-06-448-L14.md": {
+    "mtime": 1793993376.1164076,
+    "ast_hash": "56dce0a65ffe5814f11ea258eea438b3",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-06-448-L15.md": {
+    "mtime": 1794009074.9566083,
+    "ast_hash": "5d94068a44262d115b37ad79bbeecdc4",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-06-arcade-Q19-27.md": {
+    "mtime": 1793990617.0753086,
+    "ast_hash": "2fc8fc5c665976fe1b786eff0f14779a",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-06-films-Q19-27.md": {
+    "mtime": 1793992548.946425,
+    "ast_hash": "e40abf9f6b37b0951eed94d420fb73ef",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-07-448-L14L15-fix.md": {
+    "mtime": 1794021578.7374942,
+    "ast_hash": "7dff68337403dda816724c450bfe3d86",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-07-448-L16.md": {
+    "mtime": 1794022446.2561295,
+    "ast_hash": "f572db4b19976aebdef1275a039ecef9",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-07-448-L16L18-fix.md": {
+    "mtime": 1794029021.8513663,
+    "ast_hash": "e0965b1559ff517ba7f10ad075dee61f",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-07-448-L17.md": {
+    "mtime": 1794022563.6927867,
+    "ast_hash": "cf156f948542ccffd47118da161a75f2",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-07-448-L18.md": {
+    "mtime": 1794026827.618812,
+    "ast_hash": "2ea1b83d54421c0754de8b477d74b195",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-L14L15-review.md": {
+    "mtime": 1794020705.8544757,
+    "ast_hash": "69718ad6039b0efaced45c324ede1990",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-L16L18-review.md": {
+    "mtime": 1794027744.9130356,
+    "ast_hash": "d694671ddb97b0867780abc5ebe1e13c",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/448-L14L18.md": {
+    "mtime": 1794021571.452514,
+    "ast_hash": "65673f0c45e9cf6be3571b217a710dc1",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L14-story.md": {
+    "mtime": 1793993376.1175785,
+    "ast_hash": "7b20f2d6f4e92a590ab6de29372a5dd6",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L15-story.md": {
+    "mtime": 1794009074.957451,
+    "ast_hash": "5e45a083d948c9f07d0829bec88e81fc",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L16-story.md": {
+    "mtime": 1794022446.256597,
+    "ast_hash": "3ee5624ce92ca96e068d50c3d3b08431",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L17-story.md": {
+    "mtime": 1794022563.6935265,
+    "ast_hash": "c0bcdafd1a5e2125def362dde70ee1b8",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-L18-story.md": {
+    "mtime": 1794026827.619209,
+    "ast_hash": "057c4fda55c50d724f77c9d9bc797bfe",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0000.webp": {
+    "mtime": 1793992548.6700509,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0001.webp": {
+    "mtime": 1793992548.670391,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0002.webp": {
+    "mtime": 1793992548.6705935,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0003.webp": {
+    "mtime": 1793992548.6707964,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0004.webp": {
+    "mtime": 1793992548.6709905,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0005.webp": {
+    "mtime": 1793992548.6711915,
+    "ast_hash": "f74471228c34002643c55396f7707611",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0006.webp": {
+    "mtime": 1793992548.6715322,
+    "ast_hash": "e646d2226b367afde557198703067639",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0007.webp": {
+    "mtime": 1793992548.6717181,
+    "ast_hash": "e646d2226b367afde557198703067639",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0008.webp": {
+    "mtime": 1793992548.6720648,
+    "ast_hash": "c8247c2fe27ca6bb221cf27a6be4b8a3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0009.webp": {
+    "mtime": 1793992548.6725025,
+    "ast_hash": "a5c66a66ac55fabeb6f9f74904d8d2cb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0010.webp": {
+    "mtime": 1793992548.672817,
+    "ast_hash": "a6485a270c6ca30b35fc679118ce88ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0011.webp": {
+    "mtime": 1793992548.6731105,
+    "ast_hash": "15f648f6e2f91b437508f1d28d63890d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0012.webp": {
+    "mtime": 1793992548.673472,
+    "ast_hash": "697e6fb8ffb7b2e974b96fa2378571e3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0013.webp": {
+    "mtime": 1793992548.673758,
+    "ast_hash": "0c8c03c6efefc75c6418da0a7e90551d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0014.webp": {
+    "mtime": 1793992548.6740355,
+    "ast_hash": "69166b319dbb9ee361d1e0e616c45384",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0015.webp": {
+    "mtime": 1793992548.6743157,
+    "ast_hash": "fa35d170ff164dcd19e01e8c1b5c0552",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0016.webp": {
+    "mtime": 1793992548.6745992,
+    "ast_hash": "42516f88ae1cb0734a662e7abea65890",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0017.webp": {
+    "mtime": 1793992548.674882,
+    "ast_hash": "884bb62c2658374d3553b85d19ee89c0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0018.webp": {
+    "mtime": 1793992548.675173,
+    "ast_hash": "7112ff2bf15a200c5fb25ef91000bef1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0019.webp": {
+    "mtime": 1793992548.6756213,
+    "ast_hash": "ad0e32ed1623d80e2da5b2fccd38e95e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0020.webp": {
+    "mtime": 1793992548.6759696,
+    "ast_hash": "03bb19da8fc304e5b74c8df0f7051122",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0021.webp": {
+    "mtime": 1793992548.6762857,
+    "ast_hash": "1d963e4cfe275e05e14b85edb4cdee92",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0022.webp": {
+    "mtime": 1793992548.676574,
+    "ast_hash": "2c49b6b2c7e6f82427b2a441b5293855",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0023.webp": {
+    "mtime": 1793992548.6768706,
+    "ast_hash": "d55cb399228aef9c2df620ae678bf042",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0024.webp": {
+    "mtime": 1793992548.6771576,
+    "ast_hash": "22f96b1c845c2b5258bdff961933e1a0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0025.webp": {
+    "mtime": 1793992548.6774523,
+    "ast_hash": "1c0c0e5d033a98d4d235e1450c853c36",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0026.webp": {
+    "mtime": 1793992548.6777973,
+    "ast_hash": "9d035a85c1bebdce0069ad4959672d71",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0027.webp": {
+    "mtime": 1793992548.678288,
+    "ast_hash": "8a4120d985caead25a71d8138ab32b0e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0028.webp": {
+    "mtime": 1793992548.6785839,
+    "ast_hash": "b1db92b45b5ad2643b36e236990fc0b1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0029.webp": {
+    "mtime": 1793992548.678961,
+    "ast_hash": "ced316533f8185c20133e7aff608c791",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0030.webp": {
+    "mtime": 1793992548.6792736,
+    "ast_hash": "1599a355d708743cf285f234a0188452",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0031.webp": {
+    "mtime": 1793992548.6795568,
+    "ast_hash": "625bc70ec31febbb3d15ace6d3b0e8d6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0032.webp": {
+    "mtime": 1793992548.6799235,
+    "ast_hash": "3991b58c25c811d653ec3a3b3b888266",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0033.webp": {
+    "mtime": 1793992548.6802166,
+    "ast_hash": "f57a2401c738aa465ba29d1a58f5fa81",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0034.webp": {
+    "mtime": 1793992548.6805243,
+    "ast_hash": "8d42034073bc3b009cbe2eacb02aa1e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0035.webp": {
+    "mtime": 1793992548.6808221,
+    "ast_hash": "81eed025702b07ed83f38cde5b04ccb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0036.webp": {
+    "mtime": 1793992548.681073,
+    "ast_hash": "81eed025702b07ed83f38cde5b04ccb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0037.webp": {
+    "mtime": 1793992548.6812994,
+    "ast_hash": "81eed025702b07ed83f38cde5b04ccb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0038.webp": {
+    "mtime": 1793992548.6814888,
+    "ast_hash": "81eed025702b07ed83f38cde5b04ccb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0039.webp": {
+    "mtime": 1793992548.6816614,
+    "ast_hash": "81eed025702b07ed83f38cde5b04ccb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0040.webp": {
+    "mtime": 1793992548.6819458,
+    "ast_hash": "422c7a1d9209ea41b810970c52207978",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0041.webp": {
+    "mtime": 1793992548.682109,
+    "ast_hash": "422c7a1d9209ea41b810970c52207978",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0042.webp": {
+    "mtime": 1793992548.6823752,
+    "ast_hash": "ea50d0eafe62c9500173f1b42d3cb320",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0043.webp": {
+    "mtime": 1793992548.6828413,
+    "ast_hash": "c73dad2ae2e16f4393fefc8db9880ddd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0044.webp": {
+    "mtime": 1793992548.6831539,
+    "ast_hash": "ee0f8f225fd7fec17cb61b4d3e7007cd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0045.webp": {
+    "mtime": 1793992548.6834512,
+    "ast_hash": "6419bcfb5b8b98a7ad119531e84e70c6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0046.webp": {
+    "mtime": 1793992548.6837482,
+    "ast_hash": "8e88cc62e1a2405609ddd028522fc5f6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0047.webp": {
+    "mtime": 1793992548.6840527,
+    "ast_hash": "a3c5dce1010fd799d2b6252f77224f6b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0048.webp": {
+    "mtime": 1793992548.6844323,
+    "ast_hash": "98bd7ea17ceb1c17e04c5b850ec4067f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0049.webp": {
+    "mtime": 1793992548.6847954,
+    "ast_hash": "2dae360908a7f8990c06824d7fe9c501",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0050.webp": {
+    "mtime": 1793992548.6850858,
+    "ast_hash": "ec5d2ccb7581d4c0c62cd23930380055",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0051.webp": {
+    "mtime": 1793992548.6853764,
+    "ast_hash": "d1ba41e5929db1747d096a0eec61b52e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0052.webp": {
+    "mtime": 1793992548.68565,
+    "ast_hash": "93a7f53e2f216ac035af62afe7f7d5e5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0053.webp": {
+    "mtime": 1793992548.6859288,
+    "ast_hash": "bd4f98037a5e13c303a3d72c672bf192",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0054.webp": {
+    "mtime": 1793992548.6862078,
+    "ast_hash": "55617c862936bc0b88fd1559ec1ee24d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0055.webp": {
+    "mtime": 1793992548.6865535,
+    "ast_hash": "13238ebb80cc3518e3c62602e7450708",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0056.webp": {
+    "mtime": 1793992548.6868417,
+    "ast_hash": "6653176a4cf3ff1b0b10b9418312c447",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0057.webp": {
+    "mtime": 1793992548.6871347,
+    "ast_hash": "468ca2ef8e367fbcae7be5060323e7de",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0058.webp": {
+    "mtime": 1793992548.6874368,
+    "ast_hash": "2b53d24b367db7bffbd53912dfef5743",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0059.webp": {
+    "mtime": 1793992548.6877236,
+    "ast_hash": "aceb568d4e28322f0a37e6e5963d26f0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0060.webp": {
+    "mtime": 1793992548.6879973,
+    "ast_hash": "c0214e992599574947ce5361bee5ea6c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0061.webp": {
+    "mtime": 1793992548.6882594,
+    "ast_hash": "2948f4581ee711b503068a33d07685fc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0062.webp": {
+    "mtime": 1793992548.688533,
+    "ast_hash": "7d346ab4267b55d2cd970650699eee86",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0063.webp": {
+    "mtime": 1793992548.6887927,
+    "ast_hash": "dda2ad11d25759ace4762263c80bd477",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0064.webp": {
+    "mtime": 1793992548.6890476,
+    "ast_hash": "7f575a955c61e13027bac34c45d18294",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0065.webp": {
+    "mtime": 1793992548.6893222,
+    "ast_hash": "e7e1d96a3a9cb069749c7adde17982c2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0066.webp": {
+    "mtime": 1793992548.6895933,
+    "ast_hash": "7d8ff7282ce2785c68f800c86092b334",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0067.webp": {
+    "mtime": 1793992548.6898625,
+    "ast_hash": "0c8654dbf61717bb62b0e4e046cf620f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0068.webp": {
+    "mtime": 1793992548.6901376,
+    "ast_hash": "d0989b387c80a3af8f3fc97046b347ad",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0069.webp": {
+    "mtime": 1793992548.6904228,
+    "ast_hash": "adf80d9da0e50ba30e64f8c453459e72",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0070.webp": {
+    "mtime": 1793992548.6906738,
+    "ast_hash": "1f34a00bfa1b2cf8ef7855abe86a6378",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0071.webp": {
+    "mtime": 1793992548.6909587,
+    "ast_hash": "f72a77ab87619798e4d3f5a514f32ba9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0072.webp": {
+    "mtime": 1793992548.6912205,
+    "ast_hash": "d1f70d8596429ec709773e7629192e69",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0073.webp": {
+    "mtime": 1793992548.6914663,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0074.webp": {
+    "mtime": 1793992548.6916244,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0075.webp": {
+    "mtime": 1793992548.6917918,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0076.webp": {
+    "mtime": 1793992548.6919508,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0077.webp": {
+    "mtime": 1793992548.6921089,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0078.webp": {
+    "mtime": 1793992548.6922727,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0079.webp": {
+    "mtime": 1793992548.6924338,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0080.webp": {
+    "mtime": 1793992548.6927054,
+    "ast_hash": "bec746d8b222d85df6e339859e718b90",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0081.webp": {
+    "mtime": 1793992548.6928809,
+    "ast_hash": "bec746d8b222d85df6e339859e718b90",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0082.webp": {
+    "mtime": 1793992548.693155,
+    "ast_hash": "14360d6b6e1a55601ac281be1e347890",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0083.webp": {
+    "mtime": 1793992548.6934159,
+    "ast_hash": "f436ef2380e873121dce50bd826bfe5f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0084.webp": {
+    "mtime": 1793992548.693771,
+    "ast_hash": "59a385d954189c8e22594c319fe555e8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0085.webp": {
+    "mtime": 1793992548.6940618,
+    "ast_hash": "3093eb10844eb4d9ed8df6e7eae812ec",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0086.webp": {
+    "mtime": 1793992548.6943488,
+    "ast_hash": "5cfe0764c543c6b328f9bd186cd1dd81",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0087.webp": {
+    "mtime": 1793992548.6946244,
+    "ast_hash": "f54df64e1a1703b38883ab28ca56714e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0088.webp": {
+    "mtime": 1793992548.6949186,
+    "ast_hash": "d639d84f8f2bbaad839f4e39496f1bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0089.webp": {
+    "mtime": 1793992548.6952848,
+    "ast_hash": "d4a358f2ee9a92c6e3f68187ed478cb6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0090.webp": {
+    "mtime": 1793992548.6956234,
+    "ast_hash": "1dc9ffd0a7dca82de4806b4bb503c7b6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0091.webp": {
+    "mtime": 1793992548.6959054,
+    "ast_hash": "5f4a8ce957281871c85bf1c3840fdad9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0092.webp": {
+    "mtime": 1793992548.6961577,
+    "ast_hash": "20fd74a3ac9838dbd18290109a2d6882",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0093.webp": {
+    "mtime": 1793992548.6964328,
+    "ast_hash": "e976e515b2b0fde44c7e4c94bf6b1c5b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0094.webp": {
+    "mtime": 1793992548.6966827,
+    "ast_hash": "9c7f5c4a7af8470b48ba9ac17b876c16",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0095.webp": {
+    "mtime": 1793992548.6969593,
+    "ast_hash": "d92b5b627361d0e0911d10b3632ac193",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0096.webp": {
+    "mtime": 1793992548.6972182,
+    "ast_hash": "1b62463d7b1a30ca5a7400ceb31fc65d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0097.webp": {
+    "mtime": 1793992548.697582,
+    "ast_hash": "1ee7f6bf13442eb5361da827a8d5edc8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0098.webp": {
+    "mtime": 1793992548.6978414,
+    "ast_hash": "8a47a5cc8684e712beb4306d7f8c73fd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0099.webp": {
+    "mtime": 1793992548.6981175,
+    "ast_hash": "6f27f782f7e98d125ac70257e2822eb0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0100.webp": {
+    "mtime": 1793992548.6983726,
+    "ast_hash": "bb9b161b7c91ac0e23266dcc7f756a47",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0101.webp": {
+    "mtime": 1793992548.6986516,
+    "ast_hash": "5f54561f229e976e833950a3393fd052",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0102.webp": {
+    "mtime": 1793992548.6989174,
+    "ast_hash": "30e2db9fd1e4930eefc33117a0b18e16",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0103.webp": {
+    "mtime": 1793992548.699202,
+    "ast_hash": "921151a18470441c3512e95c573f9769",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0104.webp": {
+    "mtime": 1793992548.6994634,
+    "ast_hash": "66cc278d7761928320f6948c4df3b7db",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0105.webp": {
+    "mtime": 1793992548.6997442,
+    "ast_hash": "72c5410d7d2c35c48aee85b0affa3aa6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0106.webp": {
+    "mtime": 1793992548.6999986,
+    "ast_hash": "6fe872c981e29ea977b0dd4526e0b187",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0107.webp": {
+    "mtime": 1793992548.700291,
+    "ast_hash": "3a5426fbfff2768f782b5d4cdc383181",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0108.webp": {
+    "mtime": 1793992548.7005548,
+    "ast_hash": "90159f2f57de2359a4e05a1d6d5941f5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0109.webp": {
+    "mtime": 1793992548.7008405,
+    "ast_hash": "fcc8637fe938e2d78cafc845e82b1109",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0110.webp": {
+    "mtime": 1793992548.7011025,
+    "ast_hash": "e432678e5f0e12d3cec7da8625b74f77",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0111.webp": {
+    "mtime": 1793992548.7013874,
+    "ast_hash": "23bafef9d19a26c1467222aaac329db6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0112.webp": {
+    "mtime": 1793992548.7017565,
+    "ast_hash": "3e7f9d62f1f5c90fc8e72f61601cfb9b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0113.webp": {
+    "mtime": 1793992548.7020996,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0114.webp": {
+    "mtime": 1793992548.7022784,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0115.webp": {
+    "mtime": 1793992548.702451,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0116.webp": {
+    "mtime": 1793992548.7026224,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0117.webp": {
+    "mtime": 1793992548.7027977,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0118.webp": {
+    "mtime": 1793992548.702967,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/0119.webp": {
+    "mtime": 1793992548.7031436,
+    "ast_hash": "55704f0e0fa4d2a8ab2c78e22a32cdff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q19-walker/poster.webp": {
+    "mtime": 1793992548.7036583,
+    "ast_hash": "9d4873f4716c0f811978a5cdd8933ece",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0000.webp": {
+    "mtime": 1793992548.7040143,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0001.webp": {
+    "mtime": 1793992548.7041914,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0002.webp": {
+    "mtime": 1793992548.7043655,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0003.webp": {
+    "mtime": 1793992548.7045422,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0004.webp": {
+    "mtime": 1793992548.7047143,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0005.webp": {
+    "mtime": 1793992548.7048886,
+    "ast_hash": "1d52c0754879736f2eb302c26f2726a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0006.webp": {
+    "mtime": 1793992548.70517,
+    "ast_hash": "8a4435b630f7cdf65fdc553e229d242f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0007.webp": {
+    "mtime": 1793992548.705353,
+    "ast_hash": "8a4435b630f7cdf65fdc553e229d242f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0008.webp": {
+    "mtime": 1793992548.7056494,
+    "ast_hash": "9d4cf784a1f5524064c170a72b011f24",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0009.webp": {
+    "mtime": 1793992548.7061164,
+    "ast_hash": "e838e626d576d75564acf1a12d23725c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0010.webp": {
+    "mtime": 1793992548.7064428,
+    "ast_hash": "1b9837c341336e81f140e5349b8557d0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0011.webp": {
+    "mtime": 1793992548.7067356,
+    "ast_hash": "d5bcf390673ad0d700f9ef7d36f67531",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0012.webp": {
+    "mtime": 1793992548.7070563,
+    "ast_hash": "59c5b125166ced2dff2dcb2a3eab9280",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0013.webp": {
+    "mtime": 1793992548.7073417,
+    "ast_hash": "b31c7af371baf530ea45aa35c93ea3c7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0014.webp": {
+    "mtime": 1793992548.7076418,
+    "ast_hash": "ba482bc31b419ea67994b6218127fe9d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0015.webp": {
+    "mtime": 1793992548.70791,
+    "ast_hash": "8afae20372d196d9695f66d0fbe92019",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0016.webp": {
+    "mtime": 1793992548.708282,
+    "ast_hash": "1aa40bb62f3c52d6f72f2f56d38cacd0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0017.webp": {
+    "mtime": 1793992548.7085624,
+    "ast_hash": "745482337ed824bf24ed76b076fa3893",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0018.webp": {
+    "mtime": 1793992548.7088518,
+    "ast_hash": "fdbcc2ccbc6168f7a8ca6a621761c607",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0019.webp": {
+    "mtime": 1793992548.709166,
+    "ast_hash": "8e71aa605d34ffadf7fc51cb72287a44",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0020.webp": {
+    "mtime": 1793992548.7094781,
+    "ast_hash": "dfc744631e55742f74a12f040fd8ad10",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0021.webp": {
+    "mtime": 1793992548.709821,
+    "ast_hash": "3c01e36f57d0bafacb39564e550eacbc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0022.webp": {
+    "mtime": 1793992548.7101457,
+    "ast_hash": "9e396deff91fc94e0bc4f63e55bd5516",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0023.webp": {
+    "mtime": 1793992548.7104318,
+    "ast_hash": "ecb5145f86d9820ea179384d029c13b5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0024.webp": {
+    "mtime": 1793992548.710746,
+    "ast_hash": "2b72e945a793bb58e6f796ec6cf52f6c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0025.webp": {
+    "mtime": 1793992548.7110596,
+    "ast_hash": "6bac9ead4b460a3602594cdb66db4b11",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0026.webp": {
+    "mtime": 1793992548.711378,
+    "ast_hash": "8d46769886ec1de581553ca2c867f482",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0027.webp": {
+    "mtime": 1793992548.711693,
+    "ast_hash": "f87c50e9f2a0db7b3b813de79f06f33a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0028.webp": {
+    "mtime": 1793992548.7119987,
+    "ast_hash": "65117e5ee3c9b3264bacd12e51ec0cb2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0029.webp": {
+    "mtime": 1793992548.7123044,
+    "ast_hash": "40f126ccbc3c119181baa09d1622f7e0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0030.webp": {
+    "mtime": 1793992548.7127562,
+    "ast_hash": "0ba4d0db51a1273458eb203e452046d4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0031.webp": {
+    "mtime": 1793992548.7130363,
+    "ast_hash": "e527517c4db5a9e0c3f9c65344162cca",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0032.webp": {
+    "mtime": 1793992548.7134209,
+    "ast_hash": "1a8c902a947b95c093e102ad95bf10a3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0033.webp": {
+    "mtime": 1793992548.7137122,
+    "ast_hash": "7620e4e0cfa069010b18a25ce18857eb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0034.webp": {
+    "mtime": 1793992548.7140162,
+    "ast_hash": "33472f748268d1459854ae9a1082f968",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0035.webp": {
+    "mtime": 1793992548.7143295,
+    "ast_hash": "00bcea45c5501314c4cbb9661a750bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0036.webp": {
+    "mtime": 1793992548.7145293,
+    "ast_hash": "00bcea45c5501314c4cbb9661a750bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0037.webp": {
+    "mtime": 1793992548.7147233,
+    "ast_hash": "00bcea45c5501314c4cbb9661a750bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0038.webp": {
+    "mtime": 1793992548.7149231,
+    "ast_hash": "00bcea45c5501314c4cbb9661a750bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0039.webp": {
+    "mtime": 1793992548.71513,
+    "ast_hash": "00bcea45c5501314c4cbb9661a750bac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0040.webp": {
+    "mtime": 1793992548.7154183,
+    "ast_hash": "6d37179265379b6fb78beb4bd1347d65",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0041.webp": {
+    "mtime": 1793992548.7155788,
+    "ast_hash": "6d37179265379b6fb78beb4bd1347d65",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0042.webp": {
+    "mtime": 1793992548.7158597,
+    "ast_hash": "e31b8e2af3132539d7a233aa1f5953db",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0043.webp": {
+    "mtime": 1793992548.7161436,
+    "ast_hash": "18ea892c8f24d03c7190b9ec460869f1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0044.webp": {
+    "mtime": 1793992548.7164009,
+    "ast_hash": "51817c435bf203cf8d2bc885b5cb88ad",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0045.webp": {
+    "mtime": 1793992548.7166963,
+    "ast_hash": "0fe0b7fad8e6c5c531b292bf05ee3e90",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0046.webp": {
+    "mtime": 1793992548.7169745,
+    "ast_hash": "302261566263b18c2aedf7b1e3f68090",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0047.webp": {
+    "mtime": 1793992548.7173595,
+    "ast_hash": "098a341ec526905c711b03b69f3abc24",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0048.webp": {
+    "mtime": 1793992548.7176418,
+    "ast_hash": "9308bba756050caed28421f4bdeb191c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0049.webp": {
+    "mtime": 1793992548.7179258,
+    "ast_hash": "351e9fe949715309dab007ea2ae3b90a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0050.webp": {
+    "mtime": 1793992548.7182066,
+    "ast_hash": "7a3d60b0e6ce6ef96ba9612a66059d1b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0051.webp": {
+    "mtime": 1793992548.71854,
+    "ast_hash": "1272cb3e349832e234b36bb40322d0ce",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0052.webp": {
+    "mtime": 1793992548.7188303,
+    "ast_hash": "2e205fddb64da52f036fe984cee5fdac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0053.webp": {
+    "mtime": 1793992548.7192001,
+    "ast_hash": "d535a290dbc9d5eef7f20d21515ce1ad",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0054.webp": {
+    "mtime": 1793992548.719511,
+    "ast_hash": "3eda008974b7e1bd4f1c879fa280d02c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0055.webp": {
+    "mtime": 1793992548.7198296,
+    "ast_hash": "e06cdb50b529884680b3783294035cd3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0056.webp": {
+    "mtime": 1793992548.7201488,
+    "ast_hash": "f561005a1ffe6c3336b62ccb6e76ea3b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0057.webp": {
+    "mtime": 1793992548.720432,
+    "ast_hash": "d86667e1c4164aaf3c369d530019ccbc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0058.webp": {
+    "mtime": 1793992548.7207406,
+    "ast_hash": "af5036c91bf389d4ed5f938cfe188a5c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0059.webp": {
+    "mtime": 1793992548.7210238,
+    "ast_hash": "9def9d7d71b3f1864a54c4ac67913ae9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0060.webp": {
+    "mtime": 1793992548.7213256,
+    "ast_hash": "1308cc00a5e7d5a0369c23263ca5a168",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0061.webp": {
+    "mtime": 1793992548.7216103,
+    "ast_hash": "d571e336fde9282812eb85374353b867",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0062.webp": {
+    "mtime": 1793992548.7219946,
+    "ast_hash": "012312b2185511d62a95d434e622c54a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0063.webp": {
+    "mtime": 1793992548.7222898,
+    "ast_hash": "75a229bc368fdec2a99ebc952f773a3c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0064.webp": {
+    "mtime": 1793992548.722641,
+    "ast_hash": "4409b4bc82f5244d52d39ffa451d2c94",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0065.webp": {
+    "mtime": 1793992548.7229712,
+    "ast_hash": "895d64c4744f4be3c1eb52584aae0bcf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0066.webp": {
+    "mtime": 1793992548.7233183,
+    "ast_hash": "b8e04509a78e20507860c8678f152cfe",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0067.webp": {
+    "mtime": 1793992548.7236345,
+    "ast_hash": "399d56bb516ee93037ba1281b457748f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0068.webp": {
+    "mtime": 1793992548.7239788,
+    "ast_hash": "763f5970fbab8636cabf4eebdff3f350",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0069.webp": {
+    "mtime": 1793992548.7243612,
+    "ast_hash": "5fd9727ae0a3fd09e25ed1de1ba3491b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0070.webp": {
+    "mtime": 1793992548.7247102,
+    "ast_hash": "39bf92112e8514e6def3d55d0f33295d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0071.webp": {
+    "mtime": 1793992548.7250276,
+    "ast_hash": "356c61160164ab563e65c9fba99b864a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0072.webp": {
+    "mtime": 1793992548.7253683,
+    "ast_hash": "48eb8ba39e72502cde039abce4ee5193",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0073.webp": {
+    "mtime": 1793992548.7257023,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0074.webp": {
+    "mtime": 1793992548.7259219,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0075.webp": {
+    "mtime": 1793992548.7261302,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0076.webp": {
+    "mtime": 1793992548.7263622,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0077.webp": {
+    "mtime": 1793992548.7265906,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0078.webp": {
+    "mtime": 1793992548.726824,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0079.webp": {
+    "mtime": 1793992548.7270417,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0080.webp": {
+    "mtime": 1793992548.7275212,
+    "ast_hash": "0860ab4d7fc8c303e33f45566d22ec22",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0081.webp": {
+    "mtime": 1793992548.727745,
+    "ast_hash": "0860ab4d7fc8c303e33f45566d22ec22",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0082.webp": {
+    "mtime": 1793992548.7281134,
+    "ast_hash": "b6f5857b5df3065c5bba4e20f81ea151",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0083.webp": {
+    "mtime": 1793992548.7284725,
+    "ast_hash": "1ade589a7b98f9f6f4f4402f47856047",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0084.webp": {
+    "mtime": 1793992548.7289796,
+    "ast_hash": "92cf7e1e403b6148c192a735949dfa36",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0085.webp": {
+    "mtime": 1793992548.7293277,
+    "ast_hash": "02afab9f3d6e2b4bbff3734d237641bb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0086.webp": {
+    "mtime": 1793992548.7296798,
+    "ast_hash": "3b67c6850f9b9127663cd1694d4329c5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0087.webp": {
+    "mtime": 1793992548.7302473,
+    "ast_hash": "35960d7a55fc8c466dd28d3fabb96c58",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0088.webp": {
+    "mtime": 1793992548.7307742,
+    "ast_hash": "6a2e08c6593a837c766f9ba1b2d4bebd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0089.webp": {
+    "mtime": 1793992548.7312937,
+    "ast_hash": "009a876c7c72af1e93bb7c82dc4b17aa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0090.webp": {
+    "mtime": 1793992548.7318623,
+    "ast_hash": "ca25e8f8ee44a7e7dbacea6daf01ca85",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0091.webp": {
+    "mtime": 1793992548.7322073,
+    "ast_hash": "8bd9fec0fcaa225efd836ffb7d654e23",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0092.webp": {
+    "mtime": 1793992548.7326002,
+    "ast_hash": "313a423c3eb35214f5f121a07293b148",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0093.webp": {
+    "mtime": 1793992548.7329786,
+    "ast_hash": "49fe8e5121d1db27e62790f33897b769",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0094.webp": {
+    "mtime": 1793992548.7333274,
+    "ast_hash": "527f912302d99445344dbe9414d3fcc1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0095.webp": {
+    "mtime": 1793992548.7336783,
+    "ast_hash": "966d4abd50b557f0c44af4fa3ea283dd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0096.webp": {
+    "mtime": 1793992548.7340279,
+    "ast_hash": "61539931f4d205dd1abfe7fdf6c9fa35",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0097.webp": {
+    "mtime": 1793992548.7343907,
+    "ast_hash": "6d8b782bec77f8ac9e706a04183b7c2d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0098.webp": {
+    "mtime": 1793992548.734968,
+    "ast_hash": "e4c2bfd3f39984e3d1a2ebf58b11c0ec",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0099.webp": {
+    "mtime": 1793992548.735455,
+    "ast_hash": "53abe4266b04fb420c79a65da5bba71d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0100.webp": {
+    "mtime": 1793992548.735912,
+    "ast_hash": "caeb48d6ea0556061902ebaffa6d9502",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0101.webp": {
+    "mtime": 1793992548.7362802,
+    "ast_hash": "911f02c57940b95f9679ae89929c231b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0102.webp": {
+    "mtime": 1793992548.73664,
+    "ast_hash": "7141b74bb4f42ed65e7416c3dbfdac8b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0103.webp": {
+    "mtime": 1793992548.737003,
+    "ast_hash": "e6362d7baf216d207455a8b2bb42ede0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0104.webp": {
+    "mtime": 1793992548.7373748,
+    "ast_hash": "46d0079e76d66fd294e5fb7179363256",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0105.webp": {
+    "mtime": 1793992548.737844,
+    "ast_hash": "0cac2302139e69ac7dd7a167df4990c7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0106.webp": {
+    "mtime": 1793992548.7383392,
+    "ast_hash": "24fdc9ef1af668169857382111ae138a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0107.webp": {
+    "mtime": 1793992548.7386992,
+    "ast_hash": "f055a3b9621bbb5214857e98f9a11cfc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0108.webp": {
+    "mtime": 1793992548.739058,
+    "ast_hash": "2de87d19109348b7d70e856f19af07c5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0109.webp": {
+    "mtime": 1793992548.7395313,
+    "ast_hash": "390836362eea22e95884ff3193bd5bfb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0110.webp": {
+    "mtime": 1793992548.7399025,
+    "ast_hash": "7a6c51efea8517f66856cd5a5e3ab9ef",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0111.webp": {
+    "mtime": 1793992548.7402835,
+    "ast_hash": "468ddbb6a2837f02bc73849e095afe3f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0112.webp": {
+    "mtime": 1793992548.7408488,
+    "ast_hash": "fcc88b428cbcc68e0f0721501d29748c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0113.webp": {
+    "mtime": 1793992548.7412746,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0114.webp": {
+    "mtime": 1793992548.7415648,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0115.webp": {
+    "mtime": 1793992548.741854,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0116.webp": {
+    "mtime": 1793992548.7421362,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0117.webp": {
+    "mtime": 1793992548.7424452,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0118.webp": {
+    "mtime": 1793992548.742728,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/0119.webp": {
+    "mtime": 1793992548.74301,
+    "ast_hash": "4e62e5e4dcc11f392f460087dc39bd1c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q20-cloner/poster.webp": {
+    "mtime": 1793992548.7435737,
+    "ast_hash": "7a4f34b0cd34a0e4863cd2d0ef004b1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0000.webp": {
+    "mtime": 1793992548.7440786,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0001.webp": {
+    "mtime": 1793992548.744286,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0002.webp": {
+    "mtime": 1793992548.744484,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0003.webp": {
+    "mtime": 1793992548.744695,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0004.webp": {
+    "mtime": 1793992548.7448976,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0005.webp": {
+    "mtime": 1793992548.7451034,
+    "ast_hash": "acaa50648cdb53186e6c74308e7cc694",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0006.webp": {
+    "mtime": 1793992548.7455282,
+    "ast_hash": "f84b316c66d61dd48138df487d2702c9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0007.webp": {
+    "mtime": 1793992548.745737,
+    "ast_hash": "f84b316c66d61dd48138df487d2702c9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0008.webp": {
+    "mtime": 1793992548.7461176,
+    "ast_hash": "e8bf7b75a5c336b3a4f09e52ace9d2ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0009.webp": {
+    "mtime": 1793992548.7464194,
+    "ast_hash": "888b1c8726c065818e5c2c64bb0077f5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0010.webp": {
+    "mtime": 1793992548.7467384,
+    "ast_hash": "809ce79f67bb4138e63fe241d38a5e39",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0011.webp": {
+    "mtime": 1793992548.747071,
+    "ast_hash": "c2d03559949fcb6b00508d07efd06577",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0012.webp": {
+    "mtime": 1793992548.7473745,
+    "ast_hash": "654c6057e780a20c7b1575ca6ea876c7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0013.webp": {
+    "mtime": 1793992548.7476957,
+    "ast_hash": "13bb9f1d00f87a02ddd3d14b5d852216",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0014.webp": {
+    "mtime": 1793992548.7479773,
+    "ast_hash": "e17e990a07be8dcd65abf12649555f7a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0015.webp": {
+    "mtime": 1793992548.7483733,
+    "ast_hash": "bb71e72380b5483805adb3cf09c8dd34",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0016.webp": {
+    "mtime": 1793992548.7486641,
+    "ast_hash": "8a0d2410ce2542642d5c63885ed07122",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0017.webp": {
+    "mtime": 1793992548.7490003,
+    "ast_hash": "dbf37952d8da2a1d4d58c14d9e878869",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0018.webp": {
+    "mtime": 1793992548.7493074,
+    "ast_hash": "4b406cdd5b052c7e1a8a2804414a26bd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0019.webp": {
+    "mtime": 1793992548.7496367,
+    "ast_hash": "b712cd65cef13c7e15e858ad3d51f804",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0020.webp": {
+    "mtime": 1793992548.7499237,
+    "ast_hash": "f418d25c5a5313af07537e9355739e26",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0021.webp": {
+    "mtime": 1793992548.7502427,
+    "ast_hash": "352d7fe8b12524db00377e38852641a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0022.webp": {
+    "mtime": 1793992548.750626,
+    "ast_hash": "e312539bed03cb43b71fea2511700445",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0023.webp": {
+    "mtime": 1793992548.7509573,
+    "ast_hash": "4334cecd270dce3f538891be18cb2346",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0024.webp": {
+    "mtime": 1793992548.751278,
+    "ast_hash": "708fd5ef9f07e17810999d98873fa265",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0025.webp": {
+    "mtime": 1793992548.7516105,
+    "ast_hash": "68a4a2e30d0fb1fa92088f7b0f9e249c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0026.webp": {
+    "mtime": 1793992548.7519236,
+    "ast_hash": "3a34005c0c7e3ac2306bc58d747a1191",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0027.webp": {
+    "mtime": 1793992548.752242,
+    "ast_hash": "c04cac024f42650b6c4d734b3c7afb45",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0028.webp": {
+    "mtime": 1793992548.7525947,
+    "ast_hash": "3f73c991a4fddad8b9ca48ad4431fa54",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0029.webp": {
+    "mtime": 1793992548.7529578,
+    "ast_hash": "29669cea5ffd0089ea35199ebad701c3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0030.webp": {
+    "mtime": 1793992548.7533178,
+    "ast_hash": "607b5903ad2ab7d099a79d71be60faa6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0031.webp": {
+    "mtime": 1793992548.7536886,
+    "ast_hash": "fe3a1c10d946bf01b5e638c468c2ffed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0032.webp": {
+    "mtime": 1793992548.754043,
+    "ast_hash": "73a1495b197ca77fbf9292e771ca3677",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0033.webp": {
+    "mtime": 1793992548.754402,
+    "ast_hash": "b18470e34025bdf228bea7647d3970b7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0034.webp": {
+    "mtime": 1793992548.7547529,
+    "ast_hash": "bf8b1559dca04e5c4fbe1850469db330",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0035.webp": {
+    "mtime": 1793992548.7552447,
+    "ast_hash": "58b6f437c16a7a7ee6a6999602b8babc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0036.webp": {
+    "mtime": 1793992548.7554874,
+    "ast_hash": "58b6f437c16a7a7ee6a6999602b8babc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0037.webp": {
+    "mtime": 1793992548.7558568,
+    "ast_hash": "58b6f437c16a7a7ee6a6999602b8babc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0038.webp": {
+    "mtime": 1793992548.7561102,
+    "ast_hash": "58b6f437c16a7a7ee6a6999602b8babc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0039.webp": {
+    "mtime": 1793992548.756342,
+    "ast_hash": "58b6f437c16a7a7ee6a6999602b8babc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0040.webp": {
+    "mtime": 1793992548.7566545,
+    "ast_hash": "330ab0f446e22a371c3ce42fd81fc3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0041.webp": {
+    "mtime": 1793992548.7568674,
+    "ast_hash": "330ab0f446e22a371c3ce42fd81fc3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0042.webp": {
+    "mtime": 1793992548.7573211,
+    "ast_hash": "db778e9bcaaae5ae8c1caa6b94bb8920",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0043.webp": {
+    "mtime": 1793992548.7576103,
+    "ast_hash": "40af2bd26230edac59e48e3943232cba",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0044.webp": {
+    "mtime": 1793992548.7579238,
+    "ast_hash": "5ff4acf987f9d3b30d3c0ebd13641af2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0045.webp": {
+    "mtime": 1793992548.758207,
+    "ast_hash": "45ad23df14d4054199922ebf0601c20c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0046.webp": {
+    "mtime": 1793992548.7585046,
+    "ast_hash": "4ecf974317e42ca51ca5588a161e1d94",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0047.webp": {
+    "mtime": 1793992548.7587826,
+    "ast_hash": "28d3ee478a99abe7fad879e7e0e17e07",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0048.webp": {
+    "mtime": 1793992548.7590966,
+    "ast_hash": "3638bd648d9bdcb476f7705e3145356f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0049.webp": {
+    "mtime": 1793992548.7593753,
+    "ast_hash": "702ff1613b1f95b3569e3773e90d31ac",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0050.webp": {
+    "mtime": 1793992548.7596812,
+    "ast_hash": "91b8548ffeb4d92f61954643cf95e6f8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0051.webp": {
+    "mtime": 1793992548.759957,
+    "ast_hash": "029a25c49b75af95ba22e7c92292def6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0052.webp": {
+    "mtime": 1793992548.76026,
+    "ast_hash": "5570b2315e43a48718b29df300aa31d1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0053.webp": {
+    "mtime": 1793992548.7606304,
+    "ast_hash": "8061fe889074c6ab54a96ae6bfaa3fbe",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0054.webp": {
+    "mtime": 1793992548.7610092,
+    "ast_hash": "30cfb41beebd4e11f4fb1a2c10dc0bfc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0055.webp": {
+    "mtime": 1793992548.7613177,
+    "ast_hash": "e2f16a09aadccb8706d4cf85564751f9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0056.webp": {
+    "mtime": 1793992548.7616317,
+    "ast_hash": "65b0195544c208a484a8daf26009a7f8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0057.webp": {
+    "mtime": 1793992548.761933,
+    "ast_hash": "a9032cf40ef26cb002c39d0744042a08",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0058.webp": {
+    "mtime": 1793992548.762341,
+    "ast_hash": "066b233dd223b620f60e54366ed6fcf0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0059.webp": {
+    "mtime": 1793992548.7626512,
+    "ast_hash": "c5b52fe971245d121808e877203c50f2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0060.webp": {
+    "mtime": 1793992548.7629616,
+    "ast_hash": "3cede84a1744c9884eddd4ac24b7ea20",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0061.webp": {
+    "mtime": 1793992548.763269,
+    "ast_hash": "4f4e42b51d432996c4bdcf68e0fb6879",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0062.webp": {
+    "mtime": 1793992548.763586,
+    "ast_hash": "af2b4569652350abb7ada3c0905ae7bf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0063.webp": {
+    "mtime": 1793992548.7639327,
+    "ast_hash": "049ebc896e1c1e308af33b27d36c2c1d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0064.webp": {
+    "mtime": 1793992548.7642734,
+    "ast_hash": "dd4d94f60703bf0804bfca93fd20de93",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0065.webp": {
+    "mtime": 1793992548.7646158,
+    "ast_hash": "ff03d7bdf58154f90585965305c444c9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0066.webp": {
+    "mtime": 1793992548.764946,
+    "ast_hash": "b7ebb4a325720f57747e25467fc6ec78",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0067.webp": {
+    "mtime": 1793992548.7652833,
+    "ast_hash": "b9ecacb03d89873f3308590539a4d749",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0068.webp": {
+    "mtime": 1793992548.7656286,
+    "ast_hash": "0e9eb1dae3cc31f81c28a1254ceeead5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0069.webp": {
+    "mtime": 1793992548.7659817,
+    "ast_hash": "72e017e5af03a5ab8176df5969cbc69f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0070.webp": {
+    "mtime": 1793992548.7663205,
+    "ast_hash": "c1939f71d7ea3505c99d632c1e5f6d38",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0071.webp": {
+    "mtime": 1793992548.7667155,
+    "ast_hash": "ba3dba7367dc16e6741f33c1fe102abf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0072.webp": {
+    "mtime": 1793992548.7671137,
+    "ast_hash": "9b96bd947d9034a1cc34adc5c28aa330",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0073.webp": {
+    "mtime": 1793992548.7674294,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0074.webp": {
+    "mtime": 1793992548.7676625,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0075.webp": {
+    "mtime": 1793992548.7679002,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0076.webp": {
+    "mtime": 1793992548.768127,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0077.webp": {
+    "mtime": 1793992548.768359,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0078.webp": {
+    "mtime": 1793992548.7685912,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0079.webp": {
+    "mtime": 1793992548.76882,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0080.webp": {
+    "mtime": 1793992548.7692757,
+    "ast_hash": "8a5c23e50bbfb8c4d9d098635d3fd823",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0081.webp": {
+    "mtime": 1793992548.7695205,
+    "ast_hash": "8a5c23e50bbfb8c4d9d098635d3fd823",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0082.webp": {
+    "mtime": 1793992548.7698932,
+    "ast_hash": "7b18482d9c2aee19c6e0d1db018360c7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0083.webp": {
+    "mtime": 1793992548.7702618,
+    "ast_hash": "37fb599069ce41009d1b8c6426160b5f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0084.webp": {
+    "mtime": 1793992548.7706223,
+    "ast_hash": "8d60c6c4d88148788e6309b35c8ee260",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0085.webp": {
+    "mtime": 1793992548.7709696,
+    "ast_hash": "611adf0801fea9f75f491a0c1bd474b7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0086.webp": {
+    "mtime": 1793992548.7713165,
+    "ast_hash": "5194caab6e49ba337e81c4fe31bf44c0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0087.webp": {
+    "mtime": 1793992548.7716653,
+    "ast_hash": "b42bd7614ac338d0e8aa41c1e4b24771",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0088.webp": {
+    "mtime": 1793992548.7720401,
+    "ast_hash": "dead0dd9cd1d9c93103b2751e2f08ba6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0089.webp": {
+    "mtime": 1793992548.7723935,
+    "ast_hash": "3e96077c3b5879c6048698889f9c21ab",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0090.webp": {
+    "mtime": 1793992548.7727585,
+    "ast_hash": "0c7ab2b24554a82978b68b80a97eac08",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0091.webp": {
+    "mtime": 1793992548.7731233,
+    "ast_hash": "b5df22aa00ecccbbb44c44d7cf22216c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0092.webp": {
+    "mtime": 1793992548.7734995,
+    "ast_hash": "2e504504bac69ad9a26673c0b9703249",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0093.webp": {
+    "mtime": 1793992548.7738857,
+    "ast_hash": "7f0ca5082d7d5ea0ebf6e0681057b961",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0094.webp": {
+    "mtime": 1793992548.7742598,
+    "ast_hash": "5a9d899c4ab4f66f4bfd6859e1a1e09b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0095.webp": {
+    "mtime": 1793992548.7746596,
+    "ast_hash": "c5ebd55d26d1e6ee50407bb838fa7c9b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0096.webp": {
+    "mtime": 1793992548.7752,
+    "ast_hash": "6a27030b55cf1514d98a36d8a2afd2c0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0097.webp": {
+    "mtime": 1793992548.7755563,
+    "ast_hash": "818d6656f3ef1e6dd4b0bee638acb457",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0098.webp": {
+    "mtime": 1793992548.7759902,
+    "ast_hash": "cc7938ba6fd3b8208754efb90d04e629",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0099.webp": {
+    "mtime": 1793992548.7763577,
+    "ast_hash": "976a1e5203862fee7118a9d92f2410bf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0100.webp": {
+    "mtime": 1793992548.7767246,
+    "ast_hash": "57387e471e0321eb609dcb22cfbc0e49",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0101.webp": {
+    "mtime": 1793992548.7770402,
+    "ast_hash": "fec481ae8bedbee54eb96d8f5d2bee2b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0102.webp": {
+    "mtime": 1793992548.7773721,
+    "ast_hash": "1f79ad8b87fb6903fe09b41b5cfc6521",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0103.webp": {
+    "mtime": 1793992548.777703,
+    "ast_hash": "d409eb953f082bd112b7faca67bdd9d3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0104.webp": {
+    "mtime": 1793992548.7780929,
+    "ast_hash": "07372d7c7ff9c7928647e7267f62bb54",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0105.webp": {
+    "mtime": 1793992548.7784696,
+    "ast_hash": "835586fad4ffc71c4d6e64eabefa9f05",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0106.webp": {
+    "mtime": 1793992548.7788744,
+    "ast_hash": "7a5327c0d279ba71437638f7d468a4de",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0107.webp": {
+    "mtime": 1793992548.7792103,
+    "ast_hash": "652b4941708d8756e7ac860fffec154f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0108.webp": {
+    "mtime": 1793992548.7796082,
+    "ast_hash": "9f7cd7b63a39bef4282c283fde1fdcd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0109.webp": {
+    "mtime": 1793992548.7799592,
+    "ast_hash": "46ac87baf65fd13b51121e90c4b1db68",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0110.webp": {
+    "mtime": 1793992548.7802882,
+    "ast_hash": "f11ef7045df7f82387fc7329b9ed26b8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0111.webp": {
+    "mtime": 1793992548.7806199,
+    "ast_hash": "0df77622e1a5c0ddb2efc81bc35a1ab9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0112.webp": {
+    "mtime": 1793992548.7809622,
+    "ast_hash": "cff588b665f1e07addb0d6331f4c0790",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0113.webp": {
+    "mtime": 1793992548.7812953,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0114.webp": {
+    "mtime": 1793992548.7815306,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0115.webp": {
+    "mtime": 1793992548.781755,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0116.webp": {
+    "mtime": 1793992548.781977,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0117.webp": {
+    "mtime": 1793992548.7822075,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0118.webp": {
+    "mtime": 1793992548.7824175,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/0119.webp": {
+    "mtime": 1793992548.7827077,
+    "ast_hash": "45d28568876c5a3c602a91a5449e0d15",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q23-holevo-gap/poster.webp": {
+    "mtime": 1793992548.7833178,
+    "ast_hash": "6dd77ec08f20d2a70ea0159230017cf3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0000.webp": {
+    "mtime": 1793992548.7838607,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0001.webp": {
+    "mtime": 1793992548.784113,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0002.webp": {
+    "mtime": 1793992548.7843616,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0003.webp": {
+    "mtime": 1793992548.7848015,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0004.webp": {
+    "mtime": 1793992548.7849958,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0005.webp": {
+    "mtime": 1793992548.7851787,
+    "ast_hash": "3971045fe3b894c5df080256739d5d5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0006.webp": {
+    "mtime": 1793992548.7856214,
+    "ast_hash": "81dfe25a3ef055b1fb63ae306ffc5d55",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0007.webp": {
+    "mtime": 1793992548.7858105,
+    "ast_hash": "81dfe25a3ef055b1fb63ae306ffc5d55",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0008.webp": {
+    "mtime": 1793992548.7861145,
+    "ast_hash": "323d2c962b4a9247fe6e81839c66eb27",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0009.webp": {
+    "mtime": 1793992548.7864165,
+    "ast_hash": "6dcaf756cc060adf976c071c9c12c4d5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0010.webp": {
+    "mtime": 1793992548.7868023,
+    "ast_hash": "55f04bde74df4642fc015e802cedcfb8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0011.webp": {
+    "mtime": 1793992548.78712,
+    "ast_hash": "1b0dd5659fe9e0004ece95106928ae99",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0012.webp": {
+    "mtime": 1793992548.78741,
+    "ast_hash": "240b593c5b7f1c98b20d8f55a209049a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0013.webp": {
+    "mtime": 1793992548.7877178,
+    "ast_hash": "73b7f499f10368a4ab8b454ead3372d0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0014.webp": {
+    "mtime": 1793992548.7880268,
+    "ast_hash": "c2c614c8f46d74e389cbe24ed8030fce",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0015.webp": {
+    "mtime": 1793992548.7883306,
+    "ast_hash": "f98f0f63370dbca94121f875a6731698",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0016.webp": {
+    "mtime": 1793992548.7886393,
+    "ast_hash": "f051efa683a1957bb0e54672993f49d9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0017.webp": {
+    "mtime": 1793992548.7890136,
+    "ast_hash": "9ec3292b49ac7bc3a12d66dbe6030c40",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0018.webp": {
+    "mtime": 1793992548.7894156,
+    "ast_hash": "43a48fdc2500cca566425b086f81fe47",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0019.webp": {
+    "mtime": 1793992548.7897472,
+    "ast_hash": "4e0ae1f4f4e9e88fc8956604ddf8b719",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0020.webp": {
+    "mtime": 1793992548.7900565,
+    "ast_hash": "a55de5b6a9bce7b9d69f66a4a75d1365",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0021.webp": {
+    "mtime": 1793992548.7903996,
+    "ast_hash": "662e714e447cc7fd4cfa60b3c218b41f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0022.webp": {
+    "mtime": 1793992548.7907205,
+    "ast_hash": "67e911d148e6a78587e8d475f88d4761",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0023.webp": {
+    "mtime": 1793992548.7911124,
+    "ast_hash": "f4bfeebf3d38b0fbdfe8cdba48b3f2ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0024.webp": {
+    "mtime": 1793992548.7914388,
+    "ast_hash": "97406bb206e49aeaeb874f92bfc51711",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0025.webp": {
+    "mtime": 1793992548.7917807,
+    "ast_hash": "4b7976bee04023d2f1cb7a246ab7d671",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0026.webp": {
+    "mtime": 1793992548.7921312,
+    "ast_hash": "f7c2df8c5e0015e00bc6f3c02120d68e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0027.webp": {
+    "mtime": 1793992548.7925386,
+    "ast_hash": "4071eed1eb7eb4e60329d0da74f5c599",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0028.webp": {
+    "mtime": 1793992548.7928998,
+    "ast_hash": "3e5db92579da72e11520a881d6239c74",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0029.webp": {
+    "mtime": 1793992548.793322,
+    "ast_hash": "176ca01b3757cf130fa6dff7c57de65d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0030.webp": {
+    "mtime": 1793992548.7937562,
+    "ast_hash": "14a2049e50f9d333519bd3f5ee28eca4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0031.webp": {
+    "mtime": 1793992548.7941728,
+    "ast_hash": "f849266d784f4c9f152dde92eacb56de",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0032.webp": {
+    "mtime": 1793992548.7946079,
+    "ast_hash": "4a613960427e1ac91f6c140fc2991f33",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0033.webp": {
+    "mtime": 1793992548.7950392,
+    "ast_hash": "6f76a4ac59fd59e96498ecd76d17b652",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0034.webp": {
+    "mtime": 1793992548.7954607,
+    "ast_hash": "87c98bcbc91afefdfd47b6ae4911fa6a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0035.webp": {
+    "mtime": 1793992548.7958906,
+    "ast_hash": "765eb157b27aff7e759b1825e9424b8e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0036.webp": {
+    "mtime": 1793992548.7961197,
+    "ast_hash": "765eb157b27aff7e759b1825e9424b8e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0037.webp": {
+    "mtime": 1793992548.7963421,
+    "ast_hash": "765eb157b27aff7e759b1825e9424b8e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0038.webp": {
+    "mtime": 1793992548.7965665,
+    "ast_hash": "765eb157b27aff7e759b1825e9424b8e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0039.webp": {
+    "mtime": 1793992548.7967918,
+    "ast_hash": "765eb157b27aff7e759b1825e9424b8e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0040.webp": {
+    "mtime": 1793992548.7971296,
+    "ast_hash": "32755b6ef57f56833193aac53289473a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0041.webp": {
+    "mtime": 1793992548.7973368,
+    "ast_hash": "32755b6ef57f56833193aac53289473a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0042.webp": {
+    "mtime": 1793992548.7976484,
+    "ast_hash": "9ab755f69406fa580ce5ab39694b1c93",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0043.webp": {
+    "mtime": 1793992548.7979677,
+    "ast_hash": "eff7d2c5b816f39d7e52e6f29e0c3132",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0044.webp": {
+    "mtime": 1793992548.7983615,
+    "ast_hash": "617b5c8c8af4a58b74b76675824e06aa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0045.webp": {
+    "mtime": 1793992548.7986655,
+    "ast_hash": "703d0ce789299fde0afcf4e4f10e0bf0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0046.webp": {
+    "mtime": 1793992548.7989907,
+    "ast_hash": "a85f92702535f4c2e06eb8a432d48095",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0047.webp": {
+    "mtime": 1793992548.7993097,
+    "ast_hash": "34f5379dce374b5ee51554d2e72493b3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0048.webp": {
+    "mtime": 1793992548.799631,
+    "ast_hash": "bf5fa8758bfebf8b8365962c9e93bcaa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0049.webp": {
+    "mtime": 1793992548.7999568,
+    "ast_hash": "1692c81d2f64a32b0143903dcd56957a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0050.webp": {
+    "mtime": 1793992548.8003397,
+    "ast_hash": "55f6103fef8f31013d9a2e599af1f8b5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0051.webp": {
+    "mtime": 1793992548.8006668,
+    "ast_hash": "a0ebde5ebba85fb2e28d31b55be6764b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0052.webp": {
+    "mtime": 1793992548.801083,
+    "ast_hash": "125559b6424f0d8205ce54ccdb5eaaff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0053.webp": {
+    "mtime": 1793992548.8014252,
+    "ast_hash": "910bdc577e50d29d5ad5aa665f324c87",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0054.webp": {
+    "mtime": 1793992548.8018208,
+    "ast_hash": "7214a92175017d8a69a23cc0af7e2959",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0055.webp": {
+    "mtime": 1793992548.8022687,
+    "ast_hash": "7443ac1f1359a80c34c654f072436290",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0056.webp": {
+    "mtime": 1793992548.8027327,
+    "ast_hash": "25c32d05608682bba710f942841f0dc0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0057.webp": {
+    "mtime": 1793992548.8031723,
+    "ast_hash": "bb5b69da4fb4eb8e262027508c1a7594",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0058.webp": {
+    "mtime": 1793992548.803634,
+    "ast_hash": "a8d1e94aae081ac42d595d1ecd669b76",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0059.webp": {
+    "mtime": 1793992548.8041768,
+    "ast_hash": "b2c64f8a4ff7869040ceef187b86e41e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0060.webp": {
+    "mtime": 1793992548.8046184,
+    "ast_hash": "ad709fdf5f2e28e017e3a61d84b7ec7a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0061.webp": {
+    "mtime": 1793992548.8050475,
+    "ast_hash": "96ee162fc553f75195faf65a84a295d6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0062.webp": {
+    "mtime": 1793992548.8055086,
+    "ast_hash": "b91d71e0de796f408fab158ca7e7474e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0063.webp": {
+    "mtime": 1793992548.8059456,
+    "ast_hash": "1dce3db6307edefb79d750936adee636",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0064.webp": {
+    "mtime": 1793992548.8063633,
+    "ast_hash": "edcbc30ad1173b67db6edb92aef16912",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0065.webp": {
+    "mtime": 1793992548.8068054,
+    "ast_hash": "4fc3d8557e317eb96802ad5e8d63328f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0066.webp": {
+    "mtime": 1793992548.8072727,
+    "ast_hash": "773941c6f40121cfc6cf73385590870f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0067.webp": {
+    "mtime": 1793992548.807654,
+    "ast_hash": "2b6b3608a6cc26efc209204156809925",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0068.webp": {
+    "mtime": 1793992548.8081257,
+    "ast_hash": "6844650af9972d07c965a5f81d43e2b6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0069.webp": {
+    "mtime": 1793992548.8085327,
+    "ast_hash": "4ed8a05ceffc63734b7f258246b7159e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0070.webp": {
+    "mtime": 1793992548.8089433,
+    "ast_hash": "ba22937a063ed791d8b9ff07d4446312",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0071.webp": {
+    "mtime": 1793992548.8093586,
+    "ast_hash": "23db30e9c96053ee7ad86cfc89988cde",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0072.webp": {
+    "mtime": 1793992548.8097866,
+    "ast_hash": "4c89eb8d9f740871c61516b45856b264",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0073.webp": {
+    "mtime": 1793992548.810209,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0074.webp": {
+    "mtime": 1793992548.8104372,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0075.webp": {
+    "mtime": 1793992548.81066,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0076.webp": {
+    "mtime": 1793992548.810876,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0077.webp": {
+    "mtime": 1793992548.8110924,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0078.webp": {
+    "mtime": 1793992548.8113143,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0079.webp": {
+    "mtime": 1793992548.8115392,
+    "ast_hash": "d3116c013bd11dbf9f1c24a8f4f5ccd9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0080.webp": {
+    "mtime": 1793992548.8119235,
+    "ast_hash": "0a786f1cd7d894268573928a8bae997a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0081.webp": {
+    "mtime": 1793992548.8121543,
+    "ast_hash": "0a786f1cd7d894268573928a8bae997a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0082.webp": {
+    "mtime": 1793992548.8125694,
+    "ast_hash": "6ba0c796be2a58ef70ece7e444a1e0c4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0083.webp": {
+    "mtime": 1793992548.8129764,
+    "ast_hash": "413669342fe71847697e110e1b6af77b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0084.webp": {
+    "mtime": 1793992548.8134553,
+    "ast_hash": "c5a15402736b32e73e3d97f1b1255696",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0085.webp": {
+    "mtime": 1793992548.8138769,
+    "ast_hash": "15595a8f39a145db70e57f5b606ea8fd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0086.webp": {
+    "mtime": 1793992548.8143158,
+    "ast_hash": "c4ce5efccf826766deffa8edc93be9fb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0087.webp": {
+    "mtime": 1793992548.814742,
+    "ast_hash": "cba75ea41e3e1a12cf7dbf79d5bd5d9a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0088.webp": {
+    "mtime": 1793992548.8151684,
+    "ast_hash": "66c6edccc3f5bd2776bc73c3d3fc8943",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0089.webp": {
+    "mtime": 1793992548.815553,
+    "ast_hash": "ff75e36ea0a22ca288ebcd06d6125b91",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0090.webp": {
+    "mtime": 1793992548.8161807,
+    "ast_hash": "671396b5b174d15ac1bbf25479c5133f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0091.webp": {
+    "mtime": 1793992548.8166971,
+    "ast_hash": "193ac0f6070b79719dcf1e4cf60ff832",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0092.webp": {
+    "mtime": 1793992548.817149,
+    "ast_hash": "a7f3b3343d201712cbf89e803e6af27f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0093.webp": {
+    "mtime": 1793992548.817728,
+    "ast_hash": "79ce0bb817546469e1895b2426292330",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0094.webp": {
+    "mtime": 1793992548.8182425,
+    "ast_hash": "5b77080aee27e6c7c5986a48da6b1c1a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0095.webp": {
+    "mtime": 1793992548.818685,
+    "ast_hash": "d58a8538e575965230af0f0f8b999b68",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0096.webp": {
+    "mtime": 1793992548.8191729,
+    "ast_hash": "5e7b9b1a79f89d9ff76fcd43c159022a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0097.webp": {
+    "mtime": 1793992548.8197415,
+    "ast_hash": "a189d1b6cd7510cf33fed20256fbaf7b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0098.webp": {
+    "mtime": 1793992548.8201747,
+    "ast_hash": "cd9af93e9a94f05b35046730a4484484",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0099.webp": {
+    "mtime": 1793992548.8206437,
+    "ast_hash": "46ab57db164b46f3ec5bdf947f8cb774",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0100.webp": {
+    "mtime": 1793992548.8211424,
+    "ast_hash": "f53b4d51f140eabba57ce94f953d878b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0101.webp": {
+    "mtime": 1793992548.8216343,
+    "ast_hash": "0b15a35d180f26709986eab66413779d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0102.webp": {
+    "mtime": 1793992548.822105,
+    "ast_hash": "d5ba5126ff44b478bc7f9896df82a499",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0103.webp": {
+    "mtime": 1793992548.8226547,
+    "ast_hash": "62e8485b0de27db83b7932f50f8aed33",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0104.webp": {
+    "mtime": 1793992548.823155,
+    "ast_hash": "17b4459b3e1c200e504b706edc2c5104",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0105.webp": {
+    "mtime": 1793992548.82364,
+    "ast_hash": "8726633d8d9bf519b36f8a0f37188690",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0106.webp": {
+    "mtime": 1793992548.8241177,
+    "ast_hash": "79751f47dd9b97f867ab264095183e05",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0107.webp": {
+    "mtime": 1793992548.824603,
+    "ast_hash": "278ab752ca23b01035688b05896999b9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0108.webp": {
+    "mtime": 1793992548.82509,
+    "ast_hash": "a9f21fcdc0b3e7abe9358405b0addec3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0109.webp": {
+    "mtime": 1793992548.8256373,
+    "ast_hash": "cd7c9f766c54bc09603bf557f0d31a52",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0110.webp": {
+    "mtime": 1793992548.8260841,
+    "ast_hash": "a2c5282774d95b4cf0d28c24045da639",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0111.webp": {
+    "mtime": 1793992548.826558,
+    "ast_hash": "0b1e7660b0f7a6e6ffaefef873cf3810",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0112.webp": {
+    "mtime": 1793992548.8270164,
+    "ast_hash": "8acf0c0c0eebee20986f0d0873a263e0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0113.webp": {
+    "mtime": 1793992548.827504,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0114.webp": {
+    "mtime": 1793992548.827773,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0115.webp": {
+    "mtime": 1793992548.8280451,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0116.webp": {
+    "mtime": 1793992548.8283136,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0117.webp": {
+    "mtime": 1793992548.8285732,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0118.webp": {
+    "mtime": 1793992548.828836,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/0119.webp": {
+    "mtime": 1793992548.829092,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q24-rabi-ball/poster.webp": {
+    "mtime": 1793992548.8296127,
+    "ast_hash": "3c7a1b1dd550b6caf594d8ada88f29be",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0000.webp": {
+    "mtime": 1793992548.8300097,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0001.webp": {
+    "mtime": 1793992548.8302076,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0002.webp": {
+    "mtime": 1793992548.8304052,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0003.webp": {
+    "mtime": 1793992548.8306136,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0004.webp": {
+    "mtime": 1793992548.8308134,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0005.webp": {
+    "mtime": 1793992548.8310125,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0006.webp": {
+    "mtime": 1793992548.8312123,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0007.webp": {
+    "mtime": 1793992548.8314238,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0008.webp": {
+    "mtime": 1793992548.8316212,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0009.webp": {
+    "mtime": 1793992548.8318338,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0010.webp": {
+    "mtime": 1793992548.8320312,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0011.webp": {
+    "mtime": 1793992548.8322225,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0012.webp": {
+    "mtime": 1793992548.8324254,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0013.webp": {
+    "mtime": 1793992548.8326387,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0014.webp": {
+    "mtime": 1793992548.832833,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0015.webp": {
+    "mtime": 1793992548.8330333,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0016.webp": {
+    "mtime": 1793992548.8332322,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0017.webp": {
+    "mtime": 1793992548.8334324,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0018.webp": {
+    "mtime": 1793992548.8336236,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0019.webp": {
+    "mtime": 1793992548.833831,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0020.webp": {
+    "mtime": 1793992548.83403,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0021.webp": {
+    "mtime": 1793992548.8342257,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0022.webp": {
+    "mtime": 1793992548.83442,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0023.webp": {
+    "mtime": 1793992548.8346167,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0024.webp": {
+    "mtime": 1793992548.8348124,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0025.webp": {
+    "mtime": 1793992548.8350093,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0026.webp": {
+    "mtime": 1793992548.8352046,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0027.webp": {
+    "mtime": 1793992548.8354006,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0028.webp": {
+    "mtime": 1793992548.8356025,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0029.webp": {
+    "mtime": 1793992548.836013,
+    "ast_hash": "10e81c9efa293d51db65f9206a8aa751",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0030.webp": {
+    "mtime": 1793992548.8363395,
+    "ast_hash": "cd2535bed428a06d323d7b342c6b0489",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0031.webp": {
+    "mtime": 1793992548.8365319,
+    "ast_hash": "cd2535bed428a06d323d7b342c6b0489",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0032.webp": {
+    "mtime": 1793992548.8368514,
+    "ast_hash": "3b8b20a0c51242c6aaa7b6d883925883",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0033.webp": {
+    "mtime": 1793992548.8371532,
+    "ast_hash": "ab0a7e7456ebab3e2ffe72090656026f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0034.webp": {
+    "mtime": 1793992548.8374653,
+    "ast_hash": "84c1370e08f231467e59c5b072c5cc74",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0035.webp": {
+    "mtime": 1793992548.8377914,
+    "ast_hash": "8b6bf6ede71bf0a2afcfa0115fb25bc5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0036.webp": {
+    "mtime": 1793992548.8381858,
+    "ast_hash": "aabfaa12e2b4eb08fc1c307b9d783ed9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0037.webp": {
+    "mtime": 1793992548.8385186,
+    "ast_hash": "ece8e07073e6117eaad2880a656a8cea",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0038.webp": {
+    "mtime": 1793992548.8388,
+    "ast_hash": "29301ee44e67a8889f01ca3191feff25",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0039.webp": {
+    "mtime": 1793992548.8390982,
+    "ast_hash": "e71afb0b6f0489753240f0c453d85ae2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0040.webp": {
+    "mtime": 1793992548.8394074,
+    "ast_hash": "a36f51f70ace3261503686f22b8675d2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0041.webp": {
+    "mtime": 1793992548.8397129,
+    "ast_hash": "ec24c94d6b30e477a26f311dd937b50e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0042.webp": {
+    "mtime": 1793992548.8400095,
+    "ast_hash": "8cefd1e184433ea8145db105fd2db55f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0043.webp": {
+    "mtime": 1793992548.8403962,
+    "ast_hash": "5c93b30aed6e1a1686ff72cd1e28dd0e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0044.webp": {
+    "mtime": 1793992548.8406901,
+    "ast_hash": "75c48111979facaf3e1010d4c73ad6f9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0045.webp": {
+    "mtime": 1793992548.841063,
+    "ast_hash": "cd6b73b1ef958c3535904cdccd3377a7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0046.webp": {
+    "mtime": 1793992548.841347,
+    "ast_hash": "9f708a31c0ae4b6ed8150933720159ef",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0047.webp": {
+    "mtime": 1793992548.8416502,
+    "ast_hash": "c5f250495cda539e7d90d064684a13a8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0048.webp": {
+    "mtime": 1793992548.8419468,
+    "ast_hash": "aa3854e5f1d2a1213f781d5abd844a2d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0049.webp": {
+    "mtime": 1793992548.8423147,
+    "ast_hash": "3cd72326a9b77d37246fcaba73d9443c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0050.webp": {
+    "mtime": 1793992548.84271,
+    "ast_hash": "5f901a29c5f5e6ff5399001f6a1916bd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0051.webp": {
+    "mtime": 1793992548.8430488,
+    "ast_hash": "165984a80796ada9fbbe5fb55b2d00d3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0052.webp": {
+    "mtime": 1793992548.8433814,
+    "ast_hash": "3cfae5f74dec13272c0070e72f7042a8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0053.webp": {
+    "mtime": 1793992548.8437352,
+    "ast_hash": "fa0d68a76c05ef5518fefbfa946550a6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0054.webp": {
+    "mtime": 1793992548.8440695,
+    "ast_hash": "ee1027bb82a1d925bb2e3b73bfbba5a1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0055.webp": {
+    "mtime": 1793992548.8444963,
+    "ast_hash": "d73142b0b7a1ca21c522fbab2630ae16",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0056.webp": {
+    "mtime": 1793992548.844857,
+    "ast_hash": "6c85f0f34ee4a2e5bfd37308b76aeee3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0057.webp": {
+    "mtime": 1793992548.8452008,
+    "ast_hash": "48b2be69aef8e0e84e6cca86ed1c3aa4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0058.webp": {
+    "mtime": 1793992548.8455806,
+    "ast_hash": "4c8658f6f43dd313d3bc29dd3e226582",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0059.webp": {
+    "mtime": 1793992548.8460753,
+    "ast_hash": "bec96995fea8b39944aadcb2cafe5df7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0060.webp": {
+    "mtime": 1793992548.8464897,
+    "ast_hash": "aae68be9c91e18b1536a15c7fcaaea5e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0061.webp": {
+    "mtime": 1793992548.8468385,
+    "ast_hash": "6ff6db50a15df5ebcae265a09dccee1d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0062.webp": {
+    "mtime": 1793992548.8471618,
+    "ast_hash": "03146e85c3bf88e468d2bfb8f4e55952",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0063.webp": {
+    "mtime": 1793992548.8475902,
+    "ast_hash": "0b8130549a7f143c523f3b5a66e78dcd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0064.webp": {
+    "mtime": 1793992548.8479028,
+    "ast_hash": "5c20b651409ce330c27910d1922f580a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0065.webp": {
+    "mtime": 1793992548.8482184,
+    "ast_hash": "4e7adc002fcffd11fa6667cd386a758a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0066.webp": {
+    "mtime": 1793992548.8485854,
+    "ast_hash": "462aeb685b2cd333dcc82ecec495ecf9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0067.webp": {
+    "mtime": 1793992548.8489504,
+    "ast_hash": "b28a0577ffe11f180ec72556e8b238c4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0068.webp": {
+    "mtime": 1793992548.8491788,
+    "ast_hash": "b28a0577ffe11f180ec72556e8b238c4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0069.webp": {
+    "mtime": 1793992548.849394,
+    "ast_hash": "b28a0577ffe11f180ec72556e8b238c4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0070.webp": {
+    "mtime": 1793992548.8497002,
+    "ast_hash": "6de827bb784a2b1caecce620bbdb551a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0071.webp": {
+    "mtime": 1793992548.8499026,
+    "ast_hash": "6de827bb784a2b1caecce620bbdb551a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0072.webp": {
+    "mtime": 1793992548.8501968,
+    "ast_hash": "1ece1830ee96ebb8a16aad1aff9fddf0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0073.webp": {
+    "mtime": 1793992548.8504686,
+    "ast_hash": "b6690555bbd449f2feb02101d65a791d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0074.webp": {
+    "mtime": 1793992548.85076,
+    "ast_hash": "865611abb5c7578b21df9786d16e686d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0075.webp": {
+    "mtime": 1793992548.8510697,
+    "ast_hash": "6f6e2ea3044bb6c8bb538c09c27e85c8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0076.webp": {
+    "mtime": 1793992548.8513463,
+    "ast_hash": "8cdfce6be7db0ad9fbc5c07d46f51e35",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0077.webp": {
+    "mtime": 1793992548.8516364,
+    "ast_hash": "e44056ff4c35fbbe71286cc76cde93ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0078.webp": {
+    "mtime": 1793992548.8519378,
+    "ast_hash": "9faca4ccc1db32abaa4e2881eca3fbe5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0079.webp": {
+    "mtime": 1793992548.8522208,
+    "ast_hash": "fa3ac0a39fc9658484a493b55f22e04c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0080.webp": {
+    "mtime": 1793992548.852526,
+    "ast_hash": "4174292edbb1a4c8eed7c84a0bd6c69b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0081.webp": {
+    "mtime": 1793992548.852817,
+    "ast_hash": "457147e12e6103f250eb566bd079c870",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0082.webp": {
+    "mtime": 1793992548.8531082,
+    "ast_hash": "ebb4bbc90a4a4e850c854c176227f223",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0083.webp": {
+    "mtime": 1793992548.853487,
+    "ast_hash": "cb159533428cf1b5c07212989d1f5072",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0084.webp": {
+    "mtime": 1793992548.8538408,
+    "ast_hash": "563d9f1c696ce88442ec184d958ae2fb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0085.webp": {
+    "mtime": 1793992548.854112,
+    "ast_hash": "fda38a9eeea74ee61c6ac654ec63e968",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0086.webp": {
+    "mtime": 1793992548.8544066,
+    "ast_hash": "13b2bebadd3528b15b7fd36ae0a327a1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0087.webp": {
+    "mtime": 1793992548.854693,
+    "ast_hash": "3fd57d607e7dd911de1069200a1289af",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0088.webp": {
+    "mtime": 1793992548.85498,
+    "ast_hash": "9547ab72fa3ba97193701a7bded18ac9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0089.webp": {
+    "mtime": 1793992548.8553815,
+    "ast_hash": "ffa33512954071090031090f9674070f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0090.webp": {
+    "mtime": 1793992548.8556674,
+    "ast_hash": "bf478decc85999c57c554105bac5ed90",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0091.webp": {
+    "mtime": 1793992548.8559625,
+    "ast_hash": "4ee7cdb5673b5f3bcde0ac19d79acb4f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0092.webp": {
+    "mtime": 1793992548.8562567,
+    "ast_hash": "4e3f5ff90aaa697792624a25da41555f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0093.webp": {
+    "mtime": 1793992548.8565423,
+    "ast_hash": "eae33ed300a885deadba5ee7e082d071",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0094.webp": {
+    "mtime": 1793992548.856866,
+    "ast_hash": "a552b8ffbfa7e6a901723adec3198edf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0095.webp": {
+    "mtime": 1793992548.857168,
+    "ast_hash": "928599ba76ef21505945ef771b94c642",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0096.webp": {
+    "mtime": 1793992548.8574672,
+    "ast_hash": "c04bc984905122b1c7c1d344aade4c3b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0097.webp": {
+    "mtime": 1793992548.8577888,
+    "ast_hash": "88bbc52b98d95b4f4181547ba7dace7d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0098.webp": {
+    "mtime": 1793992548.8581312,
+    "ast_hash": "7dcdd1765ed409bbb4dd57457346ddc3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0099.webp": {
+    "mtime": 1793992548.8584309,
+    "ast_hash": "799c4e33ed88bf01c7d0329126da13f7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0100.webp": {
+    "mtime": 1793992548.8587332,
+    "ast_hash": "12a1b3b03940a495d0202a7470d7635b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0101.webp": {
+    "mtime": 1793992548.8591425,
+    "ast_hash": "e9c246539d14c4ded47f7872262c1e0b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0102.webp": {
+    "mtime": 1793992548.8595073,
+    "ast_hash": "29207e11aca833df27168d9b2155bda0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0103.webp": {
+    "mtime": 1793992548.8598127,
+    "ast_hash": "a3e576690ab99e28ec8c1377a3d95ed6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0104.webp": {
+    "mtime": 1793992548.8601658,
+    "ast_hash": "683e4d418d3d285d0c2dab82dcf76b71",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0105.webp": {
+    "mtime": 1793992548.8605232,
+    "ast_hash": "248b897d580c8949b01b6c48233e5d75",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0106.webp": {
+    "mtime": 1793992548.8608625,
+    "ast_hash": "f06b1c52b4ab26a4bebf3ff60211e374",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0107.webp": {
+    "mtime": 1793992548.861184,
+    "ast_hash": "6e33cca2b0489c68b54e209f5973d03c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0108.webp": {
+    "mtime": 1793992548.8617723,
+    "ast_hash": "2faa001045d559e0f10957d6e41083dd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0109.webp": {
+    "mtime": 1793992548.8621624,
+    "ast_hash": "e7deba0ea335679301e46f83c861c798",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0110.webp": {
+    "mtime": 1793992548.8626862,
+    "ast_hash": "f0f0f4b27a89521ac0f4458a033bb2e0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0111.webp": {
+    "mtime": 1793992548.8633459,
+    "ast_hash": "82c76df9a21413f3aa827d72c0b72680",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0112.webp": {
+    "mtime": 1793992548.8637643,
+    "ast_hash": "42a91281b9ce33910a70c4cdfcac6ada",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0113.webp": {
+    "mtime": 1793992548.8641455,
+    "ast_hash": "be3bbf838b3a5fd34176bda57a7b5947",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0114.webp": {
+    "mtime": 1793992548.864468,
+    "ast_hash": "363f0ff1c2b60d4a3c63b40c611bfb84",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0115.webp": {
+    "mtime": 1793992548.8647838,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0116.webp": {
+    "mtime": 1793992548.8649828,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0117.webp": {
+    "mtime": 1793992548.865185,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0118.webp": {
+    "mtime": 1793992548.865389,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/0119.webp": {
+    "mtime": 1793992548.8655922,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q25-blockade/poster.webp": {
+    "mtime": 1793992548.866125,
+    "ast_hash": "f19d98b03a9564c67694fbc94ab945ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0000.webp": {
+    "mtime": 1793992548.866631,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0001.webp": {
+    "mtime": 1793992548.866846,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0002.webp": {
+    "mtime": 1793992548.8670607,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0003.webp": {
+    "mtime": 1793992548.8672633,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0004.webp": {
+    "mtime": 1793992548.8674622,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0005.webp": {
+    "mtime": 1793992548.867674,
+    "ast_hash": "00d6e66d5ecc3f0e9497d388d6bdf993",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0006.webp": {
+    "mtime": 1793992548.8679912,
+    "ast_hash": "b6c04eb0303c882905dde088032dd6cb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0007.webp": {
+    "mtime": 1793992548.8681955,
+    "ast_hash": "b6c04eb0303c882905dde088032dd6cb",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0008.webp": {
+    "mtime": 1793992548.868754,
+    "ast_hash": "b32d9e9c1616320cb0bac94cb3acf792",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0009.webp": {
+    "mtime": 1793992548.869061,
+    "ast_hash": "74e2e2a4977ed13003536a2fe68b1d32",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0010.webp": {
+    "mtime": 1793992548.8693836,
+    "ast_hash": "87f0c38134e026bf46d5a183bd90055b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0011.webp": {
+    "mtime": 1793992548.869662,
+    "ast_hash": "ae007d9d5c966f8b91b47e50819e9033",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0012.webp": {
+    "mtime": 1793992548.8699675,
+    "ast_hash": "180aff432ecb5621f1ae2e86d65d97d6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0013.webp": {
+    "mtime": 1793992548.8702943,
+    "ast_hash": "0c82f86f85e649aab80b39aa1c1ebdda",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0014.webp": {
+    "mtime": 1793992548.8706017,
+    "ast_hash": "4c44df332dddc7c17acf7b47ccfd321d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0015.webp": {
+    "mtime": 1793992548.8709145,
+    "ast_hash": "485fd174a3294ac15f36c9d871d6379d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0016.webp": {
+    "mtime": 1793992548.8712294,
+    "ast_hash": "a57c7157aa9844eea441ab87f01b3088",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0017.webp": {
+    "mtime": 1793992548.8715582,
+    "ast_hash": "acb0871179679bf65c44c4942f4ee777",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0018.webp": {
+    "mtime": 1793992548.8719969,
+    "ast_hash": "8c4e6b09613b6fc0651793d4d45d182e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0019.webp": {
+    "mtime": 1793992548.8723025,
+    "ast_hash": "9e2127d2a7826da2e248750f8b98c7a1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0020.webp": {
+    "mtime": 1793992548.8726285,
+    "ast_hash": "9f78617740d5808c91f0365424f2cb11",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0021.webp": {
+    "mtime": 1793992548.8729541,
+    "ast_hash": "aa78340e15700a6d390ac8161e3ede1e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0022.webp": {
+    "mtime": 1793992548.8733087,
+    "ast_hash": "9ecf7846c51a61925e5f2f7954ee1360",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0023.webp": {
+    "mtime": 1793992548.8736567,
+    "ast_hash": "7dca9ef0d7bf0b9c6dca95e006c49da0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0024.webp": {
+    "mtime": 1793992548.8740017,
+    "ast_hash": "332375feab1f41458d06660a66ef735b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0025.webp": {
+    "mtime": 1793992548.8743558,
+    "ast_hash": "e97c819154fb8965adb6f25fe5a322ce",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0026.webp": {
+    "mtime": 1793992548.8747044,
+    "ast_hash": "4e8830ce16d88faab631d74959d1ad4c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0027.webp": {
+    "mtime": 1793992548.8750703,
+    "ast_hash": "09190fde943e916d78a45404c79655aa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0028.webp": {
+    "mtime": 1793992548.87542,
+    "ast_hash": "fa86f008a3c31426a32c44c26ccf8010",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0029.webp": {
+    "mtime": 1793992548.8757904,
+    "ast_hash": "4fa8e2676b55bab2871858efd766eaaa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0030.webp": {
+    "mtime": 1793992548.8761404,
+    "ast_hash": "154843765d32f0e79c8643210aee945d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0031.webp": {
+    "mtime": 1793992548.8765569,
+    "ast_hash": "800eb21295c5d079fb8a6924faba5ea5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0032.webp": {
+    "mtime": 1793992548.8768997,
+    "ast_hash": "45ca5afaa9c24f766127a760d043d8b7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0033.webp": {
+    "mtime": 1793992548.8772373,
+    "ast_hash": "af3439c15590058cbdac924a1cffc5a4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0034.webp": {
+    "mtime": 1793992548.877579,
+    "ast_hash": "d07322b92f58d083bf705e33de64f35a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0035.webp": {
+    "mtime": 1793992548.8779016,
+    "ast_hash": "cdcb25d1ce25715ca0554906233560ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0036.webp": {
+    "mtime": 1793992548.878108,
+    "ast_hash": "cdcb25d1ce25715ca0554906233560ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0037.webp": {
+    "mtime": 1793992548.8783195,
+    "ast_hash": "cdcb25d1ce25715ca0554906233560ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0038.webp": {
+    "mtime": 1793992548.8785574,
+    "ast_hash": "cdcb25d1ce25715ca0554906233560ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0039.webp": {
+    "mtime": 1793992548.8787966,
+    "ast_hash": "cdcb25d1ce25715ca0554906233560ae",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0040.webp": {
+    "mtime": 1793992548.879131,
+    "ast_hash": "62333d82ba2e512dd371a45404408b57",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0041.webp": {
+    "mtime": 1793992548.87936,
+    "ast_hash": "62333d82ba2e512dd371a45404408b57",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0042.webp": {
+    "mtime": 1793992548.879699,
+    "ast_hash": "e8620c77bc85eae41157799b74a6cc84",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0043.webp": {
+    "mtime": 1793992548.880064,
+    "ast_hash": "602aead4f896f1043402ca565c464fa9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0044.webp": {
+    "mtime": 1793992548.8804088,
+    "ast_hash": "0078dbe84964ec7d8332ec66b11a15b4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0045.webp": {
+    "mtime": 1793992548.8807654,
+    "ast_hash": "492a2a02253ba47d75440431df4887e4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0046.webp": {
+    "mtime": 1793992548.8811193,
+    "ast_hash": "fd46945ea6e964da1b74563ea86b4b89",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0047.webp": {
+    "mtime": 1793992548.881492,
+    "ast_hash": "912b32203f371db63be304a2509ca1d7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0048.webp": {
+    "mtime": 1793992548.8818338,
+    "ast_hash": "7c8a40d9c16094ce8ba7db5da128faf9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0049.webp": {
+    "mtime": 1793992548.8822062,
+    "ast_hash": "09c501969f0b5bf0339b0ec845b73360",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0050.webp": {
+    "mtime": 1793992548.8826144,
+    "ast_hash": "ceb80aa05cadbf7d8a0cd0e695f803c8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0051.webp": {
+    "mtime": 1793992548.8829942,
+    "ast_hash": "3e4c662d27f0e176766550d1c869702d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0052.webp": {
+    "mtime": 1793992548.8833523,
+    "ast_hash": "3e575bec164223893fa31cd0b410da00",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0053.webp": {
+    "mtime": 1793992548.8840117,
+    "ast_hash": "ab30aa050559a9480b9caf3644f8e6d4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0054.webp": {
+    "mtime": 1793992548.8843758,
+    "ast_hash": "2590910f47d5db39cc3bcf5222886609",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0055.webp": {
+    "mtime": 1793992548.8847413,
+    "ast_hash": "50f778099a0d540adad8c7336bb6fd74",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0056.webp": {
+    "mtime": 1793992548.8850648,
+    "ast_hash": "ded3dfc2ae1400da1f8307c536a2a5e0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0057.webp": {
+    "mtime": 1793992548.8854032,
+    "ast_hash": "ec2a354d30a9801d8a314ba9f495f23b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0058.webp": {
+    "mtime": 1793992548.885724,
+    "ast_hash": "571646f7d3c7b003f3fe69fb89af377e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0059.webp": {
+    "mtime": 1793992548.8860476,
+    "ast_hash": "5b5c610550b5ee0c45b93ecf3aa792a9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0060.webp": {
+    "mtime": 1793992548.8863814,
+    "ast_hash": "8031d1f225ae36fa970433b7a391c3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0061.webp": {
+    "mtime": 1793992548.8866858,
+    "ast_hash": "1ba62f3604044d216a77be6bb1451d87",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0062.webp": {
+    "mtime": 1793992548.887005,
+    "ast_hash": "ff5719d4136a5d615b8c3bf4532e01fd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0063.webp": {
+    "mtime": 1793992548.8873236,
+    "ast_hash": "93a5832e6c3d9a7697212312d39f2928",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0064.webp": {
+    "mtime": 1793992548.887649,
+    "ast_hash": "0c0830c4e7d1eb2face9777a323299dd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0065.webp": {
+    "mtime": 1793992548.8879428,
+    "ast_hash": "b4e88661162157b80f1888364ab777aa",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0066.webp": {
+    "mtime": 1793992548.888263,
+    "ast_hash": "0e08da21a163842eb1e929175161bab4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0067.webp": {
+    "mtime": 1793992548.8886185,
+    "ast_hash": "db9820306215ab62270747d8710fb399",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0068.webp": {
+    "mtime": 1793992548.8889484,
+    "ast_hash": "a18fb3a45be6edf4e2626842236956dc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0069.webp": {
+    "mtime": 1793992548.8892787,
+    "ast_hash": "46768be9424fc82669f5c832993efc79",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0070.webp": {
+    "mtime": 1793992548.889672,
+    "ast_hash": "7b8fa48531f1da4851f95cd203f8fa4f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0071.webp": {
+    "mtime": 1793992548.8901303,
+    "ast_hash": "69031cfea939e89a49f47e93f866816a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0072.webp": {
+    "mtime": 1793992548.890455,
+    "ast_hash": "c2b5aa86a76187492a8ff8cf312b0cc7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0073.webp": {
+    "mtime": 1793992548.890842,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0074.webp": {
+    "mtime": 1793992548.8910747,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0075.webp": {
+    "mtime": 1793992548.8912828,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0076.webp": {
+    "mtime": 1793992548.8915079,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0077.webp": {
+    "mtime": 1793992548.8917189,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0078.webp": {
+    "mtime": 1793992548.891939,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0079.webp": {
+    "mtime": 1793992548.892153,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0080.webp": {
+    "mtime": 1793992548.892495,
+    "ast_hash": "4ab6e814a65e1f5d7ef63b6a73f217c6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0081.webp": {
+    "mtime": 1793992548.8927362,
+    "ast_hash": "4ab6e814a65e1f5d7ef63b6a73f217c6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0082.webp": {
+    "mtime": 1793992548.8930752,
+    "ast_hash": "0ff37fd536e2341518d6bc4283fd44d6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0083.webp": {
+    "mtime": 1793992548.893421,
+    "ast_hash": "d471be3af56884af53a3494f06a7a836",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0084.webp": {
+    "mtime": 1793992548.8937488,
+    "ast_hash": "9fce9c8efc3342e89ec8a80e98e56724",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0085.webp": {
+    "mtime": 1793992548.894046,
+    "ast_hash": "e93c7446d29ca80d304831cefbce9776",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0086.webp": {
+    "mtime": 1793992548.8943756,
+    "ast_hash": "78745316d170054c61874827c12d5c7d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0087.webp": {
+    "mtime": 1793992548.8946903,
+    "ast_hash": "9d132ed191e140e6b68bfd03b6113b03",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0088.webp": {
+    "mtime": 1793992548.8950026,
+    "ast_hash": "e06f1eee9df1ce7ac51983e8583bf6fd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0089.webp": {
+    "mtime": 1793992548.89531,
+    "ast_hash": "608a90bceaa33c721c6df95a17d11b5c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0090.webp": {
+    "mtime": 1793992548.895618,
+    "ast_hash": "f66830772c4d483179bf6ea719ee3478",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0091.webp": {
+    "mtime": 1793992548.896022,
+    "ast_hash": "e703ebba2f90cd2ba376a21a31aba78e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0092.webp": {
+    "mtime": 1793992548.8963525,
+    "ast_hash": "7b9c151b1d4c26541023c3683a7c5b0b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0093.webp": {
+    "mtime": 1793992548.896657,
+    "ast_hash": "9f58fc3066c0facc7031b095cb9e37e5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0094.webp": {
+    "mtime": 1793992548.8969827,
+    "ast_hash": "6885f78fbce6dbea9e40809c89ccb413",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0095.webp": {
+    "mtime": 1793992548.8973086,
+    "ast_hash": "4c46d451e7ef4c9d9f2cc334bb92c163",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0096.webp": {
+    "mtime": 1793992548.8976305,
+    "ast_hash": "42e89757d0a0ccd2f279376d26d6893f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0097.webp": {
+    "mtime": 1793992548.8979328,
+    "ast_hash": "e16741104a418807dbae2d4943aec2ec",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0098.webp": {
+    "mtime": 1793992548.898218,
+    "ast_hash": "a2bb22db9dad98dbc17777b7e7a9e2d9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0099.webp": {
+    "mtime": 1793992548.8985114,
+    "ast_hash": "2b66c1e03ea7c08fa0409b2f11d9bbc7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0100.webp": {
+    "mtime": 1793992548.8988006,
+    "ast_hash": "c4eb2b82c91287de8081c5d249240c22",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0101.webp": {
+    "mtime": 1793992548.899101,
+    "ast_hash": "d676a3a7751b293b93b09768822f4248",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0102.webp": {
+    "mtime": 1793992548.8993948,
+    "ast_hash": "ae3190a50f6a796c229507dbb08228ff",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0103.webp": {
+    "mtime": 1793992548.8997028,
+    "ast_hash": "3dc9692e238f1308b1b7d06c07a3197b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0104.webp": {
+    "mtime": 1793992548.9000177,
+    "ast_hash": "4c003e819b39e116381727009105acdf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0105.webp": {
+    "mtime": 1793992548.900331,
+    "ast_hash": "7fd9e46a238668ec0997fd09c4a917e4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0106.webp": {
+    "mtime": 1793992548.9006753,
+    "ast_hash": "adf40d619050ed0b6a7f6ef79a25b5f8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0107.webp": {
+    "mtime": 1793992548.9010315,
+    "ast_hash": "7ff5a78d62b12c1aa1984a0a231be0cd",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0108.webp": {
+    "mtime": 1793992548.9013462,
+    "ast_hash": "1ef8a1c1ca28b4706dc6dc0d09067305",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0109.webp": {
+    "mtime": 1793992548.9016569,
+    "ast_hash": "e6a5ff6fd73b58d136cb2d2775c985d5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0110.webp": {
+    "mtime": 1793992548.901954,
+    "ast_hash": "74ea926c8ab4af963a0cc82ea092642f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0111.webp": {
+    "mtime": 1793992548.9022589,
+    "ast_hash": "a28c9dda3e73922a7f0e9c7601c0b629",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0112.webp": {
+    "mtime": 1793992548.9025624,
+    "ast_hash": "8613037357dcfa23cb7682280c625d5a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0113.webp": {
+    "mtime": 1793992548.9028842,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0114.webp": {
+    "mtime": 1793992548.9030933,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0115.webp": {
+    "mtime": 1793992548.903289,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0116.webp": {
+    "mtime": 1793992548.9034994,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0117.webp": {
+    "mtime": 1793992548.903723,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0118.webp": {
+    "mtime": 1793992548.9039273,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/0119.webp": {
+    "mtime": 1793992548.9041338,
+    "ast_hash": "4a2181230f268359f36c1f74710d78ed",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q26-hom/poster.webp": {
+    "mtime": 1793992548.9047272,
+    "ast_hash": "81f393ed4dc164008b3048b77884e3e9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0000.webp": {
+    "mtime": 1793992548.9052281,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0001.webp": {
+    "mtime": 1793992548.9054303,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0002.webp": {
+    "mtime": 1793992548.9056313,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0003.webp": {
+    "mtime": 1793992548.9058292,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0004.webp": {
+    "mtime": 1793992548.906047,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0005.webp": {
+    "mtime": 1793992548.90625,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0006.webp": {
+    "mtime": 1793992548.9064562,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0007.webp": {
+    "mtime": 1793992548.9066584,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0008.webp": {
+    "mtime": 1793992548.9068692,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0009.webp": {
+    "mtime": 1793992548.9070818,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0010.webp": {
+    "mtime": 1793992548.9072814,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0011.webp": {
+    "mtime": 1793992548.9074752,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0012.webp": {
+    "mtime": 1793992548.90769,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0013.webp": {
+    "mtime": 1793992548.907908,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0014.webp": {
+    "mtime": 1793992548.9081218,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0015.webp": {
+    "mtime": 1793992548.9083328,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0016.webp": {
+    "mtime": 1793992548.9085433,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0017.webp": {
+    "mtime": 1793992548.9087503,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0018.webp": {
+    "mtime": 1793992548.9089541,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0019.webp": {
+    "mtime": 1793992548.9091697,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0020.webp": {
+    "mtime": 1793992548.9093604,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0021.webp": {
+    "mtime": 1793992548.9095705,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0022.webp": {
+    "mtime": 1793992548.909781,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0023.webp": {
+    "mtime": 1793992548.909992,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0024.webp": {
+    "mtime": 1793992548.9101875,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0025.webp": {
+    "mtime": 1793992548.910392,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0026.webp": {
+    "mtime": 1793992548.9105802,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0027.webp": {
+    "mtime": 1793992548.9108996,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0028.webp": {
+    "mtime": 1793992548.9110963,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0029.webp": {
+    "mtime": 1793992548.9112952,
+    "ast_hash": "f8e6ff6e8a49108ebe3a0faded7e5534",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0030.webp": {
+    "mtime": 1793992548.9117959,
+    "ast_hash": "003911ed55d8ae554adaf90bc2b37157",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0031.webp": {
+    "mtime": 1793992548.912007,
+    "ast_hash": "003911ed55d8ae554adaf90bc2b37157",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0032.webp": {
+    "mtime": 1793992548.912375,
+    "ast_hash": "8bfe72c189987dbaa674cf6eca701a54",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0033.webp": {
+    "mtime": 1793992548.9126701,
+    "ast_hash": "79b7ed8e0bd9dfd5caafb99ec33da10e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0034.webp": {
+    "mtime": 1793992548.9129887,
+    "ast_hash": "52b9eed3844d5775c749ca9bfea0d3b1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0035.webp": {
+    "mtime": 1793992548.9133146,
+    "ast_hash": "e6667143adc6bfac172fbb963bbd1e82",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0036.webp": {
+    "mtime": 1793992548.9136398,
+    "ast_hash": "ad5027698f8391c81567af3f5875d888",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0037.webp": {
+    "mtime": 1793992548.913913,
+    "ast_hash": "d22181aae133fcb4ff6558c462b7a233",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0038.webp": {
+    "mtime": 1793992548.9143002,
+    "ast_hash": "8ccc1f6d2c0474ba23e1e6ba9d3eb54d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0039.webp": {
+    "mtime": 1793992548.9147623,
+    "ast_hash": "0f19bfa0fe63aa731f9ff2d487165ab0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0040.webp": {
+    "mtime": 1793992548.9150734,
+    "ast_hash": "b2e1fd5c7f691590abf75f92ddc5325b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0041.webp": {
+    "mtime": 1793992548.9153712,
+    "ast_hash": "0bb4d4f60efdf00ed642fcd84dbc8f9a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0042.webp": {
+    "mtime": 1793992548.9156852,
+    "ast_hash": "39167ac9eea1323b9a537720c0623390",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0043.webp": {
+    "mtime": 1793992548.915995,
+    "ast_hash": "1ff271041d9d259daedf955714a267f6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0044.webp": {
+    "mtime": 1793992548.9163015,
+    "ast_hash": "b6d37fc62ba91a05c4bc7b1c61130820",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0045.webp": {
+    "mtime": 1793992548.9166079,
+    "ast_hash": "9c40c4d7c9797b8b201b6dd6a3ccb886",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0046.webp": {
+    "mtime": 1793992548.9169297,
+    "ast_hash": "68f9be249848b934e7d85da7bff63e28",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0047.webp": {
+    "mtime": 1793992548.91723,
+    "ast_hash": "36ad9a1c2e6ef87fdfcbc0c2fb3c1e17",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0048.webp": {
+    "mtime": 1793992548.9177809,
+    "ast_hash": "229fc4c84910f4ee49a747b619a0bf28",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0049.webp": {
+    "mtime": 1793992548.918098,
+    "ast_hash": "caca1964ee9c39e335bc5436685baf53",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0050.webp": {
+    "mtime": 1793992548.9184048,
+    "ast_hash": "fa9e9a2b24caf191ab3ae12d4f30206b",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0051.webp": {
+    "mtime": 1793992548.9186888,
+    "ast_hash": "b001c2424fff2b4c3cefec67515243a5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0052.webp": {
+    "mtime": 1793992548.9189916,
+    "ast_hash": "0b4ddee813adf4995a771aed6ec2bb77",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0053.webp": {
+    "mtime": 1793992548.9193027,
+    "ast_hash": "214db155054385fccb761ac5538a228e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0054.webp": {
+    "mtime": 1793992548.9196117,
+    "ast_hash": "beacb652fd30bfead23668b7ca6f49b4",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0055.webp": {
+    "mtime": 1793992548.9199142,
+    "ast_hash": "7146c11f2ffa1d687f073c30c59c98bf",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0056.webp": {
+    "mtime": 1793992548.920221,
+    "ast_hash": "139843763c0b65cfcceade53f315e879",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0057.webp": {
+    "mtime": 1793992548.9208293,
+    "ast_hash": "d190638f7908803fc14417debe280b57",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0058.webp": {
+    "mtime": 1793992548.9211466,
+    "ast_hash": "757a27dda3f90bedbd65a1419f104ec2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0059.webp": {
+    "mtime": 1793992548.9214487,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0060.webp": {
+    "mtime": 1793992548.921675,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0061.webp": {
+    "mtime": 1793992548.9218838,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0062.webp": {
+    "mtime": 1793992548.9221013,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0063.webp": {
+    "mtime": 1793992548.9223242,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0064.webp": {
+    "mtime": 1793992548.922535,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0065.webp": {
+    "mtime": 1793992548.9227448,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0066.webp": {
+    "mtime": 1793992548.9229605,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0067.webp": {
+    "mtime": 1793992548.923189,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0068.webp": {
+    "mtime": 1793992548.9234095,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0069.webp": {
+    "mtime": 1793992548.9236312,
+    "ast_hash": "6acf44448a301a2a06bda79f5eb6bb8c",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0070.webp": {
+    "mtime": 1793992548.9239657,
+    "ast_hash": "c77b74085eeb6857d03fd8542c1d2d51",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0071.webp": {
+    "mtime": 1793992548.9241664,
+    "ast_hash": "c77b74085eeb6857d03fd8542c1d2d51",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0072.webp": {
+    "mtime": 1793992548.9244614,
+    "ast_hash": "587e7fab345d7bb6daee0857f0a1c0d9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0073.webp": {
+    "mtime": 1793992548.924771,
+    "ast_hash": "f516edb2ca9e796abe0a30f65367b9df",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0074.webp": {
+    "mtime": 1793992548.9250693,
+    "ast_hash": "b3c24ce4401a7f6d0d683fa5c5736bec",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0075.webp": {
+    "mtime": 1793992548.9253798,
+    "ast_hash": "cd4e8e031a4a52dae45f05da054e32a2",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0076.webp": {
+    "mtime": 1793992548.9258213,
+    "ast_hash": "6c40037d3719a35577ebc93662cfc834",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0077.webp": {
+    "mtime": 1793992548.926151,
+    "ast_hash": "c59965529c3189a7a70816123f610aba",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0078.webp": {
+    "mtime": 1793992548.926482,
+    "ast_hash": "4f0d05264a995b6c63eac209d54136b6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0079.webp": {
+    "mtime": 1793992548.9267583,
+    "ast_hash": "6da030de3ad1ef66c2193ea9d044ebe1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0080.webp": {
+    "mtime": 1793992548.927026,
+    "ast_hash": "f15c4b84ec96fc771d210a13837f84c5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0081.webp": {
+    "mtime": 1793992548.9273105,
+    "ast_hash": "c756e1e9a099c0e4446b37d7c1815275",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0082.webp": {
+    "mtime": 1793992548.9276083,
+    "ast_hash": "9371b84b3a430a143991a8d5e8883732",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0083.webp": {
+    "mtime": 1793992548.927893,
+    "ast_hash": "cd5ad8676d4d71662127a72873221262",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0084.webp": {
+    "mtime": 1793992548.9281666,
+    "ast_hash": "da673d325bb3b6a0d41f6808a75423b1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0085.webp": {
+    "mtime": 1793992548.9284627,
+    "ast_hash": "2672c08ce1b04660d8c0aeb044f29c8f",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0086.webp": {
+    "mtime": 1793992548.9287534,
+    "ast_hash": "5110c7344d972c1f0901f02db15640bc",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0087.webp": {
+    "mtime": 1793992548.929065,
+    "ast_hash": "47dbb5ede388d4df022150fda947a73d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0088.webp": {
+    "mtime": 1793992548.9293733,
+    "ast_hash": "57e977b192dae2b594bb278556ebf848",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0089.webp": {
+    "mtime": 1793992548.9296741,
+    "ast_hash": "d2e6e2636e99b80958099cf800571097",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0090.webp": {
+    "mtime": 1793992548.9299707,
+    "ast_hash": "4b89be22c61e13a705e84da73e91fe3e",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0091.webp": {
+    "mtime": 1793992548.930278,
+    "ast_hash": "9c4e733496b72ca075dd178a903d3299",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0092.webp": {
+    "mtime": 1793992548.9306214,
+    "ast_hash": "7f6761720cac755e80792f431553ba36",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0093.webp": {
+    "mtime": 1793992548.9309404,
+    "ast_hash": "dfa202f55ba03ea88c0701fa676e61e6",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0094.webp": {
+    "mtime": 1793992548.9312766,
+    "ast_hash": "930361102ca6a3bda618a25e9b5bbd40",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0095.webp": {
+    "mtime": 1793992548.9316232,
+    "ast_hash": "4a78c4b8c807a269b01e5f06c2756896",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0096.webp": {
+    "mtime": 1793992548.9319556,
+    "ast_hash": "d7d9a073e28fd4d96d966c2ee5e3c4c7",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0097.webp": {
+    "mtime": 1793992548.9322636,
+    "ast_hash": "865de52bd6ae04a6d1b5a92bb636d573",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0098.webp": {
+    "mtime": 1793992548.9325883,
+    "ast_hash": "08cd71dc14ada7aa7bfd0807a94756e5",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0099.webp": {
+    "mtime": 1793992548.9329052,
+    "ast_hash": "e63ffcd4147e96fffe1c121abe3ee50a",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0100.webp": {
+    "mtime": 1793992548.9332232,
+    "ast_hash": "669d3391a3dbbe12d79f21092df7c933",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0101.webp": {
+    "mtime": 1793992548.9335408,
+    "ast_hash": "900c7da549d744ae8987b8bc1617e399",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0102.webp": {
+    "mtime": 1793992548.9338639,
+    "ast_hash": "24a1bcb656487ddf33951bb2174aa6c1",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0103.webp": {
+    "mtime": 1793992548.934195,
+    "ast_hash": "eedbc8d23a4220ccc27d743663deb0c9",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0104.webp": {
+    "mtime": 1793992548.934517,
+    "ast_hash": "c9c8f766c9078d10a5b9ac1fc5a99c50",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0105.webp": {
+    "mtime": 1793992548.9348493,
+    "ast_hash": "e1bdf19a2c454f77fbff8dc9dc5529f8",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0106.webp": {
+    "mtime": 1793992548.9352489,
+    "ast_hash": "7a553a4aa78b5c832aacc8d0951cdfc0",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0107.webp": {
+    "mtime": 1793992548.93557,
+    "ast_hash": "34cccd1f0379d9d8ab1a3fb954cdbcd3",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0108.webp": {
+    "mtime": 1793992548.9358823,
+    "ast_hash": "a1c6b309a8778136201e5967cd69e99d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0109.webp": {
+    "mtime": 1793992548.9362018,
+    "ast_hash": "c61667ca3bb943ed437802d0ab187723",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0110.webp": {
+    "mtime": 1793992548.9364955,
+    "ast_hash": "108e74ccb6f6ae59eb86847a7f6eb999",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0111.webp": {
+    "mtime": 1793992548.9367943,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0112.webp": {
+    "mtime": 1793992548.936995,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0113.webp": {
+    "mtime": 1793992548.9372041,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0114.webp": {
+    "mtime": 1793992548.9374142,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0115.webp": {
+    "mtime": 1793992548.9376051,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0116.webp": {
+    "mtime": 1793992548.9379015,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0117.webp": {
+    "mtime": 1793992548.9381073,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0118.webp": {
+    "mtime": 1793992548.9383106,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/0119.webp": {
+    "mtime": 1793992548.9385135,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
+    "semantic_hash": ""
+  },
+  "app/public/films/qc709/qc-q27-transmon/poster.webp": {
+    "mtime": 1793992548.9390616,
+    "ast_hash": "21ec21675dd627bde51b5c0be9c1b44d",
     "semantic_hash": ""
   }
 }

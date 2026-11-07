@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/e2e/security.spec.ts": {
-    "mtime": 1793040559.2733433,
-    "ast_hash": "98eb25aa40b566850eb6ea6860afc0fb",
+    "mtime": 1793224926.7652552,
+    "ast_hash": "1041df2091f021354338be3667191c90",
     "semantic_hash": ""
   },
   "app/e2e/story-nowebgl.spec.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1792266407.4744256,
-    "ast_hash": "854a4b1a459720313384ce11985d40da",
+    "mtime": 1793220640.7878113,
+    "ast_hash": "4407bddb0be871a7758e5451533472fb",
     "semantic_hash": ""
   },
   "app/src/components/BeyondBadge.tsx": {
@@ -140,13 +140,13 @@
     "semantic_hash": ""
   },
   "app/src/content/claims.test.ts": {
-    "mtime": 1792450590.0568614,
-    "ast_hash": "8a26dccf98ac30fd27b8a9ca034cca88",
+    "mtime": 1793220640.7913666,
+    "ast_hash": "43a42bb1f7c2e899771b1cddd682c595",
     "semantic_hash": ""
   },
   "app/src/content/content.test.tsx": {
-    "mtime": 1792266407.4763706,
-    "ast_hash": "7d1f07a1223c1e26bdc3e98936c197eb",
+    "mtime": 1793220640.7923918,
+    "ast_hash": "9a65278d8ec8281e790bedb9c935949b",
     "semantic_hash": ""
   },
   "app/src/content/fidelity.ts": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "app/src/content/schema.ts": {
-    "mtime": 1792446971.6144023,
-    "ast_hash": "d94a7d7901d3ec4501af312ee45f4330",
+    "mtime": 1793224166.2192864,
+    "ast_hash": "1e2c3a6950dff8d811fa4a242c372c70",
     "semantic_hash": ""
   },
   "app/src/content/stage.test.ts": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "app/src/content/stage.ts": {
-    "mtime": 1793037652.51123,
-    "ast_hash": "0b021bfff8a712d9c5391bbd1e9ced0a",
+    "mtime": 1793224975.0671704,
+    "ast_hash": "ca2176fc46fc4f72fbe8fed850619ca3",
     "semantic_hash": ""
   },
   "app/src/content/stageVocab.ts": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "app/src/content/symbols.test.ts": {
-    "mtime": 1792266407.4795134,
-    "ast_hash": "51b6ff79f27f9c5c032ef7fb9bcb652f",
+    "mtime": 1793220640.805845,
+    "ast_hash": "c8eeddef4685bfa40631170460f7bcc8",
     "semantic_hash": ""
   },
   "app/src/content/verbatim.test.ts": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/Home.tsx": {
-    "mtime": 1791695420.2409863,
-    "ast_hash": "20aee122674be258d25b38ddd64525b4",
+    "mtime": 1793224501.066829,
+    "ast_hash": "0d999f014ca5da0105792c3dd2335203",
     "semantic_hash": ""
   },
   "app/src/pages/LecturePage.tsx": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/types.ts": {
-    "mtime": 1793037652.5189087,
-    "ast_hash": "9a048326d24b3d37dcce9d57ba6f26c3",
+    "mtime": 1793224166.2271268,
+    "ast_hash": "b46a87f49e7edaf7082217d51638018a",
     "semantic_hash": ""
   },
   "app/src/stage/useLiveStage.ts": {
@@ -805,8 +805,8 @@
     "semantic_hash": ""
   },
   "app/src/widgets/registry.tsx": {
-    "mtime": 1791695420.2460108,
-    "ast_hash": "7238d1bff2e93942339b47e755994af3",
+    "mtime": 1793220640.823718,
+    "ast_hash": "80f42fd83d682f50d3a1d947813dbf14",
     "semantic_hash": ""
   },
   "app/src/widgets/svg.tsx": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1793042765.711732,
-    "ast_hash": "36fa04e16222047404d8d695812955f7",
+    "mtime": 1793229364.5067027,
+    "ast_hash": "663b2343661ec312814665f8d60eee23",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -935,8 +935,8 @@
     "semantic_hash": ""
   },
   "docs/roles/interface-changes.md": {
-    "mtime": 1792092442.017993,
-    "ast_hash": "20850e7af080b5c318b719cb39b5ac7c",
+    "mtime": 1793224166.230015,
+    "ast_hash": "df7249e6f36180473986196d71639aa9",
     "semantic_hash": ""
   },
   "docs/roles/proposals/D-L1-scenes.md": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "app/src/openers/openerCopy.ts": {
-    "mtime": 1791731792.4851665,
-    "ast_hash": "06aaeb9e72225cb654b8fe4ac691ecd6",
+    "mtime": 1793224501.0654907,
+    "ast_hash": "8e9174282a39d81c882ec76d1c776553",
     "semantic_hash": ""
   },
   "app/src/openers/openerData.test.ts": {
@@ -2420,8 +2420,8 @@
     "semantic_hash": ""
   },
   "app/src/content/values.ts": {
-    "mtime": 1792266407.4799447,
-    "ast_hash": "e15360691483a3a99d39964563900a85",
+    "mtime": 1793220640.8067803,
+    "ast_hash": "b1e55a4112ce51bff8163da9f3c14530",
     "semantic_hash": ""
   },
   "app/src/stage/scenes/BlochScene.tsx": {
@@ -2560,8 +2560,8 @@
     "semantic_hash": ""
   },
   "app/src/components/UnitOpener.tsx": {
-    "mtime": 1790498029.5408745,
-    "ast_hash": "1eb5bc3e050b8db4bb46f874b8a4c948",
+    "mtime": 1793224501.0644476,
+    "ast_hash": "a3c6d20182fda4b8c9ec0e4a5daedb18",
     "semantic_hash": ""
   },
   "app/src/content/L4.review.ts": {
@@ -2650,23 +2650,23 @@
     "semantic_hash": ""
   },
   "app/src/content/load.ts": {
-    "mtime": 1792266407.477067,
-    "ast_hash": "5332c993f858dbbbf7d95904ea309ac0",
+    "mtime": 1793224926.7661152,
+    "ast_hash": "2b80e51f3017e3ffb7a4ccf6a867c1a1",
     "semantic_hash": ""
   },
   "app/src/content/meta.generated.ts": {
-    "mtime": 1793042765.4110665,
+    "mtime": 1793226484.1257968,
     "ast_hash": "9d0fedc11329d892df512a350fe2c43b",
     "semantic_hash": ""
   },
   "app/src/content/meta.test.ts": {
-    "mtime": 1792266407.4773946,
-    "ast_hash": "5b456338fcdfc1594448406f1cb364bc",
+    "mtime": 1793224926.7666466,
+    "ast_hash": "565992bba2b91122254447a0dab8359d",
     "semantic_hash": ""
   },
   "app/src/content/meta.ts": {
-    "mtime": 1792266407.4776413,
-    "ast_hash": "20a4196b68234afd2c5d5a9ee2765a0e",
+    "mtime": 1793220640.796358,
+    "ast_hash": "cb399166fc2d17518a9408a36da3a4bb",
     "semantic_hash": ""
   },
   "app/e2e/lab-dev.spec.ts": {
@@ -2800,8 +2800,8 @@
     "semantic_hash": ""
   },
   "pipeline/course.qc709.json": {
-    "mtime": 1792263404.9479585,
-    "ast_hash": "93e2feafd88d4a91b1571efd90506900",
+    "mtime": 1793218182.4450557,
+    "ast_hash": "542b1cd902ad6392e73913cb43f66f0f",
     "semantic_hash": ""
   },
   "docs/roles/PLAN-709.md": {
@@ -3035,8 +3035,8 @@
     "semantic_hash": ""
   },
   "app/e2e/course709.spec.ts": {
-    "mtime": 1793042335.1773856,
-    "ast_hash": "479d5e524e8b5410150a8bdfba4c68d6",
+    "mtime": 1793224926.764781,
+    "ast_hash": "8cabb273755043743945428c9e3c55e3",
     "semantic_hash": ""
   },
   "app/src/components/CourseSwitcher.tsx": {
@@ -3050,13 +3050,13 @@
     "semantic_hash": ""
   },
   "app/src/content/courses.test.ts": {
-    "mtime": 1792266407.4765167,
-    "ast_hash": "1c00d3cf18b5f841867318366c7fa9f1",
+    "mtime": 1793220640.794478,
+    "ast_hash": "4c45086f9607710ad9e87d81c5e35ac6",
     "semantic_hash": ""
   },
   "app/src/content/courses.ts": {
-    "mtime": 1792266407.476791,
-    "ast_hash": "ee70e1bfa75869868e2feb8fc7e20cc2",
+    "mtime": 1793220640.795421,
+    "ast_hash": "7378cae6df4201e7d601a68983510a26",
     "semantic_hash": ""
   },
   "app/src/content/glossRegistry.ts": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/concepts.ts": {
-    "mtime": 1793040559.277965,
-    "ast_hash": "3c86bc01d1876c3d1f9394feff00b49a",
+    "mtime": 1793224926.7700565,
+    "ast_hash": "6343eec68554946254c8c8f3221da489",
     "semantic_hash": ""
   },
   "app/src/content/qc709/index.ts": {
@@ -3080,8 +3080,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/meta.generated.ts": {
-    "mtime": 1793042765.4124205,
-    "ast_hash": "4b8ac0192937956c9ed0b0823fbed609",
+    "mtime": 1793226484.1272302,
+    "ast_hash": "2d14501841afc99fa5b888c900935c14",
     "semantic_hash": ""
   },
   "app/src/content/qc709/outline.test.ts": {
@@ -3095,13 +3095,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/pack.ts": {
-    "mtime": 1791671600.6421423,
-    "ast_hash": "4a6e196163903a26d48fedfad92e9d0a",
+    "mtime": 1793224166.2188337,
+    "ast_hash": "5fa69849ec7cfd2783b7848411c6fd4b",
     "semantic_hash": ""
   },
   "app/src/content/qc709/registry.ts": {
-    "mtime": 1792266407.479145,
-    "ast_hash": "4565bee759faba227802dd30b3f6a1a6",
+    "mtime": 1793224926.7711072,
+    "ast_hash": "04ed42e7aa63347adb250b2622dfa5be",
     "semantic_hash": ""
   },
   "app/src/content/qc709/values.ts": {
@@ -3135,13 +3135,13 @@
     "semantic_hash": ""
   },
   "app/src/pages/Chapter709Page.tsx": {
-    "mtime": 1792266407.4802513,
-    "ast_hash": "f74777730309260df3203a95c477c619",
+    "mtime": 1793220640.807276,
+    "ast_hash": "77cc9ac9a3a5a7602170bc693eed7f9a",
     "semantic_hash": ""
   },
   "app/src/pages/CourseHome709.tsx": {
-    "mtime": 1792266407.4805782,
-    "ast_hash": "99aa03db830eb65d5e56593c07b5c255",
+    "mtime": 1793220640.8082218,
+    "ast_hash": "9f921b998eeadadcbd5b583ad35b5c21",
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.tsx": {
@@ -3150,13 +3150,13 @@
     "semantic_hash": ""
   },
   "app/src/paths.test.ts": {
-    "mtime": 1792266407.4810233,
-    "ast_hash": "a16d62ad8356bdafc9c39cd062a323d9",
+    "mtime": 1793220640.8122559,
+    "ast_hash": "eddfec6dc79b1cc09b8ee0e6328f7059",
     "semantic_hash": ""
   },
   "app/src/paths.ts": {
-    "mtime": 1792266407.4811232,
-    "ast_hash": "9187972df99c7db25d2ec3c0bb8c1efc",
+    "mtime": 1793220640.8130088,
+    "ast_hash": "ca4b9a742937b71e57c19aa766348dbb",
     "semantic_hash": ""
   },
   "app/src/styles/courseTheme.ts": {
@@ -3360,18 +3360,18 @@
     "semantic_hash": ""
   },
   "app/src/content/bridgeRegistry.ts": {
-    "mtime": 1792266407.4756036,
-    "ast_hash": "e793b0539411fb7277e953bbe5df922f",
+    "mtime": 1793220640.7906425,
+    "ast_hash": "53aa51c86da92bc85354371f77f3fac2",
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.test.ts": {
-    "mtime": 1792266407.4779322,
-    "ast_hash": "129c54eeeb272a7923699bab368bd418",
+    "mtime": 1793220640.7969053,
+    "ast_hash": "eda0ff3dedd2dbb44f9de3bb51829107",
     "semantic_hash": ""
   },
   "app/src/content/qc709/bridges.ts": {
-    "mtime": 1793040559.2773082,
-    "ast_hash": "26c5d266d34a610835037f56ed2c1174",
+    "mtime": 1793224946.7984984,
+    "ast_hash": "102a19394c8de4617f79b91157efc389",
     "semantic_hash": ""
   },
   "app/src/content/track.ts": {
@@ -3400,8 +3400,8 @@
     "semantic_hash": ""
   },
   "app/src/ui/returnParam.security.test.ts": {
-    "mtime": 1792266407.4823573,
-    "ast_hash": "1e87a41accc32e7db3f348d40402d6ac",
+    "mtime": 1793220640.8158007,
+    "ast_hash": "c0ca590f4051ded6c6fec21fa6ccf27a",
     "semantic_hash": ""
   },
   "app/src/ui/returnParam.ts": {
@@ -4385,8 +4385,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/plot.ts": {
-    "mtime": 1793037652.5166605,
-    "ast_hash": "f7e6158877df27c5b5aeb6b84724272c",
+    "mtime": 1793224946.8003361,
+    "ast_hash": "88ff71c995c4beebab59a635758da33f",
     "semantic_hash": ""
   },
   "app/src/content/qc709/Q8.glossary.ts": {
@@ -4875,8 +4875,8 @@
     "semantic_hash": ""
   },
   "app/src/widgets/visualSpecs.test.tsx": {
-    "mtime": 1791995708.520166,
-    "ast_hash": "7247c789e814a8307d72a98c3326e1b1",
+    "mtime": 1793220640.824672,
+    "ast_hash": "1a0717c396ab98fc5c9d6a1b2cd702d8",
     "semantic_hash": ""
   },
   "SECURITY.md": {
@@ -5095,13 +5095,13 @@
     "semantic_hash": ""
   },
   "app/src/components/UnitNotesLink.test.tsx": {
-    "mtime": 1792270535.2778845,
-    "ast_hash": "8b418de48fcea4ab456177684a3501dc",
+    "mtime": 1793220640.7891192,
+    "ast_hash": "0afd4482025f5a022a88cd6c9a48d5c5",
     "semantic_hash": ""
   },
   "app/src/components/UnitNotesLink.tsx": {
-    "mtime": 1792266407.4746332,
-    "ast_hash": "1ec5ff0d67c7a12d6a555bdb6cfc4d99",
+    "mtime": 1793220640.7898457,
+    "ast_hash": "e98e2e8ec0519e9a3c3fe32ee11263b6",
     "semantic_hash": ""
   },
   "app/src/content/L10.review.ts": {
@@ -5285,7 +5285,7 @@
     "semantic_hash": ""
   },
   "app/src/content/meta.detail.generated.ts": {
-    "mtime": 1793042765.4117088,
+    "mtime": 1793226484.1265128,
     "ast_hash": "a3284c431f3d01cecd36e389bf77c79c",
     "semantic_hash": ""
   },
@@ -5410,7 +5410,7 @@
     "semantic_hash": ""
   },
   "app/src/content/papers/meta.generated.ts": {
-    "mtime": 1793042765.4129205,
+    "mtime": 1793226484.1277406,
     "ast_hash": "106015c16774b1324a0400d5365e3216",
     "semantic_hash": ""
   },
@@ -5800,13 +5800,13 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/kit.test.ts": {
-    "mtime": 1792266407.4784818,
-    "ast_hash": "a234e861955dae9c9e8ee0ed75486fa6",
+    "mtime": 1793220640.7979875,
+    "ast_hash": "fa72de70351b87d79c265f809e0ea760",
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/kit.ts": {
-    "mtime": 1793037652.5099058,
-    "ast_hash": "97d62e0902c99ea7c7d0b53e22906581",
+    "mtime": 1793224166.2131329,
+    "ast_hash": "a83433265fd3df5e594b7397bf0586d2",
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/loaders.ts": {
@@ -5815,7 +5815,7 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/meta.generated.ts": {
-    "mtime": 1793042765.4152474,
+    "mtime": 1793226484.1304252,
     "ast_hash": "fcc7ca22c946452715c9bc3c08c08c34",
     "semantic_hash": ""
   },
@@ -5825,8 +5825,8 @@
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/notes.test.ts": {
-    "mtime": 1792266407.4788363,
-    "ast_hash": "0775ffe50869dd22edcc460f0a35b700",
+    "mtime": 1793220640.7995355,
+    "ast_hash": "c6e8fd6e9a2e68dd67f4206a36e96b72",
     "semantic_hash": ""
   },
   "app/src/content/qc709/notes/values.ts": {
@@ -5840,8 +5840,8 @@
     "semantic_hash": ""
   },
   "app/src/content/unitNotes.ts": {
-    "mtime": 1792266407.4797075,
-    "ast_hash": "704634eda6e5e001b5fb2a2026fa0c9c",
+    "mtime": 1793220640.8063786,
+    "ast_hash": "8f7aa533faaa53869dc773dfa763b33e",
     "semantic_hash": ""
   },
   "app/src/openers/openerFrames.test.ts": {
@@ -5855,8 +5855,8 @@
     "semantic_hash": ""
   },
   "app/src/pages/NotesPages.tsx": {
-    "mtime": 1792266407.4808068,
-    "ast_hash": "0da292c8539740b22698d96b80aed4d2",
+    "mtime": 1793224166.2207875,
+    "ast_hash": "2574a0404848037fe3ff44b1f52e4b1f",
     "semantic_hash": ""
   },
   "app/src/pages/Pages709.test.tsx": {
@@ -6870,8 +6870,8 @@
     "semantic_hash": ""
   },
   "app/src/stage/svg/plotSeries.test.tsx": {
-    "mtime": 1792020882.9440856,
-    "ast_hash": "861ebcac1b0abc124220d9854670e9b6",
+    "mtime": 1793224166.2263916,
+    "ast_hash": "10d2cc47209ac1644fc778b5c9eb20e9",
     "semantic_hash": ""
   },
   "app/src/stage/svg/plotVote.test.tsx": {
@@ -7065,8 +7065,8 @@
     "semantic_hash": ""
   },
   "app/src/widgets/registry.test.tsx": {
-    "mtime": 1791695420.2456467,
-    "ast_hash": "6536427ed6bc34cc60498c33e738452e",
+    "mtime": 1793220640.8225868,
+    "ast_hash": "0d004cf5b6ad4b295cdc2b1227335eea",
     "semantic_hash": ""
   },
   "docs/papers/tdg/prereq-graph.json": {
@@ -7210,8 +7210,8 @@
     "semantic_hash": ""
   },
   "pipeline/context/build_context.mjs": {
-    "mtime": 1792266407.4849236,
-    "ast_hash": "bbc54a3315f3039cecd6bc768dbefc92",
+    "mtime": 1793220640.8310757,
+    "ast_hash": "f7c6346873ded29e46c56c7b43438fa7",
     "semantic_hash": ""
   },
   "pipeline/course.papers.json": {
@@ -7360,13 +7360,13 @@
     "semantic_hash": ""
   },
   "docs/context/cards/content-model.md": {
-    "mtime": 1792266407.4832895,
-    "ast_hash": "2ca19c2b14855ab4e7b846148d527572",
+    "mtime": 1793224926.7754667,
+    "ast_hash": "f1fff083ca532f13b500be08f468dcef",
     "semantic_hash": ""
   },
   "docs/context/cards/notes-platform.md": {
-    "mtime": 1792266407.483417,
-    "ast_hash": "2b68a7fca38cae6a7c782083388607b1",
+    "mtime": 1793224166.2283883,
+    "ast_hash": "de553d00d540c3fca1e9fccf8a8282fe",
     "semantic_hash": ""
   },
   "docs/context/cards/papers-platform.md": {
@@ -7375,13 +7375,13 @@
     "semantic_hash": ""
   },
   "docs/context/cards/pipeline.md": {
-    "mtime": 1793040559.279463,
-    "ast_hash": "1c8822c1ab47ee53388c36bd7d0b5eea",
+    "mtime": 1793224926.7776284,
+    "ast_hash": "c05547fb7c1fce9f849d4d8cae4a6c3d",
     "semantic_hash": ""
   },
   "docs/context/cards/qc-engine.md": {
-    "mtime": 1793037652.5200822,
-    "ast_hash": "96096215c8db26e9c6afdbb3cb32f6a6",
+    "mtime": 1793224926.7780879,
+    "ast_hash": "4e95b54e0f8a235e005046775ed17414",
     "semantic_hash": ""
   },
   "docs/context/cards/qec-engine.md": {
@@ -7390,13 +7390,13 @@
     "semantic_hash": ""
   },
   "docs/context/cards/stage-kinds.md": {
-    "mtime": 1793037652.5206838,
-    "ast_hash": "3f5e55fd2d535ece917be8fd2481865b",
+    "mtime": 1793224946.7988994,
+    "ast_hash": "c68b2b45b306fcb91d4b9da7f22537a2",
     "semantic_hash": ""
   },
   "docs/context/cards/tests-and-gate.md": {
-    "mtime": 1792472006.1330912,
-    "ast_hash": "da57d0796ceca3c3e96625c6a827464b",
+    "mtime": 1793224946.7991683,
+    "ast_hash": "a265f91cc61388676338dde1bb731f2a",
     "semantic_hash": ""
   },
   "docs/context/conventions.md": {
@@ -10107,6 +10107,401 @@
   "docs/roles/proposals/P-Q19-story.md": {
     "mtime": 1793035581.8848128,
     "ast_hash": "975385ee6155e6c34f90a9ad6570d04e",
+    "semantic_hash": ""
+  },
+  "app/e2e/optics.spec.ts": {
+    "mtime": 1793228979.2581725,
+    "ast_hash": "e8acc9daf0eb083d8413e89f87a91c31",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.glossary.ts": {
+    "mtime": 1793224926.7671177,
+    "ast_hash": "85ea55a2032789e13b37a57abe8313c7",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.review.ts": {
+    "mtime": 1793224926.767514,
+    "ast_hash": "3b1edc6ddb58167168e9ce751a1bc84c",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.story.ts": {
+    "mtime": 1793224926.7679026,
+    "ast_hash": "52c98fbf4fdacc1b33afa666ca4a80bb",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.test.ts": {
+    "mtime": 1793224926.768188,
+    "ast_hash": "2388e3736628be85368a5739659b58c5",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.tryits.test.tsx": {
+    "mtime": 1793224926.7684581,
+    "ast_hash": "c35f558df94d0ca66e963ff997e5036a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.ts": {
+    "mtime": 1793224926.7687087,
+    "ast_hash": "24b896295d083c03e7fe8e076a6cba28",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/Q20.values.ts": {
+    "mtime": 1793224926.769033,
+    "ast_hash": "7677eb32c902f222df32d679e9ce4f54",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/loaders.ts": {
+    "mtime": 1793224926.7702594,
+    "ast_hash": "621a5e208b4b29e9c7ea85a7838594e4",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/notes/checks.ts": {
+    "mtime": 1793220640.7975285,
+    "ast_hash": "124479f391fcb80daaf73c3c26a37ecc",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O1.ts": {
+    "mtime": 1793226474.5336478,
+    "ast_hash": "0ae4626504495bcb13b93debf788c4e1",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O1.values.ts": {
+    "mtime": 1793226474.5341864,
+    "ast_hash": "e7c3c26e0453843f8836cb1e90b1a016",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O2.ts": {
+    "mtime": 1793226474.5345683,
+    "ast_hash": "911fcee0aa86cd3da3169073ba106e4d",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O2.values.ts": {
+    "mtime": 1793224166.2146773,
+    "ast_hash": "7e35ab66860f6fb78cee69412fe623c8",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O3.ts": {
+    "mtime": 1793226474.5351114,
+    "ast_hash": "7e445d4787f2d32178944eaf99fbeff2",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O3.values.ts": {
+    "mtime": 1793224166.2152145,
+    "ast_hash": "bb6f042b4f1983b709bad2b27823b62f",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O4.ts": {
+    "mtime": 1793226474.5355937,
+    "ast_hash": "826380c369218dd6b1fa9ee28f0c6383",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O4.values.ts": {
+    "mtime": 1793224166.215812,
+    "ast_hash": "24805414f297754d639d99bc4abdca9b",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O5.ts": {
+    "mtime": 1793226474.5360012,
+    "ast_hash": "3198ecbc7291ec7d68e774e73b6c794c",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O5.values.ts": {
+    "mtime": 1793224166.216375,
+    "ast_hash": "0e5023f6dff3fd1fd6b65ba5e39c9113",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O6.ts": {
+    "mtime": 1793226474.5364504,
+    "ast_hash": "33ccaf4b2ff5bd50a2e16bab683c82c6",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/O6.values.ts": {
+    "mtime": 1793226474.536952,
+    "ast_hash": "10046c108b2b216f8d81a7d69cf2321a",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/format.ts": {
+    "mtime": 1793224166.217384,
+    "ast_hash": "1135eb32b3f9b9ae7de8ae4a9be167c6",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/glossary.ts": {
+    "mtime": 1793224166.2176962,
+    "ast_hash": "aaf52e1321585a00430671dc7b8746d5",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/index.ts": {
+    "mtime": 1793220640.8008618,
+    "ast_hash": "97215c4a1555886335c3520e52240de0",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/loaders.ts": {
+    "mtime": 1793220640.8011727,
+    "ast_hash": "d13a26ea2de066d0138d1fd9f01b9ad9",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/meta.generated.ts": {
+    "mtime": 1793226484.131464,
+    "ast_hash": "eea61b445503193b6bd2b908846adf49",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/optics.test.ts": {
+    "mtime": 1793226474.5383,
+    "ast_hash": "ca835b2e286034752c890e66539e0214",
+    "semantic_hash": ""
+  },
+  "app/src/content/qc709/optics/values.ts": {
+    "mtime": 1793220640.8022196,
+    "ast_hash": "30049194502f2332b8ac6c242e0b595b",
+    "semantic_hash": ""
+  },
+  "app/src/openers/OpenerByName.tsx": {
+    "mtime": 1793224501.0647762,
+    "ast_hash": "5a42c0603332d6d0b2368107ccebff84",
+    "semantic_hash": ""
+  },
+  "app/src/openers/openerTitles.ts": {
+    "mtime": 1793224501.0658414,
+    "ast_hash": "a286b2ac29963428f7c7825d25bfc66a",
+    "semantic_hash": ""
+  },
+  "app/src/pages/OpticsPages.test.tsx": {
+    "mtime": 1793224166.2211642,
+    "ast_hash": "b34b50d9709f330c21d1bfa041e1384a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o1.json": {
+    "mtime": 1793226474.538776,
+    "ast_hash": "1b626b16e20dcbf44e7213ec850f0c57",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o2.json": {
+    "mtime": 1793224166.2218149,
+    "ast_hash": "ff4c057f4d7ac1494d1076383d075213",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o3.json": {
+    "mtime": 1793224166.2220728,
+    "ast_hash": "e8e0c94a127592bb499434046ee06a45",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o4.json": {
+    "mtime": 1793224166.2222977,
+    "ast_hash": "9bce19679ce5c9afa614f99ce2c73438",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o5.json": {
+    "mtime": 1793224166.222526,
+    "ast_hash": "7ea30d8125226e9781f45ac11dc61458",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-optics/o6.json": {
+    "mtime": 1793226474.5392177,
+    "ast_hash": "6fa70c68093be82b9fad5101c94bcbb9",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/claims-qc709/q20.json": {
+    "mtime": 1793224926.7720823,
+    "ast_hash": "2d0a2d27cdf493e4a5e73aa8f8e49d5f",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/optics.json": {
+    "mtime": 1793226474.539866,
+    "ast_hash": "06b188d1d8f89dac9167f1642a49d24a",
+    "semantic_hash": ""
+  },
+  "app/src/physics/__fixtures__/qc-machines.json": {
+    "mtime": 1793224926.7728546,
+    "ast_hash": "f473a23077bae4654ef619c139afe513",
+    "semantic_hash": ""
+  },
+  "app/src/physics/optics/collisions.test.ts": {
+    "mtime": 1793226474.5401947,
+    "ast_hash": "09863fed6f45ff2e91f424ff985b5759",
+    "semantic_hash": ""
+  },
+  "app/src/physics/optics/collisions.ts": {
+    "mtime": 1793226474.5407608,
+    "ast_hash": "fa8279a93128d641905370eb79b3eda5",
+    "semantic_hash": ""
+  },
+  "app/src/physics/optics/cooling.test.ts": {
+    "mtime": 1793226474.5412538,
+    "ast_hash": "5c786a8a10596c64d4f0cedfde6b9a45",
+    "semantic_hash": ""
+  },
+  "app/src/physics/optics/cooling.ts": {
+    "mtime": 1793224166.2243075,
+    "ast_hash": "5aea55b5e5b87d94333565677c09477e",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/machines.test.ts": {
+    "mtime": 1793224926.773239,
+    "ast_hash": "7b496f1001ea9296e917a28e413a3acf",
+    "semantic_hash": ""
+  },
+  "app/src/physics/qc/machines.ts": {
+    "mtime": 1793224926.7736547,
+    "ast_hash": "3733ede22a89d84009f9c3f44dbb426f",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotMachines.test.ts": {
+    "mtime": 1793224926.774586,
+    "ast_hash": "016192af0b1223ca3e7f14ac02d231f9",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotOptics.test.ts": {
+    "mtime": 1793226474.5417237,
+    "ast_hash": "370ea62c97237b43317cea66d4faeedb",
+    "semantic_hash": ""
+  },
+  "app/src/stage/svg/plotOptics.ts": {
+    "mtime": 1793226474.5421228,
+    "ast_hash": "dc1d976e795d0512a3f184c5714e7557",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/OpticsBench.test.tsx": {
+    "mtime": 1793226474.542667,
+    "ast_hash": "70913dc2be38c3460938fafd6b1e49c1",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/OpticsBench.tsx": {
+    "mtime": 1793220640.8173392,
+    "ast_hash": "9ceaa574351b86eb0aaec8d078782114",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/OpticsBenchAxes.test.tsx": {
+    "mtime": 1793220640.8179023,
+    "ast_hash": "b05ebd15de9e44cdad14fddb151e3839",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/OpticsPresets.test.ts": {
+    "mtime": 1793224166.2275019,
+    "ast_hash": "8a7985e4e8ab1b7373748c5740cc6a6b",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/opticsBench/model.ts": {
+    "mtime": 1793220640.819215,
+    "ast_hash": "b74996c3586e50116fefdcfb928e1e59",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/opticsBench/plot.ts": {
+    "mtime": 1793220640.8196776,
+    "ast_hash": "2fa03899355ebe1ace0fc42f45b8d7a7",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/opticsBench/presets.ts": {
+    "mtime": 1793226474.5430865,
+    "ast_hash": "6423d2a57eda4ef6e8514b6b2722a91a",
+    "semantic_hash": ""
+  },
+  "app/src/widgets/opticsBench/validate.ts": {
+    "mtime": 1793220640.820953,
+    "ast_hash": "b873301e6683d242daf2a07e4b2d8b0f",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_optics/o.py": {
+    "mtime": 1793226474.5437999,
+    "ast_hash": "f1d0a8992a899c0eb7878822fd5ad614",
+    "semantic_hash": ""
+  },
+  "pipeline/claims_qc709/q20.py": {
+    "mtime": 1793224926.779478,
+    "ast_hash": "f1012bd13d6eaa2164d566183403d801",
+    "semantic_hash": ""
+  },
+  "pipeline/machines_numpy.py": {
+    "mtime": 1793224926.7800303,
+    "ast_hash": "22bf0af3b6befd64df89d05fc74d6c6d",
+    "semantic_hash": ""
+  },
+  "pipeline/make_machines_fixtures.py": {
+    "mtime": 1793224926.780465,
+    "ast_hash": "8b5ecefd4730926aabf4a0cb3e010c4e",
+    "semantic_hash": ""
+  },
+  "pipeline/make_optics_fixtures.py": {
+    "mtime": 1793226474.5443106,
+    "ast_hash": "8ce88766e23c56f4023f21c465758907",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-Q20.md": {
+    "mtime": 1793224926.7792127,
+    "ast_hash": "87df7eb92d39a736ede8906c8e7eb307",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-entry-trim2.md": {
+    "mtime": 1793224501.0679615,
+    "ast_hash": "08ad65e559ac8f400d3f0cb89d2c6f4e",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-optics-content.md": {
+    "mtime": 1793224166.2294242,
+    "ast_hash": "8bdd41e9891595737fe8c5de275aedaa",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-optics-fix.md": {
+    "mtime": 1793226474.5433962,
+    "ast_hash": "cf9ddd72d25c77de6b67200e65521f16",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-10-29-optics-platform.md": {
+    "mtime": 1793220640.8274736,
+    "ast_hash": "a0956b9a73484a377362e91069f88cdf",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-Q20-corrections-check.md": {
+    "mtime": 1793225625.7294488,
+    "ast_hash": "fbcd60d14d4d34134eacad2915076e27",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/P-optics-lab-review.md": {
+    "mtime": 1793225326.9841435,
+    "ast_hash": "9c20edd1558e5a703ab05490973a01e2",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/optics-lab.md": {
+    "mtime": 1793219789.5165575,
+    "ast_hash": "83ded084b4fb069ecf9cd22208d01114",
+    "semantic_hash": ""
+  },
+  "docs/roles/decisions/qc709-Q20-Q27.md": {
+    "mtime": 1793220692.9054947,
+    "ast_hash": "6e273473bdd111ab698a054f2662db80",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q20-story.md": {
+    "mtime": 1793220582.1048276,
+    "ast_hash": "b7c14353e39dc4e6e851b6d14260446f",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q23-story.md": {
+    "mtime": 1793220638.397365,
+    "ast_hash": "05581b84228d8e887b8b0613e9a63eb3",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q24-story.md": {
+    "mtime": 1793220509.157289,
+    "ast_hash": "694d0cc24966e83c94790d2c2be9e1ba",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q25-story.md": {
+    "mtime": 1793220509.1566384,
+    "ast_hash": "55371b3df39655a30b8d5d15ed68dcf9",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q26-story.md": {
+    "mtime": 1793220350.74969,
+    "ast_hash": "403e8ef0dc31eefa081c0666519e9903",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-Q27-story.md": {
+    "mtime": 1793220366.473825,
+    "ast_hash": "a2e6121f3d06045be950eabe72b63656",
+    "semantic_hash": ""
+  },
+  "docs/roles/proposals/P-optics-lab.md": {
+    "mtime": 1793219741.007411,
+    "ast_hash": "2fb0e90b051c590bd6a13677299d6e4a",
     "semantic_hash": ""
   }
 }

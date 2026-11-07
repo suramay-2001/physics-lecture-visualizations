@@ -57,15 +57,18 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**STATE (2026-11-07, read first after a compaction).** On local main, NOT pushed: 709 Arcade rounds for Q19, Q20, Q23–Q27
-(Spot-the-error, `content/qc709/games.ts` + `Q*.arcade.test.ts`); 709 films for the same seven chapters (unit openers,
-manifests checked); 448 L14, L15 (reviewed `audits/P-L14L15-review.md`, fixed), L16, L17 (merged by a merge agent,
-101 units / 17 map lines); an L12 TeX step reordered so the new notes do not trip the verbatim guard. Rulings
-`decisions/448-L14L18.md` M1–M7 (+ L14 note). IN FLIGHT: L18 builder (moves `l13-flow` b3–b6, `l13-pr-tunnel`, the
-p. 231 Correction into L18, deletes `l13-flow`, trims the `l13-schrodinger` beat that repeats L14's stationary states).
-REMAINING: merge L18 (merge agent; recompute counts; `LAST_448` 18) → independent review of L16–L18 (adapt
-`scratchpad/brief-review-L14L15.md`) → fix pass → full gate + full preview e2e + unpiped audit → BUILD-LOG → push.
-Budget 35 points for the batch (meter 8 % after the 11-06 reset).
+**DONE and PUSHED (2026-11-07): 448 L14–L18; 709 Arcade and films for Q19–Q27.** 448: five new lectures from the
+notes (Schrödinger equation and stationary states; free particles, wavepackets, dispersion; Gaussian packets and
+Ehrenfest; classical mean motion and quantum reflection; reflection and tunnelling), each with Townsend books beats,
+formula boards, practice questions (HW6/HW7 submitted), engines `physics/wave14.ts`–`wave18.ts`, the `wavefunction`
+`potential` field; ownership per `decisions/448-L14L18.md` (L13 keeps its notes units; Townsend-only units moved to the
+lecture whose notes teach them: box/stationary → L14, fringes → L15, Ex. 6.4/Ehrenfest → L16, flow → L17/L18, p. 231
+Correction → L18; `l13-flow` deleted). Reviews `audits/P-L14L15-review.md`, `P-L16L18-review.md` and fix passes merged.
+709: Spot-the-error Arcade rounds for Q19, Q20, Q23–Q27; films (unit openers, manifests checked) for the same seven.
+Gate 334 files / 17,498 tests; full preview e2e green (L16 left the SVG-only list: its Try-it is the Bloch widget).
+NEXT: Arcade rounds for 448 L14–L18 (builders skipped them); the live-site header check (needs the URL).
+LESSONS: the merge agent's SVG-only lists must be derived from kinds AND widgets (a Try-it Bloch widget is a canvas);
+macOS has no `timeout`: run long git/vitest steps in the background instead.
 
 **Next action (2026-11-06): 448 L14–L18, then Arcade and films for 709 Q19–Q27.** Owner: build the new 448 notes
 (`~/Documents/Physics 448 notes/Lecture_14–18.pdf`, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
