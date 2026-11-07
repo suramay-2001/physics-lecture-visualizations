@@ -9,10 +9,11 @@ export const L15_REVIEW: Record<string, ReviewCard> = {
     points: [
       'An energy eigenstate has a fixed density, because its time dependence is one overall phase that cancels in $|\\psi|^2$.',
       'Motion needs a mix of several energies: the phase between the parts changes the interference, and so the density.',
-      'A free packet released with momentum $p_0$ has its centre at $p_0t/m$; for $p_0 = 3$ and $m = 1$ it is at 6 when $t = 2$.',
+      `A free packet released with momentum $p_0$ has its centre at $p_0t/m$; for $p_0 = 3$ and $m = 1$ it is at ${d(V.l15FreeMean2, 0)} when $t = 2$.`,
     ],
     equations: '|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle',
     trap: 'Expecting a stationary state to move, or a single energy to describe a particle that travels.',
+    claims: [claim('l15FreeMean2', 'the free packet’s centre is at 6 ℓ at t = 2', () => close(V.l15FreeMean2, 6, 1e-9))],
   },
   'l15-free-eigenstate': {
     points: [

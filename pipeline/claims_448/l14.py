@@ -94,6 +94,7 @@ put('l14TkinP0', kinetic(k3))
 assert abs(kinetic(k3) - (4.5 + 0.125)) < 1e-9
 put('l14TkinMean', 0.5 * mean_p(k3) ** 2)
 put('l14TkinSpread', 0.5 * spread_p(k3) ** 2)
+put('l14DpP0', spread_p(k3))
 put('l14VMean', 0.5 * np.sum(x**2 * np.abs(pk(2, 1)) ** 2) * dx)
 
 # ---- l14-dispersion ----
@@ -123,8 +124,8 @@ def top_hat(L, P):
     return 2 * simpson(lambda p: np.sin(p * L / 2) ** 2 / (pi * L), 0.0, P)
 
 
-put('l14TopHatT4', top_hat(1.0, 8 * pi))
-put('l14TopHatT8', top_hat(1.0, 16 * pi))
+put('l14TopHatT4', top_hat(2.0, 4 * pi))
+put('l14TopHatT8', top_hat(2.0, 8 * pi))
 
 
 def tent(L, m=1.0):
