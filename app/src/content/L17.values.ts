@@ -60,7 +60,7 @@ export const V = {
   l17SineTaylorB: sineTaylor(Math.PI / 2, 1), // 0.5
   l17ChTwoPeaks: forceMean(peaks([-3, 3], 0.05), GRID, sq), // 9.0025 (the challenge: ⟨x²⟩ for sharp peaks at ±3)
   l17ChVar: forceMean(PK(3, 0.5), GRID, sq), // 9.25
-  l17PrMeanFactor: forceMean(PK(3, 0.5), GRID, sq) / meanX(PK(3, 0.5), GRID) ** 2, // 1.0278 = 1 + σ²/μ²
+  l17PrMeanFactor: forceMean(PK(2, 0.5), GRID, sq) / meanX(PK(2, 0.5), GRID) ** 2, // 1.0625 = 1 + σ²/μ² (practice: μ = 2, σ = ½)
   /* l17-step */
   l17K1: st43.k1, // 2
   l17K2: st43.k2, // 1
@@ -73,6 +73,7 @@ export const V = {
   l17TrapT1: rampBlockKinetic(10, 1), // 0.09375
   l17TrapT05: rampBlockKinetic(10, 0.5), // 0.1935
   l17TrapRatio: rampBlockKinetic(10, 0.5) / rampBlockKinetic(10, 1), // 2.065
+  l17PrEdgeRatio: rampBlockKinetic(8, 1) / rampBlockKinetic(8, 2), // 2.154 = (1/1)/(8 + 2/3) over (1/2)/(8 + 4/3) (practice: plateau 8, ramps 2 then 1)
   l17ChR: stepAmplitudes(4.5, 4).r.re, // k₁ = 3k₂: r = 1/2
   l17ChTau: stepAmplitudes(4.5, 4).tau.re, // τ = 3/2
   /* l17-current */

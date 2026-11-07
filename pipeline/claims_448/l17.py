@@ -174,7 +174,7 @@ for nm, sg_ in [('A', 0.5), ('B', 1.0)]:
 # challenge and practice answers
 put('l17ChTwoPeaks', trap(lambda x: x**2 * mix(x, [-3.0, 3.0], 0.05), -9, 9))
 put('l17ChVar', trap(lambda x: x**2 * gauss(x, 3.0, 0.5), -9, 15))
-put('l17PrMeanFactor', trap(lambda x: x**2 * gauss(x, 3.0, 0.5), -9, 15) / 9.0)
+put('l17PrMeanFactor', trap(lambda x: x**2 * gauss(x, 2.0, 0.5), -9, 13) / 4.0)  # practice: mu = 2, sigma = 1/2
 # k1 = 3 k2: E = k1^2/2 = 4.5, E - V0 = k2^2/2 = 0.5 -> V0 = 4
 _, _, Bq, Cq = step_solve(4.5, 4.0)
 put('l17ChR', Bq.real)
@@ -196,6 +196,7 @@ def ramp_block(L, eps, dx=1 / 64):
 put('l17TrapT1', ramp_block(10.0, 1.0))
 put('l17TrapT05', ramp_block(10.0, 0.5))
 put('l17TrapRatio', ramp_block(10.0, 0.5) / ramp_block(10.0, 1.0))
+put('l17PrEdgeRatio', ramp_block(8.0, 1.0) / ramp_block(8.0, 2.0))  # practice: plateau 8, ramps 2 then 1
 
 # ------------------------------------------------------------------ the continuity residual with a potential (np.fft): a packet across a smooth step
 pk = (2 * np.pi * 1.5**2) ** -0.25 * np.exp(-((xg + 6.0) ** 2) / (4 * 1.5**2)) * np.exp(1j * 3.0 * xg)

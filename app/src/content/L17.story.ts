@@ -92,14 +92,14 @@ const meanForce: Beat[] = [
   {
     id: 'l17-mean-force:b1',
     phase: 'lecture',
-    text: `Lecture 16 ended with two exact equations for the means: $d\\langle x\\rangle/dt = \\langle p\\rangle/m$ and $d\\langle p\\rangle/dt = \\langle F(\\hat x)\\rangle$, where $F = -dV/dx$. Together they give $m\\,d^2\\langle x\\rangle/dt^2 = \\langle F(\\hat x)\\rangle$. A classical particle sitting at the mean position would feel $F(\\langle x\\rangle)$ instead. Are the two forces equal? The first is the [[mean-force|mean force]], an average over the whole density. A quick check shows they can differ: a fixed mean position does not mean a fixed width.`,
+    text: `Lecture 16 ended with two exact equations for the means: $d\\langle x\\rangle/dt = \\langle p\\rangle/m$ and $d\\langle p\\rangle/dt = \\langle F(\\hat x)\\rangle$, where $F = -dV/dx$. Together they give $m\\,d^2\\langle x\\rangle/dt^2 = \\langle F(\\hat x)\\rangle$. A classical particle sitting at the mean position would feel $F(\\langle x\\rangle)$ instead. Are the two forces equal? The first is the [[mean-force|mean force]], an average over the whole density. A quick check: a fixed mean position does not mean a fixed width, so the width may matter.`,
     caption: 'a free packet with $p_0 = 3$ moves and spreads: its mean position and its width are two separate numbers',
     stage: W(PK(0, 1, 3), { time: sweep(0, 4), window: { x: [-4, 16] }, readouts: ['xmean', 'xspread'] }),
   },
   {
     id: 'l17-mean-force:b2',
     phase: 'lecture',
-    text: `Three cases are exact. A free particle has $\\langle x\\rangle = x_0 + p_0t/m$. A constant force $F_0$ adds $\\tfrac{F_0t^2}{2m}$. With $x_0 = 0$, $p_0 = 3$ and $F_0 = 1$ the mean sits at ${d(V.l17ConstMean2, 0)} after $t = 2$. The width is still the free ${d(V.l17ConstDx2, 3)}. A harmonic force $F = -m\\Omega^2x$ gives $d^2\\langle x\\rangle/dt^2 = -\\Omega^2\\langle x\\rangle$. For any force $F = \\alpha + \\beta x$, the mean force is the force at the mean, whatever the width or shape. None of this turns the state into a point. Take a well with $\\Omega = 1$ and a packet of width 1 that starts at 2. A quarter period later its mean is ${dz(V.l17HarmMeanHalfPi)} and its width is ${d(V.l17HarmDxHalfPi, 1)}. After half a period the mean is ${d(V.l17HarmMeanPi, 0)} and the width is back to ${d(V.l17HarmDxPi, 1)}.`,
+    text: `Three cases are exact. A free particle has $\\langle x\\rangle = x_0 + p_0t/m$. A constant force $F_0$ adds $\\tfrac{F_0t^2}{2m}$. With $x_0 = 0$, $p_0 = 3$ and $F_0 = 1$ the mean sits at ${d(V.l17ConstMean2, 0)} after $t = 2$. The width is still the free ${d(V.l17ConstDx2, 3)}. A harmonic force $F = -m\\Omega^2x$ ($\\Omega$ is the oscillator’s angular frequency; the period is $2\\pi/\\Omega$) gives $d^2\\langle x\\rangle/dt^2 = -\\Omega^2\\langle x\\rangle$. For any force $F = \\alpha + \\beta x$, the mean force is the force at the mean, whatever the width or shape. None of this turns the state into a point. Take a well with $\\Omega = 1$ and a packet of width 1 that starts at 2. A quarter period later its mean is ${dz(V.l17HarmMeanHalfPi)} and its width is ${d(V.l17HarmDxHalfPi, 1)}. After half a period the mean is ${d(V.l17HarmMeanPi, 0)} and the width is back to ${d(V.l17HarmDxPi, 1)}.`,
     caption: 'a constant force carries the packet along $x_0 + p_0t + \\tfrac{F_0t^2}{2}$ without changing its width',
     stage: W(PK(0, 1, 3), { potential: { force: { F: 1 } }, time: sweep(0, 2), window: { x: [-4, 16] }, readouts: ['xmean', 'xspread'] }),
     derivation: {
@@ -235,7 +235,7 @@ const step: Beat[] = [
   {
     id: 'l17-step:b2',
     phase: 'lecture',
-    text: `An energy eigenstate evolves as $\\varphi_E(x)e^{-iEt/\\hbar}$ (Unit 11.5). The notes call the function $u_E$; this course calls it $\\varphi_E$ (Unit 13.6). It solves $-\\tfrac{\\hbar^2}{2m}\\varphi_E'' + V\\varphi_E = E\\varphi_E$. Where $V$ is constant, $\\varphi_E'' = -k^2\\varphi_E$ with $k^2 = 2m(E - V)/\\hbar^2$, so $e^{ikx}$ and $e^{-ikx}$ solve it, with momenta $+\\hbar k$ and $-\\hbar k$. These extended waves are [[scattering-state|scattering states]]: energy components, not particles. A packet is a sum of them, so we solve one energy first. A stationary density can still carry a flow. Take $E = 2$ and $V_0 = \\tfrac{3E}{4}$: then $k_1 = ${d(V.l17K1, 0)}$ on the left and $k_2 = ${d(V.l17K2, 0)}$ on the right.`,
+    text: `An energy eigenstate evolves as $\\varphi_E(x)e^{-iEt/\\hbar}$ (Unit 11.5). The notes call the function $u_E$; this course calls it $\\varphi_E$ (Unit 14.5). It solves $-\\tfrac{\\hbar^2}{2m}\\varphi_E'' + V\\varphi_E = E\\varphi_E$. Where $V$ is constant, $\\varphi_E'' = -k^2\\varphi_E$ with $k^2 = 2m(E - V)/\\hbar^2$, so $e^{ikx}$ and $e^{-ikx}$ solve it, with momenta $+\\hbar k$ and $-\\hbar k$. These extended waves are [[scattering-state|scattering states]]: energy components, not particles. A packet is a sum of them, so we solve one energy first. A stationary density can still carry a flow. Take $E = 2$ and $V_0 = \\tfrac{3E}{4}$: then $k_1 = ${d(V.l17K1, 0)}$ on the left and $k_2 = ${d(V.l17K2, 0)}$ on the right.`,
     caption: 'the real part of a wave of momentum 2: a plane wave is an energy component, not a particle',
     stage: W(PL(2), { show: ['re', 'im'] }),
     claims: [
@@ -286,7 +286,7 @@ const step: Beat[] = [
   {
     id: 'l17-step:b4',
     phase: 'lecture',
-    text: `For a step up, $0 < r < 1$ and $\\tau > 1$. Does $\\tau > 1$ break the conservation of probability? No. The transmitted wave is slower, and comparing densities is not comparing flows. For $E = \\tfrac{4V_0}{3}$ the transmitted density is ${d(V.l17StepDens43, 3)} times the incident density. The curve shows it falling from 4 at the threshold to 1 far above the step. The numbers $r$ and $\\tau$ are amplitudes, not probabilities.`,
+    text: `For $E = \\tfrac{4V_0}{3}$ the transmitted density is ${d(V.l17StepDens43, 3)} times the incident density, which looks like too much probability. The curve shows this ratio falling from 4 at the threshold to 1 far above the step. It is no violation: the transmitted wave is slower, so a given density carries less flow. For a step up $0 < r < 1$ and $\\tau > 1$, and both are amplitudes, not probabilities.`,
     caption: 'the density ratio $|\\tau|^2$ against $E/V_0$ is above 1; the transmitted share $T$ never is',
     stage: DENSITY_RATIO(),
     claims: [claim('l17StepDens43', 'the transmitted density is 16/9 = 1.778 times the incident density', () => close(V.l17StepDens43, 16 / 9, 1e-12))],
@@ -325,7 +325,7 @@ const step: Beat[] = [
   {
     id: 'l17-step:b8',
     phase: 'deeper',
-    text: `Beyond the main line: why must the slope be continuous? Integrate the energy equation over a tiny stretch $\\epsilon$ on each side of $x = 0$: $-\\tfrac{\\hbar^2}{2m}\\left[\\varphi'(\\epsilon) - \\varphi'(-\\epsilon)\\right] + \\int (V - E)\\varphi\\,dx = 0$. For a finite step the integral shrinks to zero with $\\epsilon$, so the slope cannot jump. A jump in the function would put a delta function in $\\varphi''$ that nothing balances. A delta potential or an infinite wall can break the rule. The cost of a jump shows in the kinetic energy. Take a block of plateau length 10 with linear ramps of width $\\epsilon$ at its edges. Its $\\langle T\\rangle$ is ${d(V.l17TrapT1, 3)} for $\\epsilon = 1$ and ${d(V.l17TrapT05, 3)} for $\\epsilon = \\tfrac12$, in units of $\\hbar^2/m\\ell^2$. Halving the ramp more than doubles it, by a factor ${d(V.l17TrapRatio, 3)}. A true jump costs infinite energy.`,
+    text: `Beyond the main line: why must the slope be continuous? Integrate the energy equation over a tiny stretch $\\epsilon$ on each side of $x = 0$: $-\\tfrac{\\hbar^2}{2m}\\left[\\varphi'(\\epsilon) - \\varphi'(-\\epsilon)\\right] + \\int (V - E)\\varphi\\,dx = 0$. For a finite step the integral shrinks to zero with $\\epsilon$, so the slope cannot jump. A jump in the function would put the derivative of a delta function in $\\varphi''$, and nothing balances that. A delta potential or an infinite wall can break the rule. The cost of a jump shows in the kinetic energy. Take a block of plateau length 10 with linear ramps of width $\\epsilon$ at its edges. Its $\\langle T\\rangle$ is ${d(V.l17TrapT1, 3)} for $\\epsilon = 1$ and ${d(V.l17TrapT05, 3)} for $\\epsilon = \\tfrac12$, in units of $\\hbar^2/m\\ell^2$. Halving the ramp more than doubles it, by a factor ${d(V.l17TrapRatio, 3)}. A true jump costs infinite energy.`,
     caption: 'a narrow packet: the narrower the structure, the larger its kinetic energy',
     stage: W(PK(0, 1), { show: ['density'] }),
     claims: [
@@ -344,7 +344,7 @@ const current: Beat[] = [
   {
     id: 'l17-current:b1',
     phase: 'lecture',
-    text: `The ratio $|C|^2/|A|^2$ compares two densities. It is not the fraction crossing per second, because the particles are slower on the high side. A stationary state is a steady stream, so start from conservation. The chance in a stretch $[a, b]$ is $P(t) = \\int_a^b\\rho\\,dx$ with $\\rho = |\\psi|^2$. It can change only by flow in at one end and out at the other: $dP/dt = j(a) - j(b)$, where $j$ is the rightward current. Locally this is the [[continuity-equation|continuity equation]] $\\partial_t\\rho + \\partial_xj = 0$, like fluid in a pipe. The formula for $j$ has to be derived, not guessed. A packet with $p_0 = 1.5$ has a total current of $${d(V.l17CurrentMean, 1)}\\,\\hbar/\\ell$ per unit mass, which is $\\langle p\\rangle/m$.`,
+    text: `What fraction of the particles crosses a detector on the right? The ratio $|C|^2/|A|^2$ cannot say. It compares two densities, and the particles are slower on the high side. A steady stream has a flow even though its density never changes. Conservation gives the right quantity. The chance in a stretch $[a, b]$ is $P(t) = \\int_a^b\\rho\\,dx$ with $\\rho = |\\psi|^2$. It changes only by flow in at $a$ and out at $b$, so $dP/dt = j(a) - j(b)$ for the rightward current $j$. Locally this is the [[continuity-equation|continuity equation]] $\\partial_t\\rho + \\partial_xj = 0$. Its formula for $j$ has to be derived, not guessed. A packet with $p_0 = 1.5$ has a total current of $${d(V.l17CurrentMean, 1)}\\,\\hbar/\\ell$ per unit mass, which is $\\langle p\\rangle/m$.`,
     caption: 'the density of a packet with $p_0 = 1.5$ slides to the right: probability flows past each point',
     stage: W(PK(0, 1, 1.5), { time: sweep(0, 4), show: ['density'], readouts: ['pmean'] }),
     claims: [claim('l17CurrentMean', 'the total current of the packet with p₀ = 1.5 is ⟨p⟩/m = 1.5', () => close(V.l17CurrentMean, 1.5, 1e-9))],
@@ -400,7 +400,7 @@ const current: Beat[] = [
   {
     id: 'l17-current:b4',
     phase: 'lecture',
-    text: `A right-moving wave $De^{ikx}$ has $\\psi^*\\psi' = ik|D|^2$, so $j = \\hbar k|D|^2/m = v|D|^2$, where $v$ is its speed. A left-moving wave has the opposite sign. So $j_{\\mathrm{in}} = v_1|A|^2$, $j_{\\mathrm{ref}} = -v_1|B|^2$ and $j_{\\mathrm{tr}} = v_2|C|^2$, and the balance is $j_{\\mathrm{in}} + j_{\\mathrm{ref}} = j_{\\mathrm{tr}}$. With $k_1 = 2$ and $A = 1$ the incident current is ${d(V.l17Jin, 0)}$, the reflected one is minus ${d(V.l17JrefMag, 3)} and the transmitted one is ${d(V.l17Jtr, 3)}. The incident current minus the reflected size equals the transmitted one. The density on the left has fringes, between ${d(V.l17FringeMin, 3)} and ${d(V.l17FringeMax, 3)}, repeating every ${d(V.l17FringeSpacing, 3)}. The current has none.`,
+    text: `A right-moving wave $De^{ikx}$ has $\\psi^*\\psi' = ik|D|^2$, so $j = \\hbar k|D|^2/m = v|D|^2$, where $v$ is its speed. A left-moving wave has the opposite sign. So $j_{\\mathrm{in}} = v_1|A|^2$, $j_{\\mathrm{ref}} = -v_1|B|^2$ and $j_{\\mathrm{tr}} = v_2|C|^2$, and the balance is $j_{\\mathrm{in}} + j_{\\mathrm{ref}} = j_{\\mathrm{tr}}$. With $k_1 = 2$ and $A = 1$ the incident current is ${d(V.l17Jin, 0)}, the reflected one is minus ${d(V.l17JrefMag, 3)} and the transmitted one is ${d(V.l17Jtr, 3)}. The incident current minus the reflected size equals the transmitted one. The density on the left has fringes, between ${d(V.l17FringeMin, 3)} and ${d(V.l17FringeMax, 3)}, repeating every ${d(V.l17FringeSpacing, 3)}. The current has none.`,
     caption: 'incident plus reflected wave: the density ripples, the current does not',
     stage: W(TW(2, -2), { show: ['density'] }),
     derivation: {
@@ -492,7 +492,7 @@ const current: Beat[] = [
   {
     id: 'l17-current:b7',
     phase: 'lecture',
-    text: `Three distinctions to keep. The mean force equals the force at the mean for a linear force or a localised packet, and not otherwise. Matching the function and its slope fixes the amplitudes, while the Schrödinger equation itself gives local conservation. The current turns amplitudes into outgoing fractions, so $T$ carries the ratio of the speeds. Next we lower the energy below the step. There a wave can decay into the step while no flux passes through.`,
+    text: `Three distinctions to keep. The mean force equals the force at the mean exactly for a linear force and approximately for a narrow packet in a slowly varying force. Matching the function and its slope fixes the amplitudes, while the Schrödinger equation itself gives local conservation. The current turns amplitudes into outgoing fractions, so $T$ carries the ratio of the speeds. Next we lower the energy below the step. There a wave can decay into the step while no flux passes through.`,
     caption: 'the packet and the step again, now with the chance on each side of the step',
     stage: STEP_PACKET({ readouts: ['reflected', 'transmitted'] }),
     fidelity: ['wavefunction-potential-splitstep'],
