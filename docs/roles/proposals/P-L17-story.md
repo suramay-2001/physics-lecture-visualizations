@@ -10,7 +10,7 @@ Siblings: `P-L16-story.md` (Gaussian packets, Ehrenfest's two equations), `P-L18
 | item (today) | proposal | why |
 |---|---|---|
 | `l13-flow:b1` (current, continuity equation; derivation; keys `l13TContResidual`, `l13TCurrentMean`) | **move to L17**: the derivation becomes the lecture beat `l17-current:b2` (the notes derive it on p. 8); Townsend's pages stay as refs on `l17-current:b8`. | The notes teach it in L17 §17.5; one derivation only. |
-| `l13-flow:b2` (step E > V₀, R + T = 1, keys `l13TStepR2`, `l13TStepT2`, `l13TStepR3`, `l13TStepT3`) | **move to L17** as the books beat `l17-current:b8`; challenge-side keys `l13PrStepT`, `l13PrStepR` and the practice `l13-pr-step` (id kept) move too. | L17 §17.3–17.6 teach it. |
+| `l13-flow:b2` (step E > V₀, R + T = 1, keys `l13TStepR2`, `l13TStepT2`, `l13TStepR3`, `l13TStepT3`) | **move to L17** as the books beat `l17-current:b8`; challenge-side keys `l13PrStepT`, `l13PrStepR` and the practice `l17-pr-step` (id kept) move too. | L17 §17.3–17.6 teach it. |
 | `l13-flow:b3`–`b6`, the Correction at p. 231, `l13-pr-tunnel` | to **L18** (see `P-L18-story.md`). The unit `l13-flow` then no longer exists. | L18 teaches below-step and the barrier. |
 | `l13-time:b6a` (d⟨p⟩/dt = −⟨V′⟩ = −2) | to **L16** (`P-L16-story.md`); L17 only uses the result. | |
 | `l13-stationary` | the L14–L15 plan; L17 links back by name ("Unit 14.x, stationary states"). | |
@@ -83,7 +83,7 @@ Siblings: `P-L16-story.md` (Gaussian packets, Ehrenfest's two equations), `P-L18
 - **step**: `l17-st-k2` warm-up numeric k₂/k₁ for E = 4V₀/3 → 0.5 · `l17-st-r` core numeric r for k₁ = 3k₂ → 0.5 · `l17-st-t` core numeric 𝗍 for k₁ = 3k₂ → 1.5 · `l17-st-order` core order D3.
 - **current** `l17-cu-j` warm-up numeric j_in for k₁ = 2, A = 1, ħ = m = 1 → 2 · `l17-cu-T` core numeric T for k₂/k₁ = ½ → 0.889 · `l17-cu-sum` core numeric j_in + j_ref for r = 1/3 → 1.778 · `l17-cu-which` core choice: "|𝗍|² > 1 breaks probability conservation" → false ✓ · `l17-cu-net` core numeric the net current as a fraction of the incident one for |B| = |A|/2 → 0.75 · `l17-cu-order` core order D4.
 **Practice (T1):** 
-- `l13-pr-step` (moved, id kept) core, `practice: 'townsend'` (Problem 6.22): E = 1.5V₀ → T = 0.928 (`l13PrStepT`), R = 0.0718.
+- `l17-pr-step` (moved; renamed per M2) core, `practice: 'townsend'` (Problem 6.22): E = 1.5V₀ → T = 0.928 (`l13PrStepT`), R = 0.0718.
 - `l17-pr-mean` core, `practice: 'townsend'` (§6.3 Eq. 6.36 and Problem 6.1): F = −κx², a Gaussian at μ = 3 with σ = 0.5: by what factor is ⟨F⟩ larger than F(μ)? → 1 + σ²/μ² = 1.0278 (`l17PrMeanFactor`; tolerance 0.005).
 - `l17-pr-edge` stretch, `practice: 'homework'` (HW7 P2 type, new numbers): a block of plateau 10 with linear ramps; how many times larger is ⟨ħ²p̂²/2m⟩ when the ramp width halves from 1 to ½? → 2.065 (`l17TrapRatio`; two routes: closed form (1/ε)/(L + 2ε/3) and the grid).
 

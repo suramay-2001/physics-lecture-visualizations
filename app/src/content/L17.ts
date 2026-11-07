@@ -243,11 +243,11 @@ export const L17: Lecture = {
       books: [{ source: 'townsend', where: '§6.10, pp. 226–229 (Eqs. 6.117–6.134)', adds: 'The same three waves and matching conditions for the step with $E > V_0$, with $k_0$ for our $k_2$; also incidence from the right.' }],
       visual: {
         kind: 'complex-plane',
-        props: { mode: 'add', z: [1, 0], w: [0.3333, 0] },
-        caption: 'The incident arrow z = 1 and the reflected arrow w = r = 1/3, tip to tail: their sum is the transmitted amplitude.',
+        props: { mode: 'phasor', phases: [0, 0] },
+        caption: 'Two unit arrows with the same phase, tip to tail: amplitudes add as arrows, the way 1 + r adds to give the transmitted amplitude.',
         tryThis: [
-          'Here z = 1 is the incident amplitude and w is the reflected one, a third of it. The sum is the transmitted amplitude, 4/3: amplitudes add.',
-          'Press “drag w” under “Drag which number” and make w larger. The sum grows toward 2, the value of $\\tau$ at the threshold, though the transmitted wave itself dies (next unit).',
+          'Both phases are 0°: the two unit arrows lie along one line and their sum has length 2. At the threshold, where $r$ tends to 1, the amplitude $\\tau = 1 + r$ tends to 2 in the same way.',
+          'Turn one of the phases away from 0°: the sum shrinks. At a step all the amplitudes are real, but adding arrows is the same picture as $1 + r = \\tau$.',
         ],
       },
       clues: [],
