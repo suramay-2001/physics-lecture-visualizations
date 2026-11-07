@@ -54,6 +54,8 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-q24-rabi': { course: 'qc709', lecture: 'Q24', unit: 'q24-rabi', label: 'Rabi oscillations and the rotating frame' },
   // Lecture 16 (Gaussian packets and Ehrenfest): 709's Q24 refocuses spread-out phases with a spin echo, the idea behind a chirped packet that narrows first
   'sl-q24-decoupling': { course: 'qc709', lecture: 'Q24', unit: 'q24-decoupling', label: 'Undoing dephasing: the echo and dynamical decoupling' },
+  // Lecture 17 (a wave meets a step): 709's Q26 beam splitter, where the two exits have the same speed
+  'sl-q26-beamsplitter': { course: 'qc709', lecture: 'Q26', unit: 'q26-beamsplitter', label: 'The beam splitter, two exits of equal speed' },
 }
 
 registerBridges(BRIDGES_448)

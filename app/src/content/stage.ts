@@ -767,6 +767,8 @@ export interface TwoQubitState {
 /**
  * Townsend pass G4b (additive; ruling T2; physics/scatter.ts): `stepR` and `stepT` (x = E/V₀ from 0.2 to 4: the reflected and transmitted CURRENT ratios of a potential step, Eq. 6.135; R = 1 and T = 0 below the step, Eqs. 6.139–6.140);
  * `barrierT` (x = qa from 0 to 4 for E/V₀ = ½: T = 1/[1 + ((k² + q²)/2kq)² sinh² qa], Eq. 6.144, here 1/cosh² qa) and `barrierThick` (the thick-barrier form of Eq. 6.146 for the same barrier, 4e^{−2qa}; it is only valid for qa ≫ 1 and exceeds 1 for a thin barrier).
+ * Lecture 17 (additive; ruling M3): `stepDensityRatio` (x = E/V₀ above the step, default 1.0001 to 4; y = |τ|² = 4k₁²/(k₁ + k₂)², the ratio of the transmitted density to the incident one, from 4 down to 1:
+ * a ratio of DENSITIES, not of currents, so it may exceed 1 while T = (k₂/k₁)|τ|² never does; draw it with `vs: 'stepT'`).
  */
 /**
  * Chapter Q19 (additive; P-Q19-story §9.2 S2; physics/qc/walk.ts, trotter.ts, variational.ts). Curves of a WHOLE number only (a walk takes whole steps, a Trotter product whole pieces): the plot draws a
@@ -811,7 +813,7 @@ export interface TwoQubitState {
  * Drawn as a curve or with `vs`, markers at any t in the range; y is never below 0, x label `t`.
  */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | 'clonerF1' | 'clonerF2' | 'usdProgrammable' | 'usdKnown' | 'holevoChiPair' | 'accessibleInfoPair' | 'usdBoundPair' | 'usdFailPair' | 'bscCapacity' | 'popDecay' | 'cohDecay' | 'steadyLow' | 'steadyHigh' | 'ouSlow' | 'ouFast' | 'echoOuSlow' | 'pulseErr1' | 'pulseErr2' | 'homDip' | 'homDistinguishable' | 'klmSuccess' | 'transmonF01r1' | 'transmonF01r20' | 'transmonDispersion' | 'mathieuBeta' | 'mathieuBetaApprox' | 'twoIonPotential' | OpticsCurveName | 'freeOmega' | 'linearOmega' | 'packetWidth' | 'packetWidthChirp'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'stepDensityRatio' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | 'clonerF1' | 'clonerF2' | 'usdProgrammable' | 'usdKnown' | 'holevoChiPair' | 'accessibleInfoPair' | 'usdBoundPair' | 'usdFailPair' | 'bscCapacity' | 'popDecay' | 'cohDecay' | 'steadyLow' | 'steadyHigh' | 'ouSlow' | 'ouFast' | 'echoOuSlow' | 'pulseErr1' | 'pulseErr2' | 'homDip' | 'homDistinguishable' | 'klmSuccess' | 'transmonF01r1' | 'transmonF01r20' | 'transmonDispersion' | 'mathieuBeta' | 'mathieuBetaApprox' | 'twoIonPotential' | OpticsCurveName | 'freeOmega' | 'linearOmega' | 'packetWidth' | 'packetWidthChirp'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -1509,8 +1511,18 @@ export const WAVEFUNCTION_CELLS = [4, 8, 16, 64, 512] as const
  * norm ∫|ψ|²dx · xmean, xspread (Δx) · pmean, pspread (Δp) · product ΔxΔp (in ħ) · interval P(a<x<b) · peak max |ψ|² (per ℓ) · cell the cell [0, w):
  * its chance and chance ÷ w · wavelength 2π/p (a plane wave only) · energy E_n (or the mean energy of a pair), a `box` source only.
  */
-export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength', 'energy'] as const
+export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength', 'energy', 'reflected', 'transmitted'] as const
 export type WavefunctionReadout = (typeof WAVEFUNCTION_READOUTS)[number]
+/**
+ * A potential V(x) the packet moves in (Lecture 17, ruling M3; Lecture 18 reuses it). Needs a `packet` source: the state at time t is the packet at t = 0 evolved by
+ * e^{−iĤt}, Ĥ = p̂²/2 + V(x̂) (ħ = m = 1), on the same grid (physics/wave.ts `evolveV`, a Strang split step; frames are cached). Exactly one of
+ * `step: {V0}` (V = 0 for x < 0, V₀ for x > 0; 0 < V₀ ≤ 8) · `barrier: {V0, a}` (V₀ on 0 < x < a; V₀ ≤ 8, 0.1 ≤ a ≤ 4) · `harmonic: {omega}` (V = Ω²x²/2; 0.2 ≤ Ω ≤ 2) ·
+ * `force: {F}` (V = −Fx, a constant force; |F| ≤ 2). The position panel draws V(x) as a thin profile on its own scale (the packet's kinetic energy ⟨p⟩²/2 marked by a dashed line for
+ * a step or barrier). `time` (0 to 16) runs the evolution. Refused with `boost`, `shift`, `overlay`, `cells` and `interval`, and with a `plane`, `twoWaves` or `box` source.
+ * Readouts `reflected` (the chance at x < 0, the whole grid) and `transmitted` (the chance beyond the last edge: x > 0 for a step, x > a for a barrier) need a step or barrier.
+ * Fidelity `wavefunction-potential-splitstep`.
+ */
+export type WavefunctionPotential = { step: { V0: number } } | { barrier: { V0: number; a: number } } | { harmonic: { omega: number } } | { force: { F: number } }
 export interface WavefunctionState {
   kind: 'wavefunction'
   /** Exactly one source (above). */
@@ -1519,6 +1531,8 @@ export interface WavefunctionState {
   boost?: Scrub
   shift?: Scrub
   time?: Scrub
+  /** A potential the packet moves in (above); `time` then runs the evolution under it. */
+  potential?: WavefunctionPotential
   /** Default ['position']; both = two stacked panels of the SAME state, in the same colours. */
   panels?: WavefunctionPanel[]
   /** Default ['re', 'im', 'density']. */

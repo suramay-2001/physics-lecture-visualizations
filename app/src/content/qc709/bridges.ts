@@ -178,7 +178,7 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-l13-plane-wave': { course: 'sl448', lecture: 'L13', unit: 'l13-plane-wave', label: 'the plane wave and its momentum' },
   'qc-l13-generator': { course: 'sl448', lecture: 'L13', unit: 'l13-generator', label: 'momentum generates the shifts' },
   'qc-l14-box': { course: 'sl448', lecture: 'L14', unit: 'l14-box', label: 'stationary states of a wave' },
-  'qc-l13-flow': { course: 'sl448', lecture: 'L13', unit: 'l13-flow', label: 'the flow of probability' },
+  'qc-l17-current': { course: 'sl448', lecture: 'L17', unit: 'l17-current', label: 'the flow of probability' },
   'qc-q5-interferometer': { course: 'qc709', lecture: 'Q5', unit: 'q5-interferometer', label: 'interference as a way to compute' },
   // Chapter Q20 (P-Q20-story §11.3): the three Q13 / Q14 units it builds on
   'qc-q13-no-cloning': { course: 'qc709', lecture: 'Q13', unit: 'q13-no-cloning', label: 'why no machine copies an unknown qubit' },

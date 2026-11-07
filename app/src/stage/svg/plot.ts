@@ -33,7 +33,7 @@ import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
 import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
-import { barrierT, barrierThick, stepRT } from '../../physics/scatter'
+import { barrierT, barrierThick, stepAmplitudes, stepRT } from '../../physics/scatter'
 import { omegaFree, omegaLinear } from '../../physics/wave14'
 import { chirpWidth } from '../../physics/wave16'
 import { gaussianWidth } from '../../physics/wave'
@@ -161,6 +161,11 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   // Townsend pass G4b (physics/scatter.ts): a step, x = E/V₀ (the current ratios R and T, Eq. 6.135), and the barrier of E/V₀ = ½ against q a (Eq. 6.144 and the thick-barrier form of Eq. 6.146)
   stepR: (x) => stepRT(x, 1).R,
   stepT: (x) => stepRT(x, 1).T,
+  // Lecture 17: the transmitted DENSITY over the incident one, |τ|² = 4k₁²/(k₁ + k₂)² (from 4 at the threshold down to 1), beside T = (k₂/k₁)|τ|² which never exceeds 1
+  stepDensityRatio: (x) => {
+    const t = stepAmplitudes(x, 1).tau
+    return t.re * t.re + t.im * t.im
+  },
   barrierT: (x) => barrierT(0.5, 1, x / decayHalf),
   barrierThick: (x) => barrierThick(0.5, 1, x / decayHalf),
   // Lecture 14 (physics/wave14.ts): the dispersion relations against the wave number k, ħ = m = c = 1: a matter wave's ω = k²/2 and light's ω = |k| (they meet at k = 2)
@@ -246,6 +251,7 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   rabiPeak: { from: -3, to: 3 },
   stepR: { from: 0.2, to: 4 },
   stepT: { from: 0.2, to: 4 },
+  stepDensityRatio: { from: 1.0001, to: 4 },
   barrierT: { from: 0, to: 4 },
   barrierThick: { from: 0, to: 4 },
   freeOmega: { from: -4, to: 4 },
@@ -318,6 +324,7 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   rabiPeak: 'ceiling',
   stepR: 'reflected',
   stepT: 'transmitted',
+  stepDensityRatio: 'density ratio |τ|²',
   barrierT: 'exact T',
   barrierThick: 'thick form',
   freeOmega: 'matter wave, k²/2m',
@@ -362,7 +369,7 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   mathieuBetaApprox: 'effective potential',
   twoIonPotential: 'two-ion energy',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', packetWidth: 't', packetWidthChirp: 't', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', stepDensityRatio: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', packetWidth: 't', packetWidthChirp: 't', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3, homDip: 2, homDistinguishable: 2, transmonF01r1: 3, transmonF01r20: 3, mathieuBeta: 2, mathieuBetaApprox: 2, twoIonPotential: 2 }
 
@@ -393,6 +400,8 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   // Townsend pass G4b: R, T and the exact barrier T are chances; the thick-barrier form is only valid for qa ≫ 1 and exceeds 1 for a thin barrier
   stepR: { min: 0, max: 1 },
   stepT: { min: 0, max: 1 },
+  // a ratio of densities: above 1 is allowed (it is not a chance)
+  stepDensityRatio: { min: 0, max: Infinity },
   barrierT: { min: 0, max: 1 },
   barrierThick: { min: 0, max: Infinity },
   // Lecture 14: an angular frequency is never negative

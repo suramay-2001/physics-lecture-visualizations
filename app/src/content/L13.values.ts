@@ -20,7 +20,7 @@ import { abs, add, c } from '../physics/complex'
 import { E_CHARGE, HBAR, M_ELECTRON, M_HELIUM4, deBroglie, fringeSpacing } from '../physics/constants'
 import { ammoniaH, ammoniaPeriod, energySpread, evolveKet } from '../physics/dynamics'
 import { type Mat, commutator, identity, mat, mscale, vec } from '../physics/linalg'
-import { barrierT, barrierThick, continuityResidual, decayConstant, stepRT, totalCurrent } from '../physics/scatter'
+import { barrierT, barrierThick, decayConstant, stepRT } from '../physics/scatter'
 import { KET, SX, SZ, sandwich, variance } from '../physics/spin'
 import { ringEigenphases, ringOffDiagonal, ringUnitaryGap, traceCommutator } from '../physics/ring'
 import {
@@ -41,7 +41,6 @@ const eV = E_CHARGE
 const BOOK_E = 5 * eV
 const BOOK_V0 = 10 * eV
 const bookT = (aMetres: number) => barrierT(BOOK_E, BOOK_V0, aMetres, M_ELECTRON, HBAR)
-const pk15 = packet(GRID, { x0: 0, sigma: 1, p0: 1.5 })
 const free4 = freeEvolve(packet(GRID, { x0: 0, sigma: 1 }), GRID, 4)
 /** ΔE·Δt for a spin in a field along z (H = ωS_z, ħ = ω = 1) started along +x, measured with A = S_x at ωt = 70°; d⟨A⟩/dt = i⟨[H, A]⟩ (Eq. 4.16). */
 const timeBound = (() => {
@@ -202,15 +201,7 @@ export const V = {
   l13TChirpProduct: spreadX(free4, GRID) * spreadP(free4, GRID), // 1.118: ΔxΔp of the unit packet after t = 4 (more than ħ/2: it is no longer a minimum-uncertainty state)
   l13TTimeBound: timeBound, // 0.5: ΔE·Δt for a precessing spin, at every instant
   l13TAmmDtRatio: ammonia, // 0.3183 = 1/π
-  /* l13-flow */
-  l13TContResidual: continuityResidual(pk15, GRID), // 0 (rounding error)
-  l13TCurrentMean: totalCurrent(pk15, GRID), // 1.5 = ⟨p⟩/m
-  l13TStepR2: stepRT(2, 1).R, // 0.0294
-  l13TStepT2: stepRT(2, 1).T, // 0.9706
-  l13TStepR3: stepRT(3, 1).R, // 0.0102
-  l13TStepT3: stepRT(3, 1).T, // 0.9898
-  l13PrStepR: stepRT(1.5, 1).R, // 0.0718 (practice: E = 1.5 V0, k0/k = 1/sqrt3)
-  l13PrStepT: stepRT(1.5, 1).T, // 0.9282
+  /* l13-flow (the keys of its first two beats and of the practice question moved to L17.values.ts, ruling M2, and were renamed l17ContResidualFree, l17CurrentMean, l17StepR2/T2/R3/T3 and l17PrStepR/T: their twins stay in claims-448/g4b.json) */
   l13TStepRbelow: stepRT(0.5, 1).R, // 1
   l13TStepTbelow: stepRT(0.5, 1).T, // 0
   l13TBookAT: bookT(0.53e-10), // 0.7061: E = 5 eV, V₀ = 10 eV, a = 0.53 Å

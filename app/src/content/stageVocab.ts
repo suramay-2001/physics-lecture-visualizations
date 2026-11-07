@@ -176,7 +176,7 @@ export const ANCHORS = {
   // Papers P1: a module (code block + LPU + its 12 wires), a code block, an LPU block, the pivot wire (logical qubit 1), an adapter between modules, the T factory with its adapter, and the readout rows
   'module-map': ['module', 'code', 'lpu', 'pivot', 'adapter', 'factory', 'readout'],
   // W-448 L12: Re ψ and Im ψ, the density, the phase band under it, the shaded interval, a cell's bar, the original (dashed), x̂ψ, p̂ψ and the momentum panel
-  wavefunction: ['psi-re', 'psi-im', 'density', 'phase-band', 'interval', 'cell-bar', 'original', 'xpsi', 'ppsi', 'momentum-panel'],
+  wavefunction: ['psi-re', 'psi-im', 'density', 'phase-band', 'interval', 'cell-bar', 'original', 'xpsi', 'ppsi', 'momentum-panel', 'potential'],
   // Townsend pass G2b: a level, the bar of a state's chance, the J+- arrow, the matrix grid, the |J| cone picture
   'spin-ladder': ['level', 'bar', 'arrow', 'matrix', 'cone'],
   // P-Q19-story §9.2 S1: a vertex (the centre or an outer one), a spoke (an edge of the star), the extra edge and a cut edge of the ring

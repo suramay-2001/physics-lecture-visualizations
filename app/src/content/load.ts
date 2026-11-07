@@ -30,6 +30,7 @@ const LOADERS: Record<string, () => Promise<Lecture>> = {
   L14: () => import('./L14').then((m) => m.L14),
   L15: () => import('./L15').then((m) => m.L15),
   L16: () => import('./L16').then((m) => m.L16),
+  L17: () => import('./L17').then((m) => m.L17),
 }
 
 /**
