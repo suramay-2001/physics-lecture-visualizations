@@ -8,7 +8,7 @@
 import { type C, abs2, c, conj, div, mul, scale } from './complex'
 import { E_CHARGE, HBAR, M_ELECTRON } from './constants'
 import { barrierT } from './scatter'
-import { GRID, type Wave, barrierPotential, chanceAbove, chanceBelow, evolveV, packet, stepPotential } from './wave'
+import { GRID, type Wave, barrierPotential, chanceAbove, chanceBelow, evolveV, norm, packet, stepPotential } from './wave'
 
 /** ħ²/2mₑ in eV·Å² (CODATA 2018: 3.80998…): with it an electron's k² is E/this and q² is (V₀ − E)/this when lengths are in ångströms and energies in electron-volts. */
 export const HBAR2_OVER_2M_EV_A2 = ((HBAR * HBAR) / (2 * M_ELECTRON) / E_CHARGE) * 1e20
@@ -131,6 +131,12 @@ export function barrierTMinOverWidth(E: number, V0: number, m = 1, hbar = 1): { 
   }
   const a = (lo + hi) / 2
   return { a, T: T(a) }
+}
+
+/** The width of the n-th resonance above a barrier (E > V₀): T = 1 where k′a = nπ, so a = nπħ/√(2m(E − V₀)). */
+export function barrierResonanceWidth(E: number, V0: number, n = 1, m = 1, hbar = 1): number {
+  if (!(E > V0) || !Number.isInteger(n) || n < 1) throw new Error('barrierResonanceWidth: needs E > V0 and a whole n ≥ 1')
+  return (n * Math.PI * hbar) / Math.sqrt(2 * m * (E - V0))
 }
 
 /**
@@ -259,25 +265,26 @@ function potentialOf(p: ScatterPotential): { V: Float64Array; far: number } {
 
 /**
  * The packet ψ(x, 0) = `packet(x0, σ, p0)` evolved to time t under p̂²/2 + V (the split step of wave.ts `evolveV`, the very call the stage makes), and the chances read off the whole grid:
- * `reflected` = P(x < 0) and `transmitted` = P(x > far edge) (spline integrals of |ψ|², as the stage's readouts). Whatever lies inside a barrier belongs to neither.
+ * `reflected` = P(x < 0) and `transmitted` = P(x > far edge) (spline integrals of |ψ|², as the stage's readouts), `norm` = ∫|ψ|²dx. Whatever lies inside a barrier belongs to neither. `dt` is the
+ * largest step of the split (the stage uses the default 0.005; 0.02 is four times cheaper and agrees to a few parts in 10⁴).
  */
-export function scatterChances(x0: number, sigma: number, p0: number, pot: ScatterPotential, t: number): { reflected: number; transmitted: number } {
+export function scatterChances(x0: number, sigma: number, p0: number, pot: ScatterPotential, t: number, dt = 0.005): { reflected: number; transmitted: number; norm: number } {
   const { V, far } = potentialOf(pot)
-  const w = evolveV(packet(GRID, { x0, sigma, p0 }), GRID, V, t)
-  return { reflected: chanceBelow(w, GRID, 0), transmitted: chanceAbove(w, GRID, far) }
+  const w = evolveV(packet(GRID, { x0, sigma, p0 }), GRID, V, t, dt)
+  return { reflected: chanceBelow(w, GRID, 0), transmitted: chanceAbove(w, GRID, far), norm: norm(w, GRID) }
 }
 
 /**
  * The chance in x > 0 at each of the times 0.5, 1, … `end` for a packet at an infinite step (the penetration of notes §18.6): the evolution is done once in steps of 0.5, as the stage builds its
  * frames. Returns the whole list; `maxRight` and `lateRight` are the largest and the last.
  */
-export function stepPenetration(x0: number, sigma: number, p0: number, V0: number, end: number): { times: number[]; right: number[]; maxRight: number; timeOfMax: number; lateRight: number } {
+export function stepPenetration(x0: number, sigma: number, p0: number, V0: number, end: number, dt = 0.005): { times: number[]; right: number[]; maxRight: number; timeOfMax: number; lateRight: number } {
   const V = stepPotential(GRID, V0)
   let w: Wave = packet(GRID, { x0, sigma, p0 })
   const times: number[] = []
   const right: number[] = []
   for (let t = 0.5; t <= end + 1e-9; t += 0.5) {
-    w = evolveV(w, GRID, V, 0.5)
+    w = evolveV(w, GRID, V, 0.5, dt)
     times.push(t)
     right.push(chanceAbove(w, GRID, 0))
   }

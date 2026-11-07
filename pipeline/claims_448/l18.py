@@ -171,11 +171,13 @@ def spline_chances(psi, edge_lo, edge_hi):
     return float(cs.integrate(xg[0], edge_lo)), float(cs.integrate(edge_hi, xg[-1]))
 
 
-psi_s = split_step(pk(X0S, SGS, P0S), v_step(V0S), TS)
+DT_RUN, DT_PEN = 0.01, 0.01  # the lecture's value table runs the split step with this largest step (the stage uses 0.005; the chances agree to 3e-5 and 3e-4)
+psi_s = split_step(pk(X0S, SGS, P0S), v_step(V0S), TS, DT_RUN)
 refl_s, trans_s = spline_chances(psi_s, 0.0, 0.0)
 put('l18StepAreaL', refl_s)
 put('l18StepAreaR', trans_s)
 put('l18StepNorm', np.sum(np.abs(psi_s) ** 2) * dxg)
+put('l18ChR', step_R(4.5, 4.0))  # the challenge: k1 = 3 k2, so r = 1/2
 
 
 def weighted(p0, sig, fun, kink=None):
@@ -256,22 +258,19 @@ def penetration(x0, sg, p0, V0, end):
     ts, rs = [], []
     t = 0.0
     while t < end - 1e-9:
-        psi = split_step(psi, V, 0.5)
+        psi = split_step(psi, V, 0.5, DT_PEN)
         t += 0.5
         ts.append(t)
         rs.append(spline_chances(psi, 0.0, 0.0)[1])
     return np.array(ts), np.array(rs)
 
 
-tl, rl = penetration(-8.0, 2.0, 2.0, 4.0, 9.0)
+tl, rl = penetration(-8.0, 2.0, 2.0, 4.0, 5.0)
 put('l18MaxPenetration', rl.max())
 put('l18PenetrationTime', tl[np.argmax(rl)])
-put('l18LateRight', rl[-1])
 
 # ------------------------------------------------------------------ unit 4: the barrier, E = 2, V0 = 4, a = 0.5 (kappa a = 1, T = 1/cosh^2 1)
 V0B, P0B, SGB, X0B, AB, TB = 4.0, 2.0, 2.0, -8.0, 0.5, 9.0
-psi_b = split_step(pk(X0B, SGB, P0B), v_barrier(V0B, AB), TB)
-put('l18BarrierAreaR', spline_chances(psi_b, 0.0, AB)[1])
 Tw = lambda p: barrier_T(p * p / 2, V0B, AB)
 put('l18BarrierWeightedT', weighted(P0B, SGB, Tw))
 kB, qB, BB, CB, DB, FB = barrier_solve(2.0, V0B, AB)

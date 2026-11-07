@@ -56,6 +56,8 @@ export const BRIDGES_448: Readonly<Record<string, BridgeTarget>> = {
   'sl-q24-decoupling': { course: 'qc709', lecture: 'Q24', unit: 'q24-decoupling', label: 'Undoing dephasing: the echo and dynamical decoupling' },
   // Lecture 17 (a wave meets a step): 709's Q26 beam splitter, where the two exits have the same speed
   'sl-q26-beamsplitter': { course: 'qc709', lecture: 'Q26', unit: 'q26-beamsplitter', label: 'The beam splitter, two exits of equal speed' },
+  // Lecture 18 (tunnelling): 709's Q27 lets Cooper pairs tunnel through an insulating barrier, the Josephson junction
+  'sl-q27-josephson': { course: 'qc709', lecture: 'Q27', unit: 'q27-josephson', label: 'Cooper pairs tunnelling through a barrier' },
 }
 
 registerBridges(BRIDGES_448)

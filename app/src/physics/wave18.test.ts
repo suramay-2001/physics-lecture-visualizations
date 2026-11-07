@@ -10,7 +10,7 @@ import { barrierT, barrierThick, probabilityCurrent, stepRT } from './scatter'
 import { GRID, density, interval, norm, packet } from './wave'
 import { gaussianExact } from './wave16'
 import {
-  HBAR2_OVER_2M_EV_A2, barrierAmplitudes, barrierInnerCurrent, barrierTMinOverWidth, barrierWidthForT, currentOf, detectorPeak, detectorTotal, evanescentCurrent, gaussianCurrentClosed,
+  HBAR2_OVER_2M_EV_A2, barrierAmplitudes, barrierInnerCurrent, barrierResonanceWidth, barrierTMinOverWidth, barrierWidthForT, currentOf, detectorPeak, detectorTotal, evanescentCurrent, gaussianCurrentClosed,
   gaussianDensityClosed, integrate, momentumAverage, penetrationDepth, rigidCurrentPeak, scatterChances, stepEvanescent, stepPenetration, triangularExponent, wkbExponent,
 } from './wave18'
 
@@ -134,6 +134,10 @@ describe('barrierWidthForT and barrierTMinOverWidth', () => {
     close(r.a, C.minAbove.a, 1e-5)
     close(r.T, 8 / 9, 1e-12)
     close(barrierT(2, 1, C.minAbove.res), 1, 1e-12)
+    close(barrierResonanceWidth(2, 1), C.minAbove.res, 1e-13)
+    close(barrierT(2, 1, barrierResonanceWidth(2, 1, 3)), 1, 1e-12)
+    expect(() => barrierResonanceWidth(1, 2)).toThrow()
+    expect(() => barrierResonanceWidth(2, 1, 0)).toThrow()
     expect(() => barrierTMinOverWidth(1, 2)).toThrow()
   })
 })
@@ -238,6 +242,13 @@ describe('packets at a step and a barrier: the split-step engine against the Cra
   it('the evolution conserves the norm and the chances are the spline integral of |ψ|² that the stage reads (readouts)', () => {
     const r = scatterChances(-8, 2, 4, { step: { V0: 6 } }, 2.5)
     expect(r.reflected + r.transmitted).toBeGreaterThan(0.999999)
+    close(r.norm, 1, 1e-12)
+    // a larger step of the split is cheaper and agrees to a few parts in 10⁵ (the lecture's value table uses 0.01)
+    const fast = scatterChances(-8, 2, 4, { step: { V0: 6 } }, 5.5, 0.01)
+    const fine = scatterChances(-8, 2, 4, { step: { V0: 6 } }, 5.5)
+    close(fast.reflected, fine.reflected, 5e-5)
+    close(fast.transmitted, fine.transmitted, 5e-5)
+    close(stepPenetration(-8, 2, 2, 4, 5, 0.01).maxRight, stepPenetration(-8, 2, 2, 4, 5).maxRight, 5e-4)
     const w = packet(GRID, { x0: -8, sigma: 2, p0: 4 })
     close(norm(w, GRID), 1, 1e-12)
     close(interval(w, GRID, -32, 0) + interval(w, GRID, 0, 32), 1, 1e-6)
