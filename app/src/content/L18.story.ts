@@ -123,11 +123,11 @@ const packetBeats: Beat[] = [
   {
     id: 'l18-packet:b5',
     phase: 'books',
-    text: 'Townsend (§6.10, p. 225, Fig. 6.12) draws the same experiment. A packet sent at a step or a barrier splits into a reflected and a transmitted part. He adds that a packet sharply peaked in energy, and so broad in space, acts like a plane wave (footnote 20). That is the narrow-energy case of the last beat, where $r$ and $\\tau$ can be used as they stand.',
+    text: 'Townsend (§6.10, p. 225, Fig. 6.12) draws the same experiment. A packet sent at a step or a barrier splits into a reflected and a transmitted part. He adds that a packet sharply peaked in energy, and so broad in space, acts like a plane wave. A footnote points to Shankar for the full packet treatment. That is the narrow-energy case of the last beat, where $r$ and $\\tau$ can be used as they stand.',
     caption: 'the packet of this unit again: the split the book draws as a sketch, here computed',
     stage: STEP_RUN(),
     fidelity: ['wavefunction-potential-splitstep'],
-    refs: [townsend('§6.10, p. 225 (Fig. 6.12, footnote 20)', 'A packet sent at a step or barrier splits into a reflected and a transmitted part; a packet sharply peaked in energy and broad against the interaction region may be treated as a plane wave.')],
+    refs: [townsend('§6.10, p. 225 (Fig. 6.12)', 'A packet sent at a step or barrier splits into a reflected and a transmitted part; a packet sharply peaked in energy and broad against the interaction region may be treated as a plane wave.')],
   },
   {
     id: 'l18-packet:b6',
@@ -528,7 +528,7 @@ const tunnelBeats: Beat[] = [
   {
     id: 'l18-tunnel:b8',
     phase: 'deeper',
-    text: `Beyond the notes: for 5 eV against a barrier 10 eV high and 300 pm wide, how good is the thick form? The exact transmission is ${d(V.l18TThickRatio, 3)} of it. That is why $e^{-2\\kappa a}$ with the prefactor is the working formula for the thick barriers of real devices.`,
+    text: `Beyond the notes: for 5 eV against a barrier 10 eV high and 300 pm wide, how good is the thick form? The exact transmission is ${d(V.l18TThickRatio, 3)} of it. So for a barrier this thick the exponential with its prefactor is a good working formula.`,
     caption: 'the exact transmission and its thick-barrier form meet for large $\\kappa a$',
     stage: BARRIER_THICK(3),
     claims: [claim('l18TThickRatio', 'the exact transmission is 0.998 of the thick-barrier form for 5 eV against 10 eV and 300 pm', () => close(V.l18TThickRatio, 0.99793, 5e-5))],
