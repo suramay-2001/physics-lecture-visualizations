@@ -203,7 +203,7 @@ const spread: Beat[] = [
   {
     id: 'l16-spread:b2',
     phase: 'lecture',
-    text: `Compare with a normal bell curve of mean $\\mu$ and width $s$. The centre is $\\langle x\\rangle = x_0 + p_0t/m$ and the width is $\\Delta x(t) = \\sigma\\sqrt{1 + (t/t_s)^2}$. At $t = t_s$ it is $\\sqrt2\\,\\sigma$. For $t \\gg t_s$ it tends to $\\hbar t/2m\\sigma = \\Delta p\\,t/m$, the velocity-spread estimate of Unit 15.6, now exact: at $t = 20$ the true width is ${d(V.l16FarRatio, 3)} times $\\Delta p\\,t$ for $\\sigma = 1\\,\\ell$.`,
+    text: `Compare with a normal bell curve of mean $\\mu$ and width $s$. The centre is $\\langle x\\rangle = x_0 + p_0t/m$ and the width is $\\Delta x(t) = \\sigma\\sqrt{1 + (t/t_s)^2}$. At $t = t_s$ it is $\\sqrt2\\,\\sigma$. For $t \\gg t_s$ it tends to $\\hbar t/2m\\sigma = \\Delta p\\,t/m$, the velocity-spread estimate of Unit 15.6, now exact. At $t = 20$ the true width is ${d(V.l16FarRatio, 3)} times $\\Delta p\\,t$ for $\\sigma = 1\\,\\ell$.`,
     caption: 'the width against time for $\\sigma = 1\\,\\ell$: a hyperbola that bends toward a straight line',
     stage: WIDTH,
     fidelity: ['plot-packet-width'],
@@ -260,7 +260,7 @@ const spread: Beat[] = [
   {
     id: 'l16-spread:b5',
     phase: 'lecture',
-    text: `Do not blame the spreading on the uncertainty relation. That relation limits which starting states exist. The Hamiltonian decides what happens next, and for a free particle it lets the momenta pull the density apart. Nothing random was added and nothing was lost: the area under $|\\psi|^2$ is still ${d(V.l16Norm4, 0)} at $t = 4$.`,
+    text: `The area under $|\\psi|^2$ is still ${d(V.l16Norm4, 0)} at $t = 4$ although the curve is wider, so what widened it? Not a random force and not lost chance. Each momentum component turns at its own rate, and the Hamiltonian lets those turns pull the density apart. The uncertainty relation does not push anything; it only says which starting states exist.`,
     caption: 'the area stays one while the width grows',
     stage: W(PK(0, 1, 3), { time: sweep(0, 4), readouts: ['norm', 'xspread'], window: RUN }),
     claims: [claim('l16Norm4', 'the area under |ψ|² is still 1 at t = 4', () => close(V.l16Norm4, 1, 1e-9))],
@@ -322,7 +322,7 @@ const ehrenfest: Beat[] = [
   {
     id: 'l16-ehrenfest:b1',
     phase: 'lecture',
-    text: 'Unit 12.1 gave the rate law $\\frac{d}{dt}\\langle A\\rangle = \\frac{i}{\\hbar}\\langle[H,A]\\rangle$ for an operator $A$ without explicit time dependence. This beat recalls it and defines nothing new. The notes’ reading: the bra and the ket evolve with opposite phases. If $A$ commutes with $H$ the two cancel and $\\langle A\\rangle$ never changes. A term $\\langle\\partial A/\\partial t\\rangle$ is added only when $A$ itself depends on time. Now apply the law to $\\hat x$ and $\\hat p$.',
+    text: 'Can an average change when nothing seems to push? Unit 12.1 already answered, and this beat defines nothing new: $\\frac{d}{dt}\\langle A\\rangle = \\frac{i}{\\hbar}\\langle[H,A]\\rangle$ for an operator $A$ without explicit time dependence. Only the commutator moves the average. If $A$ commutes with $H$, the opposite phases of bra and ket cancel and $\\langle A\\rangle$ stays put. A term $\\langle\\partial A/\\partial t\\rangle$ enters only when $A$ itself depends on time. Take $\\hat x$ and $\\hat p$ next.',
     caption: 'a packet at 2 with mean momentum 1.5, left alone: the readouts follow its two averages',
     stage: W(PK(2, 1, 1.5), { time: sweep(0, 2), readouts: ['xmean', 'pmean'] }),
   },

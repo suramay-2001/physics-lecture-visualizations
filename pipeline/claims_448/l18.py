@@ -229,6 +229,7 @@ put('l18DetPeakExact', -res.fun)
 put('l18DetPeakRatio', -res.fun / (P0D / (np.sqrt(2 * pi) * SGD)))
 psi_j = np.sqrt(0.2) * np.exp(2j * xg)
 put('l18ChJ', float(np.imag(np.conj(psi_j[100]) * 2j * psi_j[100])))  # rho = 0.2, k = 2: j = Im(conj(psi) psi')
+put('l18DeT', step_T_from_currents(8.0, 7.5))  # the challenge l18-de-T: k1 = 4, k2 = 1 (E = 8, V0 = 7.5), so tau = 8/5 and T = (1/4)(64/25)
 
 # ------------------------------------------------------------------ unit 3: below the step, E = 2, V0 = 4 (k = kappa = 2)
 k3, kap3, B3, C3 = evanescent_solve(2.0, 4.0)

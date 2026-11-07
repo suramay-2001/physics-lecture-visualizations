@@ -303,6 +303,17 @@ describe('Lecture 18: the practice questions and the numbers', () => {
     expect(V.l18DetPeakExact).toBeCloseTo(V.l18DetPeakRatio * V.l18DetPeakRigid, 14)
     expect(V.l18ChJ).toBeCloseTo(0.4, 14)
     expect(stepRT(8, 6).T).toBeCloseTo(V.l18StepT43, 14)
+    // review P-L16L18 S4: l18-de-T is a fresh step (k₂/k₁ = ¼, |τ|² = 64/25, T = 0.64), not Lecture 17's l17-cu-T (k₂/k₁ = ½, T = 8/9) and not the l18-pk-R step (k₁ = 3k₂)
+    expect(V.l18DeT).toBeCloseTo(0.25 * (8 / 5) ** 2, 14)
+    expect(V.l18DeT).toBeCloseTo(16 / 25, 14)
+    expect(Math.abs(V.l18DeT - V.l18StepT43)).toBeGreaterThan(0.2)
+    expect(Math.abs(V.l18DeT - (1 - V.l18ChR))).toBeGreaterThan(0.1)
+    const q = L18.units.flatMap((u) => u.play).find((x) => x.id === 'l18-de-T')!
+    expect(q.kind === 'numeric' && q.answer).toBe(V.l18DeT)
+    expect(q.prompt).toContain('\\tfrac14')
+    // the numbers beat after "defines nothing new" points to Unit 17.3 and keeps only the density-against-share point
+    expect(beat('l18-detector:b6').text).toContain('Unit 17.3')
+    expect(beat('l18-detector:b6').text.length).toBeLessThan(520)
   })
   it('below the step: |r| = 1, R = 1, r = −i for k = κ, edge density 2, no current, the density falls by e over 1/2κ and to 1 % at ln 100/2κ, and the most chance ever in the step is about a tenth', () => {
     expect(V.l18K).toBe(V.l18Kappa)
@@ -314,7 +325,8 @@ describe('Lecture 18: the practice questions and the numbers', () => {
     expect(V.l18X1pct).toBeCloseTo(Math.log(100) / 4, 14)
     expect(V.l18MaxPenetration).toBeGreaterThan(0.09)
     expect(V.l18MaxPenetration).toBeLessThan(0.11)
-    expect(V.l18PenetrationTime).toBe(4)
+    expect(V.l18PenetrationTime).toBe(4) // the largest of the frames every half unit; a fine run peaks near 4.05, so the text says "near t = 4" (review N6)
+    expect(beat('l18-below:b3').text).toMatch(/near \$t = 4\$/)
   })
   it('the barrier: T = 1/cosh² at E = V₀/2 by every route, the thick form is 0.5 % high at κa = 3 and 4 at a = 0, and the current inside is the transmitted one', () => {
     for (const [qa, key] of [[0.5, 'l18BarrierT05'], [1, 'l18BarrierT1'], [2, 'l18BarrierT2'], [3, 'l18BarrierT3']] as const) expect(V[key]).toBeCloseTo(1 / Math.cosh(qa) ** 2, 12)

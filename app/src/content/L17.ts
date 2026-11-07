@@ -19,8 +19,8 @@ export const L17: Lecture = {
   date: 'Class 17',
   outcomes: [
     'Separate the mean force from the force at the mean position, and say when the mean motion is exactly or approximately classical.',
-    'Write the three waves of a scattering state (incident, reflected, transmitted) at a potential step with E above it, and match them to find r and τ.',
-    'Derive the continuity equation from the Schrödinger equation, and use the probability current to turn r and τ into the reflected and transmitted shares R and T.',
+    'Write the three waves of a scattering state at a potential step with E above it: incident, reflected and transmitted. Then match them to find r and τ.',
+    'Derive the continuity equation from the Schrödinger equation. Use the probability current to turn r and τ into the reflected and transmitted shares R and T.',
   ],
   prerequisites: ['position-operator', 'time-parameter', 'stationary-states', 'plane-wave'],
   symbols: {
@@ -46,7 +46,7 @@ export const L17: Lecture = {
     '\\ddot\\mu': 'l17-mean-force:b4',
     '\\delta': 'l17-mean-force:b4.derivation.ground[0]',
     '\\kappa': 'l17-mean-force:b6',
-    '\\pi': 'l17-mean-force:b7',
+    '\\pi': 'l17-mean-force:b2',
     'V_0': 'l17-step:b1',
     'E': 'l17-step:b1',
     '\\varphi_E': 'l17-step:b2',
@@ -91,7 +91,7 @@ export const L17: Lecture = {
       title: 'Mean force against force at the mean',
       question: 'When does the centre of a packet obey Newton’s equation?',
       lecture: {
-        pages: 'L17 pp. 2–3 (§17.1–17.2), p. 11 (App. A)',
+        pages: 'L16 pp. 9–10 (§16.6); L17 pp. 2–3 (§17.1–17.2), p. 11 (App. A)',
         summary:
           'Ehrenfest’s equation says the mean position accelerates under the mean force $\\langle F(\\hat x)\\rangle$. A classical particle at the mean would feel $F(\\langle x\\rangle)$. The two agree exactly for a force $\\alpha + \\beta x$ and approximately for a narrow packet in a smooth force. For a nonlinear force and a wide state, the width enters.',
         equations: [
@@ -109,8 +109,8 @@ export const L17: Lecture = {
         props: { state: '+x', basis: 'z' },
         caption: 'A two-outcome stand-in: two outcomes of equal chance, to which you can give two different "forces".',
         tryThis: [
-          'With the state at +x and the basis z, the two outcomes have equal chances, one half each. Give them two different values and average: the mean of the values is one number.',
-          'Now square each value and average the squares. The average of the squares is not the square of the average, which is the same gap as between $\\langle F\\rangle$ and $F(\\langle x\\rangle)$ for $F = x^2$.',
+          'With the state at +x and the basis z, the two outcomes have equal chances, one half each. Imagine two different values attached to them: the average of the values is one number.',
+          'A thought exercise, since the widget takes no values: square each value and average the squares. The average of the squares is not the square of the average, which is the same gap as between $\\langle F\\rangle$ and $F(\\langle x\\rangle)$ for $F = x^2$.',
         ],
       },
       clues: [],
@@ -205,8 +205,8 @@ export const L17: Lecture = {
           kind: 'numeric',
           tier: 'core',
           practice: 'townsend',
-          title: 'A restoring force that weakens',
-          prompt: 'The force is $F = -\\kappa x^2$. A Gaussian packet is centred at $\\mu = 3$ with $\\sigma = \\tfrac12$. By what factor is $\\langle F\\rangle$ larger than $F(\\mu)$?',
+          title: 'A restoring force that grows with distance',
+          prompt: 'The force is $F = -\\kappa x^2$. A Gaussian packet is centred at $\\mu = 2$ with $\\sigma = \\tfrac12$. By what factor is $\\langle F\\rangle$ larger than $F(\\mu)$?',
           answer: V.l17PrMeanFactor,
           tolerance: 0.005,
           refs: [{ source: 'townsend', where: 'Problem 6.1, end of Ch. 6; §6.3, Eqs. 6.35–6.36', adds: 'The book’s problem derives the equation for the mean momentum; this one uses the expansion of the force about the mean for a given force and packet.' }],
@@ -216,8 +216,8 @@ export const L17: Lecture = {
             { text: 'The ratio is $1 + \\sigma^2/\\mu^2$.' },
           ],
           walkthrough: [
-            { text: 'The force at the mean position is $F(\\mu) = -\\kappa\\mu^2 = -9\\kappa$.' },
-            { text: 'The mean force is $-\\kappa\\left(\\mu^2 + \\sigma^2\\right) = -9.25\\kappa$.' },
+            { text: 'The force at the mean position is $F(\\mu) = -\\kappa\\mu^2 = -4\\kappa$.' },
+            { text: 'The mean force is $-\\kappa\\left(\\mu^2 + \\sigma^2\\right) = -4.25\\kappa$.' },
             { text: `The factor is $1 + \\sigma^2/\\mu^2$, which is ${d(V.l17PrMeanFactor, 4)}. The second derivative of $F$ is $-2\\kappa$, so Eq. 6.36 gives the same correction.` },
           ],
         },
@@ -387,7 +387,7 @@ export const L17: Lecture = {
           ],
           walkthrough: [
             { text: 'The wave has $\\psi^*\\psi\' = ik|A|^2$, so the current is $\\hbar k|A|^2/m$.' },
-            { text: `With $k_1 = 2$ and $A = 1$ it is ${d(V.l17Jin, 0)}$.` },
+            { text: `With $k_1 = 2$ and $A = 1$ it is ${d(V.l17Jin, 0)}.` },
           ],
         },
         {
@@ -513,18 +513,18 @@ export const L17: Lecture = {
           tier: 'stretch',
           practice: 'homework',
           title: 'The cost of a sharp edge',
-          prompt: 'A block of plateau length 10 has linear ramps of width $\\epsilon$ at both edges. By what factor does $\\langle p^2/2m\\rangle$ grow when $\\epsilon$ is halved from 1 to $\\tfrac12$?',
-          answer: V.l17TrapRatio,
+          prompt: 'A block of plateau length 8 has linear ramps of width $\\epsilon$ at both edges. By what factor does $\\langle p^2/2m\\rangle$ grow when $\\epsilon$ is halved from 2 to 1?',
+          answer: V.l17PrEdgeRatio,
           tolerance: 0.005,
           hints: [
             { text: 'On a ramp the slope of the function is $1/\\epsilon$ and it is zero on the plateau.' },
             { text: 'The kinetic energy is proportional to $\\int|\\psi\'|^2dx$ divided by $\\int|\\psi|^2dx$.' },
-            { text: 'The numerator is $2/\\epsilon$ and the denominator is $L + 2\\epsilon/3$, with $L = 10$.' },
+            { text: 'The numerator is $2/\\epsilon$ and the denominator is $L + 2\\epsilon/3$, with $L = 8$.' },
           ],
           walkthrough: [
             { text: 'Each ramp contributes $\\int|\\psi\'|^2dx = 1/\\epsilon$, so the numerator is $2/\\epsilon$.' },
             { text: 'The normalising integral is $L + 2\\epsilon/3$: the plateau plus a third of each ramp’s width, twice.' },
-            { text: `So $\\langle T\\rangle \\propto \\tfrac{1/\\epsilon}{L + 2\\epsilon/3}$. The ratio of the values for $\\epsilon = \\tfrac12$ and $\\epsilon = 1$ is ${d(V.l17TrapRatio, 4)}; a true jump would give an infinite energy.` },
+            { text: `So $\\langle T\\rangle \\propto \\tfrac{1/\\epsilon}{L + 2\\epsilon/3}$. The ratio of the values for $\\epsilon = 1$ and $\\epsilon = 2$ is ${d(V.l17PrEdgeRatio, 4)}; a true jump would give an infinite energy.` },
           ],
         },
       ],

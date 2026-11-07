@@ -207,13 +207,13 @@ describe('Lecture 16: the practice questions and the new numbers', () => {
       if (q.practice === 'townsend') expect(q.refs?.[0].where, q.id).toMatch(/^Problem 6\.\d+/)
     }
     const tol = Object.fromEntries(qs.map((q) => [q.id, q.kind === 'numeric' ? q.tolerance : -1]))
-    expect(tol).toEqual({ 'l16-pr-width': 0.005, 'l16-pr-double': 0.005, 'l16-pr-quartic': 0.005, 'l16-pr-spin': 0.005 })
+    expect(tol).toEqual({ 'l16-pr-width': 0.005, 'l16-pr-double': 0.01, 'l16-pr-quartic': 0.005, 'l16-pr-spin': 0.005 })
   })
-  it('a whole-number answer is a whole number with tolerance 0; a decimal answer uses 0.005', () => {
+  it('a whole-number answer is a whole number with tolerance 0; a decimal answer uses 0.005 (l16-pr-double, worked with rounded SI constants in its hints, uses 0.01)', () => {
     for (const q of L16.units.flatMap((u) => u.play)) {
       if (q.kind !== 'numeric') continue
       if (Number.isInteger(q.answer)) expect(q.tolerance, q.id).toBe(0)
-      else expect(q.tolerance, q.id).toBe(0.005)
+      else expect(q.tolerance, q.id).toBe(q.id === 'l16-pr-double' ? 0.01 : 0.005)
     }
   })
   it('the numbers: the closed forms agree with the grid, the product grows as √(1 + τ²)/2, the chirp narrows first and returns, the means obey Ehrenfest', () => {
@@ -233,7 +233,7 @@ describe('Lecture 16: the practice questions and the new numbers', () => {
     expect(V.l16EhrenfestFreeGap).toBeLessThan(1e-8)
     expect(V.l16PrQuarticDpdt).toBeCloseTo(-V.l16PrQuarticMean3, 9)
     expect(Math.abs(V.l16PrQuarticDpdt)).toBeGreaterThan(Math.abs(V.l16PrQuarticCentreForce)) // the mean force exceeds the force at the centre
-    expect(V.l16PrSpinDXdt).toBeCloseTo(-Math.sin(Math.PI / 3), 9)
+    expect(V.l16PrSpinDZdt).toBeCloseTo(-Math.sin(Math.PI / 4), 9)
     expect(V.l16PrDoubleFs).toBeCloseTo(Math.sqrt(3) * V.l16PrTsFs, 9)
     expect(V.l16PrKinetic).toBeCloseTo(V.l16PrP2 / 2, 9)
   })
