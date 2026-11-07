@@ -138,7 +138,6 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutator-bases', label: 'Position in the momentum basis', lecture: 'L13', unit: 'l13-two-bases', needs: ['momentum-space', 'uncertainty'] },
   { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
   { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
-  { id: 'current-tunnelling', label: 'Below the step and tunnelling', lecture: 'L13', unit: 'l13-flow', needs: ['schrodinger-position'] },
   // L14 (the Schrödinger equation, time and stationary states; every built unit is a station). The box was Unit 13.8 (l13-stationary) and moved here (ruling M2).
   { id: 'components', label: 'Discrete and continuous components of one ket', lecture: 'L14', unit: 'l14-components', needs: ['wavefunction'] },
   { id: 'schrodinger-assumed', label: 'What the position-space equation assumes', lecture: 'L14', unit: 'l14-schrodinger', needs: ['schrodinger-position', 'components'] },

@@ -622,14 +622,6 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "\\Delta t = \\Delta A/\\lvert d\\langle A\\rangle/dt\\rvert"
     ]
   },
-  "l13-flow": {
-    "question": "What happens when the energy is below the top of a step or a barrier?",
-    "equations": [
-      "R = 1,\\quad T = 0\\quad (E < V_0)",
-      "T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}",
-      "T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}"
-    ]
-  },
   "l14-components": {
     "question": "What is new in ψ(x) compared with ψ(a), and what is not?",
     "equations": [

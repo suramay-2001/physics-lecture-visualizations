@@ -9,6 +9,7 @@
  * - R5: the notes' optional §13.10 is a Go-deeper beat (phase 'deeper'), the last beat of Unit 13.6, not a unit.
  * - R7: the `wave-lab` widget is deferred. Every Try-it uses an existing widget and says what it does and does not show.
  * - R8: the notes' slips are layout and notation only, so there is no Correction box.
+ * - M2 (docs/roles/decisions/448-L14L18.md): the books-only unit l13-flow (below the step and tunnelling) moved to Lecture 18 with the Townsend p. 231 Correction; its first two beats went to Lecture 17.
  * One track (448): sentences stay ≤ 25 words, symbols are defined before use, link-back beats name the unit they recall and define nothing new.
  *
  * Rules kept here (as in L1–L12.story.ts): stage states carry physics inputs only (the resolvers compute every angle, length, chance and sample); every
@@ -16,7 +17,7 @@
  * follows them); lengths are in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ. A fraction such as one half is never typed in a formula, because the number reader
  * would ask for a claim: kinetic energy is written \tfrac{p^2}{2m}.
  */
-import type { Beat, Claim, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, PlotState, Ref, Scrub, WavefunctionState } from './schema'
+import type { Beat, Claim, ClocksState, ComplexPlaneState, MatrixGridState, MatrixSource, Ref, Scrub, WavefunctionState } from './schema'
 import { V, claim, close, d } from './L13.values'
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -37,15 +38,9 @@ const K = (timeDeg: Scrub, o: Omit<ClocksState, 'kind' | 'levels' | 'timeDeg'> =
 })
 /** A Gaussian packet: ⟨x⟩ = x0, Δx = σ, ⟨p⟩ = p0 (in ħ/ℓ). */
 const PK = (x0: Scrub, sigma: Scrub, p0?: Scrub): WavefunctionState['source'] => ({ packet: { x0, sigma, ...(p0 === undefined ? {} : { p0 }) } })
-/** A plane wave e^{ipx} and the sum of two. */
+/** A plane wave e^{ipx}. */
 const PL = (p: number): WavefunctionState['source'] => ({ plane: { p } })
-const TW = (p1: number, p2: number): WavefunctionState['source'] => ({ twoWaves: { p1, p2 } })
 const W = (source: WavefunctionState['source'], o: Omit<WavefunctionState, 'kind' | 'source'> = {}): WavefunctionState => ({ kind: 'wavefunction', source, shot: 'W-STD', ...o })
-
-/** The transmission of a barrier with E = V₀/2 against qa (Eq. 6.144); the dot is the book's electron, qa = 0.607. */
-const BARRIER_T: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'barrierT', samples: 120 }, markers: [{ x: 0.607 }] }
-/** The same barrier from qa = 1: the exact transmission beside the thick-barrier form of Eq. 6.146, which it approaches from below. */
-const BARRIER_THICK: PlotState = { kind: 'plot', shot: 'P-CURVE', curve: { fn: 'barrierT', vs: 'barrierThick', x: { from: 1, to: 4 }, samples: 90 }, markers: [{ x: 3.4 }] }
 
 const townsend = (where: string, adds: string): Ref => ({ source: 'townsend', where, adds })
 const susskind = (where: string, adds: string): Ref => ({ source: 'susskind', where, adds })
@@ -701,7 +696,7 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b6',
     phase: 'deeper',
-    text: `The notes’ optional §13.10: for a time-independent $H$ and the start state $|E\\rangle$ with $H|E\\rangle = E|E\\rangle$, the state is $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5 and Unit 12.1). Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ and write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Then $\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V\\right]\\varphi_E = E\\varphi_E$, not a separate postulate. The state is stationary: $\\psi(x,t) = e^{-iEt/\\hbar}\\varphi_E(x)$ has a fixed $|\\psi|^2$. Two energies together make a moving pattern: the two-wave fringes are Unit 15.4. The energy equation along $x$ is taken up in Unit 14.5, and the box that follows from it is Unit 14.6.`,
+    text: `The notes’ optional §13.10: projecting $H|E\\rangle = E|E\\rangle$ on $\\langle x|$ gives the [[energy-eigenfunction|energy eigenfunction]] equation. That is Unit 14.5; the box that follows is Unit 14.6. Two energies make the moving fringes of Unit 15.4.`,
     caption: 'one plane wave, one energy: the crests run to the right and the density stays flat',
     stage: W(PL(2), { time: sweep(0, 2), show: ['re', 'density'] }),
     refs: [susskind('Lecture 9, §9.3', 'The time-independent equation for free particles; any solution is a sum of energy eigenstates, and only phases change.')],
@@ -773,7 +768,7 @@ const time: Beat[] = [
   {
     id: 'l13-time:b5',
     phase: 'lecture',
-    text: 'The notes’ four points. The state is a ket, and wavefunctions are its components. In the position basis $\\hat x = x$ and $\\hat p = -i\\hbar\\,d/dx$; in the momentum basis $\\hat p = p$ and $\\hat x = i\\hbar\\,d/dp$. The differential equation is the abstract law written in the position basis. And $H$ generates time shifts without a universal energy-shifting operator: time says when the positions are predicted.',
+    text: 'The notes’ four points. The state is a ket, and wavefunctions are its components. In the position basis $\\hat x = x$ and $\\hat p = -i\\hbar\\,d/dx$; in the momentum basis $\\hat p = p$ and $\\hat x = i\\hbar\\,d/dp$. The differential equation is the abstract law written in the position basis. And $H$ generates time shifts without a universal energy-shifting operator: time says when the positions are predicted. The step, the barrier and tunnelling are Lectures 17 and 18.',
     caption: 'one state in two representations while time runs',
     stage: W(PK(0, 1, 3), { panels: ['position', 'momentum'], time: sweep(0, 2) }),
   },
@@ -826,59 +821,6 @@ const time: Beat[] = [
   },
 ]
 
-/* ---------------------------------------------------------------------------------------------- */
-/* l13-flow — Below the step and tunnelling (beyond the notes; its first two beats moved to L17)       */
-/* ---------------------------------------------------------------------------------------------- */
-
-const flow: Beat[] = [
-  {
-    id: 'l13-flow:b1',
-    phase: 'books',
-    text: `This unit is beyond the lecture notes; it follows Townsend. Lecture 17 teaches the current and the step with $E > V_0$. Here the energy is below the step. For $E < V_0$ the wave on the right is $Ce^{-qx}$ with $q = \\sqrt{2m(V_0 - E)}/\\hbar$ (Townsend §6.10, pp. 229–230, Eqs. 6.137–6.140). Matching at $x = 0$ gives $|B| = |A|$, so $R = ${d(V.l13TStepRbelow, 0)}$. Yet $C = 2kA/(k + iq)$ is not zero: the wave enters the step. No current flows there, because $\\varphi^*\\varphi'$ is real for a real exponent, so $T = ${d(V.l13TStepTbelow, 0)}$. This case follows from the one above by $ik_0 \\to -q$, but only for $R$. Do not take $T$ from the formula above by the same substitution: $T$ is a ratio of currents, not a ratio of squared amplitudes.`,
-    caption: 'the density to the left of the step when everything is reflected: the incident and reflected waves form a standing ripple',
-    stage: W(TW(3, -3), { show: ['density'] }),
-    refs: [townsend('§6.10, pp. 229–230 (Eqs. 6.137–6.140)', 'Below the step the reflection is total, yet the function enters it as a decaying exponential; the transmission is zero because that wave carries no current.')],
-    claims: [
-      claim('l13TStepRbelow', 'below the step everything is reflected: R = 1', () => close(V.l13TStepRbelow, 1, 1e-12)),
-      claim('l13TStepTbelow', 'and T = 0', () => close(V.l13TStepTbelow, 0, 1e-12)),
-    ],
-  },
-  {
-    id: 'l13-flow:b2',
-    phase: 'books',
-    text: `A barrier of height $V_0$ and width $a$, with $E < V_0$ (Townsend §6.10, pp. 230–233, Eqs. 6.141–6.146, Fig. 6.15). Matching the function and its slope at both edges gives four equations. Solving them gives $T = 1/[1 + ((k^2 + q^2)/2kq)^2\\sinh^2 qa]$. This is not zero: the particle [[tunnelling|tunnels]]. A numerical solution of the four equations agrees with the formula. For a thick barrier, $qa \\gg 1$, it becomes $T \\to (4kq/(k^2 + q^2))^2e^{-2qa}$. An electron with 5 eV meeting a barrier 10 eV high and 53 pm wide has $qa = ${d(V.l13TBookQa, 3)}$ and $T = ${d(V.l13TBookAT, 3)}$. At $E = V_0$ exactly, the function inside is a straight line and $T = 1/(1 + k^2a^2/4)$ (Ex. 6.7), which is ${d(V.l13TEV0T, 1)} for $ka = 2$.`,
-    caption: 'the transmission of a barrier with $E = V_0/2$ against $qa$; the dot marks $qa = 0.607$, the electron of the text',
-    stage: BARRIER_T,
-    refs: [townsend('§6.10, pp. 230–233 (Eqs. 6.141–6.146, Ex. 6.7, Figs. 6.15–6.16)', 'Four matching conditions give the barrier’s transmission; for a thick barrier it falls as $e^{-2qa}$; at $E = V_0$ it is $1/(1 + k^2a^2/4)$.')],
-    claims: [
-      claim('l13TBookQa', 'for the book’s electron qa = 0.607', () => close(V.l13TBookQa, 0.6072, 5e-4)),
-      claim('l13TBookAT', 'and the transmission is 0.706', () => close(V.l13TBookAT, 0.7061, 5e-4)),
-      claim('l13TEV0T', 'at E = V₀ with ka = 2 the transmission is 1/(1 + 1) = 0.5', () => close(V.l13TEV0T, 0.5, 1e-9)),
-    ],
-  },
-  {
-    id: 'l13-flow:b3',
-    phase: 'clue',
-    text: 'Make a thick barrier wider by one decay length, $1/q$. By what factor does the transmission fall?',
-    stage: BARRIER_THICK,
-    reveal: {
-      text: `By $e^{-2}$, about ${d(V.l13TDecayFactor, 3)}. The thick-barrier form has $e^{-2qa}$, and $a$ grew by $1/q$, so the exponent grew by 2.`,
-      caption: 'the thick-barrier curve falls by a fixed factor for each added decay length',
-      stage: BARRIER_THICK,
-      claims: [claim('l13TDecayFactor', 'one more decay length multiplies the thick-barrier T by e⁻² = 0.135', () => close(V.l13TDecayFactor, Math.exp(-2), 1e-9))],
-    },
-  },
-  {
-    id: 'l13-flow:b4',
-    phase: 'deeper',
-    text: `Beyond the notes: a smooth barrier is a stack of thin square ones. Each contributes a factor $e^{-2q\\,\\Delta x}$, so $T \\approx \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)$ over the stretch where the root is real (Townsend §6.10, pp. 233–234, Eqs. 6.147–6.149, Fig. 6.17). It fails near the turning points, where $E = V$. For 5 eV against a square barrier 10 eV high and 300 pm wide, the exact transmission is ${d(V.l13TThickRatio, 3)} of the thick-barrier form.`,
-    caption: 'the exact transmission and its thick-barrier form meet for large $qa$',
-    stage: BARRIER_THICK,
-    refs: [townsend('§6.10, pp. 233–234 (Eqs. 6.147–6.149, Fig. 6.17)', 'A smooth barrier as a stack of square ones: $T \\simeq \\exp(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar)$, which fails near the turning points.')],
-    claims: [claim('l13TThickRatio', 'the exact transmission is 0.998 of the thick-barrier form for 5 eV against 10 eV and 300 pm', () => close(V.l13TThickRatio, 0.99793, 5e-5))],
-  },
-]
-
 export const L13_STORY: Record<string, Beat[]> = {
   'l13-delta': delta,
   'l13-generator': generator,
@@ -887,7 +829,6 @@ export const L13_STORY: Record<string, Beat[]> = {
   'l13-two-bases': twoBases,
   'l13-schrodinger': schrodinger,
   'l13-time': time,
-  'l13-flow': flow,
 }
 
 /** Every claim of a unit's beats, reveals and derivation steps (each unit's `claims`: the number reader backs a unit's prose with it). */

@@ -901,13 +901,6 @@ export const LECTURE_META: LectureIndex[] = [
           "l13-ti-boost",
           "l13-ti-min"
         ]
-      },
-      {
-        "id": "l13-flow",
-        "title": "Below the step and tunnelling",
-        "challenges": [
-          "l13-pr-tunnel"
-        ]
       }
     ]
   },

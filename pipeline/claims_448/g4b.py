@@ -132,10 +132,9 @@ put('l14TBoxDpRatio', sqrt(dsq(2.0)) / sqrt(dsq(4.0)))
 put('l14PrE1Ev', (hbar * pi / 0.55e-9) ** 2 / (2 * me) / e)
 put('l14PrWall3', overlap((0.0, 1.0, 1), (0.0, 3.0, 1)) ** 2)
 
-# ---- step and barrier ----
+# ---- step and barrier (the Townsend p. 231 keys, the thick-barrier ones and the tunnelling practice question moved to Lecture 18: pipeline/claims_448/l18.py, ruling M2) ----
 r2, t2 = step_RT(2.0, 1.0)
 r3, t3 = step_RT(3.0, 1.0)
-rb, tb = step_RT(0.5, 1.0)
 put('l17StepR2', r2)
 put('l17StepT2', t2)
 put('l17StepR3', r3)
@@ -143,18 +142,6 @@ put('l17StepT3', t3)
 r15, t15 = step_RT(1.5, 1.0)
 put('l17PrStepR', r15)
 put('l17PrStepT', t15)
-put('l13TStepRbelow', rb)
-put('l13TStepTbelow', tb)
-put('l13TBookAT', barrier_T(5.0, 10.0, 0.53, HBAR2_2M))  # E = 5 eV, V0 = 10 eV, a = 0.53 angstrom
-put('l13TBookBohrT', barrier_T(5.0, 10.0, 0.529177, HBAR2_2M))
-put('l13TBookQa', sqrt((10.0 - 5.0) / HBAR2_2M) * 0.53)
-put('l13TEV0T', barrier_T(2.0, 2.0, 1.0))  # E = V0 = 2 (hbar = m = 1): k a = 2
-q_th = sqrt((10.0 - 5.0) / HBAR2_2M)
-k_th = sqrt(5.0 / HBAR2_2M)
-thick = (4 * k_th * q_th / (k_th**2 + q_th**2)) ** 2 * np.exp(-2 * q_th * 3.0)
-put('l13TThickRatio', barrier_T(5.0, 10.0, 3.0, HBAR2_2M) / thick)  # exact over thick, a = 0.30 nm
-put('l13TDecayFactor', np.exp(-2.0))  # one more decay length 1/q multiplies the thick-barrier T by e^{-2}
-put('l13PrTunnelPct', 100 * barrier_T(5.0, 8.0, 3.0, HBAR2_2M))
 
 # ---- the probability current on the grid (np.fft) ----
 NG, LBOX = 4096, 64.0

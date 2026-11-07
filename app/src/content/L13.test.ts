@@ -5,7 +5,7 @@
  *   R4  T(a) is the translation, U(t) the time evolution, ψ̃(p) the momentum amplitude, t̂ the hypothetical time operator (the notation beat `l13-time:b2`);
  *   R5  the notes' optional §13.10 is a Go-deeper beat, the last of Unit 13.6, with no new unit;
  *   R7  the Try-it of every unit is an existing widget whose lines say what it is (no `wave-lab`);
- *   R8  no Correction box.
+ *   R8  no Correction box (the Townsend p. 231 one moved to Lecture 18 with the unit l13-flow, ruling M2 of docs/roles/decisions/448-L14L18.md).
  * Also: the unit order and beat counts, every text balances its dollar signs, the chips into 709, every V key is claimed, the Try-it lines are what the widgets'
  * engines compute, and the four Arcade rounds are true.
  */
@@ -37,20 +37,18 @@ const unit = (id: string) => L13.units.find((u) => u.id === id)!
 const beat = (id: string) => beats.find((b) => b.id === id)!
 
 describe('Lecture 13: shape', () => {
-  it('has the seven lecture units in order and the Townsend unit l13-flow (below the step and tunnelling) after them, with the planned beats (the notes’ line, the Townsend beats and four Go-deeper beats, §13.10 among them); the box moved to Lecture 14 (ruling M2)', () => {
-    expect(L13.units.map((u) => u.id)).toEqual(['l13-delta', 'l13-generator', 'l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time', 'l13-flow'])
-    expect(L13.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([6, 5, 7, 7, 7, 5, 7, 3])
-    expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l13-plane-wave:b7', 'l13-two-bases:b8', 'l13-schrodinger:b6', 'l13-flow:b4'])
-    expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(7)
-    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(10) // 7 from the notes' pass (two moved to Lecture 16, ruling M2), 3 added to lecture units and 2 in the Townsend unit l13-flow (the box's 4 moved to l14-box; its first two moved to L17)
+  it('has the seven lecture units in order and no Townsend unit after them (the box moved to Lecture 14 and l13-flow to Lectures 17 and 18, ruling M2), with the planned beats (the notes’ line, the Townsend beats and three Go-deeper beats, §13.10 among them)', () => {
+    expect(L13.units.map((u) => u.id)).toEqual(['l13-delta', 'l13-generator', 'l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time'])
+    expect(L13.units.map((u) => (u.story ?? []).filter((b) => b.phase !== 'deeper').length)).toEqual([6, 5, 7, 7, 7, 5, 7])
+    expect(beats.filter((b) => b.phase === 'deeper').map((b) => b.id)).toEqual(['l13-plane-wave:b7', 'l13-two-bases:b8', 'l13-schrodinger:b6'])
+    expect(beats.filter((b) => b.phase === 'clue')).toHaveLength(6) // l13-flow's clue moved to Lecture 18 (ruling M2)
+    expect(beats.filter((b) => b.phase === 'books')).toHaveLength(8) // 7 from the notes' pass (two moved to Lecture 16, ruling M2) and 3 added to lecture units, less the two of the old Townsend unit l13-flow that Lecture 18 teaches now (its two others went to L17 and the box's 4 to l14-box)
     expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual([
       'l13-delta:b2', 'l13-generator:b3', 'l13-plane-wave:b1', 'l13-momentum-space:b2', 'l13-momentum-space:b5b', 'l13-two-bases:b2', 'l13-two-bases:b4', 'l13-schrodinger:b2', 'l13-schrodinger:b4', 'l13-time:b3',
       'l13-time:b6',
     ])
-    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(23) // l13-pr-step moved to Lecture 17 (ruling M2); three more moved to Lecture 16 (l13-sc-sd, l13-sc-electron, l13-ti-ehren, ruling M2); 25 from the notes' pass and one Townsend practice question (the box's two moved to l14-box; the free-centre and the two fringe questions moved to Lecture 15, ruling M2)
-    expect(L13.corrections).toHaveLength(1) // R8 stands for the notes; the one Correction is Townsend's p. 231 (ruling T5)
-    expect(L13.corrections![0].where).toMatch(/Townsend p\. 231/)
-    expect(L13.corrections![0].source).toBe('book')
+    expect(L13.units.reduce((n, u) => n + u.play.length, 0)).toBe(22) // l13-pr-tunnel moved to Lecture 18 and l13-pr-step to Lecture 17 (ruling M2); three more moved to Lecture 16 (l13-sc-sd, l13-sc-electron, l13-ti-ehren, ruling M2); 25 from the notes' pass and one Townsend practice question (the box's two moved to l14-box; the free-centre and the two fringe questions moved to Lecture 15, ruling M2)
+    expect(L13.corrections ?? []).toHaveLength(0) // R8 stands for the notes; the Townsend p. 231 Correction (ruling T5) moved to Lecture 18 with its beat (ruling M2)
   })
   it('every text balances its dollar signs (a stray one would typeset the rest of the sentence as TeX)', () => {
     for (const t of [...beats.flatMap(textsOf), ...unitTexts()]) {
@@ -70,7 +68,7 @@ describe('Lecture 13: R1 the shared kind', () => {
       const states = (u.story ?? []).flatMap(statesOf)
       const wf = states.filter((s): s is WavefunctionState => s.kind === 'wavefunction')
       const ck = states.filter((s): s is ClocksState => s.kind === 'clocks')
-      expect(wf.length, u.id).toBeGreaterThan(u.id === 'l13-flow' ? 0 : 3) // l13-flow lost its two wavefunction-rich beats to L17 and goes to L18
+      expect(wf.length, u.id).toBeGreaterThan(3)
       if (u.id !== 'l13-time') expect(ck, u.id).toHaveLength(0)
       for (const s of wf) expect(validateWavefunctionStage(s), u.id).toEqual([])
       for (const s of states) expect(['wavefunction', 'clocks', 'complex-plane', 'matrix', 'plot'], `${u.id} ${s.kind}`).toContain(s.kind)
@@ -125,8 +123,8 @@ describe('Lecture 13: R2, R4, R5 ownership, notation and the optional section', 
 })
 
 describe('Lecture 13: R7 the Try-its are what the widgets compute', () => {
-  it('no unit uses wave-lab; the eight widgets are the planned stand-ins', () => {
-    expect(L13.units.map((u) => u.visual.kind)).toEqual(['amplitude-bars', 'complex-plane', 'complex-plane', 'basis-translator', 'basis-translator', 'two-clocks', 'two-clocks', 'amplitude-bars'])
+  it('no unit uses wave-lab; the seven widgets are the planned stand-ins', () => {
+    expect(L13.units.map((u) => u.visual.kind)).toEqual(['amplitude-bars', 'complex-plane', 'complex-plane', 'basis-translator', 'basis-translator', 'two-clocks', 'two-clocks'])
     expect(unit('l13-delta').visual.caption).toMatch(/stand-in/)
     expect(unit('l13-momentum-space').visual.caption).toMatch(/stand-in/)
   })
@@ -240,16 +238,12 @@ describe('Lecture 13: Arcade rounds', () => {
 })
 
 describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townsend-G4)', () => {
-  const townsendUnits = ['l13-flow'] // the box (old l13-stationary) moved to Lecture 14 as l14-box (ruling M2); its tests are in L14.test.ts
-  it('the Townsend unit is books only and opens with a lede that says the lecture notes do not cover it (T3); it follows the lecture units', () => {
-    for (const id of townsendUnits) {
-      const story = unit(id).story!
-      expect(story[0].phase, id).toBe('books')
-      expect(story[0].text, id).toMatch(/^This unit is beyond the lecture notes; it follows Townsend/)
-      expect(story.filter((b) => b.phase === 'lecture'), id).toHaveLength(0)
-      expect(unit(id).lecture.pages, id).toMatch(/^not in the lecture notes/)
-    }
-    expect(L13.units.slice(-1).map((u) => u.id)).toEqual(townsendUnits)
+  it('the books-only units left Lecture 13: the box is Lecture 14’s l14-box, below the step and tunnelling are Lecture 18’s, and a pointer stays in the last lecture beat (ruling M2)', () => {
+    expect(L13.units.map((u) => u.id)).not.toContain('l13-flow')
+    expect(L13.units.map((u) => u.id)).not.toContain('l13-stationary')
+    expect(beat('l13-time:b5').text).toMatch(/The step, the barrier and tunnelling are Lectures 17 and 18\.$/)
+    expect(Object.keys(V).filter((k) => /^l13T(Step|Book|EV0|Thick|Decay)|^l13PrTunnel/.test(k))).toEqual([])
+    expect(L13.units.flatMap((u) => u.play.map((q) => q.id))).not.toContain('l13-pr-tunnel')
   })
   it('each lettered books beat starts its group at a; the three renamed beats keep their texts', () => {
     expect(beat('l13-plane-wave:b5a').text).toMatch(/^Townsend §6\.5 derives the normalisation/)
@@ -258,37 +252,11 @@ describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townse
     expect(beat('l13-momentum-space:b5b').phase).toBe('books')
     expect(beat('l13-time:b6').phase).toBe('books')
   })
-  it('the practice question that stayed is tagged townsend, name their end-of-chapter problem, carry full walkthroughs and are not assigned (T1)', () => {
-    const qs = townsendUnits.flatMap((id) => unit(id).play)
-    expect(qs.map((q) => q.id)).toEqual(['l13-pr-tunnel'])
-    for (const q of qs) {
-      expect(q.practice, q.id).toBe('townsend')
-      expect(q.refs?.[0].where, q.id).toMatch(/^Problem 6\.\d+, end of Ch\. 6/)
-      expect(q.walkthrough.length, q.id).toBeGreaterThan(1)
-      expect(q.hints, q.id).toHaveLength(3)
-      expect(q.assigned, q.id).toBeFalsy()
-      expect(JSON.stringify(q), q.id).not.toMatch(/\bH\d-\d/) // no homework label (T1)
-    }
-    const tol = Object.fromEntries(qs.map((q) => [q.id, q.kind === 'numeric' ? q.tolerance : -1]))
-    expect(tol).toEqual({ 'l13-pr-tunnel': 0.02 })
-  })
-  it('the Correction is Townsend p. 231: printed 0.68, our calculation 0.706 (two routes in the twin), checked by the engine (T5)', () => {
-    const c = L13.corrections![0]
-    expect(c.says).toMatch(/0\.68/)
-    expect(c.shouldSay).toMatch(/0\.706/)
-    expect(c.check()).toBe(true)
-    expect(V.l13TBookAT).toBeCloseTo(0.7061, 3)
-    expect(Math.abs(V.l13TBookAT - 0.68)).toBeGreaterThan(0.02)
-  })
   it('no number is shown with a power of ten: the helium angles are in micro-radians (T4, ruling for exponent notation)', () => {
-    const mine = ['l13-plane-wave:b5b', 'l13-momentum-space:b5b', 'l13-time:b6', ...beats.filter((b) => b.id.startsWith('l13-flow')).map((b) => b.id)]
+    const mine = ['l13-plane-wave:b5b', 'l13-momentum-space:b5b', 'l13-time:b6']
     const all = mine.flatMap((id) => textsOf(beat(id))).join(' ')
     expect(all).not.toMatch(/\d\s*(?:\\times|×)\s*10\^/)
     expect(V.l13THeFringeUrad).toBeCloseTo(5.6644, 3)
     expect(V.l13TWhichWayUrad).toBeCloseTo(2 * V.l13THeFringeUrad, 9)
-  })
-  it('the flow unit draws the step and barrier curves', () => {
-    const fns = unit('l13-flow').story!.flatMap(statesOf).flatMap((s) => (s.kind === 'plot' && s.curve ? [s.curve.fn, ...(s.curve.vs ? [s.curve.vs] : [])] : []))
-    expect(new Set(fns)).toEqual(new Set(['barrierT', 'barrierThick']))
   })
 })

@@ -1,18 +1,9 @@
 {
  "about": "Numpy twin of the 448 Townsend pass G4b (Lecture 13): pipeline/claims_448/g4b.py",
  "values": {
-  "l13PrTunnelPct": 1.8116902262800136,
   "l13TAmmDtRatio": 0.3183098861837907,
-  "l13TBookAT": 0.7061046476417303,
-  "l13TBookBohrT": 0.7068263760880362,
-  "l13TBookQa": 0.6071547586544623,
   "l13TChirpProduct": 1.1180339887498951,
-  "l13TDecayFactor": 0.1353352832366127,
-  "l13TEV0T": 0.5000000000000001,
   "l13THeFringeUrad": 5.664371383223985,
-  "l13TStepRbelow": 1.0,
-  "l13TStepTbelow": 0.0,
-  "l13TThickRatio": 0.9979334078476249,
   "l13TTimeBound": 0.49999999999984884,
   "l13TWhichWayUrad": 11.32874276644797,
   "l14PrE1Ev": 1.2430749177412812,

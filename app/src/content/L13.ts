@@ -1,5 +1,5 @@
 import type { Lecture } from './schema'
-import { V, claim, close, d } from './L13.values'
+import { V, d } from './L13.values'
 import { L13_STORY, L13_UNIT_CLAIMS } from './L13.story'
 import { L13_REVIEW } from './L13.review'
 import './bridges448'
@@ -13,8 +13,9 @@ import './bridges448'
 // Go-deeper beat of Unit 13.6 (R5). The widget `wave-lab` is deferred (R7), so every Try-it borrows the nearest existing widget. No homework exists for L13. The two chips into
 // 709 live in content/bridges448.ts.
 // Townsend pass (G4b; rulings docs/roles/decisions/448-townsend.md, plan docs/roles/proposals/P-448-townsend-G4.md): books beats for Townsend §6.7 (which slit), Example 6.2 (why the Gaussian is the floor) and §4.6
-// (evolution time), and two new books-only units after the lecture units (T3): l13-flow (§6.10, current, step, tunnelling); l13-stationary (§6.8–6.9, the box) moved to Lecture 14 as l14-box (ruling M2 of docs/roles/decisions/448-L14L18.md); the formula boards, four practice
-// questions modelled on Townsend's problem types (practice: 'townsend', T1) and the one Correction box (p. 231, T5). L13 is drawn by SVG kinds only (the e2e SVG_ONLY list), so no GL kind is used.
+// (evolution time), the formula boards and practice questions modelled on Townsend's problem types (practice: 'townsend', T1). Two books-only units were added after the lecture units (T3) and have since
+// moved (ruling M2 of docs/roles/decisions/448-L14L18.md): l13-stationary (§6.8–6.9, the box) to Lecture 14 as l14-box, and l13-flow (§6.10, current, step, tunnelling) to Lectures 17 and 18, with the Townsend p. 231 Correction
+// and the practice question on tunnelling, which are now Lecture 18's. Lecture 13 has no Correction box (R8). L13 is drawn by SVG kinds only (the e2e SVG_ONLY list), so no GL kind is used.
 
 export const L13: Lecture = {
   id: 'L13',
@@ -29,20 +30,8 @@ export const L13: Lecture = {
     'Derive x̂ = iħ ∂/∂p and check [x̂, p̂] = iħ in both representations.',
     'Turn the abstract law into the position-space Schrödinger equation, and check it on a plane wave.',
     'Say why time is a parameter and not an operator beside x̂.',
-    'Find the reflection, transmission and tunnelling of a step and a barrier from continuity of the function and its slope.',
   ],
   prerequisites: ['wavefunction', 'position-operator', 'momentum-generator', 'uncertainty', 'schrodinger'],
-  // The one slip with physics in Townsend Ch. 4 and 6 (ruling T5), re-read on the page image (PDF p. 247) and re-computed two ways: the four matching conditions of Eq. 6.143 solved as a linear system
-  // (numpy) and the closed form of Eq. 6.144 (the engine).
-  corrections: [
-    {
-      where: 'Townsend p. 231, below Eq. 6.144',
-      says: 'The page gives T = 0.68 for a barrier 10 eV high and 0.53 Å wide, the Bohr radius, struck by electrons of 5 eV.',
-      shouldSay: `Our calculation finds ${d(V.l13TBookAT, 3)} for these numbers, with the product of the decay constant and the width equal to ${d(V.l13TBookQa, 3)}. The four matching conditions of Eq. 6.143 solved directly and the closed form of Eq. 6.144 agree. Using the Bohr radius 0.529177 Å instead gives ${d(V.l13TBookBohrT, 3)}. The thick-barrier form is not valid here, because that product is below 1.`,
-      check: () => close(V.l13TBookAT, 0.7061, 1e-3) && close(V.l13TBookBohrT, 0.7068, 1e-3) && Math.abs(V.l13TBookAT - 0.68) > 0.02,
-      source: 'book',
-    },
-  ],
   // Symbols defined in the text itself (symbol → the unit, beat or site whose sentence defines it). Kets, bras and the letters of earlier lectures
   // are mapped to the first unit that uses them: a recap.
   symbols: {
@@ -114,13 +103,6 @@ export const L13: Lecture = {
     '\\theta': 'l13-plane-wave:b5b',
     'n': 'l13-plane-wave:b5b',
     'c': 'l13-momentum-space:b5b',
-    'B': 'l13-flow:b1',
-    'q': 'l13-flow:b1',
-    'V_0': 'l13-flow:b1',
-    'k_0': 'l13-flow:b1',
-    'R': 'l13-flow:b1',
-    '\\sinh': 'l13-flow:b2',
-    '\\gg': 'l13-flow:b2',
   },
   units: [
     {
@@ -797,69 +779,6 @@ export const L13: Lecture = {
           walkthrough: [
             { text: '$E = p^2/2m \\ge 0$ with equality at $p = 0$.' },
             { text: 'So a shift of every energy by $-1$ would need states that do not exist.' },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'l13-flow',
-      story: L13_STORY['l13-flow'],
-      claims: [
-        ...L13_UNIT_CLAIMS['l13-flow'],
-        claim('l13TBookBohrT', 'with the Bohr radius 0.529 Å for the width the transmission is 0.707', () => close(V.l13TBookBohrT, 0.7068, 5e-4)),
-        claim('l13PrTunnelPct', 'an electron with 5 eV meeting an 8 eV barrier 0.30 nm wide is transmitted with 1.812 percent', () => close(V.l13PrTunnelPct, 1.8117, 5e-4)),
-      ],
-      title: 'Below the step and tunnelling',
-      question: 'What happens when the energy is below the top of a step or a barrier?',
-      lecture: {
-        pages: 'not in the lecture notes (Townsend §6.10)',
-        summary:
-          'The lecture notes do not cover this unit; it follows Townsend. The current and the step with $E > V_0$ moved to Lecture 17. Below the top of a step the function decays inside but carries no current. Through a barrier, a fraction still gets through.',
-        equations: [
-          'R = 1,\\quad T = 0\\quad (E < V_0)',
-          'T = \\left[1 + \\left(\\tfrac{k^2 + q^2}{2kq}\\right)^2\\sinh^2 qa\\right]^{-1}',
-          'T \\to \\left(\\tfrac{4kq}{k^2 + q^2}\\right)^2e^{-2qa}',
-        ],
-      },
-      books: [
-        { source: 'townsend', where: '§6.10, pp. 229–230', adds: 'The potential step with $E < V_0$: total reflection, and a decaying wave that carries no current.' },
-        { source: 'townsend', where: '§6.10, pp. 230–234', adds: 'Tunnelling through a square barrier, the thick-barrier limit, Example 6.7 at $E = V_0$ and a smooth barrier as a stack of square ones.' },
-      ],
-      visual: {
-        kind: 'amplitude-bars',
-        props: { state: '+z', basis: 'z' },
-        caption: 'A two-outcome stand-in: the two shares of the chance always add to 1, as $R + T = 1$ does at a step.',
-        tryThis: [
-          'With the state at +z and the basis z, one outcome holds all of the chance and the other none. Total reflection below a step is this picture: everything goes one way.',
-          'Drag θ away from 0°: the second outcome gets a share, and the two shares add to 1. A step does the same with the reflected and transmitted currents.',
-        ],
-      },
-      clues: [],
-      insight: 'Below the top of a step everything is reflected, yet the function enters it. A barrier a classical particle could never cross still lets a fraction through, falling as $e^{-2qa}$.',
-      pitfalls: [
-        'Saying there is no function inside a step the particle cannot cross. The function decays there as $e^{-qx}$, but it carries no current.',
-      ],
-      play: [
-        {
-          id: 'l13-pr-tunnel',
-          kind: 'numeric',
-          tier: 'stretch',
-          practice: 'townsend',
-          title: 'Tunnelling through a thin barrier',
-          prompt: 'A 5 eV electron approaches a barrier 8 eV high and 0.30 nm wide. What percentage is transmitted?',
-          answer: V.l13PrTunnelPct,
-          tolerance: 0.02,
-          unit: '%',
-          refs: [{ source: 'townsend', where: 'Problem 6.23, end of Ch. 6 (p. 243)', adds: 'The book’s problem is a derivation of the tunnelling coefficient; this one evaluates it for a numerical case.' }],
-          hints: [
-            { text: 'Use $T = 1/[1 + ((k^2 + q^2)/2kq)^2\\sinh^2 qa]$.' },
-            { text: 'Here $k^2 = 2mE/\\hbar^2$ and $q^2 = 2m(V_0 - E)/\\hbar^2$, with $\\hbar^2/2m = 3.81$ eV Å² for an electron.' },
-            { text: 'Work in electron-volts and ångströms. The width is 3 Å.' },
-          ],
-          walkthrough: [
-            { text: 'In these units $k^2 = 5/3.81$ and $q^2 = 3/3.81$, both in Å$^{-2}$, and $a = 3$ Å, so $qa$ is a little over 2.6.' },
-            { text: 'Put $k$, $q$ and $qa$ into the formula. The factor $((k^2 + q^2)/2kq)^2$ and $\\sinh^2 qa$ multiply to give a large number.' },
-            { text: `The transmission is its reciprocal after adding 1, ${d(V.l13PrTunnelPct, 3)} percent. A barrier this thick is already close to the thick-barrier form $e^{-2qa}$.` },
           ],
         },
       ],

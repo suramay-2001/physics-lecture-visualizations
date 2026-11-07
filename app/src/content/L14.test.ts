@@ -94,7 +94,7 @@ describe('Lecture 14: pictures', () => {
 
 describe('Lecture 14: M1 the recaps, the Rosetta line and the chip into 709', () => {
   it('Units 13.6 and 13.7 stay in Lecture 13; Lecture 14 names each in its recap beat and defines no term there', () => {
-    expect(L13.units.map((u) => u.id)).toEqual(['l13-delta', 'l13-generator', 'l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time', 'l13-flow'])
+    expect(L13.units.map((u) => u.id)).toEqual(['l13-delta', 'l13-generator', 'l13-plane-wave', 'l13-momentum-space', 'l13-two-bases', 'l13-schrodinger', 'l13-time'])
     expect(beat('l14-schrodinger:b1').text).toContain('Unit 13.6')
     expect(beat('l14-time:b1').text).toContain('Unit 13.7')
     expect(beat('l14-components:b1').text).toContain('Unit 12.3')

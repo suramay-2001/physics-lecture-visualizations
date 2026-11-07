@@ -16,7 +16,7 @@ test.describe('topbar', () => {
     const panel = page.getByRole('region', { name: 'Lectures' })
     await expect(panel).toBeVisible()
     await expect(panel.getByRole('link', { name: /Stern–Gerlach/ })).toBeFocused()
-    await expect(panel.locator('.panel-units a')).toHaveCount(101) // L1, L2, L5 and L6 (five units each), L3, L4, L9 and L11 (six each), L7 (seven: l7-ladder, the Townsend unit), L12 (seven: l12-driven, the Townsend unit), L8 and L10 (eight each), L13 (eight: seven lecture units and the Townsend unit l13-flow; the box moved to L14), L14 (six: five lecture units and the books-only box l14-box), L16 (four lecture units), L15 (six lecture units), L17 (three: l17-mean-force, l17-step, l17-current)
+    await expect(panel.locator('.panel-units a')).toHaveCount(100) // L1, L2, L5 and L6 (five units each), L3, L4, L9 and L11 (six each), L7 (seven: l7-ladder, the Townsend unit), L12 (seven: l12-driven, the Townsend unit), L8 and L10 (eight each), L13 (seven lecture units; the box moved to L14 and the Townsend unit l13-flow to L17 and L18), L14 (six: five lecture units and the books-only box l14-box), L16 (four lecture units), L15 (six lecture units), L17 (three: l17-mean-force, l17-step, l17-current)
     await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await expect(button).toBeFocused()
