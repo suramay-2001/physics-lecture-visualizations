@@ -106,8 +106,8 @@ export const V = {
   l16PrQuarticDpdt: commutatorRate(Q10, GRID, QUARTIC, 'p'), // −1.75: V = x⁴/4, x₀ = 1, σ = ½
   l16PrQuarticMean3: meanOf(Q10, GRID, (x) => x * x * x), // 1.75 = x₀³ + 3x₀σ²
   l16PrQuarticCentreForce: -(meanX(Q10, GRID) ** 3), // −1: the force at the centre
-  l16PrSpinDXdt: spinMeanRate(Math.PI / 3), // −0.866: from the rate law
-  l16PrSpinMag: Math.abs(spinMeanRate(Math.PI / 3)), // 0.866
+  l16PrSpinDZdt: spinMeanRate(Math.PI / 4), // −0.7071: from the rate law, H = ħωX/2 on |+z⟩
+  l16PrSpinMag: Math.abs(spinMeanRate(Math.PI / 4)), // 0.7071
 } as const
 
 export type ValueKey = keyof typeof V

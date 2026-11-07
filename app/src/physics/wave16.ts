@@ -160,12 +160,12 @@ export function commutatorRate(psi: Wave, g: Grid, V: (x: number) => number, whi
 }
 
 /**
- * d⟨X⟩/dt for one spin under H = ħωZ/2 started in |+x⟩, in units of ω, from the rate law (i/ħ)⟨[H, X]⟩ at ωt = `omegaT` (ħ = ω = 1): the ket is evolved by e^{−iHt}, and the commutator is formed
- * from the 2 × 2 matrices; the solution ⟨X⟩ = cos ωt is never used.
+ * d⟨Z⟩/dt for one spin under H = ħωX/2 started in |+z⟩, in units of ω, from the rate law (i/ħ)⟨[H, Z]⟩ at ωt = `omegaT` (ħ = ω = 1): the ket is evolved by e^{−iHt}, and the commutator is formed
+ * from the 2 × 2 matrices; the solution ⟨Z⟩ = cos ωt is never used.
  */
 export function spinMeanRate(omegaT: number): number {
-  const H = mscale(SIGMA_Z, 0.5)
-  const psi = evolveKet(H, omegaT, KET['+x'])
-  const comm = msub(matmul(H, SIGMA_X), matmul(SIGMA_X, H))
+  const H = mscale(SIGMA_X, 0.5)
+  const psi = evolveKet(H, omegaT, KET['+z'])
+  const comm = msub(matmul(H, SIGMA_Z), matmul(SIGMA_Z, H))
   return -sandwich(comm, psi).im
 }

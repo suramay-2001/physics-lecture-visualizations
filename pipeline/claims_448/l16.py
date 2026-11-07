@@ -9,7 +9,7 @@ Nothing here imports the repo engine. Routes differ from the engine's on purpose
   - the covariance of x and p is Re<a|b> with a = (x - <x>) psi and b = (p - <p>) psi (the symmetrised product written out), not Re<x p> - <x><p>;
   - the focus time of a chirped packet is -C_xp / (Delta p)^2 from grid moments, and a bounded scalar minimiser over the np.fft widths is asserted to agree to 1e-6; the closed-form width
     sqrt(sigma^2 + 2 t C / m + t^2 (Delta p)^2 / m^2) is asserted against the FFT evolution;
-  - the doubling time is a brentq root of the closed-form width minus twice the start, not t_s sqrt 3; the spin rate is scipy.linalg.expm of -iHt on |+x> with dense 2 x 2 matrices;
+  - the doubling time is a brentq root of the closed-form width minus twice the start, not t_s sqrt 3; the spin rate is scipy.linalg.expm of -iHt on |+z> with dense 2 x 2 matrices (H = X/2);
   - SI numbers use the CODATA 2018 values written out below (the engine's constants), never scipy.constants.
 
 Usage (from the repo root): python3 pipeline/claims_448/l16.py -> app/src/physics/__fixtures__/claims-448/l16.json and app/src/physics/__fixtures__/wave16-cases.json
@@ -210,11 +210,11 @@ put('l16PrQuarticDpdt', rate(Q, 0.25 * x**4, 'p'))
 put('l16PrQuarticMean3', np.sum(x**3 * np.abs(Q) ** 2) * dx)
 put('l16PrQuarticCentreForce', -(mean_x(Q) ** 3))
 assert abs(out['l16PrQuarticDpdt'] + 1.75) < 1e-9 and abs(out['l16PrQuarticMean3'] - (1 + 3 * 1 * 0.25)) < 1e-9
-Hs = 0.5 * np.array([[1, 0], [0, -1]], dtype=complex)
-Xs = np.array([[0, 1], [1, 0]], dtype=complex)
-psi_s = expm(-1j * Hs * (pi / 3)) @ (np.array([1, 1], dtype=complex) / sqrt(2))
-put('l16PrSpinDXdt', np.real(1j * (np.conj(psi_s) @ ((Hs @ Xs - Xs @ Hs) @ psi_s))))
-put('l16PrSpinMag', abs(out['l16PrSpinDXdt']))
+Hs = 0.5 * np.array([[0, 1], [1, 0]], dtype=complex)  # H = hbar omega X / 2
+Zs = np.array([[1, 0], [0, -1]], dtype=complex)
+psi_s = expm(-1j * Hs * (pi / 4)) @ np.array([1, 0], dtype=complex)  # starts in |+z>
+put('l16PrSpinDZdt', np.real(1j * (np.conj(psi_s) @ ((Hs @ Zs - Zs @ Hs) @ psi_s))))
+put('l16PrSpinMag', abs(out['l16PrSpinDZdt']))
 
 # ---- engine cases for physics/wave16.ts ----
 idx = [1700, 1900, 2048, 2176, 2300, 2500]
@@ -242,8 +242,8 @@ for (s, r, m, hb) in ((1.0, 2.0, 1.0, 1.0), (0.5, 3.0, 2.0, 1.0), (0.5e-9, 2.0, 
     cases['widthTime'].append({'s': s, 'r': r, 'm': m, 'hbar': hb, 'v': v})
 cases['spinRate'] = []
 for wt in (0.0, pi / 6, pi / 3, pi / 2, 2.0):
-    ps = expm(-1j * Hs * wt) @ (np.array([1, 1], dtype=complex) / sqrt(2))
-    cases['spinRate'].append({'wt': wt, 'v': float(np.real(1j * (np.conj(ps) @ ((Hs @ Xs - Xs @ Hs) @ ps))))})
+    ps = expm(-1j * Hs * wt) @ np.array([1, 0], dtype=complex)
+    cases['spinRate'].append({'wt': wt, 'v': float(np.real(1j * (np.conj(ps) @ ((Hs @ Zs - Zs @ Hs) @ ps))))})
 cases['townsend'] = []
 for (a, t, m) in ((sqrt(2), 2.0, 1.0), (1.3, 1.5, 2.0)):
     psi = townsend76(a, t, m)
