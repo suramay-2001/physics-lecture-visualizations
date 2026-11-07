@@ -30,6 +30,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L15', number: 15, title: 'Free particles and packets: group velocity and dispersion' },
   { id: 'L16', number: 16, title: 'Gaussian packets and Ehrenfest' },
   { id: 'L17', number: 17, title: 'Classical mean motion and quantum reflection' },
+  { id: 'L18', number: 18, title: 'Quantum reflection and tunnelling' },
 ]
 
 export interface Concept {
@@ -161,6 +162,11 @@ export const CONCEPTS: Concept[] = [
   { id: 'mean-force', label: 'Mean force against force at the mean', lecture: 'L17', unit: 'l17-mean-force', needs: ['position-operator', 'time-parameter'] },
   { id: 'potential-step', label: 'A wave meets a potential step', lecture: 'L17', unit: 'l17-step', needs: ['stationary-states', 'plane-wave'] },
   { id: 'probability-current', label: 'Why probability flows: the current, R and T', lecture: 'L17', unit: 'l17-current', needs: ['potential-step', 'schrodinger-position'] },
+  // L18 (quantum reflection and tunnelling; every built unit is a station). Tunnelling was the Townsend unit l13-flow of Lecture 13 and moved here (ruling M2).
+  { id: 'packet-scattering', label: 'A packet splits at the step: R and T as areas', lecture: 'L18', unit: 'l18-packet', needs: ['potential-step', 'gaussian-spreading'] },
+  { id: 'probability-flux', label: 'The flux of a moving Gaussian and the shares R and T', lecture: 'L18', unit: 'l18-detector', needs: ['probability-current', 'packet-scattering'] },
+  { id: 'evanescent-wave', label: 'Below the step: a tail is not transmission', lecture: 'L18', unit: 'l18-below', needs: ['potential-step', 'probability-flux'] },
+  { id: 'tunnelling', label: 'A finite barrier lets it through', lecture: 'L18', unit: 'l18-tunnel', needs: ['evanescent-wave', 'stationary-states'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

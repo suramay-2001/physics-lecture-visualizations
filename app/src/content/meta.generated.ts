@@ -1129,5 +1129,54 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L18",
+    "number": 18,
+    "title": "Quantum reflection and tunnelling",
+    "units": [
+      {
+        "id": "l18-packet",
+        "title": "A packet splits at the step",
+        "challenges": [
+          "l18-pk-id",
+          "l18-pk-area",
+          "l18-pk-R",
+          "l18-pr-energy"
+        ]
+      },
+      {
+        "id": "l18-detector",
+        "title": "Probability current from a moving Gaussian",
+        "challenges": [
+          "l18-de-j",
+          "l18-de-T",
+          "l18-de-order",
+          "l18-de-sign"
+        ]
+      },
+      {
+        "id": "l18-below",
+        "title": "Below the step: a tail is not transmission",
+        "challenges": [
+          "l18-be-r",
+          "l18-be-edge",
+          "l18-be-len"
+        ]
+      },
+      {
+        "id": "l18-tunnel",
+        "title": "A finite barrier lets it through",
+        "challenges": [
+          "l18-tu-sech",
+          "l18-tu-thick",
+          "l18-tu-a0",
+          "l18-tu-order",
+          "l18-pr-tunnel",
+          "l18-pr-resonance",
+          "l18-pr-field"
+        ]
+      }
+    ]
   }
 ]
