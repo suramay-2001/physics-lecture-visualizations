@@ -94,7 +94,6 @@ export const L13: Lecture = {
     'A': 'l13-schrodinger:b4',
     '\\omega': 'l13-schrodinger:b4',
     'E': 'l13-schrodinger:b4',
-    '|E\\rangle': 'l13-schrodinger:b6',
     'U': 'l13-time:b2',
     '\\hat T': 'l13-time:b2',
     '\\epsilon': 'l13-time:b3',
