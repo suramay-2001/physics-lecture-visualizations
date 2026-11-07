@@ -57,6 +57,7 @@ export const V = {
   l14TkinP0: kineticEnergy(K3, GRID), // 4.625 = 4.5 + 0.125
   l14TkinMean: 0.5 * meanP(K3, GRID) ** 2, // 4.5: p₀²/2m
   l14TkinSpread: 0.5 * spreadP(K3, GRID) ** 2, // 0.125: (Δp)²/2m
+  l14DpP0: spreadP(K3, GRID), // 0.5: Δp = ħ/2σ of the p₀ = 3, σ = 1 packet
   l14VMean: 0.5 * meanX2(PK(2, 1), GRID), // 2.5: ⟨x²/2⟩ for a packet at 2
   /* l14-dispersion */
   l14Omega3: omegaFree(3), // 4.5
@@ -67,8 +68,8 @@ export const V = {
   l14GaussTHalf: kineticEnergy(PK(0, 0.5), GRID), // 0.5
   l14GaussTRatio: kineticEnergy(PK(0, 0.5), GRID) / kineticEnergy(U1, GRID), // 4
   l14TwoWaveOk: twoWaveResidual(2, 4, 0.7, 1.3) < 1e-6 ? 1 : 0, // 1: iψ_t = −½ψ_xx for p = 2 and 4 to 1e-6 (a check, not shown)
-  l14TopHatT4: topHatKineticCut(1, 8 * Math.PI), // 8: the top hat of width 1 cut at P = 2πn/L with n = 4
-  l14TopHatT8: topHatKineticCut(1, 16 * Math.PI), // 16
+  l14TopHatT4: topHatKineticCut(2, 4 * Math.PI), // 2: the top hat of width 2 cut at P = 2πn/L with n = 4 (value 2n/L²)
+  l14TopHatT8: topHatKineticCut(2, 8 * Math.PI), // 4: n = 8
   l14PrTentT: tentKinetic(2), // 0.375
   /* l14-time */
   l14MeanP15: meanP(P15, GRID), // 1.5: the mean momentum of the packet that is shifted and left to run

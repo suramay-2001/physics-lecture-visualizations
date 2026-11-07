@@ -49,7 +49,7 @@ const components: Beat[] = [
   {
     id: 'l14-components:b2',
     phase: 'lecture',
-    text: `A chance is $|\\psi(a)|^2$. Along a line, $|\\psi(x_0)|^2\\,dx$ is the chance of finding the particle in a thin stretch $dx$ at $x_0$. So $|\\psi|^2$ is a density, not a chance. Cut $[-8, 8]$ into 16 equal cells for the unit packet. The cell from 0 to 1 holds ${d(V.l14Cell16, 3)}, and the 16 chances add up to ${d(V.l14CellsSum, 0)}. With 512 cells, a cell's chance divided by its width settles at ${d(V.l14Cell512Dens, 3)} per $\\ell$: the density.`,
+    text: `A chance is $|\\psi(a)|^2$. Along a line, $|\\psi(x_0)|^2\\,dx$ is the chance of finding the particle in a thin stretch $dx$ at $x_0$. So $|\\psi|^2$ is a density, not a chance. Cut $[-8, 8]$ into 16 equal cells for the packet with $\\sigma = 1\\,\\ell$ (the unit packet). The cell from 0 to 1 holds ${d(V.l14Cell16, 3)}, and the 16 chances add up to ${d(V.l14CellsSum, 0)}. With 512 cells, a cell's chance divided by its width settles at ${d(V.l14Cell512Dens, 3)} per $\\ell$: the density.`,
     caption: 'sixteen cells: each bar is a chance, and all the bars together make one',
     stage: W(PK(0, 1), { cells: 16, readouts: ['cell'] }),
     claims: [
@@ -96,12 +96,13 @@ const schrodinger: Beat[] = [
   {
     id: 'l14-schrodinger:b1',
     phase: 'lecture',
-    text: `Unit 13.6 wrote the law in the position basis for $H = \\tfrac{\\hat p^2}{2m} + V(\\hat x)$. This lecture asks what that choice assumes. The classical energy suggests the operators, but it does not prove that every classical expression has one quantum version. For a packet with $p_0 = 3$ and $\\sigma = 1\\,\\ell$, the mean kinetic energy is ${d(V.l14TkinP0, 3)}: ${d(V.l14TkinMean, 1)} from the mean momentum plus ${d(V.l14TkinSpread, 3)} from the spread of momentum.`,
+    text: `Unit 13.6 wrote the law in the position basis for $H = \\tfrac{\\hat p^2}{2m} + V(\\hat x)$. This lecture asks what that choice assumes. The classical energy suggests the operators, but it does not prove that every classical expression has one quantum version. For a packet with $p_0 = 3$ and $\\sigma = 1\\,\\ell$ (with $\\hbar = m = 1$), the mean kinetic energy is ${d(V.l14TkinP0, 3)}. The mean momentum gives ${d(V.l14TkinMean, 1)}. The spread $\\Delta p = \\hbar/2\\sigma = ${d(V.l14DpP0, 1)}$ adds ${d(V.l14TkinSpread, 3)}.`,
     caption: 'a packet with mean momentum 3: the momentum panel gives the mean and the spread behind its kinetic energy',
     stage: W(PK(0, 1, 3), { panels: ['position', 'momentum'], readouts: ['pmean', 'pspread'] }),
     claims: [
       claim('l14TkinP0', 'the mean kinetic energy ⟨p̂²/2m⟩ of the p₀ = 3, σ = 1 packet is 4.625', () => close(V.l14TkinP0, 4.625, 1e-9)),
       claim('l14TkinMean', 'p₀²/2m is 4.5', () => close(V.l14TkinMean, 4.5, 1e-9)),
+      claim('l14DpP0', 'the spread of momentum Δp = ħ/2σ is 0.5', () => close(V.l14DpP0, 0.5, 1e-9)),
       claim('l14TkinSpread', 'and (Δp)²/2m is 0.125', () => close(V.l14TkinSpread, 0.125, 1e-9)),
     ],
   },
@@ -194,34 +195,9 @@ const dispersion: Beat[] = [
   {
     id: 'l14-dispersion:b2',
     phase: 'lecture',
-    text: 'What can be done to a wave to read off $\\omega$ and $k^2$? Take one component $\\psi_k = Ae^{i(kx-\\omega t)}$. A time derivative brings down $-i\\omega$, and two space derivatives bring down $(ik)^2 = -k^2$. The simplest linear, local equation that reproduces $\\omega = \\hbar k^2/2m$ pairs the first with the second. Multiplying by $\\hbar$ gives the free Schrödinger equation.',
-    caption: 'a plane wave with $p = 2$ while time runs: the pattern of the phase slides to the right',
-    stage: W(PL(2), { time: sweep(0, 1), show: ['re', 'im', 'phase'] }),
-    derivation: {
-      result: 'i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\,\\partial_x^2\\psi',
-      ground: [
-        {
-          tex: '\\psi_k = Ae^{i(kx - \\omega t)}',
-          why: 'One Fourier component, with wave number $k$ and angular frequency $\\omega$; $A$ is a constant.',
-          view: W(PL(2), { show: ['re', 'im', 'phase'] }),
-          viewCaption: 'the component at $t = 0$',
-        },
-        {
-          tex: 'i\\,\\partial_t\\psi_k = \\omega\\,\\psi_k,\\qquad -\\partial_x^2\\psi_k = k^2\\,\\psi_k',
-          why: 'One time derivative brings down $-i\\omega$; two space derivatives bring down $(ik)^2 = -k^2$.',
-        },
-        {
-          tex: '\\omega = \\tfrac{\\hbar k^2}{2m}\\ \\Rightarrow\\ i\\,\\partial_t\\psi = -\\tfrac{\\hbar}{2m}\\,\\partial_x^2\\psi',
-          why: 'The dispersion relation says $\\omega$ is $\\tfrac{\\hbar}{2m}$ times $k^2$, so pair the time derivative with the space one.',
-        },
-        {
-          tex: 'i\\hbar\\,\\partial_t\\psi = -\\tfrac{\\hbar^2}{2m}\\,\\partial_x^2\\psi',
-          why: 'Multiply both sides by $\\hbar$.',
-          view: W(PL(2), { time: 1, show: ['re', 'im', 'phase'] }),
-          viewCaption: 'the same component a moment later',
-        },
-      ],
-    },
+    text: 'Unit 13.6 started from a plane wave and checked that it obeys the free equation. Now run it the other way, from $\\omega(k)$ to the equation. What can be done to a wave to read off $\\omega$ and $k^2$? Take one component $\\psi_k = Ae^{i(kx-\\omega t)}$. A time derivative brings down $-i\\omega$, and two space derivatives bring down $-k^2$. The simplest linear, local equation that matches $\\omega = \\hbar k^2/2m$ pairs the first with the second. Multiplying by $\\hbar$ gives the free Schrödinger equation.',
+    caption: 'a plane wave with $p = 3$ while time runs: the pattern of the phase slides to the right',
+    stage: W(PL(3), { time: sweep(0, 1), show: ['re', 'im', 'phase'] }),
   },
   {
     id: 'l14-dispersion:b3',
@@ -235,7 +211,7 @@ const dispersion: Beat[] = [
   {
     id: 'l14-dispersion:b4',
     phase: 'lecture',
-    text: `Curvature and kinetic energy. For a sinusoid, $\\partial_x^2\\psi_k = -k^2\\psi_k$: the [[curvature|curvature]] is $-k^2$ times the function, which is minus ${d(V.l14Curv3Mag, 0)} times for $k = 3$. Faster oscillation means a larger $k^2$ and so a larger $\\tfrac{p^2}{2m}$. Squeeze the packet from $\\sigma = 1$ to $\\sigma = 0.5$: $\\Delta p$ doubles and the mean kinetic energy goes from ${d(V.l14GaussT1, 3)} to ${d(V.l14GaussTHalf, 1)}, ${d(V.l14GaussTRatio, 0)} times as large. This is true component by component; it is not a kinetic-energy density at each point.`,
+    text: `Curvature and kinetic energy. For a sinusoid, $\\partial_x^2\\psi_k = -k^2\\psi_k$: the [[curvature|curvature]] is $-k^2$ times the function, which is minus ${d(V.l14Curv3Mag, 0)} times for $k = 3$. Faster oscillation means a larger $k^2$ and so a larger $\\tfrac{p^2}{2m}$. In general $\\langle\\hat p^2\\rangle = \\hbar^2\\int|\\psi'|^2\\,dx$, the area under the squared slope. Squeeze the packet from $\\sigma = 1$ to $\\sigma = 0.5$: $\\Delta p$ doubles and the mean kinetic energy goes from ${d(V.l14GaussT1, 3)} to ${d(V.l14GaussTHalf, 1)}, ${d(V.l14GaussTRatio, 0)} times as large. This is true component by component; it is not a kinetic-energy density at each point.`,
     caption: 'the narrower packet has the wider momentum curve, so the kinetic energy is larger',
     stage: W(PK(0, 0.5), { panels: ['position', 'momentum'], readouts: ['pspread'] }),
     claims: [
@@ -256,7 +232,7 @@ const dispersion: Beat[] = [
   {
     id: 'l14-dispersion:b6',
     phase: 'books',
-    text: 'Susskind and Friedman, Lecture 9, §9.1–9.2, compare two Hamiltonians. With $H = c\\hat p$ the equation is first order and every component moves at the same speed $c$, so the shape never changes. With $H = \\tfrac{\\hat p^2}{2m}$ the components move at different speeds, so a free packet travels and falls apart.',
+    text: 'Susskind and Friedman, Lecture 9, §9.1–9.2, compare two Hamiltonians. With $H = c\\hat p$ the equation is first order and every component moves at the same speed $c$, so the shape never changes. With $H = \\tfrac{\\hat p^2}{2m}$ the components move at different speeds, so a free packet travels and spreads.',
     caption: 'a free packet with $p_0 = 1.5$ travels and widens',
     stage: W(PK(0, 1, 1.5), { time: sweep(0, 4) }),
     refs: [susskind('Lecture 9, §9.1–9.2', 'A first-order equation with $H = c\\hat p$ keeps the shape; $H = \\hat p^2/2m$ gives packets that move and spread.')],
@@ -303,7 +279,7 @@ const time: Beat[] = [
   {
     id: 'l14-time:b3',
     phase: 'lecture',
-    text: `Now the objection that time could still be an operator. Unit 13.7 showed that $[\\hat t,H] = i\\hbar$ would give $W(\\epsilon)HW(\\epsilon)^\\dagger = H + \\epsilon$ for every real $\\epsilon$, and the spectrum would have no floor. The notes write the unitary $\\hat V(\\epsilon)$; here it is $W(\\epsilon)$, because $V$ is the potential. Time evolution does something different: $c_E(t) = e^{-iEt/\\hbar}c_E(0)$ keeps each size and only turns each phase. With energies $3\\epsilon$ and $\\epsilon$, the two hands are $${d(V.l14ClockGap90, 0)}^\\circ$ apart once $\\epsilon t/\\hbar$ reaches $45^\\circ$. The argument excludes an unrestricted self-adjoint $\\hat t$ for a Hamiltonian with a lowest energy. It does not exclude times of arrival, time measures, or a clock inside a larger system. Nor is it a choice of the zero of energy. The $t$ in $\\psi(x,t)$ stays an outside parameter that labels the state.`,
+    text: `Now the objection that time could still be an operator. Unit 13.7 showed that $[\\hat t,H] = i\\hbar$ would give $W(\\epsilon)HW(\\epsilon)^\\dagger = H + \\epsilon$ for every real $\\epsilon$, and the spectrum would have no floor. The notes write the unitary $\\hat V(\\epsilon)$; here it is $W(\\epsilon)$, because $V$ is the potential. Time evolution does something different: $c_E(t) = e^{-iEt/\\hbar}c_E(0)$ keeps each size and only turns each phase. With energies $3\\epsilon$ and $\\epsilon$, the two hands are $${d(V.l14ClockGap90, 0)}^\\circ$ apart once $\\epsilon t/\\hbar$ reaches $45^\\circ$. Here $\\epsilon$ is the clocks’ energy unit, not the shift above. So the $t$ in $\\psi(x,t)$ stays an outside parameter that labels the state. What the argument excludes is only an unrestricted self-adjoint $\\hat t$ for a Hamiltonian with a lowest energy. A clock inside a larger system, or a time of arrival, escapes it. Nor does it merely move the zero of energy: $W$ would have to shift the spectrum of one fixed system.`,
     caption: 'the phase clocks: the hands turn at different rates, but each keeps its length',
     stage: K(sweep(0, 45), { show: ['clocks', 'gap'] }),
     claims: [claim('l14ClockGap90', 'with energies 3ε and ε the hands are 90° apart at εt/ħ = 45°', () => close(V.l14ClockGap90, 90, 1e-9))],
@@ -329,7 +305,7 @@ const stationary: Beat[] = [
   {
     id: 'l14-stationary:b1',
     phase: 'lecture',
-    text: `Start from an energy eigenket of a time-independent $H$: $H|E\\rangle = E|E\\rangle$, so $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5, Unit 12.1). Write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Energy already has a definition, as an eigenvalue, so this is not a separation of variables with an unknown constant. Level 2 of a box of width 4 has $E = ${d(V.l14BoxE2, 3)}$.`,
+    text: `Start from an energy eigenket of a time-independent $H$: $H|E\\rangle = E|E\\rangle$, so $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$ (Unit 11.5, Unit 12.1). Write $\\varphi_E(x) = \\langle x|E\\rangle$, the [[energy-eigenfunction|energy eigenfunction]]. Energy already has a definition, as an eigenvalue, so this is not a separation of variables with an unknown constant. Level 2 of a box of width 4 (with $\\hbar = m = 1$) has $E = ${d(V.l14BoxE2, 3)}$.`,
     caption: 'level 2 of a box of width 4: the real part is a function of $x$, the imaginary part is zero',
     stage: W(BOX(4, 2), { show: ['re', 'im'], readouts: ['energy'] }),
     claims: [claim('l14BoxE2', 'level 2 of a box of width 4 has E = 1.234', () => close(V.l14BoxE2, 1.2337, 5e-4))],
@@ -340,7 +316,7 @@ const stationary: Beat[] = [
     text: 'Project $H|E\\rangle = E|E\\rangle$ on $\\langle x|$. The kinetic part gives $-\\hbar^2\\varphi_E\'\'$ divided by $2m$, and the potential multiplies. The result is the [[time-independent-schrodinger|time-independent Schrödinger equation]], an ordinary differential equation in $x$. A level of the box obeys it to rounding error on the grid. Townsend §6.8 (pp. 213–214, Eqs. 6.82–6.86) reaches the same equation by letting the time factor split off.',
     caption: 'level 2: the second derivative of the real part is a fixed multiple of the function itself',
     stage: W(BOX(4, 2), { show: ['re'] }),
-    refs: [townsend('§6.8, pp. 213–214 (Eqs. 6.82–6.86)', 'For one energy the time factor splits off and what is left is an ordinary equation in $x$; Townsend names the function $\\psi_E(x)$ and then drops the subscript.')],
+    refs: [townsend('§6.8, pp. 213–214 (Eqs. 6.82–6.86)', 'For one energy the time factor splits off and what is left is an ordinary equation in $x$. Townsend names the function $\\psi_E(x)$ and then drops the subscript.')],
     derivation: {
       result: '\\left[-\\tfrac{\\hbar^2}{2m}\\tfrac{d^2}{dx^2} + V(x)\\right]\\varphi_E = E\\varphi_E',
       ground: [
@@ -506,7 +482,7 @@ const box: Beat[] = [
     text: `A wall that moves away: Townsend's Ex. 6.6 (pp. 221–224). Measure the energy, so the state is the ground state of a box of width $a$. Then pull both walls out at once, so the width doubles about the same centre. The state cannot change that fast, but it is no longer stationary. Square the overlap with the new lowest level to get the chance of that energy. The overlap is ${d(V.l14TBoxOverlap, 3)} ($8/(3\\pi)$), so the chance is ${d(V.l14TBoxP1, 2)}. The new third level gets ${d(V.l14TBoxP3, 2)}. The even levels get ${d(V.l14TBoxP2, 0)} by parity. The odd levels share all the rest, and their chances add to ${d(V.l14TBoxSumOdd, 0)}.`,
     caption: 'two levels mixed are not stationary: the density sloshes (two levels stand in for the many that the wider box produces)',
     stage: W(BOX(4, [1, 2]), { time: sweep(0, 2), show: ['density'], readouts: ['energy'] }),
-    refs: [townsend('§6.9, pp. 221–224 (Ex. 6.6, Fig. 6.11)', 'The ground state of a box, widened suddenly to twice its width, overlaps the new ground state with $8/3\\pi$, so the chance of the new ground energy is $64/9\\pi^2$.')],
+    refs: [townsend('§6.9, pp. 221–224 (Ex. 6.6, Fig. 6.11)', 'The ground state of a box, widened suddenly to twice its width, overlaps the new ground state with $8/3\\pi$. The chance of the new ground energy is $64/9\\pi^2$.')],
     claims: [
       claim('l14TBoxOverlap', 'the overlap of the old ground state with the new one is 8/3π = 0.849', () => close(V.l14TBoxOverlap, 8 / (3 * Math.PI), 1e-9)),
       claim('l14TBoxP1', 'so the chance of the new ground state is 64/9π² = 0.72', () => close(V.l14TBoxP1, 64 / (9 * Math.PI ** 2), 1e-9)),

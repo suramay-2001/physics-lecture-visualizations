@@ -42,7 +42,7 @@ describe('Lecture 14: shape', () => {
     expect(beats.filter((b) => b.phase === 'deeper')).toHaveLength(0)
     expect(beats.filter((b) => b.phase === 'clue').map((b) => b.id)).toEqual(['l14-components:b5', 'l14-schrodinger:b6', 'l14-dispersion:b7', 'l14-time:b4', 'l14-stationary:b7', 'l14-box:b3'])
     expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual(['l14-components:b4', 'l14-schrodinger:b5', 'l14-dispersion:b6', 'l14-stationary:b6', 'l14-box:b1', 'l14-box:b2'])
-    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l14-schrodinger:b2', 'l14-dispersion:b2', 'l14-stationary:b2', 'l14-stationary:b4', 'l14-box:b1'])
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l14-schrodinger:b2', 'l14-stationary:b2', 'l14-stationary:b4', 'l14-box:b1']) // dispersion:b2 links back to Unit 13.6 (review S1)
     expect(L14.units.reduce((n, u) => n + u.play.length, 0)).toBe(20)
     expect(L14.corrections ?? []).toHaveLength(0) // the notes have no slip (plan §8)
   })
@@ -152,13 +152,13 @@ describe('Lecture 14: the Try-its are what the widgets compute', () => {
 })
 
 describe('Lecture 14: the new numbers', () => {
-  it('kinetic energy: 4.625 = 4.5 + 0.125; squeezing σ from 1 to ½ multiplies it by four; the tent is 3/(2mL²) and the cut top hat grows as 2n', () => {
+  it('kinetic energy: 4.625 = 4.5 + 0.125; squeezing σ from 1 to ½ multiplies it by four; the tent is 3/(2mL²) and the cut top hat of width 2 grows as n/2', () => {
     expect(V.l14TkinP0).toBeCloseTo(V.l14TkinMean + V.l14TkinSpread, 9)
     expect(V.l14GaussTRatio).toBeCloseTo(4, 9)
     expect(kineticEnergy(packet(GRID, { x0: 0, sigma: 0.5 }), GRID)).toBeCloseTo(V.l14GaussTHalf, 12)
     expect(V.l14PrTentT).toBeCloseTo(3 / 8, 12)
-    expect(V.l14TopHatT4).toBeCloseTo(8, 9)
-    expect(V.l14TopHatT8).toBeCloseTo(16, 9)
+    expect(V.l14TopHatT4).toBeCloseTo(2, 9)
+    expect(V.l14TopHatT8).toBeCloseTo(4, 9)
   })
   it('the sloshing pair: direct terms 0.375, cross ±0.354, density 0.729 to 0.021 over half of 2π/(E₂ − E₁) = 6.79; the practice period is 12/π', () => {
     expect(V.l14SloshMean + V.l14CrossAmp).toBeCloseTo(V.l14SloshD0, 12)
@@ -183,9 +183,9 @@ describe('Lecture 14: M2 the box moved here (Townsend pass T1–T6)', () => {
     expect(L14.units.slice(-1).map((u) => u.id)).toEqual(['l14-box'])
     expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b8')!.text).toMatch(/Unit 14\.5.*Unit 14\.6/)
   })
-  it('the five practice questions are tagged, name their source, carry full walkthroughs and are not assigned (T1); no homework label appears', () => {
+  it('the six practice questions (five numeric, the top-hat choice) are tagged, name their source, carry full walkthroughs and are not assigned (T1); no homework label appears', () => {
     const qs = L14.units.flatMap((u) => u.play).filter((q) => q.practice)
-    expect(qs.map((q) => `${q.id}:${q.practice}`)).toEqual(['l14-pr-kinetic:homework', 'l14-pr-period:homework', 'l14-pr-mean-energy:townsend', 'l14-pr-box-energy:townsend', 'l14-pr-wall:townsend'])
+    expect(qs.map((q) => `${q.id}:${q.practice}`)).toEqual(['l14-di-tophat:homework', 'l14-pr-kinetic:homework', 'l14-pr-period:homework', 'l14-pr-mean-energy:townsend', 'l14-pr-box-energy:townsend', 'l14-pr-wall:townsend'])
     for (const q of qs) {
       expect(q.walkthrough.length, q.id).toBeGreaterThan(1)
       expect(q.hints, q.id).toHaveLength(3)
@@ -194,7 +194,7 @@ describe('Lecture 14: M2 the box moved here (Townsend pass T1–T6)', () => {
       if (q.practice === 'townsend') expect(q.refs?.[0].where, q.id).toMatch(/^Problem 6\.\d+, end of Ch\. 6/)
     }
     const tol = Object.fromEntries(qs.map((q) => [q.id, q.kind === 'numeric' ? q.tolerance : -1]))
-    expect(tol).toEqual({ 'l14-pr-kinetic': 0.005, 'l14-pr-period': 0.005, 'l14-pr-mean-energy': 0.005, 'l14-pr-box-energy': 0.005, 'l14-pr-wall': 0.005 })
+    expect(tol).toEqual({ 'l14-di-tophat': -1, 'l14-pr-kinetic': 0.005, 'l14-pr-period': 0.005, 'l14-pr-mean-energy': 0.005, 'l14-pr-box-energy': 0.005, 'l14-pr-wall': 0.005 })
   })
   it('every old name is gone: no l13-stationary unit or l13Tbox keys, and the Optics Lab row points at l14-box', () => {
     expect(L13.units.map((u) => u.id)).not.toContain('l13-stationary')
