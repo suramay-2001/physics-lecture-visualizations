@@ -122,7 +122,7 @@ const freeEigenstate: Beat[] = [
   {
     id: 'l15-free-eigenstate:b4',
     phase: 'books',
-    text: 'Townsend §6.6 (p. 204, Eq. 6.58) puts it this way: the chance weight $|\\langle x|p\\rangle|^2dx = \\tfrac{dx}{2\\pi\\hbar}$ does not depend on $x$, so $\\Delta x$ is infinite and the state is not physical. Susskind and Friedman, Lecture 9, §9.3, solve the time-independent equation for a free particle and find momentum eigenvectors with $E = \\tfrac{p^2}{2m}$.',
+    text: 'Townsend §6.6 (p. 204, Eq. 6.58) puts it this way. The chance weight $|\\langle x|p\\rangle|^2dx = \\tfrac{dx}{2\\pi\\hbar}$ does not depend on $x$, so $\\Delta x$ is infinite and the state is not physical. Susskind and Friedman, Lecture 9, §9.3, solve the time-independent equation for a free particle and find momentum eigenvectors with $E = \\tfrac{p^2}{2m}$.',
     caption: 'the same flat density, written as Townsend writes it',
     stage: W(PL(1.5), { show: ['density'] }),
     refs: [
@@ -160,7 +160,7 @@ const packetEvolution: Beat[] = [
   {
     id: 'l15-packet-evolution:b2',
     phase: 'lecture',
-    text: `Which basis makes the evolution easy? One where $\\hat H$ is diagonal, so the momentum basis, in which every $|p\\rangle$ is an energy ket. Each component keeps its size and only turns: $\\tilde\\psi(p,t) = e^{-ip^2t/2m\\hbar}\\,\\tilde\\psi(p,0)$. After $t = ${d(V.l15EchoT12, 1)}$ the $p = 1$ component has turned through $-${d(V.l15PhaseP1DegMag, 1)}^\\circ$, and the $p = 2$ component through $-${d(V.l15PhaseP2DegMag, 1)}^\\circ$.`,
+    text: `Which basis makes the evolution easy? One where $\\hat H$ is diagonal, so the momentum basis, in which every $|p\\rangle$ is an energy ket. Each component keeps its size and only turns: $\\tilde\\psi(p,t) = e^{-ip^2t/2m\\hbar}\\,\\tilde\\psi(p,0)$. With $\\hbar = m = 1$, after $t = ${d(V.l15EchoT12, 1)}$ the $p = 1$ component has turned through $-${d(V.l15PhaseP1DegMag, 1)}^\\circ$, and the $p = 2$ component through $-${d(V.l15PhaseP2DegMag, 1)}^\\circ$.`,
     caption: 'the height of each momentum component stays; the colour of its phase band shifts',
     stage: W(PK(0, 1, 1.5), { panels: ['momentum'], show: ['density', 'phase'], time: sweep(0, 1.2) }),
     derivation: {
@@ -278,7 +278,7 @@ const groupVelocity: Beat[] = [
         },
         {
           tex: '\\psi \\propto 2e^{i(k_0x-\\bar\\omega t)}\\cos\\tfrac{\\Delta k\\,x-\\Delta\\omega\\,t}{2}',
-          why: 'The first factor is a fast carrier. The cosine does not change sign with its argument, so it is a slow envelope.',
+          why: 'The first factor is a fast carrier. The cosine’s argument holds only the small differences $\\Delta k$ and $\\Delta\\omega$, so it varies slowly compared with the carrier.',
         },
         {
           tex: '\\Delta k\\,x-\\Delta\\omega\\,t = \\text{const}\\ \\Rightarrow\\ \\Delta k\\,\\tfrac{dx}{dt} = \\Delta\\omega',
@@ -362,7 +362,7 @@ const dispersion: Beat[] = [
   {
     id: 'l15-dispersion:b1',
     phase: 'lecture',
-    text: `The group velocity $v_g = p/m$ depends on $p$. A packet with momentum spread $\\Delta p$ holds velocities spread by $\\Delta v\\sim\\Delta p/m$, which is ${d(V.l15DeltaV, 1)} for $\\Delta p = 0.5$. Faster parts run ahead and slower parts lag: this is [[dispersion|dispersion]]. The velocity is ${d(V.l15Vg1, 0)} at $k = 1$ and ${d(V.l15Vg3, 0)} at $k = 3$.`,
+    text: `The group velocity $v_g = p/m$ depends on $p$. A packet with momentum spread $\\Delta p$ holds velocities spread by $\\Delta v\\sim\\Delta p/m$, which is ${d(V.l15DeltaV, 1)} for $\\Delta p = 0.5$ (with $\\hbar = m = 1$). Faster parts run ahead and slower parts lag: this is [[dispersion|dispersion]]. The velocity is ${d(V.l15Vg1, 0)} at $k = 1$ and ${d(V.l15Vg3, 0)} at $k = 3$.`,
     caption: 'the packet widens as its fast and slow parts part company',
     stage: W(PK(0, 1, 1.5), { panels: ['position', 'momentum'], time: sweep(0, 6), readouts: ['xspread', 'pspread'], window: RUN }),
     claims: [
@@ -412,7 +412,7 @@ const dispersion: Beat[] = [
   {
     id: 'l15-dispersion:b4',
     phase: 'lecture',
-    text: 'Payoff and care. A packet can obey the uncertainty relation and still keep its width, if every wave number it holds travels at one speed. That needs an idealised one-way wave in one dimension; real beams diffract and real media disperse. Spreading need not even grow steadily: a correlation between position and momentum can first squeeze a packet. The simple picture is for an unchirped Gaussian with a real envelope.',
+    text: 'Can a packet obey the uncertainty relation and still keep its width? Yes, if every wave number it holds travels at one speed. Two cautions. A position-momentum correlation can first squeeze a packet; the simple law is for an unchirped Gaussian with a real envelope. And the equal-speed case is an idealised one-way wave in one dimension, since real beams diffract and real media disperse.',
     caption: 'matter waves bend upward; light’s line does not',
     stage: OMEGA_LIGHT,
     fidelity: ['plot-free-omega'],
