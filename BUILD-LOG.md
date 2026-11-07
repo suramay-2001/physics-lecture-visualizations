@@ -57,6 +57,16 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**STATE (2026-11-07, read first after a compaction).** On local main, NOT pushed: 709 Arcade rounds for Q19, Q20, Q23–Q27
+(Spot-the-error, `content/qc709/games.ts` + `Q*.arcade.test.ts`); 709 films for the same seven chapters (unit openers,
+manifests checked); 448 L14, L15 (reviewed `audits/P-L14L15-review.md`, fixed), L16, L17 (merged by a merge agent,
+101 units / 17 map lines); an L12 TeX step reordered so the new notes do not trip the verbatim guard. Rulings
+`decisions/448-L14L18.md` M1–M7 (+ L14 note). IN FLIGHT: L18 builder (moves `l13-flow` b3–b6, `l13-pr-tunnel`, the
+p. 231 Correction into L18, deletes `l13-flow`, trims the `l13-schrodinger` beat that repeats L14's stationary states).
+REMAINING: merge L18 (merge agent; recompute counts; `LAST_448` 18) → independent review of L16–L18 (adapt
+`scratchpad/brief-review-L14L15.md`) → fix pass → full gate + full preview e2e + unpiped audit → BUILD-LOG → push.
+Budget 35 points for the batch (meter 8 % after the 11-06 reset).
+
 **Next action (2026-11-06): 448 L14–L18, then Arcade and films for 709 Q19–Q27.** Owner: build the new 448 notes
 (`~/Documents/Physics 448 notes/Lecture_14–18.pdf`, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
 states; free particles, wavepackets, group velocity, dispersion; Gaussian packets and Ehrenfest; classical mean motion
