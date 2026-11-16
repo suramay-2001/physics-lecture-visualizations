@@ -956,14 +956,6 @@ export const LECTURE_META: LectureIndex[] = [
           "l14-pr-period",
           "l14-pr-mean-energy"
         ]
-      },
-      {
-        "id": "l14-box",
-        "title": "Standing waves in a box",
-        "challenges": [
-          "l14-pr-box-energy",
-          "l14-pr-wall"
-        ]
       }
     ]
   },
@@ -1231,6 +1223,67 @@ export const LECTURE_META: LectureIndex[] = [
           "l19-en-alpha",
           "l19-pr-delta",
           "l19-pr-stm"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "L20",
+    "number": 20,
+    "title": "Bound states and quantized energies",
+    "units": [
+      {
+        "id": "l20-reverse",
+        "title": "From scattering to bound states",
+        "challenges": [
+          "l20-re-bound",
+          "l20-re-any"
+        ]
+      },
+      {
+        "id": "l20-infinite",
+        "title": "The infinite well fixes the energies",
+        "challenges": [
+          "l20-in-e3",
+          "l20-in-nodes",
+          "l20-in-amp",
+          "l20-in-e0",
+          "l20-in-slope",
+          "l20-in-order",
+          "l20-pr-box-energy",
+          "l20-pr-wall",
+          "l20-pr-trial",
+          "l20-pr-kink"
+        ]
+      },
+      {
+        "id": "l20-finite",
+        "title": "Lower the walls: tails, parity, matching",
+        "challenges": [
+          "l20-fi-sum",
+          "l20-fi-par",
+          "l20-fi-even",
+          "l20-fi-tail",
+          "l20-fi-count",
+          "l20-fi-electron",
+          "l20-fi-order",
+          "l20-pr-delta"
+        ]
+      },
+      {
+        "id": "l20-compare",
+        "title": "Finite against infinite; bound but moving",
+        "challenges": [
+          "l20-co-below",
+          "l20-co-period",
+          "l20-co-static"
+        ]
+      },
+      {
+        "id": "l20-oscillator",
+        "title": "A first look at the oscillator (optional)",
+        "challenges": [
+          "l20-os-est"
         ]
       }
     ]

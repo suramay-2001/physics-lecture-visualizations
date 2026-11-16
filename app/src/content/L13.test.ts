@@ -238,7 +238,7 @@ describe('Lecture 13: Arcade rounds', () => {
 })
 
 describe('Lecture 13: the Townsend pass (G4b; rulings T1–T6, plan P-448-townsend-G4)', () => {
-  it('the books-only units left Lecture 13: the box is Lecture 14’s l14-box, below the step and tunnelling are Lecture 18’s, and a pointer stays in the last lecture beat (ruling M2)', () => {
+  it('the books-only units left Lecture 13: the box is Lecture 20’s l20-infinite, below the step and tunnelling are Lecture 18’s, and a pointer stays in the last lecture beat (ruling M2)', () => {
     expect(L13.units.map((u) => u.id)).not.toContain('l13-flow')
     expect(L13.units.map((u) => u.id)).not.toContain('l13-stationary')
     expect(beat('l13-time:b5').text).toMatch(/The step, the barrier and tunnelling are Lectures 17 and 18\.$/)

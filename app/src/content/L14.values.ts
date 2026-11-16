@@ -1,8 +1,7 @@
 /**
  * Lecture 14 numbers, computed once with the engine (owner: P). Same contract as L1–L13.values.ts: every number a learner reads in L14 comes from `V` and is backed by a keyed claim;
- * the numpy twin of each `l14…` key is in physics/__fixtures__/claims-448/l14.json (pipeline/claims_448/l14.py), and the twins of the keys moved here from Lecture 13 (`l13T…`, `l13Pr…`:
- * the box) stay in claims-448/g4b.json (pipeline/claims_448/g4b.py). Keys of moved items keep their `l13` names (ruling M2 of docs/roles/decisions/448-L14L18.md: stored progress and
- * the fixtures stay valid); new ones start with `l14`.
+ * the numpy twin of each `l14…` key is in physics/__fixtures__/claims-448/l14.json (pipeline/claims_448/l14.py), and the twin of `l14TBoxNodes4` (a level-4 node count) stays in claims-448/g4b.json (pipeline/claims_448/g4b.py). The rest of the Townsend box (`l14TBox…`, `l14Pr…`) moved to
+ * Lecture 20 with the infinite well (ruling R2 of docs/roles/decisions/448-L19L20.md) and took the `l20` prefix.
  *
  * Conventions as Lectures 12 and 13: ħ = m = 1 inside the engine (physics/wave.ts, physics/wave14.ts); lengths are in ℓ, momenta in ħ/ℓ, times in mℓ²/ħ (the UI appends the units). The unit
  * packet is the Gaussian of width σ = 1 ℓ at x₀ = 0 unless a key says otherwise. A displayed magnitude of a negative number gets its own key (the number reader sees digits, not signs); a
@@ -10,11 +9,10 @@
  *
  * This file imports physics modules but no stage module: a lecture chunk must not pull in stage/svg.
  */
-import { M_ELECTRON, boxEnergyEv } from '../physics/constants'
 import { clockHands } from '../physics/dynamics'
 import { KET } from '../physics/spin'
 import {
-  GRID, boxEnergy, boxMomentumSpread, boxNodes, boxOverlap, boxState, cellChances, freeEvolve, meanP, meanX, meanX2, packet, peakDensity, spreadP, translate,
+  GRID, boxEnergy, boxNodes, boxState, cellChances, freeEvolve, meanP, meanX, meanX2, packet, peakDensity, spreadP, translate,
 } from '../physics/wave'
 import {
   boxMeanEnergy, boxPairParts, boxPairPeriod, boxResidual, densityDrift, kineticEnergy, omegaFree, omegaLinear, planeCurvature, tentKinetic, topHatKineticCut, twoWaveResidual,
@@ -41,10 +39,6 @@ const B4 = boxState(GRID, 4, 1)
 const clockGap = clockHands({ upper: 3, lower: 1 }, KET['+x'], Math.PI / 4).gap ?? Number.NaN // εt/ħ = 45°: the hands sit 2·45° apart
 const pairHalf = boxPairPeriod(4, 1, 2) / 2
 const phaseAt = (w: { re: Float64Array; im: Float64Array }, j: number) => Math.atan2(w.im[j], w.re[j])
-
-/* the box moved from Lecture 13 (Townsend §6.9; its twins are in claims-448/g4b.json) */
-const BOX_OLD = { lo: -0.5, hi: 0.5, n: 1 } // Ex. 6.6: the ground state of a box that is then widened on both sides to twice its width, about the same centre
-const boxNew = (n: number) => ({ lo: -1, hi: 1, n })
 
 export const V = {
   /* l14-components */
@@ -90,19 +84,8 @@ export const V = {
   l14PrPeriod: boxPairPeriod(3, 1, 2), // 3.820 = 12/π
   l14PrMeanE: boxMeanEnergy(2, [{ n: 1, weight: 0.36 }, { n: 3, weight: 0.64 }]), // 7.550
   l14PrChanceE1: 0.36 / (0.36 + 0.64), // 0.36: |c₁|² of 0.6φ₁ + 0.8iφ₃
-  /* l14-box (moved from l13-stationary, ruling M2) */
-  l14TBoxE1Ev: boxEnergyEv(0.4e-9, M_ELECTRON), // 2.350 eV: an electron in a well 0.4 nm wide
+  /* the level-4 node count of the box pictures (the rest of the box moved to Lecture 20 with the infinite well, ruling R2 of docs/roles/decisions/448-L19L20.md) */
   l14TBoxNodes4: boxNodes(boxState(GRID, 4, 4), GRID, 0, 4), // 3
-  l14TBoxOverlap: Math.abs(boxOverlap(BOX_OLD, boxNew(1))), // 0.8488 = 8/3π
-  l14TBoxP1: boxOverlap(BOX_OLD, boxNew(1)) ** 2, // 0.7205
-  l14TBoxP2: boxOverlap(BOX_OLD, boxNew(2)) ** 2, // 0
-  l14TBoxP3: boxOverlap(BOX_OLD, boxNew(3)) ** 2, // 0.2594 = 64/25π²
-  l14TBoxSumOdd: Array.from({ length: 399 }, (_, i) => boxOverlap(BOX_OLD, boxNew(i + 1)) ** 2).reduce((a, b) => a + b, 0), // 1 (to 2e-8)
-  l14TWall2P1: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 2, n: 1 }) ** 2, // 0.3603: one wall moves out to twice the width
-  l14TBoxEnergyRatio: boxEnergy(2, 1) / boxEnergy(4, 1), // 4: half the width
-  l14TBoxDpRatio: boxMomentumSpread(2, 1) / boxMomentumSpread(4, 1), // 2
-  l14PrE1Ev: boxEnergyEv(0.55e-9, M_ELECTRON), // 1.243 eV
-  l14PrWall3: boxOverlap({ lo: 0, hi: 1, n: 1 }, { lo: 0, hi: 3, n: 1 }) ** 2, // 0.1282
 } as const
 
 export type ValueKey = keyof typeof V

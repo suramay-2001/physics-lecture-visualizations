@@ -113,24 +113,10 @@ for n in (1, 2, 3, 4):
     assert abs(w[n - 1] - (n * pi) ** 2 / 2) / ((n * pi) ** 2 / 2) < 2e-4
 assert abs(overlap((-0.5, 0.5, 1), (-1.0, 1.0, 1)) - 8 / (3 * pi)) < 1e-12 or abs(abs(overlap((-0.5, 0.5, 1), (-1.0, 1.0, 1))) - 8 / (3 * pi)) < 1e-12
 
-# ---- box (Townsend 6.9) ----
-put('l14TBoxE1Ev', (hbar * pi / 0.4e-9) ** 2 / (2 * me) / e)  # 0.4 nm electron, ground state
+# ---- box (Townsend 6.9; all but the node count moved to Lecture 20 with the infinite well, ruling R2 of docs/roles/decisions/448-L19L20.md) ----
 sign_changes = lambda vec: int(np.sum(np.diff(np.sign(vec[np.abs(vec) > 1e-14])) != 0))
 put('l14TBoxNodes4', sign_changes(v[:, 3]))
-OLD, NEW = (-0.5, 0.5, 1), (-1.0, 1.0, 1)  # Example 6.6: both walls move out, the width doubles about the same centre
-put('l14TBoxOverlap', abs(overlap(OLD, NEW)))
-put('l14TBoxP1', overlap(OLD, NEW) ** 2)
-put('l14TBoxP2', overlap(OLD, (-1.0, 1.0, 2)) ** 2)
-put('l14TBoxP3', overlap(OLD, (-1.0, 1.0, 3)) ** 2)
-put('l14TBoxSumOdd', sum(overlap(OLD, (-1.0, 1.0, n)) ** 2 for n in range(1, 400)))
-put('l14TWall2P1', overlap((0.0, 1.0, 1), (0.0, 2.0, 1)) ** 2)  # Problem 6.16 type: one wall moves, the width doubles
-# the clue: squeeze the box to half its width (L = 4 -> 2): energy x4, momentum spread x2; both from the integral of psi'^2
-dsq = lambda L: simpson(lambda x: (sqrt(2 / L) * (pi / L) * np.cos(pi * x / L)) ** 2, 0, L)  # <p^2> = integral psi'^2
-put('l14TBoxEnergyRatio', dsq(2.0) / dsq(4.0))
-put('l14TBoxDpRatio', sqrt(dsq(2.0)) / sqrt(dsq(4.0)))
-# practice
-put('l14PrE1Ev', (hbar * pi / 0.55e-9) ** 2 / (2 * me) / e)
-put('l14PrWall3', overlap((0.0, 1.0, 1), (0.0, 3.0, 1)) ** 2)
+OLD, NEW = (-0.5, 0.5, 1), (-1.0, 1.0, 1)  # Example 6.6: both walls move out, the width doubles about the same centre (its keys moved to Lecture 20, claims_448/l20.py, ruling R2)
 
 # ---- step and barrier (the Townsend p. 231 keys, the thick-barrier ones and the tunnelling practice question moved to Lecture 18: pipeline/claims_448/l18.py, ruling M2) ----
 r2, t2 = step_RT(2.0, 1.0)

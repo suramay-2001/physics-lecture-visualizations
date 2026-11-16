@@ -342,7 +342,7 @@ const ENTRIES: GlossEntry[] = [
   { id: 'lowest-energy', term: 'lowest energy $E_0$', gloss: 'The smallest energy a system can have; every energy is at least $E_0$, and for a free particle $E_0 = 0$.', first: 'l13-time:b4', uses: ['energy-eigenstate'], symbols: ['E_0'] },
   { id: 'evolution-time', term: 'evolution time $\\Delta t$', gloss: 'How long the average of an observable takes to move by its own spread; it is not the spread of a time observable.', first: 'l13-time:b6', uses: ['energy-eigenstate'], symbols: ['\\Delta t'] },
   /* Lecture 13, Townsend pass (G4b): the box, current, step and barrier */
-  { id: 'infinite-well', term: 'infinite well', gloss: 'A box with infinitely high walls: the wavefunction is zero outside and vanishes at the walls, so only whole numbers of half-waves fit.', first: 'l14-box:b1', uses: ['energy-eigenfunction'] },
+  { id: 'infinite-well', term: 'infinite well', gloss: 'A box with infinitely high walls: the wavefunction is zero outside and vanishes at the walls, so only whole numbers of half-waves fit.', first: 'l20-infinite:b1', uses: ['energy-eigenfunction'] },
   { id: 'probability-current', term: 'probability current', gloss: 'The rate at which chance flows past a point; the chance in a stretch changes only by the current through its ends.', first: 'l17-current:b2', uses: ['wavefunction'], symbols: ['j'] },
   { id: 'transmission-coefficient', term: 'reflection and transmission coefficients', gloss: 'The shares $R$ and $T$ of the incident current that come back and go through; they add to 1.', first: 'l17-current:b5', uses: ['probability-current'] },
   { id: 'time-operator', term: 'time operator $\\hat t$', gloss: 'A hypothetical observable with $[\\hat t,H] = i\\hbar$; ordinary quantum mechanics has none, because energies have a lowest value.', first: 'l13-time:b2', uses: ['commutator', 'hamiltonian'], symbols: ['\\hat t'], introduces: 'notation' },
@@ -380,6 +380,11 @@ const ENTRIES: GlossEntry[] = [
   { id: 'thick-barrier', term: 'thick barrier', gloss: 'A barrier with $\\kappa a \\gg 1$: its transmission is about a prefactor times $e^{-2\\kappa a}$, so it falls exponentially with the width.', first: 'l19-thick:b2', uses: ['tunnelling'] },
   { id: 'scanning-tunnelling-microscope', term: 'scanning tunnelling microscope', gloss: 'A sharp tip held a few ångströms above a surface; the tunnelling current falls several-fold for each ångström of extra gap.', first: 'l19-energy:b2', uses: ['tunnelling'] },
   { id: 'alpha-decay', term: 'alpha decay', gloss: 'A nucleus emits an alpha particle by tunnelling through its Coulomb barrier; the rate depends on a transmission that is exponentially sensitive to the energy.', first: 'l19-energy:b3', uses: ['tunnelling'] },
+  /* Lecture 20: bound states and quantized energies */
+  { id: 'bound-state', term: 'bound state', gloss: 'A normalisable energy eigenstate: its chance stays confined, no flux arrives from far away, and its energy is one of a discrete set.', first: 'l20-reverse:b2' },
+  { id: 'finite-well', term: 'finite square well', gloss: 'A region of $V = 0$ and width $a$ with $V_0$ outside; its bound levels lie below $V_0$, are finitely many, and their functions leak out.', first: 'l20-finite:b1' },
+  { id: 'even-odd-state', term: 'even and odd states', gloss: 'In a symmetric potential every bound level is even, $\\varphi(-x) = \\varphi(x)$, or odd, $\\varphi(-x) = -\\varphi(x)$.', first: 'l20-finite:b4' },
+  { id: 'matching-energy', term: 'quantization condition', gloss: 'The equation in $E$ that says "joins smoothly to decaying tails on both sides"; it holds only at the bound energies.', first: 'l20-finite:b5' },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))
