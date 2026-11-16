@@ -696,7 +696,7 @@ const schrodinger: Beat[] = [
   {
     id: 'l13-schrodinger:b6',
     phase: 'deeper',
-    text: 'The notes’ optional §13.10: the energy equation along $x$ and its [[energy-eigenfunction|energy eigenfunction]] are taught in Unit 14.5. The box that follows is Unit 14.6, and two energies together make the moving fringes of Unit 15.4.',
+    text: 'The notes’ optional §13.10: the energy equation along $x$ and its [[energy-eigenfunction|energy eigenfunction]] are taught in Unit 14.5. The box is solved in Lecture 20, and two energies together make the moving fringes of Unit 15.4.',
     caption: 'one plane wave, one energy: the crests run to the right and the density stays flat',
     stage: W(PL(2), { time: sweep(0, 2), show: ['re', 'density'] }),
     refs: [susskind('Lecture 9, §9.3', 'The time-independent equation for free particles; any solution is a sum of energy eigenstates, and only phases change.')],

@@ -14,7 +14,7 @@ import './bridges448'
 // 709 live in content/bridges448.ts.
 // Townsend pass (G4b; rulings docs/roles/decisions/448-townsend.md, plan docs/roles/proposals/P-448-townsend-G4.md): books beats for Townsend §6.7 (which slit), Example 6.2 (why the Gaussian is the floor) and §4.6
 // (evolution time), the formula boards and practice questions modelled on Townsend's problem types (practice: 'townsend', T1). Two books-only units were added after the lecture units (T3) and have since
-// moved (ruling M2 of docs/roles/decisions/448-L14L18.md): l13-stationary (§6.8–6.9, the box) to Lecture 14 as l14-box, and l13-flow (§6.10, current, step, tunnelling) to Lectures 17 and 18, with the Townsend p. 231 Correction
+// moved (ruling M2 of docs/roles/decisions/448-L14L18.md): l13-stationary (§6.8–6.9, the box) to Lecture 14 as l14-box (which moved on to Lecture 20 as l20-infinite, ruling R2 of docs/roles/decisions/448-L19L20.md), and l13-flow (§6.10, current, step, tunnelling) to Lectures 17 and 18, with the Townsend p. 231 Correction
 // and the practice question on tunnelling, which are now Lecture 18's. Lecture 13 has no Correction box (R8). L13 is drawn by SVG kinds only (the e2e SVG_ONLY list), so no GL kind is used.
 
 export const L13: Lecture = {

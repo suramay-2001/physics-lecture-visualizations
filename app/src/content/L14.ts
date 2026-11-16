@@ -5,10 +5,10 @@ import { L14_REVIEW } from './L14.review'
 import './bridges448'
 
 // Every number a learner sees in this lecture is computed in L14.values.ts, then asserted in keyed claims (content.test.tsx runs `holds`; claims.test.ts compares each key with numpy: the
-// `l14…` keys in pipeline/claims_448/l14.py, the keys that travelled from Lecture 13 in pipeline/claims_448/g4b.py). Plan: docs/roles/proposals/P-L14-story.md, under the judge's rulings
+// `l14…` keys in pipeline/claims_448/l14.py, the level-4 node count `l14TBoxNodes4` in pipeline/claims_448/g4b.py). Plan: docs/roles/proposals/P-L14-story.md, under the judge's rulings
 // (docs/roles/decisions/448-L14L18.md M1–M7) and the Townsend-pass conventions (docs/roles/decisions/448-townsend.md T1–T11). Built from the instructor notes pp. 1–12 (§§14.1–14.6).
 // Ruling M1: Lecture 13's notes already teach the Schrödinger equation and the time parameter (Units 13.6 and 13.7 stay there), so Units 14.2 and 14.4 recap them in one beat each and add only what
-// the new notes add. Ruling M2: the box (Townsend §6.8–6.9, old l13-stationary) moved here as the books-only Unit 14.6, with a one-line pointer left in Lecture 13. Ruling M3: two plot curves
+// the new notes add. Ruling M2: the box (Townsend §6.8–6.9, old l13-stationary) came here as the books-only Unit 14.6 and moved on to Lecture 20 (`l20-infinite`, ruling R2 of docs/roles/decisions/448-L19L20.md); `l14-stationary:b6` keeps a one-line pointer. Ruling M3: two plot curves
 // (the dispersion relations) are the only stage addition. The widget `wave-lab` is deferred, so every Try-it borrows the nearest existing widget. No Correction box: the notes have no slip
 // (plan §8). The chip into 709 lives in content/bridges448.ts. The L14 notes are one voice (448: Ground-up only).
 
@@ -77,11 +77,8 @@ export const L14: Lecture = {
     'q': 'l14-stationary:b6',
     'n': 'l14-dispersion.play.l14-di-tophat.walkthrough[0]',
     'L': 'l14-dispersion.play.l14-di-tophat.options[2]',
-    'B': 'l14-box:b1',
-    'k_n': 'l14-box:b1',
     'E_n': 'l14-stationary.play.l14-pr-period.hints[1]',
     '\\varphi_n': 'l14-stationary.play.l14-st-mean.hints[2]',
-    'k_1': 'l14-box.play.l14-pr-box-energy.walkthrough[0]',
     '|a\\rangle': 'l14-components:b1',
     'd': 'l14-components:b2',
     '\\pi': 'l14-components.play.l14-co-amp.walkthrough[0]',
@@ -97,7 +94,6 @@ export const L14: Lecture = {
     '\\varphi': 'l14-stationary:b6',
     '\\varphi_3': 'l14-stationary.play.l14-pr-mean-energy',
     'c_n': 'l14-stationary.play.l14-pr-mean-energy.hints[2]',
-    'h': 'l14-box.play.l14-pr-box-energy.hints[0]',
     'P': 'l14-dispersion.play.l14-di-tophat.hints[2]',
   },
   units: [
@@ -564,88 +560,6 @@ export const L14: Lecture = {
           walkthrough: [
             { text: `The chances are ${d(V.l14PrChanceE1, 2)} for level 1 and 0.64 for level 3, since $0.6^2 = 0.36$ and $0.8^2 = 0.64$.` },
             { text: `$\\langle E\\rangle = 0.36\\cdot\\pi^2/8 + 0.64\\cdot9\\pi^2/8 = ${d(V.l14PrMeanE, 3)}$.` },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'l14-box',
-      story: L14_STORY['l14-box'],
-      claims: [
-        ...L14_UNIT_CLAIMS['l14-box'],
-        claim('l14TWall2P1', 'one wall moved out to twice the width: the chance of the new ground state is 32/9π² = 0.360', () => close(V.l14TWall2P1, 32 / (9 * Math.PI ** 2), 1e-9)),
-        claim('l14PrE1Ev', 'an electron in a well 0.55 nm wide has E₁ = 1.243 eV', () => close(V.l14PrE1Ev, 1.2431, 5e-5)),
-        claim('l14PrWall3', 'one wall moved out to three times the width: the chance of the new ground state is 81/64π² = 0.128', () => close(V.l14PrWall3, 81 / (64 * Math.PI ** 2), 1e-9)),
-      ],
-      title: 'Standing waves in a box',
-      question: 'What does an energy eigenstate look like along x, and why are the energies in a box quantised?',
-      lecture: {
-        pages: 'not in the lecture notes (Townsend §6.8–6.9)',
-        summary:
-          'The lecture notes do not cover this unit; it follows Townsend. Between infinite walls the solutions of the time-independent equation are sines that vanish at both ends, so only whole numbers of half-waves fit and $E_n \\propto n^2$. A sudden change of the walls leaves the state alone but makes it a mix of the new levels.',
-        equations: ['k_nL = n\\pi', 'E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}', '\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)'],
-      },
-      books: [
-        { source: 'townsend', where: '§6.8, pp. 213–218', adds: 'The oscillating and exponential regions and why only special energies fit; the units above use them.' },
-        { source: 'townsend', where: '§6.9, pp. 219–224', adds: 'The infinite well: nodes at the walls, $E_n = \\hbar^2\\pi^2n^2/2ma^2$, and the sudden widening of the box (Example 6.6).' },
-      ],
-      visual: {
-        kind: 'two-clocks',
-        props: { upper: 3, lower: 1, start: '+z' },
-        caption: 'A stand-in: one energy, one clock. Level by level, a box state is this picture with a whole function of $x$.',
-        tryThis: [
-          'Drag the time slider. With one clock the readout says gap: one clock only, so nothing about the chances moves: every level of the box is stationary.',
-          'Set the starting state to |+x⟩, the equal mix. A second hand appears and a gap opens: a mix of two levels is not stationary, and the box density sloshes.',
-        ],
-      },
-      clues: [],
-      insight: 'Walls force nodes at the ends, so only whole numbers of half-waves fit and the energies are quantised. A sudden change of the walls leaves the state alone but makes it a mix of the new levels.',
-      pitfalls: [
-        'Reading the density of a single level as something that moves. It is the same at all times; only a mix of two or more energies sloshes.',
-        'Taking the ground state of the old box to be stationary in the new one. The chance of each new level is a squared overlap.',
-      ],
-      play: [
-        {
-          id: 'l14-pr-box-energy',
-          kind: 'numeric',
-          tier: 'warm-up',
-          practice: 'townsend',
-          title: 'An electron in a narrow well',
-          prompt: 'An electron sits in an infinite well 0.55 nm wide. What is its ground-state energy, in eV?',
-          answer: V.l14PrE1Ev,
-          tolerance: 0.005,
-          unit: 'eV',
-          refs: [{ source: 'townsend', where: 'Problem 6.18, end of Ch. 6 (pp. 237–244)', adds: 'Gives an electron in a well of atomic size and asks for its lowest energy; here the width is given.' }],
-          hints: [
-            { text: 'The energy of level $n$ in a well of width $L$ is $\\hbar^2\\pi^2n^2/2mL^2$, which is also $h^2n^2/8mL^2$.' },
-            { text: 'Use $n = 1$ and SI units, then divide by the electron charge to turn joules into electron-volts.' },
-            { text: 'Take $h = 6.626 \\times 10^{-34}$ J s, $m = 9.109 \\times 10^{-31}$ kg and $e = 1.602 \\times 10^{-19}$ C.' },
-          ],
-          walkthrough: [
-            { text: 'The nodes at the walls leave room for whole numbers of half-waves, so $k_1L = \\pi$ and $E_1 = \\hbar^2\\pi^2/2mL^2$.' },
-            { text: 'In SI units this is $h^2/8mL^2$ with $L = 0.55 \\times 10^{-9}$ m. Dividing by $e$ turns joules into electron-volts.' },
-            { text: `The result is ${d(V.l14PrE1Ev, 3)} eV. A well half as wide would give four times as much.` },
-          ],
-        },
-        {
-          id: 'l14-pr-wall',
-          kind: 'numeric',
-          tier: 'core',
-          practice: 'townsend',
-          title: 'A wall that jumps away',
-          prompt: 'A particle is in the ground state of a box $0 < x < L$. The right wall jumps instantly to $3L$. What is the chance that an energy measurement then gives the new lowest value?',
-          answer: V.l14PrWall3,
-          tolerance: 0.005,
-          refs: [{ source: 'townsend', where: 'Problem 6.16, end of Ch. 6 (pp. 237–244)', adds: 'Asks for the chance of the new ground state after one wall of a box is pulled out. Here the new width is three times the old.' }],
-          hints: [
-            { text: 'The state cannot change that fast, so the chance is the squared overlap of the old ground state with the new one.' },
-            { text: 'Both are sines with a node at $x = 0$; the old one lives on $[0, L]$ and the new one on $[0, 3L]$, so integrate over $[0, L]$.' },
-            { text: 'Normalise each with $\\sqrt{2/\\text{width}}$ and evaluate $\\int_0^L \\sin(\\pi x/L)\\sin(\\pi x/3L)\\,dx$.' },
-          ],
-          walkthrough: [
-            { text: 'The old state is $\\sqrt{2/L}\\,\\sin(\\pi x/L)$ and the new ground state is $\\sqrt{2/3L}\\,\\sin(\\pi x/3L)$.' },
-            { text: 'Their overlap is the integral of the product over $[0, L]$, the only place where the old state is not zero. Product-to-sum turns it into two cosines that integrate in closed form.' },
-            { text: `The overlap is $9/8\\pi$, so the chance is its square, ${d(V.l14PrWall3, 3)}. Check the method on the book’s own Problem 6.16(a), one wall moved to $2L$: the same steps give ${d(V.l14TWall2P1, 3)}.` },
           ],
         },
       ],

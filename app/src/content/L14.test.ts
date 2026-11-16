@@ -1,9 +1,10 @@
 /**
  * Lecture 14's own rulings as lints (docs/roles/decisions/448-L14L18.md M1–M7; the Townsend pass T1–T11), on top of the platform lints every chapter passes:
  *   M1  Units 13.6 and 13.7 stay in Lecture 13; Lecture 14 recaps each in one beat that names the unit and defines nothing, and owns only what its notes add;
- *   M2  the box (old l13-stationary) is the books-only Unit 14.6, claim keys renamed `l14…`, practice questions moved with it, a pointer left in Lecture 13, and every reference follows;
+ *   M2  the box (old l13-stationary) came here as the books-only Unit 14.6 and moved on to Lecture 20 (ruling R2 of docs/roles/decisions/448-L19L20.md): five units and four practice questions are left,
+ *       a pointer in `l14-stationary:b6` and one in Lecture 13, and every reference follows;
  *   M3  the dispersion curves `freeOmega` and `linearOmega` are the only stage addition; every other picture is an existing kind;
- *   T1/T3 five practice questions with full walkthroughs, the books-only unit opens with its lede; T4 no experimental number in digits; M4/R4 the Rosetta line for V̂(ε) is in one beat only.
+ *   T1 four practice questions with full walkthroughs; T4 no experimental number in digits; M4/R4 the Rosetta line for V̂(ε) is in one beat only.
  * Also: the unit order and beat counts, every text balances its dollar signs, the chip into 709, every V key is claimed, the Try-it lines are what the widgets' engines compute.
  */
 import { describe, expect, it } from 'vitest'
@@ -36,14 +37,14 @@ const unit = (id: string) => L14.units.find((u) => u.id === id)!
 const beat = (id: string) => beats.find((b) => b.id === id)!
 
 describe('Lecture 14: shape', () => {
-  it('has the five lecture units in order and the books-only box after them, with the planned beats', () => {
-    expect(L14.units.map((u) => u.id)).toEqual(['l14-components', 'l14-schrodinger', 'l14-dispersion', 'l14-time', 'l14-stationary', 'l14-box'])
-    expect(L14.units.map((u) => (u.story ?? []).length)).toEqual([5, 6, 7, 4, 7, 3])
+  it('has the five lecture units in order (the box moved to Lecture 20), with the planned beats', () => {
+    expect(L14.units.map((u) => u.id)).toEqual(['l14-components', 'l14-schrodinger', 'l14-dispersion', 'l14-time', 'l14-stationary'])
+    expect(L14.units.map((u) => (u.story ?? []).length)).toEqual([5, 6, 7, 4, 7])
     expect(beats.filter((b) => b.phase === 'deeper')).toHaveLength(0)
-    expect(beats.filter((b) => b.phase === 'clue').map((b) => b.id)).toEqual(['l14-components:b5', 'l14-schrodinger:b6', 'l14-dispersion:b7', 'l14-time:b4', 'l14-stationary:b7', 'l14-box:b3'])
-    expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual(['l14-components:b4', 'l14-schrodinger:b5', 'l14-dispersion:b6', 'l14-stationary:b6', 'l14-box:b1', 'l14-box:b2'])
-    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l14-schrodinger:b2', 'l14-stationary:b2', 'l14-stationary:b4', 'l14-box:b1']) // dispersion:b2 links back to Unit 13.6 (review S1)
-    expect(L14.units.reduce((n, u) => n + u.play.length, 0)).toBe(20)
+    expect(beats.filter((b) => b.phase === 'clue').map((b) => b.id)).toEqual(['l14-components:b5', 'l14-schrodinger:b6', 'l14-dispersion:b7', 'l14-time:b4', 'l14-stationary:b7'])
+    expect(beats.filter((b) => b.phase === 'books').map((b) => b.id)).toEqual(['l14-components:b4', 'l14-schrodinger:b5', 'l14-dispersion:b6', 'l14-stationary:b6'])
+    expect(beats.filter((b) => b.derivation).map((b) => b.id)).toEqual(['l14-schrodinger:b2', 'l14-stationary:b2', 'l14-stationary:b4']) // dispersion:b2 links back to Unit 13.6 (review S1)
+    expect(L14.units.reduce((n, u) => n + u.play.length, 0)).toBe(18)
     expect(L14.corrections ?? []).toHaveLength(0) // the notes have no slip (plan §8)
   })
   it('every text balances its dollar signs (a stray one would typeset the rest of the sentence as TeX)', () => {
@@ -69,12 +70,7 @@ describe('Lecture 14: pictures', () => {
     expect(new Set(fns)).toEqual(new Set(['freeOmega', 'linearOmega']))
     expect(beat('l14-dispersion:b1').fidelity).toContain('plot-free-omega')
   })
-  it('the box unit draws box states only (walls at 0 and L; widths 4 and 2; one pair), the stationary unit draws the width-4 box and the clocks', () => {
-    const boxStates = unit('l14-box').story!.flatMap(statesOf).filter((s): s is WavefunctionState => s.kind === 'wavefunction')
-    for (const s of boxStates) expect('box' in s.source).toBe(true)
-    const boxes = boxStates.map((s) => (s.source as { box: { L: number; n: unknown } }).box)
-    expect(new Set(boxes.map((b) => b.L))).toEqual(new Set([4, 2]))
-    expect(boxes.some((b) => Array.isArray(b.n))).toBe(true)
+  it('the stationary unit draws the width-4 box and the clocks, and a box state resolves with the energy the lecture quotes', () => {
     const r = resolveWavefunctionStage({ kind: 'wavefunction', source: { box: { L: 4, n: 1 } }, readouts: ['energy'] }, 1)
     expect(r.stats.energy).toBeCloseTo(V.l14BoxE1, 12)
     expect(new Set(unit('l14-stationary').story!.flatMap(statesOf).map((s) => s.kind))).toEqual(new Set(['wavefunction', 'clocks']))
@@ -109,7 +105,7 @@ describe('Lecture 14: M1 the recaps, the Rosetta line and the chip into 709', ()
     for (const other of beats.filter((x) => x.id !== 'l14-time:b3')) expect(textsOf(other).join(' '), other.id).not.toMatch(/\\hat V/)
     expect(beat('l14-dispersion:b1').introduces).toEqual(['dispersion-relation'])
     expect(GLOSSARY.get('dispersion-relation')!.introduces).toBe('notation')
-    expect(GLOSSARY.get('infinite-well')!.first).toBe('l14-box:b1')
+    expect(GLOSSARY.get('infinite-well')!.first).toBe('l20-infinite:b1') // moved to Lecture 20 (ruling R2)
     expect(GLOSSARY.get('node')!.first).toBe('l14-stationary:b6')
     expect(GLOSSARY.get('time-independent-schrodinger')!.first).toBe('l14-stationary:b2')
   })
@@ -122,8 +118,8 @@ describe('Lecture 14: M1 the recaps, the Rosetta line and the chip into 709', ()
 })
 
 describe('Lecture 14: the Try-its are what the widgets compute', () => {
-  it('no unit uses wave-lab; the six widgets are the planned stand-ins', () => {
-    expect(L14.units.map((u) => u.visual.kind)).toEqual(['amplitude-bars', 'two-clocks', 'two-clocks', 'two-clocks', 'two-clocks', 'two-clocks'])
+  it('no unit uses wave-lab; the five widgets are the planned stand-ins', () => {
+    expect(L14.units.map((u) => u.visual.kind)).toEqual(['amplitude-bars', 'two-clocks', 'two-clocks', 'two-clocks', 'two-clocks'])
     expect(unit('l14-components').visual.caption).toMatch(/stand-in/)
     expect(unit('l14-schrodinger').visual.caption).toMatch(/stand-in/)
   })
@@ -173,19 +169,18 @@ describe('Lecture 14: the new numbers', () => {
   })
 })
 
-describe('Lecture 14: M2 the box moved here (Townsend pass T1–T6)', () => {
-  it('the box unit is books only, opens with the lede that the notes do not cover it (T3) and follows the lecture units; the notes’ pointer is in Lecture 13', () => {
-    const story = unit('l14-box').story!
-    expect(story[0].phase).toBe('books')
-    expect(story[0].text).toMatch(/^This unit is beyond the lecture notes; it follows Townsend/)
-    expect(story.filter((b) => b.phase === 'lecture')).toHaveLength(0)
-    expect(unit('l14-box').lecture.pages).toMatch(/^not in the lecture notes/)
-    expect(L14.units.slice(-1).map((u) => u.id)).toEqual(['l14-box'])
-    expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Unit 14\.5.*Unit 14\.6/)
+describe('Lecture 14: M2 the box moved on to Lecture 20 (Townsend pass T1–T6; ruling R2 of the L19–L20 rulings)', () => {
+  it('the box unit and its practice questions left; Lecture 14 keeps a one-line pointer in l14-stationary:b6 and Lecture 13 names Lecture 20', () => {
+    expect(L14.units.map((u) => u.id)).not.toContain('l14-box')
+    expect(L14.units.flatMap((u) => u.play.map((q) => q.id))).not.toContain('l14-pr-box-energy')
+    expect(L14.units.flatMap((u) => u.play.map((q) => q.id))).not.toContain('l14-pr-wall')
+    expect(beat('l14-stationary:b6').text).toMatch(/The box itself is solved in Lecture 20\.`?$/)
+    expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Unit 14\.5/)
+    expect(L13.units.flatMap((u) => u.story ?? []).find((b) => b.id === 'l13-schrodinger:b6')!.text).toMatch(/Lecture 20/)
   })
-  it('the six practice questions (five numeric, the top-hat choice) are tagged, name their source, carry full walkthroughs and are not assigned (T1); no homework label appears', () => {
+  it('the four practice questions (three numeric, the top-hat choice) are tagged, name their source, carry full walkthroughs and are not assigned (T1); no homework label appears', () => {
     const qs = L14.units.flatMap((u) => u.play).filter((q) => q.practice)
-    expect(qs.map((q) => `${q.id}:${q.practice}`)).toEqual(['l14-di-tophat:homework', 'l14-pr-kinetic:homework', 'l14-pr-period:homework', 'l14-pr-mean-energy:townsend', 'l14-pr-box-energy:townsend', 'l14-pr-wall:townsend'])
+    expect(qs.map((q) => `${q.id}:${q.practice}`)).toEqual(['l14-di-tophat:homework', 'l14-pr-kinetic:homework', 'l14-pr-period:homework', 'l14-pr-mean-energy:townsend'])
     for (const q of qs) {
       expect(q.walkthrough.length, q.id).toBeGreaterThan(1)
       expect(q.hints, q.id).toHaveLength(3)
@@ -194,25 +189,18 @@ describe('Lecture 14: M2 the box moved here (Townsend pass T1–T6)', () => {
       if (q.practice === 'townsend') expect(q.refs?.[0].where, q.id).toMatch(/^Problem 6\.\d+, end of Ch\. 6/)
     }
     const tol = Object.fromEntries(qs.map((q) => [q.id, q.kind === 'numeric' ? q.tolerance : -1]))
-    expect(tol).toEqual({ 'l14-di-tophat': -1, 'l14-pr-kinetic': 0.005, 'l14-pr-period': 0.005, 'l14-pr-mean-energy': 0.005, 'l14-pr-box-energy': 0.005, 'l14-pr-wall': 0.005 })
+    expect(tol).toEqual({ 'l14-di-tophat': -1, 'l14-pr-kinetic': 0.005, 'l14-pr-period': 0.005, 'l14-pr-mean-energy': 0.005 })
   })
-  it('every old name is gone: no l13-stationary unit or l13Tbox keys, and the Optics Lab row points at l14-box', () => {
+  it('every old name is gone: no l13-stationary unit, no l13 keys and no l14Box keys but the node count; the Optics Lab row now points at Lecture 20', () => {
     expect(L13.units.map((u) => u.id)).not.toContain('l13-stationary')
     expect(Object.keys(V).filter((k) => /^l13/.test(k))).toEqual([])
-    expect(BRIDGES_709['qc-l14-box']).toMatchObject({ course: 'sl448', lecture: 'L14', unit: 'l14-box' })
+    expect(Object.keys(V).filter((k) => /^l14(TBox|TWall|PrE1|PrWall)/.test(k))).toEqual(['l14TBoxNodes4'])
+    expect(BRIDGES_709['qc-l14-box']).toBeUndefined()
+    expect(BRIDGES_709['qc-l20-box']).toMatchObject({ course: 'sl448', lecture: 'L20', unit: 'l20-infinite' })
     expect(BRIDGES_709['qc-l13-stationary']).toBeUndefined()
-  })
-  it('the box numbers: Ex. 6.6 gives 8/3π and 64/9π², the odd levels add to 1, the third gets 64/25π², the even ones 0; halving the box quadruples the energy and doubles the spread', () => {
-    expect(V.l14TBoxOverlap).toBeCloseTo(8 / (3 * Math.PI), 12)
-    expect(V.l14TBoxP1).toBeCloseTo(64 / (9 * Math.PI ** 2), 12)
-    expect(V.l14TBoxP3).toBeCloseTo(64 / (25 * Math.PI ** 2), 12)
-    expect(V.l14TBoxP2).toBeCloseTo(0, 12)
-    expect(V.l14TBoxSumOdd).toBeCloseTo(1, 6)
-    expect(V.l14TBoxEnergyRatio).toBeCloseTo(4, 12)
-    expect(V.l14TBoxDpRatio).toBeCloseTo(2, 12)
     expect(V.l14TBoxNodes4).toBe(3)
   })
-  it('no number is shown with a power of ten in the new lecture (T4: every digit on screen is computed)', () => {
+  it('no number is shown with a power of ten in the lecture (T4: every digit on screen is computed)', () => {
     const all = beats.flatMap(textsOf).join(' ')
     expect(all).not.toMatch(/\d\s*(?:\\times|×)\s*10\^/)
   })
