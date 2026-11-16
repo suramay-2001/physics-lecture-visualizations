@@ -5,7 +5,12 @@
  */
 import { describe, expect, it } from 'vitest'
 import fixtures from './__fixtures__/numpy.json'
-import { wellCount, wellLevels, wellMismatch, wellNorm, wellStateSamples, wellTail } from './wave20'
+import { GRID, boxState, meanX, spreadX } from './wave'
+import { boxPairPeriod } from './wave14'
+import {
+  boxFunctionEnergy, boxFunctionOverlap, boxPairMeanX, boxPositionSpread, boxWallSlope, deltaWellBinding, gaussianOscillatorBestWidth, gaussianOscillatorEnergy, thinWellBinding, wellCount, wellEnergyRatio, wellEvenLeft, wellLevels,
+  wellMismatch, wellNodes, wellNorm, wellParityOverlap, wellStateSamples, wellTail, wellThreshold, wellWallRatio, wellCurrent,
+} from './wave20'
 
 const wells = fixtures.lecture19_20.wells
 const close = (a: number, b: number, eps: number, msg = '') => expect(Math.abs(a - b), `${msg} ${a} vs ${b}`).toBeLessThan(eps)
@@ -114,5 +119,73 @@ describe('wellStateSamples, wellTail, wellNorm', () => {
   it('a level that is not bound throws', () => {
     expect(() => wellStateSamples([0], 8, 2, 4)).toThrow()
     expect(() => wellTail(8, 2, 0)).toThrow()
+  })
+})
+
+describe('Lecture 20 values: closed forms and the plan checks (the twin of each content key is pipeline/claims_448/l20.py)', () => {
+  const near = (a: number, b: number, eps: number) => expect(Math.abs(a - b)).toBeLessThan(eps)
+  it('boxWallSlope = √(2/L)·nπ/L (0.5554 for L = 4, n = 1) and refuses a bad width', () => {
+    near(boxWallSlope(4, 1), Math.sqrt(0.5) * (Math.PI / 4), 1e-15)
+    expect(() => boxWallSlope(0, 1)).toThrow()
+  })
+  it('wellThreshold: the second, third and fourth levels of a = 2 appear at 1.234, 4.935, 11.10, and the count steps there', () => {
+    near(wellThreshold(2, 2), Math.PI ** 2 / 8, 1e-15)
+    near(wellThreshold(2, 4), (9 * Math.PI ** 2) / 8, 1e-15)
+    expect(wellThreshold(2, 1)).toBe(0)
+    expect(wellCount(wellThreshold(2, 3) - 1e-6, 2)).toBe(2)
+    expect(wellCount(wellThreshold(2, 3) + 1e-6, 2)).toBe(3)
+  })
+  it('parity: the overlap of φ(x) and φ(−x) is +1, −1, +1; node counts 0, 1, 2; the even condition and the wall ratio', () => {
+    ;[1, 2, 3].forEach((n) => {
+      near(wellParityOverlap(8, 2, n), n % 2 ? 1 : -1, 1e-9)
+      expect(wellNodes(8, 2, n)).toBe(n - 1)
+    })
+    near(wellEvenLeft(8, 2), wellLevels(8, 2)[0].kappa, 1e-9)
+    near(wellWallRatio(8, 2), 0.3131, 5e-5)
+  })
+  it('the finite level lies below the infinite one, and the ratio rises toward 1 with V0', () => {
+    let prev = 0
+    for (const V0 of [8, 32, 128, 512, 2048]) {
+      const r = wellEnergyRatio(V0, 2, 1)
+      expect(r).toBeLessThan(1)
+      expect(r).toBeGreaterThan(prev)
+      prev = r
+    }
+  })
+  it('a thin deep well approaches the delta well: binding g²/8 as a → 0 (1.1205 at a = 0.004, g = 3)', () => {
+    near(thinWellBinding(3, 0.004), 1.1205, 5e-4)
+    near(thinWellBinding(3, 1e-4), 9 / 8, 1e-3)
+    near(deltaWellBinding(3), 1.125, 1e-15)
+  })
+  it('the tent costs 12/π² of the ground energy; the cubic trial function holds even levels only', () => {
+    const L = 1
+    const tent = (x: number) => Math.min(x, L - x)
+    near(boxFunctionEnergy(tent, (x) => (x < L / 2 ? 1 : -1), L, L / 2) / (Math.PI ** 2 / 2), 12 / Math.PI ** 2, 1e-12)
+    const trial = (x: number) => x * (L - x) * (L - 2 * x)
+    let s = 0
+    for (let n = 1; n <= 60; n++) {
+      const c = boxFunctionOverlap(trial, L, n)
+      if (n % 2) near(c, 0, 1e-12)
+      s += c * c
+    }
+    near(s, 1, 1e-6)
+  })
+  it('a bound state carries no current: j = 0 at every x away from the edges, for every level', () => {
+    for (const n of [1, 2, 3]) for (const x of [-4, -1.2, -0.3, 0, 0.6, 2.2]) expect(Math.abs(wellCurrent(8, 2, n, x))).toBe(0)
+    expect(() => wellCurrent(8, 2, 1, 1)).toThrow()
+  })
+  it('the oscillator estimate is 1/2 at σ = 1/√2, and a scan of σ finds no lower energy', () => {
+    near(gaussianOscillatorBestWidth(1), Math.SQRT1_2, 1e-15)
+    near(gaussianOscillatorEnergy(Math.SQRT1_2, 1), 0.5, 1e-14)
+    for (let j = 1; j <= 400; j++) expect(gaussianOscillatorEnergy(j * 0.01, 1)).toBeGreaterThanOrEqual(0.5 - 1e-14)
+  })
+  it('the box position spread and the pair mean: Δx = 0.723 for L = 4, ⟨x⟩ swings 3 ∓ 16·6/(9π²) in a box of width 6, and the grid mean agrees to 1e-3', () => {
+    near(boxPositionSpread(4, 1), 0.72303, 5e-5)
+    near(boxPairMeanX(6, 1, 2, 0), 3 - (16 * 6) / (9 * Math.PI ** 2), 1e-12)
+    near(boxPairMeanX(6, 1, 2, boxPairPeriod(6, 1, 2) / 2), 3 + (16 * 6) / (9 * Math.PI ** 2), 1e-9)
+    expect(boxPairMeanX(6, 1, 3, 1.7)).toBe(3)
+    const half = boxPairPeriod(6, 1, 2) / 2
+    for (const t of [0, 3, half]) near(meanX(boxState(GRID, 6, [1, 2], t), GRID), boxPairMeanX(6, 1, 2, t), 1e-3)
+    near(boxPositionSpread(4, 1), spreadX(boxState(GRID, 4, 1), GRID), 1e-4)
   })
 })

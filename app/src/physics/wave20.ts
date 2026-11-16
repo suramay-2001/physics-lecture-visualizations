@@ -127,3 +127,145 @@ export function wellNorm(V0: number, a: number, n: number): number {
   for (let j = 0; j <= N; j++) s += (j === 0 || j === N ? 1 : j % 2 ? 4 : 2) * w[j] * w[j]
   return (s * h) / 3
 }
+
+/* ---------------------------------------------------- Lecture 20 only: the values of the bound-state unit (content/L20.values.ts) ---------------------------------------------------- */
+
+/** Composite Simpson's rule on [a, b] with N (even) panels: exact for cubics, about 1e-15 for the smooth integrands here. */
+function simpson(f: (x: number) => number, a: number, b: number, N = 20000): number {
+  const h = (b - a) / N
+  let s = f(a) + f(b)
+  for (let j = 1; j < N; j++) s += (j % 2 ? 4 : 2) * f(a + j * h)
+  return (s * h) / 3
+}
+
+/** The slope √(2/L)·nπ/L of the box state φₙ just inside the wall at x = 0 (it drops to 0 outside: an infinitely high wall allows the jump). ħ = m = 1. */
+export function boxWallSlope(L: number, n: number): number {
+  if (!(L > 0) || !Number.isInteger(n) || n < 1) throw new Error('boxWallSlope: L must be positive and n a whole number ≥ 1')
+  return Math.sqrt(2 / L) * ((n * Math.PI) / L)
+}
+
+/** The depth V₀ at which level n of a well of width a first appears: the (n − 1)th infinite-well energy of that width, (n − 1)²π²/(2a²). */
+export function wellThreshold(a: number, n: number): number {
+  if (!(a > 0) || !Number.isInteger(n) || n < 1) throw new Error('wellThreshold: a must be positive and n a whole number ≥ 1')
+  return ((n - 1) * (n - 1) * Math.PI * Math.PI) / (2 * a * a)
+}
+
+/** φ(a/2) over φ(0) for the ground state (even): cos(ka/2). */
+export function wellWallRatio(V0: number, a: number): number {
+  const l = wellLevels(V0, a)[0]
+  return Math.cos((l.k * a) / 2)
+}
+
+/** ∫φ(x)φ(−x)dx for level n: +1 for an even state, −1 for an odd one (Simpson over the whole line to the tails' 1e-12). */
+export function wellParityOverlap(V0: number, a: number, n: number): number {
+  const { kappa } = level(V0, a, n)
+  const X = a / 2 + 40 / kappa
+  const f = (x: number) => wellStateSamples([x], V0, a, n)[0] * wellStateSamples([-x], V0, a, n)[0]
+  const h = a / 2
+  return simpson(f, -X, -h, 4000) + simpson(f, -h, h, 4000) + simpson(f, h, X, 4000) // split at the edges, where φ″ jumps
+}
+
+/** The interior nodes of level n: sign changes of φ over a fine grid on |x| < a/2 + 8/κ (the grid is offset so that no sample sits on the centre of an odd state). */
+export function wellNodes(V0: number, a: number, n: number): number {
+  const { kappa } = level(V0, a, n)
+  const X = a / 2 + 8 / kappa
+  const N = 4000
+  const xs = Array.from({ length: N }, (_, j) => -X + (2 * X * (j + 0.5)) / N)
+  const w = wellStateSamples(xs, V0, a, n)
+  let c = 0
+  for (let j = 1; j < N; j++) if (w[j - 1] * w[j] < 0) c++
+  return c
+}
+
+/** k tan(ka/2) for the ground state: the left side of the even condition (the right side is κ). */
+export function wellEvenLeft(V0: number, a: number): number {
+  const l = wellLevels(V0, a)[0]
+  return l.k * Math.tan((l.k * a) / 2)
+}
+
+/** E_n of the finite well over the infinite well's n²π²/(2a²) of the same width. */
+export function wellEnergyRatio(V0: number, a: number, n: number): number {
+  return level(V0, a, n).E / ((n * n * Math.PI * Math.PI) / (2 * a * a))
+}
+
+/** The binding energy V₀ − E₁ of a thin deep well of depth V₀ = g/2a, for comparison with the delta well's κ²/2 (κ = g/2 when the slope jumps by −gφ(0), ħ = m = 1). */
+export function thinWellBinding(g: number, a: number): number {
+  const V0 = g / (2 * a)
+  return V0 - wellLevels(V0, a)[0].E
+}
+
+/** The function f on (0, L), normalised, overlapped with level n of the box 0 < x < L: ∫fφₙdx/√∫f², φₙ = √(2/L) sin(nπx/L). */
+export function boxFunctionOverlap(f: (x: number) => number, L: number, n: number): number {
+  const nrm = Math.sqrt(simpson((x) => f(x) * f(x), 0, L))
+  return simpson((x) => f(x) * Math.sqrt(2 / L) * Math.sin((n * Math.PI * x) / L), 0, L) / nrm
+}
+
+/** ⟨E⟩ = ½∫f′²dx/∫f²dx for a function f on (0, L) that vanishes at both walls (ħ = m = 1); df is its derivative, and `kink` splits the range where df jumps (a kink costs a finite energy). */
+export function boxFunctionEnergy(f: (x: number) => number, df: (x: number) => number, L: number, kink?: number): number {
+  const num = kink === undefined ? simpson((x) => df(x) ** 2, 0, L) : simpson((x) => df(x) ** 2, 0, kink) + simpson((x) => df(x) ** 2, kink, L)
+  return num / 2 / simpson((x) => f(x) * f(x), 0, L)
+}
+
+/** ⟨H⟩ = 1/(8σ²) + ω²σ²/2 of the Gaussian of width σ in V = ω²x²/2 (ħ = m = 1): kinetic Δp²/2 with Δp = 1/2σ plus the mean potential. */
+export function gaussianOscillatorEnergy(sigma: number, omega: number): number {
+  if (!(sigma > 0)) throw new Error('gaussianOscillatorEnergy: σ must be positive')
+  return 1 / (8 * sigma * sigma) + (omega * omega * sigma * sigma) / 2
+}
+
+/** The width that minimises gaussianOscillatorEnergy: setting the slope to zero gives σ⁴ = 1/(4ω²), so σ = 1/√(2ω) (the test confirms it by a scan). */
+export function gaussianOscillatorBestWidth(omega: number): number {
+  if (!(omega > 0)) throw new Error('gaussianOscillatorBestWidth: ω must be positive')
+  return 1 / Math.sqrt(2 * omega)
+}
+
+/** Δx of level n of the box of width L: L√(1/12 − 1/(2n²π²)) (ħ = m = 1 changes nothing: a length). */
+export function boxPositionSpread(L: number, n: number): number {
+  if (!(L > 0) || !Number.isInteger(n) || n < 1) throw new Error('boxPositionSpread: L must be positive and n a whole number ≥ 1')
+  return L * Math.sqrt(1 / 12 - 1 / (2 * n * n * Math.PI * Math.PI))
+}
+
+/**
+ * ⟨x⟩ of the equal superposition of levels m ≠ n of the box 0 < x < L at time t: L/2 + x_mn cos((E_n − E_m)t), with the matrix element
+ * x_mn = −8Lmn/(π²(m² − n²)²) when m + n is odd (and 0 when it is even, so the mean stays at L/2). ħ = m = 1.
+ */
+export function boxPairMeanX(L: number, m: number, n: number, t: number): number {
+  if (!(L > 0) || !Number.isInteger(m) || !Number.isInteger(n) || m < 1 || n < 1 || m === n) throw new Error('boxPairMeanX: L positive and two different whole levels ≥ 1')
+  const odd = (m + n) % 2 === 1
+  const xmn = odd ? (-8 * L * m * n) / (Math.PI * Math.PI * (m * m - n * n) ** 2) : 0
+  const dE = ((n * n - m * m) * Math.PI * Math.PI) / (2 * L * L)
+  return L / 2 + xmn * Math.cos(dE * t)
+}
+
+/** The bound state of the delta well whose slope jumps by −gφ(0) (Townsend Problem 6.19 type, ħ = m = 1): κ = g/2 and E = −κ²/2; this returns the binding energy κ²/2 = g²/8. */
+export function deltaWellBinding(g: number): number {
+  if (!(g > 0)) throw new Error('deltaWellBinding: g must be positive')
+  return (g * g) / 8
+}
+
+/**
+ * The probability current j = ħ Im(φ*φ′)/m of level n at x, ħ = m = 1. The state is real (a real equation with a normalisable solution has a constant phase), so φ* = φ and Im(φ*φ′) = φ·Im(φ′) − Im(φ)·φ′ = 0:
+ * it is computed that way from the closed-form φ and φ′ (the one-sided slope at an edge is not asked for), so the zero is exact and the stage needs no `current` readout.
+ */
+export function wellCurrent(V0: number, a: number, n: number, x: number): number {
+  const { k, kappa, parity } = level(V0, a, n)
+  const w = weights(V0, a, n)
+  const nrm = 1 / Math.sqrt(w.inside + w.outside)
+  const ax = Math.abs(x)
+  if (Math.abs(ax - a / 2) < 1e-12) throw new Error('wellCurrent: φ′ jumps in its second derivative only, but ask away from the edge x = ±a/2')
+  const even = parity === 'even'
+  let phi: number
+  let dphi: number
+  if (ax < a / 2) {
+    phi = even ? Math.cos(k * x) : Math.sin(k * x)
+    dphi = even ? -k * Math.sin(k * x) : k * Math.cos(k * x)
+  } else {
+    const sign = !even && x < 0 ? -1 : 1
+    phi = sign * w.edge * Math.exp(-kappa * (ax - a / 2))
+    dphi = -Math.sign(x) * kappa * phi
+  }
+  const re = phi * nrm
+  const dre = dphi * nrm
+  const im = 0
+  const dim = 0
+  return re * dim - im * dre
+}
