@@ -57,6 +57,15 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
+**Next action (2026-11-16): 448 L19–L20.** Owner: build the new notes `~/Downloads/Lecture_19.pdf` (tunnelling through
+a finite barrier, 9 pp) and `Lecture_20.pdf` (bound states and quantized energies, 12 pp), ingested as `sources/L19`,
+`L20`. No new 448 homework sheet (HW1–HW7 submitted). Weekly meter 5 % (reset Fri 11-20 19:00 UTC); estimate ~8 points.
+Ownership to rule (as in `decisions/448-L14L18.md` M2: the lecture whose NOTES teach a topic owns it): L18 holds barrier
+tunnelling and the p. 231 Correction (moved from Townsend); L14 holds the books-only particle-in-a-box `l14-box`. Plan:
+one planner for L19+L20 (`scratchpad/brief-448-plan-L19L20.md`) → rulings `decisions/448-L19L20.md` → one builder per
+lecture (`brief-build-448Lx.md` template) → one review + fix → gate, full preview e2e (derive SVG-only lists from kinds
+AND widgets), unpiped audit → push.
+
 **DONE and PUSHED (2026-11-07): 448 L14–L18; 709 Arcade and films for Q19–Q27.** 448: five new lectures from the
 notes (Schrödinger equation and stationary states; free particles, wavepackets, dispersion; Gaussian packets and
 Ehrenfest; classical mean motion and quantum reflection; reflection and tunnelling), each with Townsend books beats,
