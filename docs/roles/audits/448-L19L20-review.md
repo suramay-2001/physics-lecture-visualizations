@@ -57,3 +57,25 @@ Fix: say "the alpha's own mass, 3727 MeV, and no recoil correction", and caption
 - L20: the infinite-well derivation and the 8/(3 pi) overlap; the even and odd conditions; parity argument; the thresholds (n - 1)² pi² / 2a²; sloshing (period 15.279, swing 1.0808); the Gaussian estimate 0.5; the oscillator algebra [X, P] = i and a†a = (X² + P² - 1)/2.
 - Shared L18 keys are cited by their L18 names (`l18BarrierT1`, `l18BarrierT2`, `l18BarrierT3`, `l18BarrierThick3`, `l18BarrierInnerCurrent`, `l18TEV0T`, `l18ThickAtZero`, `l18MaxPenetration`, `l18BarrierWeightedT`); `l19L18Route` is a cross-check, not a re-key.
 - `sl-q27-josephson` is a second use from `l19-energy:b2`; no new bridge rows.
+
+## Fix pass (2026-11-16)
+
+Paths are under `app/src/content/` unless noted. Gates: `npx tsc -b` 0 errors; `vitest run src/content src/physics src/stage` 258 files green; twins `l19.json` and `l20.json` byte-identical over two runs; `UPDATE_META=1` twice clean (no meta change); `npm run build` and `build/chunks.test.ts` green.
+
+- **S1** done: `L14.ts:27` now reads "Say that a particle held between two walls has only certain energies, which Lecture 20 solves." (still seven outcomes).
+- **N1** done: `L20.story.ts:472`, the pole-from-below sentence.
+- **N2** done: `L20.story.ts:434`, the caption names the fixed well and its two even zeros.
+- **N3** done: `L19.story.ts:398` states the 8 eV top, the 4 eV electron and the 5 Å to 6 Å gap.
+- **N4** done: `L19.story.ts:411` states the alpha rest energy (new key `l19AlphaMass`, twin in `pipeline/claims_448/l19.py`), Z and R; the caption at `:412` marks the stage as a rectangular stand-in.
+- **N5** done: `L19.ts:86`, pp. 224–229.
+- **N6** done: `L19.story.ts:297` is a link-back to Unit 18.4's thick form keeping only 0.964 and 0.995 (the two L18 claims removed); `:340` drops the repeated limit of 4 and says only that the exact T tends to 1. D2 kept. `L19.test.ts:66` no longer expects `l18ThickAtZero` to be claimed in L19.
+- **Nit 1** done: `L19.ts:295`, `L19.ts:478`, `L20.ts:380` each split into two sentences.
+- **Nit 2** done: `L19.values.ts` comments now 2.0313 and 2.1249.
+- **Nit 3** done: `L20.story.ts:251` ("Walls that move away"; levels with even n, levels with odd n).
+- **Nit 4** done: `L20.story.ts:221` and `:227`, "the analogue of".
+- **Nit 5** no change (judge).
+- **Nit 6** done: `L19.review.ts:33`, "in all three regions".
+- **Nit 7** done: `L19.story.ts:441` gives the shares 0.4196 and 0.5804 (new engine function `transmittedShare` in `app/src/physics/wave19.ts`, keys `l19TransShare`, `l19ReflShare`, twins added).
+- **Nit 8** done: `L20.story.ts:403`, "(the window clips it)".
+- **Nit 9** done: `L19.ts:280`, "pp. 6–8 (§19.4), p. 9".
+- **Nit 10** done: `l14-pr-kinetic` (`L14.ts:357`) asks the symmetric tent's kinetic energy, the same quantity, so `l20-pr-kink` (`L20.ts:332`) is now a lopsided tent peaked at L/3 with a new key `l20SkewTentRatio` = 27/2π² = 1.368 (replaces `l20TentRatio`; twin in `pipeline/claims_448/l20.py`) and a walkthrough line linking back to Lecture 14's "A tent with sharp edges". Side fix: `boxFunctionEnergy` (`app/src/physics/wave20.ts:204`) now evaluates the slope just inside each piece at the kink, because a kink at 1/3 is not exactly representable.

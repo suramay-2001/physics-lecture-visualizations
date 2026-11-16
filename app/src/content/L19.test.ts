@@ -63,7 +63,7 @@ describe('Lecture 19: shape', () => {
       expect(k.startsWith('l19'), k).toBe(true)
     }
     expect(Object.keys(V)).not.toContain('l19T1')
-    for (const k of ['l18BarrierT1', 'l18BarrierInnerCurrent', 'l18TEV0T', 'l18ThickAtZero', 'l18BarrierT2', 'l18BarrierT3']) expect(claimed.has(k), k).toBe(true)
+    for (const k of ['l18BarrierT1', 'l18BarrierInnerCurrent', 'l18TEV0T', 'l18BarrierT2', 'l18BarrierT3']) expect(claimed.has(k), k).toBe(true)
   })
 })
 

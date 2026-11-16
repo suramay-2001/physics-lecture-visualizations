@@ -24,7 +24,7 @@ export const L14: Lecture = {
     'Say why time is a parameter, why a time-dependent Hamiltonian still generates the evolution, and why no operator that shifts every energy can exist.',
     'Get the time-independent equation from H|E⟩ = E|E⟩ and say what "stationary" means.',
     'Show that a superposition of two energies is not stationary, and find how fast its density moves.',
-    'Solve the energy equation between two walls and say why only whole numbers of half-waves fit.',
+    'Say that a particle held between two walls has only certain energies, which Lecture 20 solves.',
   ],
   prerequisites: ['wavefunction', 'position-operator', 'momentum-generator', 'schrodinger-position', 'time-parameter', 'stationary-states'],
   // Symbols defined in the text itself (symbol → the unit, beat or site whose sentence defines it). Symbols of Lectures 11–13 are mapped to the first unit of this lecture that uses them: a recap.

@@ -83,7 +83,7 @@ export const L19: Lecture = {
           'A packet that meets a potential ends as a reflected and a transmitted packet, and $R$ and $T$ are their areas. Plane waves only compute those chances. An infinite step gives a tail without an outgoing wave. A barrier of finite width has a second edge, so the tail can join a travelling wave.',
         equations: ['R + T = 1', 'T = |\\tau|^2'],
       },
-      books: [{ source: 'townsend', where: '§6.10, pp. 225–228 (Eqs. 6.111–6.135)', adds: 'The packet picture of scattering, the current, and $R$ and $T$ for a step; Unit 18.1 and Unit 18.2 recall them.' }],
+      books: [{ source: 'townsend', where: '§6.10, pp. 224–229 (Eqs. 6.111–6.135)', adds: 'The packet picture of scattering, the current, and $R$ and $T$ for a step; Unit 18.1 and Unit 18.2 recall them.' }],
       visual: {
         kind: 'amplitude-bars',
         props: { state: '+x', basis: 'z' },
@@ -277,7 +277,7 @@ export const L19: Lecture = {
       title: 'Reading T: width, height, mass',
       question: 'How does T change with the barrier and the particle?',
       lecture: {
-        pages: 'L19 pp. 6–9 (§19.4)',
+        pages: 'L19 pp. 6–8 (§19.4), p. 9',
         summary:
           'The boxed result is positive for every finite width. For $\\kappa a \\gg 1$ it reduces to a prefactor times $e^{-2\\kappa a}$: the amplitude falls as $e^{-\\kappa a}$ and the chance is its square. A wider or taller barrier, or a heavier particle, lowers $T$ fast; the thick form fails as $E \\to V_0$.',
         equations: ['T = \\left[1 + \\tfrac{V_0^2}{16E(V_0 - E)}(e^{\\kappa a} - e^{-\\kappa a})^2\\right]^{-1}', 'T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}\\quad (\\kappa a \\gg 1)'],
@@ -292,7 +292,7 @@ export const L19: Lecture = {
         caption: 'A stand-in: two amplitudes whose squares are the chances. Squaring a factor $e^{-\\kappa a}$ gives $e^{-2\\kappa a}$.',
         tryThis: [
           'With the state at +x and the basis z, each amplitude is about 0.707. Its square is one half.',
-          'The chance is the square of the amplitude: an amplitude that falls by some factor makes a chance that falls by the square of that factor, which is the 2 in $e^{-2\\kappa a}$.',
+          'The chance is the square of the amplitude. An amplitude that falls by some factor makes a chance that falls by the square of that factor, which is the 2 in $e^{-2\\kappa a}$.',
         ],
       },
       clues: [],
@@ -475,7 +475,7 @@ export const L19: Lecture = {
           walkthrough: [
             { text: 'The ratio is $g^2/4k^2 = 6.25/9 = 0.694$.' },
             { text: `So $T = 1/1.694 = ${d(V.l19PrDelta, 3)}$ and $R = 1 - T = ${d(1 - V.l19PrDelta, 3)}$.` },
-            { text: 'The exact barrier of the same strength and a width of a thousandth gives the same $T$ to three digits: the delta barrier is the limit.' },
+            { text: 'The exact barrier of the same strength and a width of a thousandth gives the same $T$ to three digits. So the delta barrier is the limit.' },
           ],
         },
         {

@@ -191,6 +191,7 @@ put('l19StmDecade', np.log(10) / (2 * kap))
 assert abs(out['l19StmFactorThick'] - np.exp(-2 * kap)) < 1e-12
 # alpha decay (a MODEL): a point alpha, daughter Z = 90, R = 7.4 fm; K = 2 Z e^2
 hc, ke2, mc2 = 197.3269804, 1.439964548, 3727.379378
+put('l19AlphaMass', mc2)
 Kc, Rn = 2 * 90 * ke2, 7.4
 
 
@@ -238,6 +239,8 @@ Tp_ = lambda p: T_solve(p * p / 2, 4.0, 0.5)
 num = weighted(2.0, 2.0, lambda p: Tp_(p) * p * p / 2)
 put('l19TransKinMean', num / weighted(2.0, 2.0, Tp_))
 numR = weighted(2.0, 2.0, lambda p: (1 - Tp_(p)) * p * p / 2)
+put('l19TransShare', weighted(2.0, 2.0, Tp_))
+put('l19ReflShare', 1 - weighted(2.0, 2.0, Tp_))
 put('l19ReflKinMean', numR / weighted(2.0, 2.0, lambda p: 1 - Tp_(p)))
 
 # ---- challenges and practice

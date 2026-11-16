@@ -162,6 +162,11 @@ export function regionEnergies(E: number, V0: number, a: number): { outside: num
 }
 
 /* ---- the barrier as a filter on a packet's momenta (ħ = m = 1) ---- */
+/** The chance that the barrier lets a packet (σ, p₀) through: its momentum density weighted by T(p). The turned-back chance is 1 minus this. */
+export function transmittedShare(p0: number, sigma: number, V0: number, a: number): number {
+  return momentumAverage(p0, sigma, (p) => barrierT((p * p) / 2, V0, a))
+}
+
 /** The mean kinetic energy p²/2 of the part of a packet (σ, p₀) that the barrier lets through (`part` 'T') or turns back ('R'): its momentum density weighted by T(p) or 1 − T(p). */
 export function filteredKineticMean(p0: number, sigma: number, V0: number, a: number, part: 'T' | 'R'): number {
   const w = (p: number): number => (part === 'T' ? barrierT((p * p) / 2, V0, a) : 1 - barrierT((p * p) / 2, V0, a))

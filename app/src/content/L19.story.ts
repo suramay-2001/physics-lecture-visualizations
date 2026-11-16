@@ -296,14 +296,12 @@ const thickBeats: Beat[] = [
   {
     id: 'l19-thick:b2',
     phase: 'lecture',
-    text: `For $\\kappa a \\gg 1$ we have $e^{\\kappa a} - e^{-\\kappa a} \\simeq e^{\\kappa a}$, so $T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}$. The amplitude falls as $e^{-\\kappa a}$ and the chance is its square, which is why the exponent has a 2. This is the [[thick-barrier|thick-barrier]] form. For $E = \\tfrac{V_0}{2}$ the exact transmission is ${d(V.l19ThickRatio2, 3)} of it at $\\kappa a = 2$ and ${d(V.l19ThickRatio3, 3)} at $\\kappa a = 3$. Unit 18.4 had ${d(V18.l18BarrierT3, 5)} against ${d(V18.l18BarrierThick3, 5)}.`,
+    text: `Unit 18.4 gave the [[thick-barrier|thick-barrier]] form $T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}$ for $\\kappa a \\gg 1$. Here we read it. For $E = \\tfrac{V_0}{2}$ the exact transmission is ${d(V.l19ThickRatio2, 3)} of it at $\\kappa a = 2$ and ${d(V.l19ThickRatio3, 3)} at $\\kappa a = 3$.`,
     caption: 'the exact transmission and its thick-barrier form meet for large $\\kappa a$',
     stage: BARRIER_THICK(3),
     claims: [
       claim('l19ThickRatio2', 'exact over thick is 0.964 at κa = 2', () => close(V.l19ThickRatio2, 0.964351, 5e-4)),
       claim('l19ThickRatio3', 'and 0.995 at κa = 3', () => close(V.l19ThickRatio3, 0.995061, 5e-4)),
-      claim18('l18BarrierT3', 'the exact value at κa = 3 is 0.00987', () => close(V18.l18BarrierT3, 0.0098660, 5e-6)),
-      claim18('l18BarrierThick3', 'against 0.00992 for the thick form', () => close(V18.l18BarrierThick3, 0.0099150, 5e-6)),
     ],
   },
   {
@@ -341,7 +339,7 @@ const thickBeats: Beat[] = [
   {
     id: 'l19-thick:b5',
     phase: 'lecture',
-    text: `Do not stretch the thick form. As $E \\to V_0$ we have $\\kappa \\to 0$ and the displayed prefactor misleads, but the exact $T$ stays finite. Use $e^{\\kappa a} - e^{-\\kappa a} \\simeq 2\\kappa a$ in the exact form: then $T \\to 1/(1 + \\tfrac{k^2a^2}{4})$, Ex. 6.7 of Unit 18.4. For $ka = 2$ that is ${d(V18.l18TEV0T, 1)}. A thousandth below the top the exact value is ${d(V.l19LimitT999, 4)}; a billionth below it is ${d(V.l19LimitT, 4)}. And as $a \\to 0$ the thick form tends to ${d(V18.l18ThickAtZero, 0)}, while the exact $T$ tends to 1.`,
+    text: `Do not stretch the thick form. As $E \\to V_0$ we have $\\kappa \\to 0$ and the displayed prefactor misleads, but the exact $T$ stays finite. Use $e^{\\kappa a} - e^{-\\kappa a} \\simeq 2\\kappa a$ in the exact form: then $T \\to 1/(1 + \\tfrac{k^2a^2}{4})$, Ex. 6.7 of Unit 18.4. For $ka = 2$ that is ${d(V18.l18TEV0T, 1)}. A thousandth below the top the exact value is ${d(V.l19LimitT999, 4)}; a billionth below it is ${d(V.l19LimitT, 4)}. And as $a \\to 0$ the exact $T$ tends to 1, which the thick form misses (Unit 18.4).`,
     caption: 'the state a thousandth below the top of the barrier, for $ka$ near 2: about half gets through',
     stage: W({ barrierWave: { E: 1.998, V0: 2, a: 1 } }, { show: ['density'], readouts: ['transmission'] }),
     fidelity: FIDELITY_S,
@@ -349,7 +347,6 @@ const thickBeats: Beat[] = [
       claim18('l18TEV0T', 'at E = V₀ with ka = 2 the transmission is 0.5', () => close(V18.l18TEV0T, 0.5, 1e-9)),
       claim('l19LimitT999', 'a thousandth below the top it is 0.4994', () => close(V.l19LimitT999, 0.499417, 5e-5)),
       claim('l19LimitT', 'a billionth below it is 0.5000', () => close(V.l19LimitT, 0.5, 1e-8)),
-      claim18('l18ThickAtZero', 'as a → 0 the thick form tends to 4', () => close(V18.l18ThickAtZero, 4, 1e-12)),
     ],
   },
   {
@@ -398,7 +395,7 @@ const energyBeats: Beat[] = [
   {
     id: 'l19-energy:b2',
     phase: 'lecture',
-    text: `In a [[scanning-tunnelling-microscope|scanning tunnelling microscope]] electrons cross the vacuum gap between a sharp tip and a surface. Say their energy lies 4 eV below the top of the barrier. Then $\\kappa = ${d(V.l19StmKappa, 3)}$ per ångström, and a gap one ångström wider cuts the current by the factor ${d(V.l19StmFactorExact, 4)}. The thick form gives ${d(V.l19StmFactorThick, 4)}, the same to four digits. Each ${d(V.l19StmDecade, 2)} Å of extra gap costs a factor of ten, so the current senses less than an atom's width. <<sl-q27-josephson|Go further in 709: Cooper pairs tunnelling through an insulating barrier>>.`,
+    text: `In a [[scanning-tunnelling-microscope|scanning tunnelling microscope]] electrons cross the vacuum gap between a sharp tip and a surface. Say the barrier top is 8 eV up and the electron has 4 eV, so it lies 4 eV below the top. Then $\\kappa = ${d(V.l19StmKappa, 3)}$ per ångström, and a gap that grows from 5 Å to 6 Å cuts the current by the factor ${d(V.l19StmFactorExact, 4)}. The thick form gives ${d(V.l19StmFactorThick, 4)}, the same to four digits. Each ${d(V.l19StmDecade, 2)} Å of extra gap costs a factor of ten, so the current senses less than an atom's width. <<sl-q27-josephson|Go further in 709: Cooper pairs tunnelling through an insulating barrier>>.`,
     caption: 'the thick-barrier form: every added decay length multiplies the current by a fixed factor',
     stage: BARRIER_THICK(3),
     claims: [
@@ -411,10 +408,11 @@ const energyBeats: Beat[] = [
   {
     id: 'l19-energy:b3',
     phase: 'lecture',
-    text: `[[alpha-decay|Alpha decay]] is tunnelling through the Coulomb barrier of a nucleus. We build a model, not a fit: a point alpha particle, a daughter nucleus of charge 90 and radius ${d(V.l19AlphaR, 1)} fm. At ${d(V.l19AlphaE, 2)} MeV the barrier ends at ${d(V.l19TurnB4, 1)} fm, and the exponent $2\\int\\kappa\\,dr$ is ${d(V.l19Gamow4, 1)}. At 8 MeV it is ${d(V.l19Gamow8, 1)}. The difference is ${d(V.l19GamowFactor10, 1)} decades of $T$. This is the stack of thin barriers of Unit 18.4, and it shows how sharply the rate depends on the energy. The model predicts no half-lives.`,
-    caption: 'the thick-barrier form: a small change in the exponent is a large change in $T$',
+    text: `[[alpha-decay|Alpha decay]] is tunnelling through the Coulomb barrier of a nucleus. We build a model, not a fit. The alpha has its own rest energy, ${d(V.l19AlphaMass, 0)} MeV, with no recoil correction. The daughter nucleus has charge 90 and radius ${d(V.l19AlphaR, 1)} fm. At ${d(V.l19AlphaE, 2)} MeV the barrier ends at ${d(V.l19TurnB4, 1)} fm, and the exponent $2\\int\\kappa\\,dr$ is ${d(V.l19Gamow4, 1)}. At 8 MeV it is ${d(V.l19Gamow8, 1)}. The difference is ${d(V.l19GamowFactor10, 1)} decades of $T$. This is the stack of thin barriers of Unit 18.4, and it shows how sharply the rate depends on the energy. The model predicts no half-lives.`,
+    caption: 'a stand-in: a rectangular barrier, not the Coulomb one; a small change in the exponent is a large change in $T$',
     stage: BARRIER_THICK(3),
     claims: [
+      claim('l19AlphaMass', 'the alpha’s rest energy is 3727 MeV', () => close(V.l19AlphaMass, 3727.379, 5e-4)),
       claim('l19AlphaR', 'the daughter’s radius is 7.4 fm', () => close(V.l19AlphaR, 7.4, 1e-12)),
       claim('l19AlphaE', 'the first alpha energy is 4.27 MeV', () => close(V.l19AlphaE, 4.27, 1e-12)),
       claim('l19TurnB4', 'at 4.27 MeV the barrier ends at 60.7 fm', () => close(V.l19TurnB4, 60.70108, 5e-3)),
@@ -440,13 +438,15 @@ const energyBeats: Beat[] = [
   {
     id: 'l19-energy:b5',
     phase: 'deeper',
-    text: `Beyond the notes: the part of a packet that gets through can carry more kinetic energy than the packet started with. Nothing is lent. $T$ grows with the energy, so the barrier passes the high-energy end of the packet more easily. For the packet in the picture the mean kinetic energy is ${d(V.l19IncMeanKin, 3)}. Weighting each momentum by $T(p)$ gives ${d(V.l19TransKinMean, 3)} for the transmitted part, and the reflected part has ${d(V.l19ReflKinMean, 3)}. The two parts together return the starting value.`,
+    text: `Beyond the notes: the part of a packet that gets through can carry more kinetic energy than the packet started with. Nothing is lent. $T$ grows with the energy, so the barrier passes the high-energy end of the packet more easily. For the packet in the picture the mean kinetic energy is ${d(V.l19IncMeanKin, 3)}. Weighting each momentum by $T(p)$ gives ${d(V.l19TransKinMean, 3)} for the transmitted part, and the reflected part has ${d(V.l19ReflKinMean, 3)}. Weighted by their shares, ${d(V.l19TransShare, 4)} and ${d(V.l19ReflShare, 4)}, the two parts together return the starting value.`,
     caption: 'the packet before and after: the barrier has sorted its momenta, not changed them',
     stage: BAR_RUN({ readouts: ['reflected', 'transmitted'] }),
     fidelity: FIDELITY_P,
     claims: [
       claim('l19IncMeanKin', 'the packet’s mean kinetic energy is 2.031', () => close(V.l19IncMeanKin, 2.03125, 5e-4)),
       claim('l19TransKinMean', 'the transmitted part has 2.125', () => close(V.l19TransKinMean, 2.124877, 5e-4)),
+      claim('l19TransShare', 'the transmitted share is 0.4196', () => close(V.l19TransShare, 0.419649, 5e-4)),
+      claim('l19ReflShare', 'the reflected share is 0.5804', () => close(V.l19ReflShare, 0.580351, 5e-4)),
       claim('l19ReflKinMean', 'the reflected part has 1.964', () => close(V.l19ReflKinMean, 1.963549, 5e-4)),
     ],
   },

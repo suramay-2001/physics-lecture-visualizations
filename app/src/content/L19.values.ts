@@ -17,8 +17,8 @@ import { M_ELECTRON } from '../physics/constants'
 import { barrierT, barrierThick, decayConstant } from '../physics/scatter'
 import { HBAR2_OVER_2M_EV_A2, barrierAmplitudes, barrierWidthForT, momentumAverage } from '../physics/wave18'
 import {
-  M_PROTON, barrierFringes, barrierLeftCurrent, barrierTEv, coulombTurningPoint, deltaBarrierT, deltaLimitT, filteredKineticMean, gamowExponent, kappaPerAngstrom, macroKappaA,
-  matchResidual, regionEnergies, transmissionAmplitude,
+  ALPHA_MC2_MEV, M_PROTON, barrierFringes, barrierLeftCurrent, barrierTEv, coulombTurningPoint, deltaBarrierT, deltaLimitT, filteredKineticMean, gamowExponent, kappaPerAngstrom, macroKappaA,
+  matchResidual, regionEnergies, transmittedShare, transmissionAmplitude,
 } from '../physics/wave19'
 import { keyedClaim } from './claimKit'
 
@@ -100,6 +100,7 @@ export const V = {
   l19StmFactorThick: barrierThick(4, 8, 6, 1 / (2 * HBAR2_OVER_2M_EV_A2), 1) / barrierThick(4, 8, 5, 1 / (2 * HBAR2_OVER_2M_EV_A2), 1), // 0.1288
   l19StmDecade: Math.LN10 / (2 * stmKappa), // 1.124 Å: one decade of current
   l19AlphaE: ALPHA_E, // 4.27 MeV: the first alpha energy of the model (an input, claimed because the page shows it)
+  l19AlphaMass: ALPHA_MC2_MEV, // 3727.4 MeV: the alpha's rest energy (an input)
   l19AlphaR: ALPHA_R, // 7.4 fm: the daughter's radius (an input)
   l19TurnB4: coulombTurningPoint(ALPHA_E, 90), // 60.70 fm
   l19Gamow4: G4, // 97.36
@@ -109,8 +110,10 @@ export const V = {
   l19DeltaTw1: deltaLimitT(3, 2, 0.1), // 0.6200
   l19DeltaTw2: deltaLimitT(3, 2, 0.01), // 0.6377
   l19DeltaTw3: deltaLimitT(3, 2, 0.001), // 0.6398
-  l19IncMeanKin: momentumAverage(2, 2, (p) => (p * p) / 2), // 2.0200
-  l19TransKinMean: filteredKineticMean(2, 2, 4, 0.5, 'T'), // 2.0803
+  l19IncMeanKin: momentumAverage(2, 2, (p) => (p * p) / 2), // 2.0313
+  l19TransKinMean: filteredKineticMean(2, 2, 4, 0.5, 'T'), // 2.1249
+  l19TransShare: transmittedShare(2, 2, 4, 0.5), // 0.4196: the chance the part gets through
+  l19ReflShare: 1 - transmittedShare(2, 2, 4, 0.5), // 0.5804
   l19ReflKinMean: filteredKineticMean(2, 2, 4, 0.5, 'R'), // below the incident one
   /* challenges and practice questions */
   l19PhaseT75Lag: lag75, // 85.94: the lag of τ for a = ¾

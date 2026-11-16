@@ -30,7 +30,7 @@ export const L19_REVIEW: Record<string, ReviewCard> = {
     points: [
       'Four matching conditions, two at each edge, fix the four amplitudes $r$, $A$, $B$ and $\\tau$.',
       `The transmitted amplitude has size ${d(V.l19AbsT, 3)} for $\\kappa a = 1$ and $k = \\kappa$, and $T = |\\tau|^2$ because both sides have $V = 0$.`,
-      `The current is the same on all three sides: ${d(V.l19CurrentLeft, 4)} for the lecture's barrier.`,
+      `The current is the same in all three regions: ${d(V.l19CurrentLeft, 4)} for the lecture's barrier.`,
     ],
     equations: 'T = |\\tau|^2',
     trap: 'Using $T = |\\tau|^2$ when the potential on the right differs from the one on the left. Then a speed factor enters.',
