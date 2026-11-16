@@ -1156,6 +1156,98 @@ def lecture13_cases():
     return {"widths": widths, "momenta": moms, "fringe": fringe, "ring": ring, "trace": {"X": mat(X), "P": mat(P), "re": float(tr.real), "im": float(tr.imag)}}
 
 
+def lecture19_20_cases():
+    """Lectures 19 and 20 (physics/wave19.ts, wave20.ts) by independent routes, with their OWN settings (no shared rng). hbar = m = 1.
+    The barrier (V = V0 on 0 < x < a, E below it) is solved as the FOUR MATCHING CONDITIONS, a 4 x 4 complex system (np.linalg.solve), never the
+    closed form D = cosh + i eps sinh the engine writes; the unknowns are r, A, B, tau (psi = e^{ikx} + r e^{-ikx}, A e^{kx} + B e^{-kx}, tau e^{ikx}).
+    The well (V = 0 for |x| < a/2, V0 outside, centred at 0) has its levels found by scipy brentq on a fine energy scan of the two smooth forms (the
+    engine bisects in u = ka/2 inside quarter-period brackets), by a finite-difference Hamiltonian (scipy eigh_tridiagonal, Dirichlet walls far out, a
+    node at each well edge) as a third route, and its normalisation and tail by scipy quad of the unnormalised pieces (the engine uses the closed form)."""
+    from scipy.integrate import quad
+    from scipy.linalg import eigh_tridiagonal
+    from scipy.optimize import brentq
+
+    barrier = []
+    for E, V0, a in [(2.0, 4.0, 0.5), (1.0, 4.0, 1.0), (3.5, 4.0, 2.0), (0.5, 8.0, 3.0), (7.0, 8.0, 0.3), (2.0, 8.0, 4.0), (0.3, 1.0, 0.1)]:
+        k = np.sqrt(2 * E)
+        kap = np.sqrt(2 * (V0 - E))
+        ea, ema = np.exp(kap * a), np.exp(-kap * a)
+        eik = np.exp(1j * k * a)
+        # unknowns [r, A, B, tau]
+        M = np.array([
+            [1, -1, -1, 0],
+            [-1j * k, -kap, kap, 0],
+            [0, ea, ema, -eik],
+            [0, kap * ea, -kap * ema, -1j * k * eik],
+        ], complex)
+        rhs = np.array([-1, -1j * k, 0, 0], complex)
+        r, A, B, tau = np.linalg.solve(M, rhs)
+        xs = np.linspace(-3.0, a + 3.0, 25)
+        psi = np.where(xs < 0, np.exp(1j * k * xs) + r * np.exp(-1j * k * xs), np.where(xs <= a, A * np.exp(kap * xs) + B * np.exp(-kap * xs), tau * np.exp(1j * k * xs)))
+        barrier.append({
+            "E": E, "V0": V0, "a": a, "r": cplx(r), "A": cplx(A), "B": cplx(B), "tau": cplx(tau),
+            "R": float(abs(r) ** 2), "T": float(abs(tau) ** 2),
+            "xs": [float(x) for x in xs], "re": [float(z.real) for z in psi], "im": [float(z.imag) for z in psi],
+        })
+
+    wells = []
+    for V0, a in [(8.0, 2.0), (4.0, 1.0), (8.0, 6.0), (1.0, 3.0), (2.0, 1.0), (8.0, 1.0), (6.0, 4.0)]:
+        def f_even(E):
+            k, kap = np.sqrt(2 * E), np.sqrt(2 * (V0 - E))
+            return kap * np.cos(k * a / 2) - k * np.sin(k * a / 2)
+
+        def f_odd(E):
+            k, kap = np.sqrt(2 * E), np.sqrt(2 * (V0 - E))
+            return kap * np.sin(k * a / 2) + k * np.cos(k * a / 2)
+
+        grid = np.linspace(1e-9, V0 * (1 - 1e-9), 40001)
+        levels = []
+        for parity, f in (("even", f_even), ("odd", f_odd)):
+            v = f(grid)
+            for i in np.nonzero(np.sign(v[:-1]) * np.sign(v[1:]) < 0)[0]:
+                levels.append((brentq(f, grid[i], grid[i + 1], xtol=1e-15, rtol=1e-15), parity))
+        levels.sort()
+        # finite-difference Hamiltonian: h puts a node on each well edge
+        h = (a / 2) / 800
+        nL = int(np.ceil((a / 2 + 14) / h))
+        x = np.arange(-nL, nL + 1) * h
+        V = np.where(np.abs(x) < a / 2 - 1e-9, 0.0, np.where(np.abs(np.abs(x) - a / 2) < 1e-9, V0 / 2, V0))
+        diag = 1 / h ** 2 + V
+        off = -0.5 / h ** 2 * np.ones(len(x) - 1)
+        nb = len(levels)
+        ev, vec = eigh_tridiagonal(diag, off, select="i", select_range=(0, nb - 1))
+        fd = []
+        for j in range(nb):
+            d2 = vec[:, j] ** 2
+            d2 = d2 / (np.sum(d2) * h)
+            inside = np.abs(x) < a / 2 - 1e-9
+            edge = np.abs(np.abs(x) - a / 2) < 1e-9
+            tail = (np.sum(d2[~inside & ~edge]) + 0.5 * np.sum(d2[edge])) * h
+            fd.append({"E": float(ev[j]), "tail": float(tail)})
+        states = []
+        xs = [-a, -a / 2 - 0.3, -a / 2, -0.37 * a, 0.0, 0.21 * a, a / 2, a / 2 + 0.25, a]
+        for n, (E, parity) in enumerate(levels, start=1):
+            k, kap = np.sqrt(2 * E), np.sqrt(2 * (V0 - E))
+            edge_v = np.cos(k * a / 2) if parity == "even" else np.sin(k * a / 2)
+
+            def un(t, k=k, kap=kap, parity=parity, edge_v=edge_v):
+                at = abs(t)
+                if at <= a / 2:
+                    return np.cos(k * t) if parity == "even" else np.sin(k * t)
+                s = 1.0 if (parity == "even" or t > 0) else -1.0
+                return s * edge_v * np.exp(-kap * (at - a / 2))
+
+            ins = quad(lambda t: un(t) ** 2, -a / 2, a / 2, epsabs=1e-12, epsrel=1e-12)[0]
+            out = 2 * quad(lambda t: un(t) ** 2, a / 2, a / 2 + 60 / kap, epsabs=1e-12, epsrel=1e-12)[0]
+            states.append({"n": n, "xs": xs, "psi": [float(un(t) / np.sqrt(ins + out)) for t in xs], "tail": float(out / (ins + out))})
+        mism = []
+        for E in np.linspace(0, V0, 9):
+            k, kap = np.sqrt(2 * E), np.sqrt(max(0.0, 2 * (V0 - E)))
+            mism.append({"E": float(E), "even": float((kap * np.cos(k * a / 2) - k * np.sin(k * a / 2)) / np.sqrt(2 * V0)), "odd": float((kap * np.sin(k * a / 2) + k * np.cos(k * a / 2)) / np.sqrt(2 * V0))})
+        wells.append({"V0": V0, "a": a, "levels": [{"n": i + 1, "E": float(E), "parity": p} for i, (E, p) in enumerate(levels)], "fd": fd, "states": states, "mismatch": mism, "count": len(levels)})
+    return {"barrier": barrier, "wells": wells}
+
+
 out = ROOT / "app" / "src" / "physics" / "__fixtures__" / "numpy.json"
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({
@@ -1170,5 +1262,6 @@ out.write_text(json.dumps({
     "lecture11": lecture11_cases(),
     "lecture12_13": lecture12_13_cases(),
     "lecture13": lecture13_cases(),
+    "lecture19_20": lecture19_20_cases(),
 }, indent=1, allow_nan=False))
 print(f"wrote {out.relative_to(ROOT)}", lecture_numbers)
