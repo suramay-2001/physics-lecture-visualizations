@@ -57,14 +57,28 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-11-16): 448 L19–L20.** Owner: build the new notes `~/Downloads/Lecture_19.pdf` (tunnelling through
-a finite barrier, 9 pp) and `Lecture_20.pdf` (bound states and quantized energies, 12 pp), ingested as `sources/L19`,
-`L20`. No new 448 homework sheet (HW1–HW7 submitted). Weekly meter 5 % (reset Fri 11-20 19:00 UTC); estimate ~8 points.
-Ownership to rule (as in `decisions/448-L14L18.md` M2: the lecture whose NOTES teach a topic owns it): L18 holds barrier
-tunnelling and the p. 231 Correction (moved from Townsend); L14 holds the books-only particle-in-a-box `l14-box`. Plan:
-one planner for L19+L20 (`scratchpad/brief-448-plan-L19L20.md`) → rulings `decisions/448-L19L20.md` → one builder per
-lecture (`brief-build-448Lx.md` template) → one review + fix → gate, full preview e2e (derive SVG-only lists from kinds
-AND widgets), unpiped audit → push.
+**Next action:** none queued. When new 448 notes arrive (L21+), follow the L19–L20 batch below: ingest → one planner
+for the batch → judge rulings → one stage/engine agent if a stage addition is ruled → one builder per lecture in parallel
+→ Sonnet merge agent → one review + fix → gate, full preview e2e, unpiped audit → push. Scratchpad briefs do not survive
+a new session: rewrite them from `skills/05-chapter-build` and the brief texts recorded in the rulings files.
+Known follow-ups (not requested): Arcade levels for 448 L14–L20; L20's optional oscillator preview (`l20-oscillator`)
+must be revisited for ownership if L21's notes teach the oscillator.
+
+**DONE (2026-11-16): 448 L19–L20.** Notes ingested as `sources/L19` (finite-barrier tunnelling, 9 pp) and `sources/L20`
+(bound states, 12 pp). Plans `proposals/P-L19-story.md`, `P-L20-story.md`; rulings `decisions/448-L19L20.md` R1–R10:
+- R1: barrier T, App. A route, thick form, p. 231 Correction stay in L18; L19 owns direct elimination (all four
+  amplitudes), the stationary picture, width/height/mass, energy and uses (STM, alpha model). Shared numbers keep L18 keys.
+- R2: `l14-box` moved to L20 (`l20-infinite`, keys `l20TBox…`, practice `l20-pr-box-energy`/`l20-pr-wall`, bridge
+  `qc-l14-box` → `qc-l20-box`); L14 now 5 units / 4 practice.
+- R3: stage sources `wavefunction.source.barrierWave {E,V0,a}` (readouts `reflection`, `transmission`) and
+  `wavefunction.source.well {V0,a,n}` (readouts `norm`, `energy`, `tail`), plot curves `wellMatchEven/Odd`; engines
+  `physics/wave19.ts`, `wave20.ts` live only in lazy chunks (SvgStage, PlotScene).
+- HW8 (due 11/12, sheet not ingested; holds a below-barrier problem) recorded **submitted** by the user.
+Counts: L19 5 units / 25 beats / 2 derivations / 19 challenges (3 practice) / 59 keys; L20 5 units / 30 beats /
+5 derivations / 24 challenges (5 practice) / 85 keys. e2e: 113 nav units, 20 map lines, L19 and L20 SVG-only.
+Review `audits/448-L19L20-review.md`: FIX-FIRST (1 S, 6 N, 10 nits) → all fixed except nit 5 (ruled no change); nit 10
+replaced L20's tent question (it duplicated `l14-pr-kinetic`) with a tent peaked at L/3 (`l20SkewTentRatio` 1.368).
+Final gate green after the fix pass (339 files, 17 843 tests); full preview e2e 408 passed (29.1 min) on the merge build and again on the fixed build.
 
 **DONE and PUSHED (2026-11-07): 448 L14–L18; 709 Arcade and films for Q19–Q27.** 448: five new lectures from the
 notes (Schrödinger equation and stationary states; free particles, wavepackets, dispersion; Gaussian packets and
