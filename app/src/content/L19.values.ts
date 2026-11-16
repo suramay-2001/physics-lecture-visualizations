@@ -47,8 +47,10 @@ const TProton = barrierTEv(1, 2, 1, massRatio)
 const stmKappa = kappaPerAngstrom(4)
 
 /* alpha decay (a model): Z = 90, R = 7.4 fm, the alpha's energy 4.27 and 8.0 MeV */
-const G4 = gamowExponent(4.27, 90, 7.4)
-const G8 = gamowExponent(8.0, 90, 7.4)
+const ALPHA_E = 4.27
+const ALPHA_R = 7.4
+const G4 = gamowExponent(ALPHA_E, 90, ALPHA_R)
+const G8 = gamowExponent(8, 90, ALPHA_R)
 
 /* practice: φ = 5.1 eV (E = 5 eV, V₀ = 10.1 eV), the gap grows from 5 Å to 5.5 Å */
 const prStm = barrierTEv(5, 10.1, 5.5) / barrierTEv(5, 10.1, 5)
@@ -75,6 +77,7 @@ export const V = {
   /* l19-thick */
   l19ThickRatio2: TAtKa(2) / thickAtKa(2), // 0.9644
   l19ThickRatio3: TAtKa(3) / thickAtKa(3), // 0.9951
+  l19Ka15: kappa * 0.75, // 1.5: κa for a = ¾ (the half-way width of the doubling example)
   l19T15: TAtKa(1.5), // 0.1807
   l19DoubleFactor: TAtKa(3) / TAtKa(1.5), // 0.0546
   l19LogSlopeMag: -slope, // 3.99: the slope of ln T against a tends to −2κ = −4
@@ -96,7 +99,9 @@ export const V = {
   l19StmFactorExact: barrierTEv(4, 8, 6) / barrierTEv(4, 8, 5), // 0.1288
   l19StmFactorThick: barrierThick(4, 8, 6, 1 / (2 * HBAR2_OVER_2M_EV_A2), 1) / barrierThick(4, 8, 5, 1 / (2 * HBAR2_OVER_2M_EV_A2), 1), // 0.1288
   l19StmDecade: Math.LN10 / (2 * stmKappa), // 1.124 Å: one decade of current
-  l19TurnB4: coulombTurningPoint(4.27, 90), // 60.70 fm
+  l19AlphaE: ALPHA_E, // 4.27 MeV: the first alpha energy of the model (an input, claimed because the page shows it)
+  l19AlphaR: ALPHA_R, // 7.4 fm: the daughter's radius (an input)
+  l19TurnB4: coulombTurningPoint(ALPHA_E, 90), // 60.70 fm
   l19Gamow4: G4, // 97.36
   l19Gamow8: G8, // 52.34
   l19GamowFactor10: (G4 - G8) / Math.LN10, // 19.55 decades
@@ -104,9 +109,9 @@ export const V = {
   l19DeltaTw1: deltaLimitT(3, 2, 0.1), // 0.6200
   l19DeltaTw2: deltaLimitT(3, 2, 0.01), // 0.6377
   l19DeltaTw3: deltaLimitT(3, 2, 0.001), // 0.6398
-  l19IncMeanKin: momentumAverage(2, 2.5, (p) => (p * p) / 2), // 2.0200
-  l19TransKinMean: filteredKineticMean(2, 2.5, 4, 0.5, 'T'), // 2.0803
-  l19ReflKinMean: filteredKineticMean(2, 2.5, 4, 0.5, 'R'), // below the incident one
+  l19IncMeanKin: momentumAverage(2, 2, (p) => (p * p) / 2), // 2.0200
+  l19TransKinMean: filteredKineticMean(2, 2, 4, 0.5, 'T'), // 2.0803
+  l19ReflKinMean: filteredKineticMean(2, 2, 4, 0.5, 'R'), // below the incident one
   /* challenges and practice questions */
   l19PhaseT75Lag: lag75, // 85.94: the lag of τ for a = ¾
   l19PrDelta: deltaBarrierT(2.5, 1.5), // 0.5902

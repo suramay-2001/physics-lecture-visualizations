@@ -156,6 +156,7 @@ for x_ in (0.5, 1.0, 2.0, 3.0):
     assert abs(Tka(x_) - 1 / np.cosh(x_) ** 2) < 1e-12
 put('l19ThickRatio2', Tka(2) / Tka_thick(2))
 put('l19ThickRatio3', Tka(3) / Tka_thick(3))
+put('l19Ka15', q.real * 0.75)
 put('l19T15', Tka(1.5))
 put('l19DoubleFactor', Tka(3) / Tka(1.5))
 put('l19LogSlopeMag', -(np.log(Tka(4)) - np.log(Tka(3))) / (1 / 2.0))
@@ -209,6 +210,8 @@ for E_ in (4.27, 8.0):
     assert abs(gamow_quad(E_)[0] - gamow_closed(E_)) < 1e-8
 G4_, b4_ = gamow_quad(4.27)
 G8_, _ = gamow_quad(8.0)
+put('l19AlphaE', 4.27)
+put('l19AlphaR', Rn)
 put('l19TurnB4', b4_)
 put('l19Gamow4', gamow_closed(4.27))
 put('l19Gamow8', gamow_closed(8.0))
@@ -219,7 +222,7 @@ put('l19DeltaTexact', dT(3.0, 2.0))
 for tag, a_ in (('l19DeltaTw1', 0.1), ('l19DeltaTw2', 0.01), ('l19DeltaTw3', 0.001)):
     put(tag, T_solve(2.0, 3.0 / (2 * a_), a_))
 assert abs(T_solve(2.0, 3.0 / 0.0002, 0.0001) - dT(3.0, 2.0)) < 1e-4
-# the momentum density of the packet (sigma = 5/2, p0 = 2): N(p0, 1/2 sigma); the kinetic energy of the whole, and of the part the barrier transmits or turns back
+# the momentum density of the packet (sigma = 2, p0 = 2): N(p0, 1/2 sigma); the kinetic energy of the whole, and of the part the barrier transmits or turns back
 
 
 def weighted(p0, sig, fun):
@@ -229,13 +232,13 @@ def weighted(p0, sig, fun):
     return quad(lambda p: dens_(p) * fun(p), lo, hi, epsabs=1e-14, epsrel=1e-13, limit=500)[0]
 
 
-put('l19IncMeanKin', weighted(2.0, 2.5, lambda p: p * p / 2))
-assert abs(weighted(2.0, 2.5, lambda p: 1.0) - 1) < 1e-12
+put('l19IncMeanKin', weighted(2.0, 2.0, lambda p: p * p / 2))
+assert abs(weighted(2.0, 2.0, lambda p: 1.0) - 1) < 1e-12
 Tp_ = lambda p: T_solve(p * p / 2, 4.0, 0.5)
-num = weighted(2.0, 2.5, lambda p: Tp_(p) * p * p / 2)
-put('l19TransKinMean', num / weighted(2.0, 2.5, Tp_))
-numR = weighted(2.0, 2.5, lambda p: (1 - Tp_(p)) * p * p / 2)
-put('l19ReflKinMean', numR / weighted(2.0, 2.5, lambda p: 1 - Tp_(p)))
+num = weighted(2.0, 2.0, lambda p: Tp_(p) * p * p / 2)
+put('l19TransKinMean', num / weighted(2.0, 2.0, Tp_))
+numR = weighted(2.0, 2.0, lambda p: (1 - Tp_(p)) * p * p / 2)
+put('l19ReflKinMean', numR / weighted(2.0, 2.0, lambda p: 1 - Tp_(p)))
 
 # ---- challenges and practice
 put('l19PhaseT75Lag', -np.degrees(np.angle(solve4(2.0, 4.0, 0.75)[5])))
