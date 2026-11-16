@@ -663,14 +663,6 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "|\\psi|^2 = |c_1\\varphi_1|^2 + |c_2\\varphi_2|^2 + 2\\,\\mathrm{Re}\\!\\left[c_1^*c_2\\varphi_1^*\\varphi_2\\,e^{-i(E_2 - E_1)t/\\hbar}\\right]"
     ]
   },
-  "l14-box": {
-    "question": "What does an energy eigenstate look like along x, and why are the energies in a box quantised?",
-    "equations": [
-      "k_nL = n\\pi",
-      "E_n = \\tfrac{\\hbar^2\\pi^2n^2}{2mL^2}",
-      "\\varphi_n = \\sqrt{2/L}\\,\\sin(n\\pi x/L)"
-    ]
-  },
   "l15-puzzle": {
     "question": "If energy eigenstates stand still, how can a particle move?",
     "equations": [
@@ -805,6 +797,44 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}\\quad (\\kappa a \\gg 1)",
       "j = \\tfrac{2\\hbar\\kappa}{m}\\,\\mathrm{Im}(D^*C)",
       "T \\simeq \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)"
+    ]
+  },
+  "l20-reverse": {
+    "question": "What changes when the particle cannot escape?",
+    "equations": [
+      "\\int_{-\\infty}^{\\infty}|\\varphi|^2dx < \\infty",
+      "\\varphi'' = -k^2\\varphi,\\quad \\varphi'' = \\kappa^2\\varphi"
+    ]
+  },
+  "l20-infinite": {
+    "question": "Where does quantisation come from?",
+    "equations": [
+      "k_na = n\\pi",
+      "E_n = \\dfrac{n^2\\pi^2\\hbar^2}{2ma^2}",
+      "\\varphi_n = \\sqrt{\\dfrac{2}{a}}\\,\\sin\\dfrac{n\\pi x}{a}"
+    ]
+  },
+  "l20-finite": {
+    "question": "Which energies fit when the walls are finite?",
+    "equations": [
+      "k^2 + \\kappa^2 = \\dfrac{2mV_0}{\\hbar^2}",
+      "k\\tan\\tfrac{ka}{2} = \\kappa\\ \\text{(even)}",
+      "-k\\cot\\tfrac{ka}{2} = \\kappa\\ \\text{(odd)}"
+    ]
+  },
+  "l20-compare": {
+    "question": "What survives when the walls are finite?",
+    "equations": [
+      "E_n^{\\mathrm{finite}} < E_n^{\\mathrm{infinite}}",
+      "|\\Psi|^2 = \\dfrac{\\varphi_1^2 + \\varphi_2^2}{2} + \\varphi_1\\varphi_2\\cos\\dfrac{(E_2 - E_1)t}{\\hbar}"
+    ]
+  },
+  "l20-oscillator": {
+    "question": "What if the minimum is smooth?",
+    "equations": [
+      "H = \\tfrac{\\hbar\\omega}{2}(X^2 + P^2)",
+      "[X, P] = i",
+      "H = \\hbar\\omega(\\hat a^\\dagger\\hat a + \\tfrac{1}{2})"
     ]
   }
 }

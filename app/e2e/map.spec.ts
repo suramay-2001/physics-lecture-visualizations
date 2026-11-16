@@ -9,7 +9,7 @@ import { collectErrors, expectNoErrors } from './helpers.ts'
 test('the course as beamlines: every station of the built course links into its chapter', async ({ page }) => {
   const errors = collectErrors(page)
   await page.goto('#/map')
-  await expect(page.locator('.map-line')).toHaveCount(18)
+  await expect(page.locator('.map-line')).toHaveCount(19) // L1–L18 and L20 on this branch (L19 is built in parallel; the merge makes it 20)
   await expect(page.locator('#map-L1 a.map-station')).toHaveCount(5)
   // Lecture 7 is built: seven stations, one per unit (six lecture units and the Townsend unit l7-ladder), all links; no line is in preparation any more
   await expect(page.locator('#map-L7 .map-station')).toHaveCount(7)
@@ -39,9 +39,9 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L13 .map-station')).toHaveCount(7)
   await expect(page.locator('#map-L13 a.map-station')).toHaveCount(7)
   await expect(page.locator('#map-L13')).not.toContainText('in preparation')
-  // Lecture 14 is built: six stations, one per unit (five lecture units and the books-only box l14-box), all links
-  await expect(page.locator('#map-L14 .map-station')).toHaveCount(6)
-  await expect(page.locator('#map-L14 a.map-station')).toHaveCount(6)
+  // Lecture 14 is built: five stations, one per unit (five lecture units; the box moved to L20), all links
+  await expect(page.locator('#map-L14 .map-station')).toHaveCount(5)
+  await expect(page.locator('#map-L14 a.map-station')).toHaveCount(5)
   await expect(page.locator('#map-L14')).not.toContainText('in preparation')
   // Lecture 15 is built: six stations, one per unit (six lecture units), all links
   await expect(page.locator('#map-L15 .map-station')).toHaveCount(6)
@@ -59,6 +59,10 @@ test('the course as beamlines: every station of the built course links into its 
   await expect(page.locator('#map-L18 .map-station')).toHaveCount(4)
   await expect(page.locator('#map-L18 a.map-station')).toHaveCount(4)
   await expect(page.locator('#map-L18')).not.toContainText('in preparation')
+  // Lecture 20 is built: five stations, one per unit (four lecture units and the optional oscillator unit; the infinite well came from L14), all links. This branch has no Lecture 19 yet.
+  await expect(page.locator('#map-L20 .map-station')).toHaveCount(5)
+  await expect(page.locator('#map-L20 a.map-station')).toHaveCount(5)
+  await expect(page.locator('#map-L20')).not.toContainText('in preparation')
   // every lecture is built, so the intro no longer promises dashed "in preparation" stations
   await expect(page.locator('.map-page .section-lede')).not.toContainText('in preparation')
   await expectNoErrors(errors)

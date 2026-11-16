@@ -31,6 +31,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L16', number: 16, title: 'Gaussian packets and Ehrenfest' },
   { id: 'L17', number: 17, title: 'Classical mean motion and quantum reflection' },
   { id: 'L18', number: 18, title: 'Quantum reflection and tunnelling' },
+  { id: 'L20', number: 20, title: 'Bound states and quantized energies' },
 ]
 
 export interface Concept {
@@ -139,13 +140,12 @@ export const CONCEPTS: Concept[] = [
   { id: 'commutator-bases', label: 'Position in the momentum basis', lecture: 'L13', unit: 'l13-two-bases', needs: ['momentum-space', 'uncertainty'] },
   { id: 'schrodinger-position', label: 'The Schrödinger equation of a particle', lecture: 'L13', unit: 'l13-schrodinger', needs: ['commutator-bases', 'schrodinger'] },
   { id: 'time-parameter', label: 'Why time is a parameter, not an operator', lecture: 'L13', unit: 'l13-time', needs: ['schrodinger-position', 'dynamical-law'] },
-  // L14 (the Schrödinger equation, time and stationary states; every built unit is a station). The box was Unit 13.8 (l13-stationary) and moved here (ruling M2).
+  // L14 (the Schrödinger equation, time and stationary states; every built unit is a station). The box was Unit 13.8 (l13-stationary), came here and moved on to Lecture 20 (rulings M2 and R2): its station `standing-waves` is Lecture 20's.
   { id: 'components', label: 'Discrete and continuous components of one ket', lecture: 'L14', unit: 'l14-components', needs: ['wavefunction'] },
   { id: 'schrodinger-assumed', label: 'What the position-space equation assumes', lecture: 'L14', unit: 'l14-schrodinger', needs: ['schrodinger-position', 'components'] },
   { id: 'matter-dispersion', label: 'Matter-wave dispersion and the free equation', lecture: 'L14', unit: 'l14-dispersion', needs: ['schrodinger-position'] },
   { id: 'no-time-operator', label: 'Time as a parameter and no energy-shifting operator', lecture: 'L14', unit: 'l14-time', needs: ['time-parameter', 'dynamical-law'] },
   { id: 'tise', label: 'The time-independent equation and stationary states', lecture: 'L14', unit: 'l14-stationary', needs: ['schrodinger-assumed', 'stationary-states'] },
-  { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L14', unit: 'l14-box', needs: ['tise'] },
   // L15 (free particles, wavepackets, group velocity and dispersion; every built unit is a station)
   { id: 'motion-puzzle', label: 'Why a stationary state cannot move a particle', lecture: 'L15', unit: 'l15-puzzle', needs: ['tise'] },
   { id: 'free-states', label: 'Free momentum states are energy states', lecture: 'L15', unit: 'l15-free-eigenstate', needs: ['tise'] },
@@ -167,6 +167,12 @@ export const CONCEPTS: Concept[] = [
   { id: 'probability-flux', label: 'The flux of a moving Gaussian and the shares R and T', lecture: 'L18', unit: 'l18-detector', needs: ['probability-current', 'packet-scattering'] },
   { id: 'evanescent-wave', label: 'Below the step: a tail is not transmission', lecture: 'L18', unit: 'l18-below', needs: ['potential-step', 'probability-flux'] },
   { id: 'tunnelling', label: 'A finite barrier lets it through', lecture: 'L18', unit: 'l18-tunnel', needs: ['evanescent-wave', 'stationary-states'] },
+  // L20 (bound states and quantized energies; every built unit is a station). The infinite well was Unit 14.6 (l14-box) and moved here (ruling R2); the oscillator preview is optional.
+  { id: 'bound-states', label: 'From scattering to bound states: a normalisable state fixes E', lecture: 'L20', unit: 'l20-reverse', needs: ['tise', 'potential-step'] },
+  { id: 'standing-waves', label: 'Standing waves: energies in a box', lecture: 'L20', unit: 'l20-infinite', needs: ['tise', 'bound-states'] },
+  { id: 'finite-well', label: 'Lower the walls: tails, parity and the matching condition', lecture: 'L20', unit: 'l20-finite', needs: ['evanescent-wave', 'standing-waves'] },
+  { id: 'spectra-compared', label: 'Finite against infinite wells; bound but moving', lecture: 'L20', unit: 'l20-compare', needs: ['finite-well', 'stationary-states'] },
+  { id: 'smooth-minimum', label: 'A first look at the oscillator (optional)', lecture: 'L20', unit: 'l20-oscillator', needs: ['finite-well'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

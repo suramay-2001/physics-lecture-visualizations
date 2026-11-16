@@ -17,12 +17,13 @@ import { L15 } from './L15'
 import { L16 } from './L16'
 import { L17 } from './L17'
 import { L18 } from './L18'
+import { L20 } from './L20'
 
 /** The eager registry, for tests and DEV tools only: the app loads each lecture on demand (content/load.ts) and lists
  *  them from content/meta.ts. Importing this from application code would put every lecture back in the main chunk. */
 export { COURSE } from './meta'
 
-export const LECTURES: Lecture[] = [L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18]
+export const LECTURES: Lecture[] = [L1, L2, L3, L4, L5, L6, L7, L8, L9, L10, L11, L12, L13, L14, L15, L16, L17, L18, L20]
 
 export const lectureById = (id: string) => LECTURES.find((l) => l.id.toLowerCase() === id.toLowerCase())
 
