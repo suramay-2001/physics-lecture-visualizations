@@ -279,8 +279,10 @@ cn = lambda n: simpson(lambda x: trial(x) * sqrt(2) * np.sin(n * pi * x), 0, 1) 
 put('l20TrialP2', cn(2) ** 2)
 put('l20TrialP4', cn(4) ** 2)
 put('l20TrialMeanRatio', (simpson(lambda x: dtrial(x) ** 2, 0, 1) / 2 / nrm_t) / (pi**2 / 2))
-nrm_tent = simpson(lambda x: np.minimum(x, 1 - x) ** 2, 0, 1)
-put('l20TentRatio', (simpson(lambda x: np.ones_like(x), 0, 1) / 2 / nrm_tent) / (pi**2 / 2))  # tent' = +-1, so the integral of tent'^2 is 1
+# the lopsided tent psi = x (x < 1/3), (1 - x)/2 (x > 1/3): slopes 1 and -1/2, so the integral of psi'^2 is 1/3 + 1/6 = 1/2 and of psi^2 is 1/27
+skew = lambda x: np.where(x < 1 / 3, x, (1 - x) / 2)
+nrm_skew = simpson(lambda x: skew(x) ** 2, 0, 1)
+put('l20SkewTentRatio', ((1 / 3 * 1 + 2 / 3 * 0.25) / 2 / nrm_skew) / (pi**2 / 2))
 # the delta well: kappa = g/2, binding kappa^2/2; the thin deep well by a bracketed root
 put('l20DeltaBindingClosed', (3 / 2) ** 2 / 2)
 V0_d = 3 / (2 * 0.004)

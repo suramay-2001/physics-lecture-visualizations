@@ -202,7 +202,7 @@ export function boxFunctionOverlap(f: (x: number) => number, L: number, n: numbe
 
 /** ⟨E⟩ = ½∫f′²dx/∫f²dx for a function f on (0, L) that vanishes at both walls (ħ = m = 1); df is its derivative, and `kink` splits the range where df jumps (a kink costs a finite energy). */
 export function boxFunctionEnergy(f: (x: number) => number, df: (x: number) => number, L: number, kink?: number): number {
-  const num = kink === undefined ? simpson((x) => df(x) ** 2, 0, L) : simpson((x) => df(x) ** 2, 0, kink) + simpson((x) => df(x) ** 2, kink, L)
+  const num = kink === undefined ? simpson((x) => df(x) ** 2, 0, L) : simpson((x) => df(Math.min(x, kink * (1 - 1e-12))) ** 2, 0, kink) + simpson((x) => df(Math.max(x, kink * (1 + 1e-12))) ** 2, kink, L)
   return num / 2 / simpson((x) => f(x) * f(x), 0, L)
 }
 

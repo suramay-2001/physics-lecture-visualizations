@@ -218,13 +218,13 @@ const infinite: Beat[] = [
       ground: [
         {
           tex: '\\begin{pmatrix} 0 & 1 \\\\ \\sin ka & \\cos ka \\end{pmatrix}\\begin{pmatrix} A \\\\ B \\end{pmatrix} = 0',
-          why: 'The two wall conditions, $B = 0$ and $A\\sin ka + B\\cos ka = 0$, are two linear equations for $A$ and $B$ (Eqs. 6.101–6.102).',
+          why: 'The two wall conditions, $B = 0$ and $A\\sin ka + B\\cos ka = 0$, are two linear equations for $A$ and $B$ (the analogue of Eqs. 6.101–6.102, for a wall at zero).',
           view: W(BOX(4, 3), { show: ['re'] }),
           viewCaption: 'a candidate inside the box: level 3 is a sine that fits three half-waves',
         },
         {
           tex: '\\det = -\\sin ka = 0 \\;\\Rightarrow\\; k_na = n\\pi',
-          why: 'A nonzero solution needs the determinant to vanish (Eqs. 6.103–6.105), and a sine vanishes only at whole multiples of $\\pi$.',
+          why: 'A nonzero solution needs the determinant to vanish (the analogue of Eqs. 6.103–6.105), and a sine vanishes only at whole multiples of $\\pi$.',
           view: W(BOX(4, 2), { show: ['re', 'density'] }),
           viewCaption: 'the walls leave room for a whole number of half-waves',
         },
@@ -248,7 +248,7 @@ const infinite: Beat[] = [
   {
     id: 'l20-infinite:b7',
     phase: 'books',
-    text: `A wall that moves away: Townsend's Ex. 6.6 (pp. 221–224). Measure the energy, so the state is the ground state of a box of width $a$. Then pull both walls out at once, so the width doubles about the same centre. The state cannot change that fast, but it is no longer stationary. Square the overlap with the new lowest level to get the chance of that energy. The overlap is ${d(V.l20TBoxOverlap, 3)} ($8/(3\\pi)$), so the chance is ${d(V.l20TBoxP1, 2)}. The new third level gets ${d(V.l20TBoxP3, 2)}. The even levels get ${d(V.l20TBoxP2, 0)} by parity. The odd levels share all the rest, and their chances add to ${d(V.l20TBoxSumOdd, 0)}.`,
+    text: `Walls that move away: Townsend's Ex. 6.6 (pp. 221–224). Measure the energy, so the state is the ground state of a box of width $a$. Then pull both walls out at once, so the width doubles about the same centre. The state cannot change that fast, but it is no longer stationary. Square the overlap with the new lowest level to get the chance of that energy. The overlap is ${d(V.l20TBoxOverlap, 3)} ($8/(3\\pi)$), so the chance is ${d(V.l20TBoxP1, 2)}. The new third level gets ${d(V.l20TBoxP3, 2)}. Levels with even $n$ get ${d(V.l20TBoxP2, 0)} by parity. Levels with odd $n$ share all the rest, and their chances add to ${d(V.l20TBoxSumOdd, 0)}.`,
     caption: 'two levels mixed are not stationary: the density sloshes (two levels stand in for the many that the wider box produces)',
     stage: W(BOX(4, [1, 2]), { time: sweep(0, 2), show: ['density'], readouts: ['energy'] }),
     refs: [townsend('§6.9, pp. 221–224 (Ex. 6.6, Fig. 6.11)', 'The ground state of a box, widened suddenly to twice its width, overlaps the new ground state with $8/3\\pi$. The chance of the new ground energy is $64/9\\pi^2$.')],
@@ -400,7 +400,7 @@ const finite: Beat[] = [
     id: 'l20-finite:b7',
     phase: 'books',
     text: `Townsend (§6.8, pp. 215–217, Fig. 6.9) draws a well with four bound states, and the higher ones have longer tails. He postpones the matching condition. In ours the decay length $1/\\kappa$ grows over the three levels, to ${d(V.l20DecayLen1, 3)}, ${d(V.l20DecayLen2, 3)} and ${d(V.l20DecayLen3, 3)}, because each level lies closer to the top. The constants are $\\kappa = ${d(V.l20Kappa1, 3)}$, ${d(V.l20Kappa2, 3)} and ${d(V.l20Kappa3, 3)}.`,
-    caption: 'level 3, the highest of the three: its tail is the longest',
+    caption: 'level 3, the highest of the three: its tail is the longest (the window clips it)',
     stage: WELL(3),
     fidelity: ['wavefunction-well-eigen'],
     refs: [townsend('§6.8, pp. 215–217 (Fig. 6.9)', 'A finite well with four bound states: the oscillation inside matches a decaying exponential outside, and the higher levels have longer tails.')],
@@ -431,7 +431,7 @@ const finite: Beat[] = [
     id: 'l20-finite:b9',
     phase: 'deeper',
     text: `Beyond the notes: why only finitely many levels? Below $V_0$ the inside wave number stays under $\\sqrt{2mV_0}/\\hbar$, so only so many half-waves fit. Level $n$ exists once $V_0$ exceeds the infinite-well energy of level $n - 1$ for the same width. For $a = 2$ the second, third and fourth levels appear at $V_0 = ${d(V.l20Thresh2, 3)}$, ${d(V.l20Thresh3, 3)} and ${d(V.l20Thresh4, 2)}. A well of any depth keeps at least one level: even a very shallow one holds ${d(V.l20ShallowCount, 0)}.`,
-    caption: 'the even mismatch for a well of fixed depth: each new level is born as the well deepens',
+    caption: 'the even mismatch for the well with V₀ = 8: its zeros are the two even levels, and a deeper well would add more zeros',
     stage: MATCH_EVEN(),
     fidelity: ['plot-well-match'],
     claims: [
@@ -469,7 +469,7 @@ const compare: Beat[] = [
   {
     id: 'l20-compare:b2',
     phase: 'lecture',
-    text: `Raise the walls and the finite well turns into the infinite one. The ground level climbs toward the infinite value: the ratio is ${d(V.l20E1Ratio, 3)}, ${d(V.l20RatioV32, 3)}, ${d(V.l20RatioV128, 3)}, ${d(V.l20RatioV512, 3)} and ${d(V.l20RatioV2048, 3)} for $V_0 = 8, 32, 128, 512, 2048$. The chance outside shrinks: ${d(100 * V.l20TailGround, 2)} %, ${d(100 * V.l20TailV32, 3)} %, ${d(100 * V.l20TailV128, 4)} %, ${d(100 * V.l20TailV512, 5)} % and ${d(100 * V.l20TailV2048, 6)} %. In the two conditions $\\kappa \\to \\infty$ makes $\\tan\\tfrac{ka}{2}$ and $-\\cot\\tfrac{ka}{2}$ grow without bound. The cotangent grows from below, which is why every finite level stays under its twin.`,
+    text: `Raise the walls and the finite well turns into the infinite one. The ground level climbs toward the infinite value: the ratio is ${d(V.l20E1Ratio, 3)}, ${d(V.l20RatioV32, 3)}, ${d(V.l20RatioV128, 3)}, ${d(V.l20RatioV512, 3)} and ${d(V.l20RatioV2048, 3)} for $V_0 = 8, 32, 128, 512, 2048$. The chance outside shrinks: ${d(100 * V.l20TailGround, 2)} %, ${d(100 * V.l20TailV32, 3)} %, ${d(100 * V.l20TailV128, 4)} %, ${d(100 * V.l20TailV512, 5)} % and ${d(100 * V.l20TailV2048, 6)} %. In the two conditions $\\kappa \\to \\infty$ makes $\\tan\\tfrac{ka}{2}$ and $-\\cot\\tfrac{ka}{2}$ grow without bound. Both conditions need $\\tfrac{ka}{2}$ to approach the pole from below, so $k$ stays under $n\\pi/a$ and every finite level lies under its twin.`,
     caption: 'the ground level over its infinite twin as the well deepens: the ratio climbs toward 1',
     stage: RATIO_DEPTH,
     derivation: {

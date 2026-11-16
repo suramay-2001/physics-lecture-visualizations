@@ -154,8 +154,8 @@ describe('Lecture 20: numbers against closed forms', () => {
     expect([V.l20Thresh2, V.l20Thresh3, V.l20Thresh4]).toEqual([Math.PI ** 2 / 8, (4 * Math.PI ** 2) / 8, (9 * Math.PI ** 2) / 8])
     expect(V.l20FiCount).toBe(5)
   })
-  it('the practice numbers: the tent costs 12/π² of E1, the cubic holds only even levels, the delta well binds g²/8, and the thin deep well approaches it', () => {
-    expect(V.l20TentRatio).toBeCloseTo(12 / Math.PI ** 2, 12)
+  it('the practice numbers: the lopsided tent costs 27/2π² of E1, the cubic holds only even levels, the delta well binds g²/8, and the thin deep well approaches it', () => {
+    expect(V.l20SkewTentRatio).toBeCloseTo(27 / (2 * Math.PI ** 2), 12)
     expect(V.l20TrialP2 + V.l20TrialP4).toBeLessThan(1)
     expect(V.l20DeltaBindingClosed).toBe(1.125)
     expect(Math.abs(V.l20DeltaBindingFine - V.l20DeltaBindingClosed)).toBeLessThan(5e-3)

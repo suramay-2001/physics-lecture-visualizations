@@ -49,11 +49,12 @@ const sloshGrid = (): number => {
 /* the current of a bound state: j = Im(φ*φ′) of the real state φ₁ of scenario F at points away from the edges (exactly 0) */
 const wellCurrentMax = (): number => Math.max(...[-3, -1.5, -0.7, -0.2, 0, 0.3, 0.9, 2.4].map((x) => Math.abs(wellCurrent(8, 2, 1, x))))
 
-/* the practice trial function ψ ∝ x(L − x)(L − 2x) on 0 < x < 1 and the tent min(x, 1 − x) */
+/* the practice trial function ψ ∝ x(L − x)(L − 2x) on 0 < x < 1 and the lopsided tent of the kink question */
 const trial = (x: number): number => x * (1 - x) * (1 - 2 * x)
 const dTrial = (x: number): number => 1 - 6 * x + 6 * x * x
-const tent = (x: number): number => Math.min(x, 1 - x)
-const dTent = (x: number): number => (x < 0.5 ? 1 : -1)
+/* the lopsided tent of the kink question: rises to a peak at L/3, then falls more slowly (slopes 3 and −3/2 for ψ with peak 1) */
+const skew = (x: number): number => (x < 1 / 3 ? 3 * x : 1.5 * (1 - x))
+const dSkew = (x: number): number => (x < 1 / 3 ? 3 : -1.5)
 
 export const V = {
   /* l20-reverse */
@@ -144,7 +145,7 @@ export const V = {
   l20TrialP2: boxFunctionOverlap(trial, 1, 2) ** 2, // 0.9830
   l20TrialP4: boxFunctionOverlap(trial, 1, 4) ** 2, // 0.0154
   l20TrialMeanRatio: boxFunctionEnergy(trial, dTrial, 1) / boxEnergy(1, 1), // 4.26
-  l20TentRatio: boxFunctionEnergy(tent, dTent, 1, 0.5) / boxEnergy(1, 1), // 1.2159 = 12/π²
+  l20SkewTentRatio: boxFunctionEnergy(skew, dSkew, 1, 1 / 3) / boxEnergy(1, 1), // 1.3678 = 27/2π²
   l20DeltaBindingClosed: deltaWellBinding(3), // 1.125
   l20DeltaBindingFine: thinWellBinding(3, 0.004), // 1.1205
 } as const
