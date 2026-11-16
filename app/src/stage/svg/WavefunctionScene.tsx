@@ -133,7 +133,7 @@ export function WavefunctionScene({ state: r, mode, width, height, focus, bare, 
               <g>
                 <line x1={left} y1={yPot(prof.energy)} x2={right} y2={yPot(prof.energy)} className="fg-sil3" strokeWidth={1.2} strokeDasharray="4 4" />
                 <Label at={{ x: left + 2, y: yPot(prof.energy) - 4 }} cls="fg-lbl">
-                  ⟨p⟩²/2
+                  {prof.energyLabel ?? '⟨p⟩²/2'}
                 </Label>
               </g>
             )}

@@ -1666,6 +1666,8 @@ export interface WaveCurve {
   phase: number[]
 }
 export type WavefunctionSourceInputs = { kind: 'packet'; x0: number; sigma: number; p0: number } | { kind: 'plane'; p: number } | { kind: 'twoWaves'; p1: number; p2: number } | { kind: 'box'; L: number; n: number | [number, number] }
+  | { kind: 'barrierWave'; E: number; V0: number; a: number }
+  | { kind: 'well'; V0: number; a: number; n: number }
 /** The authored inputs, sweeps resolved (so a transition can recompute: stage/svg/wavefunction.ts `wavefunctionFrom`). */
 export interface WavefunctionInputs {
   source: WavefunctionSourceInputs
@@ -1706,16 +1708,23 @@ export interface WavefunctionStats {
   /** The chance at x < 0 (the whole grid) and beyond the last edge of a step or barrier (x > 0 for a step, x > a for a barrier); null without such a potential */
   reflected: number | null
   transmitted: number | null
+  /** |r|² and |τ|² of a `barrierWave` source (the stationary state; null otherwise) */
+  reflection: number | null
+  transmission: number | null
+  /** P(|x| > a/2) of a `well` level (null otherwise) */
+  tail: number | null
 }
 /** The potential's profile over the position window, drawn on its own scale (Lecture 17). `energy` is ⟨p⟩²/2 of the packet at t = 0 for a step or barrier, else null. */
 export interface WavefunctionProfile {
-  kind: 'step' | 'barrier' | 'harmonic' | 'force'
+  kind: 'step' | 'barrier' | 'harmonic' | 'force' | 'well'
   x: number[]
   v: number[]
   /** the vertical extent of the drawing, in the units of V (covers 0, V and the energy line) */
   lo: number
   hi: number
   energy: number | null
+  /** what the dashed energy line is called: '⟨p⟩²/2' for a packet (default), 'E' for a stationary state */
+  energyLabel?: string
   /** the edge(s) where V jumps (step: [0]; barrier: [0, a]), for the thin rules */
   edges: number[]
 }

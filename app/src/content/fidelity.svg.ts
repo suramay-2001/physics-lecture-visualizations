@@ -260,6 +260,10 @@ export const SVG_FIDELITY: Partial<Record<FidelityKey, Fidelity>> = {
         text: 'Both curves are exact for ħ = m = 1 and σ = 1: the plain Gaussian and the chirped one with β = −0.2. They show the spread of the density, not a path.',
       },
       {
+        id: 'plot-well-match',
+        text: 'Each curve is the engine’s matching mismatch at the wall of the well with z₀ = 4, divided by √(k² + κ²). A level is a zero of its own curve; between zeros there is no state.',
+      },
+      {
         id: 'plot-free-omega',
         text: 'The two dispersion curves are exact for ħ = m = c = 1: ω = k²/2 for a matter wave and ω = |k| for light. They cross at k = 2, where the two waves turn at the same rate; the picture is not a measurement.',
       },
@@ -427,6 +431,14 @@ SVG_FIDELITY.wavefunction = {
     {
       id: 'wavefunction-box-walls',
       text: 'A box state is the engine’s exact sine inside the two walls and exactly zero outside them. The curve has a corner at each wall: the slope may jump only where the potential is infinite.',
+    },
+    {
+      id: 'wavefunction-barrier-stationary',
+      text: 'The state is the engine’s exact solution of the four matching conditions at the barrier’s two edges, with incident amplitude 1. It cannot be normalised, so the density is per unit incident density. The dashed line marks the energy E.',
+    },
+    {
+      id: 'wavefunction-well-eigen',
+      text: 'A level of the finite well is the engine’s exact solution of the matching conditions, normalised with its tails. The window may clip the tails; the chance outside the well still counts them all.',
     },
     {
       id: 'wavefunction-potential-splitstep',

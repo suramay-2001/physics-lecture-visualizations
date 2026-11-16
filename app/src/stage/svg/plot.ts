@@ -33,6 +33,7 @@ import { qaoaF, ringEdges } from '../../physics/qc/variational'
 import { coinWalkSigmas, extraWalkSeries, starWalkMarkedSeries, walkSigmaClassical } from '../../physics/qc/walk'
 import { bellBisectGap, chshCurve, lhvChsh, type Dir } from '../../physics/qc/entangle'
 import { interferometerPort, rabiPeak, rabiProbability, twoLevelEnergies, twoLevelWeak } from '../../physics/dynamics'
+import { wellMismatch } from '../../physics/wave20'
 import { barrierT, barrierThick, stepAmplitudes, stepRT } from '../../physics/scatter'
 import { omegaFree, omegaLinear } from '../../physics/wave14'
 import { chirpWidth } from '../../physics/wave16'
@@ -174,6 +175,9 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   // Lecture 16 (physics/wave.ts gaussianWidth, physics/wave16.ts chirpWidth): the width Δx(t) of a free packet of σ = 1 against the time t, ħ = m = 1; plain Gaussian and the chirp β = −0.2
   packetWidth: (x) => gaussianWidth(1, x),
   packetWidthChirp: (x) => chirpWidth(1, -0.2, x),
+  // Lecture 20: the finite well of z0 = 4 (V0 = 8, a = 2): the normalised matching mismatch against E/V0
+  wellMatchEven: (x) => wellMismatch(x * WELL_F.V0, WELL_F.V0, WELL_F.a, 'even'),
+  wellMatchOdd: (x) => wellMismatch(x * WELL_F.V0, WELL_F.V0, WELL_F.a, 'odd'),
   // Townsend pass G2b: N polarizers with a total turn of 90 degrees (physics/polarization.ts), N read as a real number between the whole ones
   polChain: (n) => chainTransmission(n, 90),
   // Chapter Q19 (physics/qc/walk.ts, trotter.ts, variational.ts): the walks and the Trotter errors are drawn at whole x only; the QAOA slices are smooth in the angle (degrees)
@@ -222,6 +226,8 @@ const CURVE_FNS: { readonly [K in PlotCurveName]: (x: number) => number } = {
   mathieuBetaApprox,
   twoIonPotential,
 }
+/** Lecture 20's scenario F well: V₀ = 8, a = 2 (z₀ = (a/2)√(2V₀) = 4). */
+const WELL_F = { V0: 8, a: 2 } as const
 /** The barrier curves: V₀ = 1, E = ½ gives k = q = 1 (ħ = m = 1), so the width a equals q a. */
 const decayHalf = 1
 /** Each curve's own default range (degrees) when a beat does not write `curve.x`. */
@@ -258,6 +264,8 @@ const DEFAULT_RANGE: { readonly [K in PlotCurveName]: { from: number; to: number
   linearOmega: { from: -4, to: 4 },
   packetWidth: { from: 0, to: 4 },
   packetWidthChirp: { from: 0, to: 4 },
+  wellMatchEven: { from: 0, to: 1 },
+  wellMatchOdd: { from: 0, to: 1 },
   polChain: { from: 1, to: 60 },
   randomWalkSigma: { from: 0, to: 100 },
   coinWalkSigma: { from: 0, to: 100 },
@@ -331,6 +339,8 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   linearOmega: 'light, c|k|',
   packetWidth: 'plain Gaussian',
   packetWidthChirp: 'chirped, β = −0.2',
+  wellMatchEven: 'even match',
+  wellMatchOdd: 'odd match',
   polChain: 'chain of N',
   randomWalkSigma: 'coin flips',
   coinWalkSigma: 'quantum coin',
@@ -369,7 +379,7 @@ const CURVE_NAME: { readonly [K in PlotCurveName]: string } = {
   mathieuBetaApprox: 'effective potential',
   twoIonPotential: 'two-ion energy',
 }
-const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', stepDensityRatio: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', packetWidth: 't', packetWidthChirp: 't', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
+const CURVE_X: { readonly [K in PlotCurveName]?: string } = { ...OPTICS_CURVE_X, nSquared: 'n', twoToN: 'n', sqrtTwoToN: 'n', bigORatio: 'n', dirichlet8: 'δ', peBest3: 'τ', repFail3: 'p', repFail5: 'p', identityP: 'p', qhbNeed1: 'n', steaneFailX: 'p', bellBisectGap: 'Θ', stepR: 'E/V₀', stepT: 'E/V₀', stepDensityRatio: 'E/V₀', barrierT: 'qa', barrierThick: 'qa', freeOmega: 'k', linearOmega: 'k', packetWidth: 't', packetWidthChirp: 't', wellMatchEven: 'E/V₀', wellMatchOdd: 'E/V₀', ammoniaLevel: 'μ|E|/A', ammoniaLevelWeak: 'μ|E|/A', spinFringe: 'φ/π', spinFringeOther: 'φ/π', rabiFlip: 'ω₁t/2π', rabiFlipOff: 'ω₁t/2π', rabiPeak: '(ω₀−ω)/ω₁', polChain: 'N', randomWalkSigma: 'n', coinWalkSigma: 'n', starWalkMarked8: 'n', extraWalk64: 'n', extraWalk64Plus: 'n', trotterErr1: 'M', trotterErr2: 'M', qaoaGammaSlice: 'γ', qaoaBetaSlice: 'β', clonerF1: 'u', clonerF2: 'u', usdProgrammable: 's', usdKnown: 's', holevoChiPair: 's', accessibleInfoPair: 's', usdBoundPair: 's', usdFailPair: 's', bscCapacity: 'f', popDecay: 't/T₁', cohDecay: 't/T₁', steadyLow: 'ΔT₂', steadyHigh: 'ΔT₂', ouSlow: 'σt', ouFast: 'σt', echoOuSlow: 'σt', pulseErr1: 'ε', pulseErr2: 'ε', homDip: 'R', homDistinguishable: 'R', klmSuccess: 'n', transmonF01r1: 'n_g', transmonF01r20: 'n_g', transmonDispersion: 'E_J/E_C', mathieuBeta: 'q̃', mathieuBetaApprox: 'q̃', twoIonPotential: 's' }
 /** Decimals an x value is printed with where it is a fraction (a turn), not a whole number: 0.0625 needs four. */
 const CURVE_XDIGITS: { readonly [K in PlotCurveName]?: number } = { dirichlet8: 4, peBest3: 4, repFail3: 4, repFail5: 4, identityP: 4, steaneFailX: 4, usdProgrammable: 2, usdKnown: 2, bscCapacity: 3, homDip: 2, homDistinguishable: 2, transmonF01r1: 3, transmonF01r20: 3, mathieuBeta: 2, mathieuBetaApprox: 2, twoIonPotential: 2 }
 
@@ -410,6 +420,9 @@ const CURVE_BOUNDS: { readonly [K in PlotCurveName]?: { min: number; max: number
   // Lecture 16: a width is never negative
   packetWidth: { min: 0, max: Infinity },
   packetWidthChirp: { min: 0, max: Infinity },
+  // Lecture 20: a normalised mismatch, signed, between −1 and 1
+  wellMatchEven: { min: -1, max: 1 },
+  wellMatchOdd: { min: -1, max: 1 },
   // a chance: between 0 and 1
   polChain: { min: 0, max: 1 },
   // Chapter Q19: the spreads and the errors are never negative; the walk chances are chances; F is an average cut of the 4-cycle (0 to 4)

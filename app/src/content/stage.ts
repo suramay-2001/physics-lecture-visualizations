@@ -812,8 +812,13 @@ export interface TwoQubitState {
  * packet with σ = 1, ħ = m = 1: σ√(1 + (t/t_s)²), 1 at t = 0 and √5 at t = 4) and `packetWidthChirp` (the same axes; the packet with chirp β = −0.2, which narrows to 0.781 at t = 0.976 and is back to 1 at t = 1.951).
  * Drawn as a curve or with `vs`, markers at any t in the range; y is never below 0, x label `t`.
  */
+/**
+ * Lecture 20 (additive; ruling R3 of docs/roles/decisions/448-L19L20.md; physics/wave20.ts `wellMismatch`): `wellMatchEven` and `wellMatchOdd` (x = E/V₀ from 0 to 1; y = the matching mismatch of the even / odd states of the finite well
+ * with z₀ = (a/2)√(2V₀) = 4 (V₀ = 8, a = 2, ħ = m = 1), κcos(ka/2) − k sin(ka/2) and κ sin(ka/2) + k cos(ka/2), divided by √(k² + κ²) so that it lies in [−1, 1]). A level is a zero of its own curve:
+ * put markers at x = E_n/V₀ from `wellLevels(8, 2)`. Drawn as a curve or with `vs`; y is signed (it may be negative). Fidelity `plot-well-match`.
+ */
 /** Townsend pass G2b (additive; ruling T2): `polChain`, x = N (default 1 … 60, drawn as a smooth curve through real N), y = the chance that a photon passes a chain of N polarizers whose total turn is 90°, each turned 90°/N from the one before: cos^{2N}(90°/N) (physics/polarization.ts `chainTransmission`); the curve between whole N is the same formula at a fractional N, exact only at whole N (fidelity `plot-chain-interpolated`). */
-export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'stepDensityRatio' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | 'clonerF1' | 'clonerF2' | 'usdProgrammable' | 'usdKnown' | 'holevoChiPair' | 'accessibleInfoPair' | 'usdBoundPair' | 'usdFailPair' | 'bscCapacity' | 'popDecay' | 'cohDecay' | 'steadyLow' | 'steadyHigh' | 'ouSlow' | 'ouFast' | 'echoOuSlow' | 'pulseErr1' | 'pulseErr2' | 'homDip' | 'homDistinguishable' | 'klmSuccess' | 'transmonF01r1' | 'transmonF01r20' | 'transmonDispersion' | 'mathieuBeta' | 'mathieuBetaApprox' | 'twoIonPotential' | OpticsCurveName | 'freeOmega' | 'linearOmega' | 'packetWidth' | 'packetWidthChirp'
+export type PlotCurveName = 'chshVsPhase' | 'chshClassicalBound' | 'bb84Miss' | 'nSquared' | 'twoToN' | 'sqrtTwoToN' | 'bigORatio' | 'dirichlet8' | 'peBest3' | 'repFail3' | 'repFail5' | 'identityP' | 'qhbNeed1' | 'steaneFailX' | 'bellBisectGap' | 'ammoniaLevel' | 'ammoniaLevelWeak' | 'spinFringe' | 'spinFringeOther' | 'rabiFlip' | 'rabiFlipOff' | 'rabiPeak' | 'stepR' | 'stepT' | 'stepDensityRatio' | 'barrierT' | 'barrierThick' | 'polChain' | 'randomWalkSigma' | 'coinWalkSigma' | 'starWalkMarked8' | 'extraWalk64' | 'extraWalk64Plus' | 'trotterErr1' | 'trotterErr2' | 'qaoaGammaSlice' | 'qaoaBetaSlice' | 'clonerF1' | 'clonerF2' | 'usdProgrammable' | 'usdKnown' | 'holevoChiPair' | 'accessibleInfoPair' | 'usdBoundPair' | 'usdFailPair' | 'bscCapacity' | 'popDecay' | 'cohDecay' | 'steadyLow' | 'steadyHigh' | 'ouSlow' | 'ouFast' | 'echoOuSlow' | 'pulseErr1' | 'pulseErr2' | 'homDip' | 'homDistinguishable' | 'klmSuccess' | 'transmonF01r1' | 'transmonF01r20' | 'transmonDispersion' | 'mathieuBeta' | 'mathieuBetaApprox' | 'twoIonPotential' | OpticsCurveName | 'freeOmega' | 'linearOmega' | 'packetWidth' | 'packetWidthChirp' | 'wellMatchEven' | 'wellMatchOdd'
 /**
  * B1 (additive): the named functions of `series` (physics/qec/curves.ts): `cleanRun` (x = the number of steps N, params p), `repLogicalVsD` (x = d, params p), `repLogicalVsP` (x = p, params d),
  * `surfaceVsP` (x = p, params d and preset), `surfaceVsD` (x = d, params p and preset).
@@ -1495,8 +1500,21 @@ export interface ModuleMapState {
  * `box` (Townsend pass G4b, ruling T2): a particle between infinite walls at x = 0 and x = L (2 ≤ L ≤ 16): level n (1 … 8), ψ_n = √(2/L) sin(nπx/L), E_n = n²π²/2L², or the equal superposition of two
  * different levels `[n1, n2]` (its density sloshes with period 2π/(E₂ − E₁)). ψ = 0 outside the walls, which are drawn as vertical rules; the default window is [−1, L + 1]. `time` multiplies each level by its own e^{−iE_n t}
  * (the free-particle spreading would be wrong in a box); `boost`, `shift`, `cells`, `interval` and `overlay` are refused. Readouts `norm xmean xspread pmean pspread product peak energy`.
+ * `barrierWave` (Lecture 19, ruling R3 of docs/roles/decisions/448-L19L20.md; physics/wave19.ts): the STATIONARY state for a particle of energy E meeting the barrier V₀ on 0 < x < a from the left,
+ * incident amplitude 1 (0 < E < V₀ ≤ 8, 0.1 ≤ a ≤ 4); default window [−6, a + 6]. Shows `re`, `im` and `density` (per unit incident density: not normalisable), draws V(x) and the E line; readouts
+ * `reflection` |r|² and `transmission` |τ|². `norm`, `time`, `boost`, `shift`, `cells`, `interval`, `overlay`, `potential` and the `momentum` panel are refused, each message naming the field.
+ * Fidelity `wavefunction-barrier-stationary`.
+ * `well` (Lecture 20, ruling R3; physics/wave20.ts): bound level n (1 … the count of bound levels) of the finite well V = 0 for |x| < a/2 and V₀ outside, centred at 0 (0 < V₀ ≤ 8, 1 ≤ a ≤ 6), normalised
+ * with its tails; default window [−a, a], so the window clips the tails beyond it. Shows `re`, `im` and `density`, draws V(x) and the E line; readouts `norm` ∫|φ|²dx, `energy` and `tail` (the chance
+ * outside |x| < a/2). No `current` readout: the state is real, so its current is identically 0 (a matter for prose and a claim). Refuses the same fields as `barrierWave`. Fidelity `wavefunction-well-eigen`.
  */
-export type WavefunctionSource = { packet: { x0: Scrub; sigma: Scrub; p0?: Scrub } } | { plane: { p: number } } | { twoWaves: { p1: number; p2: number } } | { box: { L: number; n: number | [number, number] } }
+export type WavefunctionSource =
+  | { packet: { x0: Scrub; sigma: Scrub; p0?: Scrub } }
+  | { plane: { p: number } }
+  | { twoWaves: { p1: number; p2: number } }
+  | { box: { L: number; n: number | [number, number] } }
+  | { barrierWave: { E: number; V0: number; a: number } }
+  | { well: { V0: number; a: number; n: number } }
 export const WAVEFUNCTION_PANELS = ['position', 'momentum'] as const
 export type WavefunctionPanel = (typeof WAVEFUNCTION_PANELS)[number]
 /** re, im: thin lines (one amplitude scale) · density: |ψ|² filled (its own scale) · phase: a hue band under the density (the hue is the phase, a code for an angle). */
@@ -1509,9 +1527,10 @@ export type WavefunctionOverlay = (typeof WAVEFUNCTION_OVERLAYS)[number]
 export const WAVEFUNCTION_CELLS = [4, 8, 16, 64, 512] as const
 /**
  * norm ∫|ψ|²dx · xmean, xspread (Δx) · pmean, pspread (Δp) · product ΔxΔp (in ħ) · interval P(a<x<b) · peak max |ψ|² (per ℓ) · cell the cell [0, w):
- * its chance and chance ÷ w · wavelength 2π/p (a plane wave only) · energy E_n (or the mean energy of a pair), a `box` source only.
+ * its chance and chance ÷ w · wavelength 2π/p (a plane wave only) · energy E_n (or the mean energy of a pair), a `box` or `well` source only · reflection |r|² and transmission |τ|² (a `barrierWave` source only) ·
+ * tail P(|x| > a/2) (a `well` source only).
  */
-export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength', 'energy', 'reflected', 'transmitted'] as const
+export const WAVEFUNCTION_READOUTS = ['norm', 'xmean', 'xspread', 'pmean', 'pspread', 'product', 'interval', 'peak', 'cell', 'wavelength', 'energy', 'reflected', 'transmitted', 'reflection', 'transmission', 'tail'] as const
 export type WavefunctionReadout = (typeof WAVEFUNCTION_READOUTS)[number]
 /**
  * A potential V(x) the packet moves in (Lecture 17, ruling M3; Lecture 18 reuses it). Needs a `packet` source: the state at time t is the packet at t = 0 evolved by

@@ -16,6 +16,8 @@ import {
   GRID, type Wave, barrierPotential, boost as boostWave, boxEnergy, boxPairEnergy, boxState, chanceAbove, chanceBelow, densitySpline, evolveV, forcePotential, harmonicPotential,
   meanX, momentumMoments, norm, pOp, packet, peakDensity, planeSamples, shiftAndEvolve, spreadX, stepPotential, toMomentum, windowIndices, xTimes,
 } from '../../physics/wave'
+import { barrierStateSamples, transmissionAmplitude } from '../../physics/wave19'
+import { wellCount, wellLevels, wellNorm, wellStateSamples, wellTail } from '../../physics/wave20'
 import { scrub } from '../resolve'
 import type { SvgReadout } from '../svgKinds'
 import type { ResolvedWavefunction, WaveCurve, WavefunctionInputs, WavefunctionProfile, WavefunctionSourceInputs, WavefunctionStats } from '../types'
@@ -40,6 +42,11 @@ export const WAVEFUNCTION_LIMITS = {
 const L_BOX = { min: 2, max: 16, nMax: 8 } as const
 const DEFAULT_WINDOW = { x: [-8, 8] as [number, number], p: [-8, 8] as [number, number] }
 const MAX_POINTS = 520
+/** Lecture 19 and 20 stationary sources (ruling R3): the barrier 0 < E < V₀ ≤ 8, 0.1 ≤ a ≤ 4; the well V₀ ≤ 8, 1 ≤ a ≤ 6 (default window [−a, a]). */
+export const STATIONARY_LIMITS = { V0Max: 8, barrierAMin: 0.1, barrierAMax: 4, wellAMin: 1, wellAMax: 6 } as const
+/** The fields a stationary source refuses (each message names the field). */
+const STATIONARY_REFUSED = ['time', 'boost', 'shift', 'cells', 'interval', 'overlay', 'potential'] as const
+const STATIONARY_SAMPLES = 801
 
 /** Limits of the `potential` field (Lecture 17): the packet starts within the window (|x₀| ≤ 12), time runs to 16. */
 export const POTENTIAL_LIMITS = { V0Max: 8, aMin: 0.1, aMax: 4, omegaMin: 0.2, omegaMax: 2, forceMax: 2, timeMax: 16, x0Max: 12 } as const
@@ -83,6 +90,18 @@ export function potentialState(src: { x0: number; sigma: number; p0: number }, p
 const vAt = (p: WavefunctionPotential, x: number): number =>
   'step' in p ? (x > 0 ? p.step.V0 : 0) : 'barrier' in p ? (x > 0 && x < p.barrier.a ? p.barrier.V0 : 0) : 'harmonic' in p ? (p.harmonic.omega * p.harmonic.omega * x * x) / 2 : -p.force.F * x
 
+/** The profile of a piecewise-constant V(x) with jumps at `edges` (a stationary source: the barrier 0 and a, the well ∓a/2) and the E line at `energy`. */
+function stationaryProfile(kind: 'barrier' | 'well', vAtX: (x: number) => number, edges: number[], energy: number, lo: number, hi: number): WavefunctionProfile {
+  const pts: { x: number; v: number }[] = Array.from({ length: 401 }, (_, j) => {
+    const x = lo + ((hi - lo) * j) / 400
+    return { x, v: vAtX(x) }
+  }).filter((o) => !edges.some((e) => Math.abs(o.x - e) < 1e-9))
+  for (const e of edges) if (e > lo && e < hi) pts.push({ x: e, v: vAtX(e - 1e-9) }, { x: e, v: vAtX(e + 1e-9) })
+  pts.sort((a, b) => a.x - b.x)
+  const vs = pts.map((o) => o.v)
+  return { kind, x: pts.map((o) => o.x), v: vs, lo: Math.min(0, ...vs), hi: Math.max(1e-9, ...vs, energy), energy, energyLabel: 'E', edges: edges.filter((e) => e >= lo && e <= hi) }
+}
+
 /** The profile over the position window: 401 even samples plus both sides of every jump, and the vertical extent that covers 0, V and the energy line. */
 function profileOf(p: WavefunctionPotential, p0: number, lo: number, hi: number): WavefunctionProfile {
   const kind = potentialKind(p)
@@ -118,11 +137,16 @@ export function potentialReach(x0: number, sigma: number, p0: number, time: numb
 }
 
 /* ------------------------------------------------ inputs ------------------------------------------------ */
+/** The position window a source asks for when the state writes none: a box [−1, L + 1], a barrier wave [−6, a + 6], a well [−a, a], else [−8, 8]. */
+const defaultWindowX = (src: WavefunctionSourceInputs): [number, number] =>
+  src.kind === 'box' ? [-1, src.L + 1] : src.kind === 'barrierWave' ? [-6, src.a + 6] : src.kind === 'well' ? [-src.a, src.a] : [DEFAULT_WINDOW.x[0], DEFAULT_WINDOW.x[1]]
 export function wavefunctionInputs(st: WavefunctionState, s: number): WavefunctionInputs {
   const src = st.source
   let source: WavefunctionSourceInputs
   if ('packet' in src) source = { kind: 'packet', x0: scrub(src.packet.x0, s), sigma: scrub(src.packet.sigma, s), p0: src.packet.p0 === undefined ? 0 : scrub(src.packet.p0, s) }
   else if ('plane' in src) source = { kind: 'plane', p: src.plane.p }
+  else if ('barrierWave' in src) source = { kind: 'barrierWave', E: src.barrierWave.E, V0: src.barrierWave.V0, a: src.barrierWave.a }
+  else if ('well' in src) source = { kind: 'well', V0: src.well.V0, a: src.well.a, n: src.well.n }
   else if ('box' in src) source = { kind: 'box', L: src.box.L, n: typeof src.box.n === 'number' ? src.box.n : [src.box.n[0], src.box.n[1]] }
   else source = { kind: 'twoWaves', p1: src.twoWaves.p1, p2: src.twoWaves.p2 }
   return {
@@ -137,7 +161,7 @@ export function wavefunctionInputs(st: WavefunctionState, s: number): Wavefuncti
     cells: st.cells ?? null,
     cellsAlpha: 1,
     interval: st.interval ? [st.interval[0], st.interval[1]] : null,
-    window: { x: st.window?.x ?? (source.kind === 'box' ? [-1, source.L + 1] : DEFAULT_WINDOW.x), p: st.window?.p ?? DEFAULT_WINDOW.p },
+    window: { x: st.window?.x ?? defaultWindowX(source), p: st.window?.p ?? DEFAULT_WINDOW.p },
     readouts: [...(st.readouts ?? [])],
     shot: st.shot,
   }
@@ -183,7 +207,7 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
   const [plo, phi] = inp.window.p
   const wantP = inp.panels.includes('momentum')
   const src = inp.source
-  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null, energy: null, reflected: null, transmitted: null }
+  const stats: WavefunctionStats = { norm: null, xmean: null, xspread: null, pmean: null, pspread: null, product: null, interval: null, peak: null, cell: null, wavelength: null, energy: null, reflected: null, transmitted: null, reflection: null, transmission: null, tail: null }
   let profile: WavefunctionProfile | null = null
   let position: WaveCurve
   let momentum: WaveCurve | null = null
@@ -267,6 +291,31 @@ export function wavefunctionFrom(inp: WavefunctionInputs): ResolvedWavefunction 
       scale.amp = Math.sqrt(2 / src.L) * (pair ? Math.SQRT2 : 1)
       scale.dens = (pair ? 4 : 2) / src.L
     }
+  } else if (src.kind === 'barrierWave' || src.kind === 'well') {
+    // Lecture 19/20 (ruling R3): a stationary state drawn from physics/wave19.ts or wave20.ts on an even spacing over the window; time, boost and shift are refused, so nothing moves it
+    const xs = Array.from({ length: STATIONARY_SAMPLES }, (_, j) => xlo + ((xhi - xlo) * j) / (STATIONARY_SAMPLES - 1))
+    if (src.kind === 'barrierWave') {
+      const w = barrierStateSamples(xs, src.E, src.V0, src.a)
+      position = curveFrom(xs, w.re, w.im)
+      const t = transmissionAmplitude(src.E, src.V0, src.a)
+      stats.reflection = t.R
+      stats.transmission = t.T
+      profile = stationaryProfile('barrier', (x) => (x > 0 && x < src.a ? src.V0 : 0), [0, src.a], src.E, xlo, xhi)
+      // |ψ| never exceeds 1 + |r| on the left and the density is read per unit incident density: one scale from the state itself, never below the incident 1
+      scale.amp = Math.max(1, ...position.re.map(Math.abs), ...position.im.map(Math.abs))
+      scale.dens = Math.max(1, ...position.density)
+    } else {
+      const lv = wellLevels(src.V0, src.a)[src.n - 1]
+      const w = wellStateSamples(xs, src.V0, src.a, src.n)
+      position = curveFrom(xs, w, new Float64Array(xs.length))
+      stats.energy = lv.E
+      stats.norm = wellNorm(src.V0, src.a, src.n)
+      stats.tail = wellTail(src.V0, src.a, src.n)
+      profile = stationaryProfile('well', (x) => (Math.abs(x) < src.a / 2 ? 0 : src.V0), [-src.a / 2, src.a / 2], lv.E, xlo, xhi)
+      scale.amp = Math.max(1e-12, ...position.re.map(Math.abs))
+      scale.dens = Math.max(1e-12, ...position.density)
+    }
+    intervalOut = null
   } else {
     const xs = planeXs(xlo, xhi)
     const opts = { boost: inp.boost, shift: inp.shift, time: inp.time }
@@ -348,6 +397,13 @@ function lerpSource(a: WavefunctionSourceInputs, b: WavefunctionSourceInputs, t:
   if (a.kind === 'plane' && b.kind === 'plane') return { kind: 'plane', p: lerp(a.p, b.p, t) }
   if (a.kind === 'twoWaves' && b.kind === 'twoWaves') return { kind: 'twoWaves', p1: lerp(a.p1, b.p1, t), p2: lerp(a.p2, b.p2, t) }
   if (a.kind === 'box' && b.kind === 'box' && JSON.stringify(a.n) === JSON.stringify(b.n)) return { kind: 'box', L: lerp(a.L, b.L, t), n: a.n }
+  if (a.kind === 'barrierWave' && b.kind === 'barrierWave') return { kind: 'barrierWave', E: lerp(a.E, b.E, t), V0: lerp(a.V0, b.V0, t), a: lerp(a.a, b.a, t) }
+  // a well keeps its level n through a sweep only while that level stays bound (the count can drop between two valid ends); otherwise it switches at the half-way point
+  if (a.kind === 'well' && b.kind === 'well' && a.n === b.n) {
+    const V0 = lerp(a.V0, b.V0, t)
+    const w = lerp(a.a, b.a, t)
+    if (a.n <= wellCount(V0, w)) return { kind: 'well', V0, a: w, n: a.n }
+  }
   return pick(a, b, t)
 }
 
@@ -417,15 +473,71 @@ function validatePotential(st: WavefunctionState, p: WavefunctionPotential, kind
   return errs
 }
 
+/** The finite-number check of one stationary-source field, between lo and hi (open at lo when `open`). */
+function stationaryNumber(errs: string[], source: string, name: string, v: unknown, lo: number, hi: number, open = false): boolean {
+  if (typeof v !== 'number' || !Number.isFinite(v)) {
+    errs.push(`wavefunction ${source} ${name}: a finite number`)
+    return false
+  }
+  if (v > hi + 1e-12 || v < lo - 1e-12 || (open && v <= lo)) {
+    errs.push(`wavefunction ${source} ${name}: ${open ? `above ${lo} and at most ${hi}` : `between ${lo} and ${hi}`} (got ${v})`)
+    return false
+  }
+  return true
+}
+
+/** The `barrierWave` and `well` sources (Lectures 19 and 20, ruling R3): ranges, the refused fields (each message names the field), panels, show, window and readouts. */
+function validateStationary(st: WavefunctionState, kind: 'barrierWave' | 'well'): string[] {
+  const errs: string[] = []
+  const S = STATIONARY_LIMITS
+  const L = WAVEFUNCTION_LIMITS
+  const src = st.source as Record<string, Record<string, unknown>>
+  const body = src[kind]
+  if (kind === 'barrierWave') {
+    const okV = stationaryNumber(errs, 'barrierWave', 'V0', body.V0, 0, S.V0Max, true)
+    const okE = stationaryNumber(errs, 'barrierWave', 'E', body.E, 0, S.V0Max, true)
+    const okA = stationaryNumber(errs, 'barrierWave', 'a', body.a, S.barrierAMin, S.barrierAMax)
+    if (okV && okE && okA && !((body.E as number) < (body.V0 as number))) errs.push(`wavefunction barrierWave E: below V0 (got E = ${body.E}, V0 = ${body.V0}; above the top the state is a different one)`)
+  } else {
+    const okV = stationaryNumber(errs, 'well', 'V0', body.V0, 0, S.V0Max, true)
+    const okA = stationaryNumber(errs, 'well', 'a', body.a, S.wellAMin, S.wellAMax)
+    const n = body.n
+    if (typeof n !== 'number' || !Number.isInteger(n) || n < 1) errs.push('wavefunction well n: a whole number from 1 (the lowest level) to the count of bound levels')
+    else if (okV && okA && n > wellCount(body.V0 as number, body.a as number)) errs.push(`wavefunction well n: at most ${wellCount(body.V0 as number, body.a as number)} (V0 = ${body.V0}, a = ${body.a} binds that many levels; got ${n})`)
+  }
+  const why = kind === 'barrierWave' ? 'a stationary state: nothing moves it' : 'a stationary state: nothing moves it (its time dependence is one phase)'
+  for (const f of STATIONARY_REFUSED) {
+    const v = (st as unknown as Record<string, unknown>)[f]
+    if (v !== undefined && !(Array.isArray(v) && v.length === 0 && f === 'overlay')) errs.push(`wavefunction ${f}: refused with a ${kind} source (${why})`)
+  }
+  const panels = st.panels ?? ['position']
+  if (panels.length !== 1 || panels[0] !== 'position') errs.push(`wavefunction panels: a ${kind} source has only the 'position' panel (no momentum picture is drawn for a stationary state)`)
+  const show = st.show ?? ['re', 'im', 'density']
+  const allowed = ['re', 'im', 'density']
+  if (!show.length || new Set(show).size !== show.length || !show.every((p) => allowed.includes(p))) errs.push("wavefunction show: a non-empty list of 're', 'im' and 'density' for a stationary source, each once")
+  const win = st.window?.x
+  if (win !== undefined && !(Number.isFinite(win[0]) && Number.isFinite(win[1]) && win[0] < win[1] && Math.abs(win[0]) <= L.windowMax && Math.abs(win[1]) <= L.windowMax)) errs.push(`wavefunction window.x: a < b within ±${L.windowMax}`)
+  const readouts = st.readouts ?? []
+  const okReadouts = kind === 'barrierWave' ? ['reflection', 'transmission'] : ['norm', 'energy', 'tail']
+  for (const r of readouts) {
+    if (!(WAVEFUNCTION_READOUTS as readonly string[]).includes(r)) errs.push(`wavefunction readouts: unknown "${r}"`)
+    else if (r === 'norm' && kind === 'barrierWave') errs.push("wavefunction readouts: 'norm' is refused with a barrierWave source (a scattering state is not normalisable; it takes 'reflection' and 'transmission')")
+    else if (!okReadouts.includes(r)) errs.push(`wavefunction readouts: "${r}" is not defined for a ${kind} source (it takes ${okReadouts.map((o) => `'${o}'`).join(', ')})`)
+  }
+  if (new Set(readouts).size !== readouts.length) errs.push('wavefunction readouts: each once')
+  return errs
+}
+
 export function validateWavefunctionStage(st: WavefunctionState): string[] {
   const errs: string[] = []
   const L = WAVEFUNCTION_LIMITS
   const src = st.source as unknown as Record<string, unknown> | undefined
-  const kinds = src ? ['packet', 'plane', 'twoWaves', 'box'].filter((k) => k in src) : []
+  const kinds = src ? ['packet', 'plane', 'twoWaves', 'box', 'barrierWave', 'well'].filter((k) => k in src) : []
   if (kinds.length !== 1) {
-    errs.push("wavefunction source: exactly one of 'packet', 'plane', 'twoWaves' and 'box'")
+    errs.push("wavefunction source: exactly one of 'packet', 'plane', 'twoWaves', 'box', 'barrierWave' and 'well'")
     return errs
   }
+  if (kinds[0] === 'barrierWave' || kinds[0] === 'well') return validateStationary(st, kinds[0])
   const limit = (name: string, v: Scrub | undefined, max: number, lo = -max) => {
     if (v === undefined) return
     if (!scrubFinite(v)) errs.push(`wavefunction ${name}: non-finite`)
@@ -463,7 +575,7 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
       if (v !== undefined) errs.push(`wavefunction ${name}: a box source takes no ${name} (the walls fix its momentum content); use 'time' to turn each level by its own phase`)
   } else if ('plane' in st.source) {
     if (!Number.isFinite(st.source.plane.p) || Math.abs(st.source.plane.p) > L.pMax) errs.push(`wavefunction plane p: at most ±${L.pMax}`)
-  } else {
+  } else if ('twoWaves' in st.source) {
     const { p1, p2 } = st.source.twoWaves
     if (![p1, p2].every((p) => Number.isFinite(p) && Math.abs(p) <= L.pMax)) errs.push(`wavefunction twoWaves: p1 and p2 at most ±${L.pMax}`)
     else if (p1 === p2) errs.push('wavefunction twoWaves: p1 and p2 must differ')
@@ -508,7 +620,9 @@ export function validateWavefunctionStage(st: WavefunctionState): string[] {
     }
     if (kind !== 'packet' && kind !== 'box' && !['pmean', 'pspread', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" needs a packet source (a plane wave is not normalisable)`)
     if (kind === 'box' && ['interval', 'cell', 'wavelength'].includes(r)) errs.push(`wavefunction readouts: "${r}" is not defined for a box source`)
-    if (r === 'energy' && kind !== 'box') errs.push("wavefunction readouts: 'energy' needs a box source")
+    if (r === 'energy' && kind !== 'box') errs.push("wavefunction readouts: 'energy' needs a box source (or a well source)")
+    if (r === 'reflection' || r === 'transmission') errs.push(`wavefunction readouts: "${r}" needs a barrierWave source (the stationary state of a barrier)`)
+    if (r === 'tail') errs.push("wavefunction readouts: 'tail' needs a well source")
     if ((r === 'reflected' || r === 'transmitted') && !(pot && ('step' in pot || 'barrier' in pot)))
       errs.push(`wavefunction readouts: "${r}" needs a step or barrier potential (the chance beyond an edge; a harmonic well or a constant force has none)`)
     if (r === 'wavelength' && kind !== 'plane') errs.push("wavefunction readouts: 'wavelength' needs a plane source")
@@ -561,6 +675,15 @@ export function wavefunctionReadouts(r: ResolvedWavefunction): SvgReadout[] {
         break
       case 'energy':
         if (s.energy !== null) put(name, `${r.source.kind === 'box' && typeof r.source.n !== 'number' ? '⟨E⟩' : 'E'} = ${fix(s.energy, 3)} ħ²/mℓ²`)
+        break
+      case 'reflection':
+        if (s.reflection !== null) put(name, `R = |r|² = ${fix(s.reflection, 3)}`)
+        break
+      case 'transmission':
+        if (s.transmission !== null) put(name, `T = |τ|² = ${fix(s.transmission, 3)}`)
+        break
+      case 'tail':
+        if (s.tail !== null && r.source.kind === 'well') put(name, `P(|x| > ${fix(r.source.a / 2, 2)}) = ${fix(s.tail, 4)}`)
         break
       case 'reflected':
         if (s.reflected !== null) put(name, `P(x < 0) = ${fix(s.reflected, 3)}`)
