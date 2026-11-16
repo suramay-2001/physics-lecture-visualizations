@@ -19,6 +19,7 @@
 | 709 HW3 (sheet not ingested) | Includes the pure-state concurrence C = 2\|Λ₀₀Λ₁₁ − Λ₀₁Λ₁₀\| from the general definition (notes p. 51 says so) | **submitted** | 2026-10-17 | Q12 and the 709 Lecture notes section may derive it in full. Any other HW3 problem: ask before working it. |
 | 709 notes L8–L11 (new edition, 58 pp., ingested 2026-10-17) | No problem set beyond HW3 above | **none assigned** | 2026-10-17 | The notes' own examples may be worked in full. |
 | 448 L12–L13 notes (ingested 2026-10-15) | No problem set provided; the notes hold in-class checks only | **none assigned** | 2026-10-15 | The L12–L13 chapters may use the notes' own checks as worked examples. |
+| 448 HW8 (due 11/12; sheet not ingested) | Includes a below-barrier scattering problem in the Lecture 19 setup (the L19 notes say so) | **submitted** | 2026-11-16 | L19–L20 may work barrier and bound-state problem types in full; practice questions stay new problems with fresh numbers. |
 
 The walkthroughs of 448's three assigned challenges stay hints-only in 448 itself unless the user asks: releasing them would
 be a new decision.
