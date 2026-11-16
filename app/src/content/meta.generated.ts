@@ -1178,5 +1178,61 @@ export const LECTURE_META: LectureIndex[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "L19",
+    "number": 19,
+    "title": "Quantum tunnelling through a finite barrier",
+    "units": [
+      {
+        "id": "l19-recap",
+        "title": "A tail is not transmission",
+        "challenges": [
+          "l19-re-tail",
+          "l19-re-second"
+        ]
+      },
+      {
+        "id": "l19-regions",
+        "title": "Three regions, two kinds of solution",
+        "challenges": [
+          "l19-rg-kappa",
+          "l19-rg-ratio"
+        ]
+      },
+      {
+        "id": "l19-match",
+        "title": "Four conditions give the transmitted amplitude",
+        "challenges": [
+          "l19-ma-absT",
+          "l19-ma-phase",
+          "l19-ma-same",
+          "l19-ma-order"
+        ]
+      },
+      {
+        "id": "l19-thick",
+        "title": "Reading T: width, height, mass",
+        "challenges": [
+          "l19-th-sech",
+          "l19-th-double",
+          "l19-th-mass",
+          "l19-th-limit",
+          "l19-th-order",
+          "l19-pr-width"
+        ]
+      },
+      {
+        "id": "l19-energy",
+        "title": "Tunnelling without borrowing energy",
+        "challenges": [
+          "l19-en-same",
+          "l19-en-stm",
+          "l19-en-alpha",
+          "l19-pr-delta",
+          "l19-pr-stm"
+        ]
+      }
+    ]
   }
 ]

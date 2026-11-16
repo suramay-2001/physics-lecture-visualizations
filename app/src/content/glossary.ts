@@ -375,6 +375,11 @@ const ENTRIES: GlossEntry[] = [
   { id: 'probability-flux', term: 'probability flux', gloss: 'The probability crossing a point per unit time, positive to the right; for a travelling packet it is the speed times the density.', first: 'l18-detector:b2', uses: ['probability-current'] },
   { id: 'evanescent-wave', term: 'evanescent wave', gloss: 'A wave that falls off as $e^{-\\kappa x}$ where the energy is below the potential; it has density but carries no current.', first: 'l18-below:b1', uses: ['potential-step'] },
   { id: 'penetration-depth', term: 'decay length', gloss: 'The distance over which the density of an evanescent wave falls by a factor $e$: $1/2\\kappa$, against $1/\\kappa$ for the amplitude.', first: 'l18-below:b3', uses: ['evanescent-wave'] },
+  /* Lecture 19: the matching conditions, the thick barrier and two uses of tunnelling */
+  { id: 'matching-conditions', term: 'matching conditions', gloss: 'At a finite jump of the potential the function and its slope are both continuous; joining the regional solutions with them fixes the amplitudes.', first: 'l19-match:b1', uses: ['potential-step'] },
+  { id: 'thick-barrier', term: 'thick barrier', gloss: 'A barrier with $\\kappa a \\gg 1$: its transmission is about a prefactor times $e^{-2\\kappa a}$, so it falls exponentially with the width.', first: 'l19-thick:b2', uses: ['tunnelling'] },
+  { id: 'scanning-tunnelling-microscope', term: 'scanning tunnelling microscope', gloss: 'A sharp tip held a few ångströms above a surface; the tunnelling current falls several-fold for each ångström of extra gap.', first: 'l19-energy:b2', uses: ['tunnelling'] },
+  { id: 'alpha-decay', term: 'alpha decay', gloss: 'A nucleus emits an alpha particle by tunnelling through its Coulomb barrier; the rate depends on a transmission that is exponentially sensitive to the energy.', first: 'l19-energy:b3', uses: ['tunnelling'] },
 ]
 
 export const GLOSSARY: ReadonlyMap<string, GlossEntry> = new Map(ENTRIES.map((e) => [e.id, e]))

@@ -31,6 +31,7 @@ export const COURSE_LECTURES: CourseLecture[] = [
   { id: 'L16', number: 16, title: 'Gaussian packets and Ehrenfest' },
   { id: 'L17', number: 17, title: 'Classical mean motion and quantum reflection' },
   { id: 'L18', number: 18, title: 'Quantum reflection and tunnelling' },
+  { id: 'L19', number: 19, title: 'Quantum tunnelling through a finite barrier' },
 ]
 
 export interface Concept {
@@ -167,6 +168,12 @@ export const CONCEPTS: Concept[] = [
   { id: 'probability-flux', label: 'The flux of a moving Gaussian and the shares R and T', lecture: 'L18', unit: 'l18-detector', needs: ['probability-current', 'packet-scattering'] },
   { id: 'evanescent-wave', label: 'Below the step: a tail is not transmission', lecture: 'L18', unit: 'l18-below', needs: ['potential-step', 'probability-flux'] },
   { id: 'tunnelling', label: 'A finite barrier lets it through', lecture: 'L18', unit: 'l18-tunnel', needs: ['evanescent-wave', 'stationary-states'] },
+  // L19 (tunnelling through a finite barrier; every built unit is a station)
+  { id: 'tunnel-tail', label: 'A tail is not transmission: a second edge', lecture: 'L19', unit: 'l19-recap', needs: ['evanescent-wave', 'packet-scattering'] },
+  { id: 'three-regions', label: 'Three regions: waves outside, exponentials inside', lecture: 'L19', unit: 'l19-regions', needs: ['tunnelling', 'tunnel-tail'] },
+  { id: 'matching', label: 'Four matching conditions give the transmitted amplitude', lecture: 'L19', unit: 'l19-match', needs: ['three-regions'] },
+  { id: 'thick-barrier', label: 'Reading T against width, height and mass', lecture: 'L19', unit: 'l19-thick', needs: ['matching'] },
+  { id: 'tunnelling-uses', label: 'Tunnelling without borrowing energy', lecture: 'L19', unit: 'l19-energy', needs: ['thick-barrier'] },
 ]
 
 export const conceptById = (id: string): Concept | undefined => CONCEPTS.find((c) => c.id === id)

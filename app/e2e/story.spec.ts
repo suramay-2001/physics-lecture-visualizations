@@ -84,9 +84,9 @@ async function everyBeat(page: Page, units: readonly string[], screens: string, 
 }
 
 /** Lectures built in the app (content/index.ts LECTURES); nav.spec checks the topbar lists exactly these. */
-export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L11', 'L12', 'L13', 'L14', 'L15', 'L16', 'L17', 'L18'] as const
+export const BUILT = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L11', 'L12', 'L13', 'L14', 'L15', 'L16', 'L17', 'L18', 'L19'] as const
 /** Lectures drawn entirely by SVG kinds (Lecture 9: the matrix kind's pair view; Lecture 13: the wavefunction, phase-clock, complex-plane and matrix kinds): no WebGL canvas and no context at all. */
-const SVG_ONLY: readonly string[] = ['L9', 'L13', 'L14', 'L15', 'L17', 'L18'] // L16's Try-it is the Bloch widget (one WebGL canvas)
+const SVG_ONLY: readonly string[] = ['L9', 'L13', 'L14', 'L15', 'L17', 'L18', 'L19'] // L16's Try-it is the Bloch widget (one WebGL canvas)
 
 test.describe('real lectures (dev and production preview, `?measure`)', () => {
   for (const L of BUILT)

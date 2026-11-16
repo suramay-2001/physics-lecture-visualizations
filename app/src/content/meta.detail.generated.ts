@@ -806,5 +806,41 @@ export const UNIT_DETAIL: Record<string, UnitDetail> = {
       "j = \\tfrac{2\\hbar\\kappa}{m}\\,\\mathrm{Im}(D^*C)",
       "T \\simeq \\exp\\left(-2\\int\\sqrt{2m(V - E)}\\,dx/\\hbar\\right)"
     ]
+  },
+  "l19-recap": {
+    "question": "What does a second edge add to the infinite step?",
+    "equations": [
+      "R + T = 1",
+      "T = |\\tau|^2"
+    ]
+  },
+  "l19-regions": {
+    "question": "Why waves outside and exponentials inside?",
+    "equations": [
+      "\\varphi'' = -k^2\\varphi\\quad (V = 0)",
+      "\\varphi'' = +\\kappa^2\\varphi\\quad (V_0 > E)",
+      "\\varphi_{III} = \\tau e^{ikx}"
+    ]
+  },
+  "l19-match": {
+    "question": "What do all four amplitudes look like?",
+    "equations": [
+      "\\tau = \\dfrac{4e^{-ika}}{4\\cosh\\kappa a + 2i\\left(\\tfrac{\\kappa}{k} - \\tfrac{k}{\\kappa}\\right)\\sinh\\kappa a}",
+      "T = |\\tau|^2"
+    ]
+  },
+  "l19-thick": {
+    "question": "How does T change with the barrier and the particle?",
+    "equations": [
+      "T = \\left[1 + \\tfrac{V_0^2}{16E(V_0 - E)}(e^{\\kappa a} - e^{-\\kappa a})^2\\right]^{-1}",
+      "T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}\\quad (\\kappa a \\gg 1)"
+    ]
+  },
+  "l19-energy": {
+    "question": "What is conserved, and where is tunnelling used?",
+    "equations": [
+      "E = \\tfrac{k^2}{2} = V_0 - \\tfrac{\\kappa^2}{2}\\quad (\\hbar = m = 1)",
+      "T \\simeq e^{-2\\kappa a}"
+    ]
   }
 }
