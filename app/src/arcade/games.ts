@@ -120,6 +120,20 @@ const MS13 = L13x('l13-momentum-space', '13.4 One ket, two sets of components')
 const XB13 = L13x('l13-two-bases', '13.5 Position in the momentum basis')
 const SC13 = L13x('l13-schrodinger', '13.6 The Schrödinger equation of a particle')
 const TI13 = L13x('l13-time', '13.7 Why time is a parameter, not an operator')
+const L14x = (unit: string, label: string): Trains => ({ lecture: 'L14', unit, label })
+const CO14 = L14x('l14-components', '14.1 Components: discrete first, then continuous')
+const SC14 = L14x('l14-schrodinger', '14.2 The Schrödinger equation: what is assumed')
+const DI14 = L14x('l14-dispersion', '14.3 From matter-wave dispersion to the equation')
+const ST14 = L14x('l14-stationary', '14.5 Energy eigenstates and the time-independent equation')
+const L15x = (unit: string, label: string): Trains => ({ lecture: 'L15', unit, label })
+const PE15 = L15x('l15-packet-evolution', '15.3 Evolve each momentum component')
+const GV15 = L15x('l15-group-velocity', '15.4 How fast does a packet move?')
+const DI15 = L15x('l15-dispersion', '15.5 Why does the packet spread?')
+const GA15 = L15x('l15-gaussian', '15.6 The Gaussian: uncertainty meets dynamics')
+const L16x = (unit: string, label: string): Trains => ({ lecture: 'L16', unit, label })
+const EV16 = L16x('l16-evolve', '16.2 The free Gaussian at time t')
+const SP16 = L16x('l16-spread', '16.3 Moving, spreading, and the uncertainty bound')
+const EH16 = L16x('l16-ehrenfest', '16.4 The centre obeys Ehrenfest’s equations')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -1020,6 +1034,149 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'Clocks measure time all the time. It is a parameter because the experimenter chooses it and the state is labelled by it; and energies have a lowest value, so no operator can shift them all (Unit 13.7).',
     trains: TI13,
+  },
+  {
+    id: 'l14-components',
+    title: 'A density is not a chance',
+    steps: [
+      'In the position basis the amplitude at $x$ is $\\psi(x) = \\langle x|\\psi\\rangle$.',
+      'For the unit packet the density at the centre is $|\\psi(0)|^2 = 0.399$ per $\\ell$.',
+      'So the chance of finding the particle at exactly $x = 0$ is $0.399$.',
+      'So the chance of the stretch from $0$ to $\\ell$ is the area under the density there, $0.341$.',
+    ],
+    wrong: 2,
+    why: 'A point has no width, so its chance is zero. The density $0.399$ is a chance per length: a thin stretch $dx$ holds $0.399\\,dx$ (Unit 14.1).',
+    trains: CO14,
+  },
+  {
+    id: 'l14-schrodinger',
+    title: 'One law or two?',
+    steps: [
+      'The law is $i\\hbar\\,d|\\psi\\rangle/dt = H|\\psi\\rangle$, with $H = \\hat p^2/2m + V(\\hat x)$.',
+      'In the position basis $\\hat p$ acts as $-i\\hbar\\,d/dx$, so the kinetic term is $-\\tfrac{\\hbar^2}{2m}\\psi\'\'$.',
+      'The equation for $\\psi(x)$ is therefore a second law, separate from the law for the ket.',
+      'Only the form of $H$ is an assumption; the rest is the same law written in one basis.',
+    ],
+    wrong: 2,
+    why: 'Projecting on $\\langle x|$ adds no physics. The position-space equation is the law for the ket written in one basis, not a second law (Unit 14.2).',
+    trains: SC14,
+  },
+  {
+    id: 'l14-dispersion',
+    title: 'Doubling the wave number',
+    steps: [
+      'A matter wave has $p = \\hbar k$ and $E = \\tfrac{p^2}{2m} = \\hbar\\omega$.',
+      'So $\\omega(k) = \\tfrac{\\hbar k^2}{2m}$.',
+      'Doubling $k$ therefore doubles $\\omega$, as it does for light.',
+      'One time derivative and two space derivatives then give the free Schrödinger equation.',
+    ],
+    wrong: 2,
+    why: 'Since $\\omega\\propto k^2$, doubling $k$ multiplies $\\omega$ by 4: from $1.125$ to $4.5$ for $m = 1$. Only light, with $\\omega = ck$, doubles (Unit 14.3).',
+    trains: DI14,
+  },
+  {
+    id: 'l14-stationary',
+    title: 'Does stationary mean at rest?',
+    steps: [
+      'In an energy eigenstate $|\\psi(t)\\rangle = e^{-iEt/\\hbar}|E\\rangle$.',
+      'The factor $e^{-iEt/\\hbar}$ has size 1 at every time, so $|\\psi(x,t)|^2$ never changes.',
+      'So the particle is at rest, and that is what “stationary” means.',
+      'A mix of two energies has a density that changes, repeating after $2\\pi\\hbar/(E_2 - E_1)$.',
+    ],
+    wrong: 2,
+    why: 'A fixed density says the chances do not change, not that nothing turns: the phase still does. Only a mix moves; levels 1 and 2 of a box of width 4 repeat every $6.79$ (Unit 14.5).',
+    trains: ST14,
+  },
+  {
+    id: 'l15-packet-evolution',
+    title: 'Does the momentum spread grow?',
+    steps: [
+      'Expand the packet in momentum states; each component picks up the phase $e^{-ip^2t/2m\\hbar}$.',
+      'A phase has size 1, so every component keeps its size.',
+      'The packet spreads in space, so its momentum spread $\\Delta p$ grows with it.',
+      'The density in $x$ changes only because the phases between components change.',
+    ],
+    wrong: 2,
+    why: 'Each momentum chance $|\\tilde\\psi(p,t)|^2$ stays fixed, so $\\Delta p$ does too: it is $0.5$ at $t = 6$, as at the start (Unit 15.3).',
+    trains: PE15,
+  },
+  {
+    id: 'l15-group-velocity',
+    title: 'How fast does the particle move?',
+    steps: [
+      'Two nearby plane waves add to a carrier wave under a slowly varying envelope.',
+      'The envelope moves at $\\Delta\\omega/\\Delta k$, which tends to $d\\omega/dk = p/m$.',
+      'The crests of one plane wave move at $\\omega/k = p/2m$.',
+      'So the particle moves at the speed of the crests, $\\omega/k$.',
+    ],
+    wrong: 3,
+    why: 'The chance travels with the envelope, at $d\\omega/dk = p/m$. For $p = 1.5$ and $m = 1$ that is $1.5$, twice the crest speed $0.75$ (Unit 15.4).',
+    trains: GV15,
+  },
+  {
+    id: 'l15-dispersion',
+    title: 'A packet with a straight dispersion line',
+    steps: [
+      'A packet spreads when the group velocity $d\\omega/dk$ differs across its range of $k$.',
+      'For a free particle $\\omega = \\hbar k^2/2m$, so $d\\omega/dk = \\hbar k/m$ changes with $k$.',
+      'For $\\omega = ck$ the group velocity changes with $k$ too, so this packet also spreads.',
+      'The curvature $\\omega\'\'$ of $\\omega(k)$ decides the spreading, not the uncertainty principle.',
+    ],
+    wrong: 2,
+    why: 'For $\\omega = ck$ the slope is $c$ for every $k$ and $\\omega\'\' = 0$, so the packet keeps its shape. The free particle has $\\omega\'\' = \\hbar/m = 1$ (Unit 15.5).',
+    trains: DI15,
+  },
+  {
+    id: 'l15-gaussian',
+    title: 'Narrower, so slower to spread?',
+    steps: [
+      'A Gaussian of width $\\sigma$ has $\\Delta p = \\hbar/2\\sigma$.',
+      'The velocities then spread by about $\\Delta p/m$, so the packet spreads in a time $t_{\\rm spread}\\sim 2m\\sigma^2/\\hbar$.',
+      'A narrower packet has less to spread, so it takes longer to spread.',
+      'In units with $m = \\hbar = 1$ the time is $2\\sigma^2$.',
+    ],
+    wrong: 2,
+    why: 'A narrower packet has a larger $\\Delta p$, so it spreads sooner. The time falls from $1.28$ for $\\sigma = 0.8$ to $0.32$ for $\\sigma = 0.4$ (Unit 15.6).',
+    trains: GA15,
+  },
+  {
+    id: 'l16-evolve',
+    title: 'Does the packet only slide?',
+    steps: [
+      'Free evolution multiplies each momentum component by a phase; the Gaussian identity sums them back.',
+      'The result has the complex factor $1 + i\\tau$, with $\\tau = t/t_s$, and its centre is at $x_0 + p_0t/m$.',
+      'The momentum chances do not change, so the packet only slides and keeps its width $\\sigma$.',
+      'At $t = 0$ we have $\\tau = 0$, and the formula returns the starting packet.',
+    ],
+    wrong: 2,
+    why: 'The momentum chances stay, but the phases between the components change, so the density widens: $\\Delta x = \\sigma\\sqrt{1 + \\tau^2}$, which is $1.414$ for $\\sigma = 1$ at $t = 2$ (Unit 16.2).',
+    trains: EV16,
+  },
+  {
+    id: 'l16-spread',
+    title: 'What makes the packet spread?',
+    steps: [
+      'A Gaussian packet starts with $\\Delta x\\,\\Delta p = \\hbar/2$, the smallest the principle allows.',
+      'Free evolution leaves $\\Delta p$ alone and widens $\\Delta x$ to $\\sigma\\sqrt{1 + (t/t_s)^2}$.',
+      'So the uncertainty principle is what pushes the packet to spread.',
+      'For $\\sigma = 1$ at $t = 4$ the product is $1.118\\,\\hbar$, above $\\hbar/2$.',
+    ],
+    wrong: 2,
+    why: 'The principle only bounds $\\Delta x\\,\\Delta p$ from below; it pushes nothing. The Hamiltonian gives each momentum its own speed, and that spreads the packet (Unit 16.3).',
+    trains: SP16,
+  },
+  {
+    id: 'l16-ehrenfest',
+    title: 'The speed of the mean position',
+    steps: [
+      'The rate law gives $\\tfrac{d}{dt}\\langle x\\rangle = \\tfrac{i}{\\hbar}\\langle[H,\\hat x]\\rangle$, with $H = \\hat p^2/2m + V$.',
+      '$V(\\hat x)$ commutes with $\\hat x$, so only $\\hat p^2/2m$ contributes.',
+      'With $[\\hat p^2,\\hat x] = -i\\hbar\\,\\hat p$ this gives $\\tfrac{d}{dt}\\langle x\\rangle = \\langle p\\rangle/2m$.',
+      'Check on a free packet: the centre should move at $p_0/m$, so $p_0 = 3$ puts it at $6$ when $t = 2$.',
+    ],
+    wrong: 2,
+    why: 'The identity is $[\\hat p^2,\\hat x] = -2i\\hbar\\,\\hat p$, because $\\hat p$ appears twice. So $\\tfrac{d}{dt}\\langle x\\rangle = \\langle p\\rangle/m$ (Unit 16.4).',
+    trains: EH16,
   },
 ]
 
