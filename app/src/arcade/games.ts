@@ -134,6 +134,24 @@ const L16x = (unit: string, label: string): Trains => ({ lecture: 'L16', unit, l
 const EV16 = L16x('l16-evolve', '16.2 The free Gaussian at time t')
 const SP16 = L16x('l16-spread', '16.3 Moving, spreading, and the uncertainty bound')
 const EH16 = L16x('l16-ehrenfest', '16.4 The centre obeys Ehrenfest’s equations')
+const L17x = (unit: string, label: string): Trains => ({ lecture: 'L17', unit, label })
+const MF17 = L17x('l17-mean-force', '17.1 Mean force against force at the mean')
+const ST17 = L17x('l17-step', '17.2 A wave meets a potential step')
+const CU17 = L17x('l17-current', '17.3 Why probability flows, and R and T')
+const L18x = (unit: string, label: string): Trains => ({ lecture: 'L18', unit, label })
+const PK18 = L18x('l18-packet', '18.1 A packet splits at the step')
+const DE18 = L18x('l18-detector', '18.2 Probability current from a moving Gaussian')
+const BE18 = L18x('l18-below', '18.3 Below the step: a tail is not transmission')
+const TU18 = L18x('l18-tunnel', '18.4 A finite barrier lets it through')
+const L19x = (unit: string, label: string): Trains => ({ lecture: 'L19', unit, label })
+const MA19 = L19x('l19-match', '19.3 Four conditions give the transmitted amplitude')
+const TH19 = L19x('l19-thick', '19.4 Reading T: width, height, mass')
+const EN19 = L19x('l19-energy', '19.5 Tunnelling without borrowing energy')
+const L20x = (unit: string, label: string): Trains => ({ lecture: 'L20', unit, label })
+const RE20 = L20x('l20-reverse', '20.1 From scattering to bound states')
+const IN20 = L20x('l20-infinite', '20.2 The infinite well fixes the energies')
+const FI20 = L20x('l20-finite', '20.3 Lower the walls: tails, parity, matching')
+const CM20 = L20x('l20-compare', '20.4 Finite against infinite; bound but moving')
 
 export const SG_LEVELS: SgLevel[] = [
   {
@@ -1177,6 +1195,188 @@ export const ERROR_ROUNDS: ErrorRound[] = [
     wrong: 2,
     why: 'The identity is $[\\hat p^2,\\hat x] = -2i\\hbar\\,\\hat p$, because $\\hat p$ appears twice. So $\\tfrac{d}{dt}\\langle x\\rangle = \\langle p\\rangle/m$ (Unit 16.4).',
     trains: EH16,
+  },
+  {
+    id: 'l17-mean-force',
+    title: 'The mean force and the force at the mean',
+    steps: [
+      'Ehrenfest gives $m\\,\\tfrac{d^2}{dt^2}\\langle x\\rangle = \\langle F(x)\\rangle$, the force averaged over the density.',
+      'For a linear force $F = \\alpha + \\beta x$ the average of $F$ is $F(\\langle x\\rangle)$ exactly.',
+      'So for any force $\\langle F\\rangle = F(\\langle x\\rangle)$, and the mean follows a classical path.',
+      'A narrow packet in a slowly varying force obeys $m\\ddot\\mu \\approx F(\\mu)$ only approximately.',
+    ],
+    wrong: 2,
+    why: 'Linearity was needed. For $F = \\gamma x^2$ and a Gaussian at 2 with $\\sigma = 1$, $\\langle x^2\\rangle = 5$: the mean force is $5\\gamma$, the force at the mean $4\\gamma$ (Unit 17.1).',
+    trains: MF17,
+  },
+  {
+    id: 'l17-step',
+    title: 'An amplitude above one',
+    steps: [
+      'At $E = \\tfrac43V_0$ the wave numbers obey $k_2/k_1 = \\tfrac12$.',
+      'Matching the function and its slope gives $r = \\tfrac{k_1 - k_2}{k_1 + k_2} = \\tfrac13$ and $\\tau = 1 + r = \\tfrac43$.',
+      'A transmitted amplitude $\\tau = \\tfrac43$ would be a probability above 1, so the matching must be wrong.',
+      'The check belongs to the current, which for the transmitted wave is $\\tfrac{k_2}{k_1}|\\tau|^2$ times the incident one.',
+    ],
+    wrong: 2,
+    why: 'An amplitude is not a probability. The slower transmitted wave is denser, but its share of the current is $T = \\tfrac12\\cdot\\tfrac{16}{9} = \\tfrac89$ (Unit 17.2).',
+    trains: ST17,
+  },
+  {
+    id: 'l17-current',
+    title: 'The current of a stationary state',
+    steps: [
+      'Probability is conserved locally: $\\partial_t\\rho + \\partial_xj = 0$.',
+      'In a stationary state $\\rho$ does not change in time, so $\\partial_xj = 0$.',
+      'So $j$ is zero everywhere in the scattering state.',
+      'So the incident current minus the reflected one equals the transmitted current, and $R + T = 1$.',
+    ],
+    wrong: 2,
+    why: 'A zero derivative means a constant current, not a zero one. At $E = \\tfrac43V_0$ it is $\\tfrac89k_1$ on both sides, since $T = \\tfrac89$ (Unit 17.3).',
+    trains: CU17,
+  },
+  {
+    id: 'l18-packet',
+    title: 'Two sums that look alike',
+    steps: [
+      'A packet meets the step and splits into a reflected and a transmitted packet; $R$ and $T$ are their areas.',
+      'Areas are chances, so $R + T = 1$.',
+      'For a narrow range of energies the amplitudes obey the same sum, $r + \\tau = 1$.',
+      'The different speeds on the two sides also enter the area of the transmitted packet.',
+    ],
+    wrong: 2,
+    why: 'The sum is for areas, not amplitudes: matching gives $1 + r = \\tau$. At $E = \\tfrac43V_0$, $r + \\tau = \\tfrac53$, while $R + T = \\tfrac19 + \\tfrac89 = 1$ (Unit 18.1).',
+    trains: PK18,
+  },
+  {
+    id: 'l18-detector',
+    title: 'The speed in R',
+    steps: [
+      'The flux of a packet past a detector is $j \\simeq v\\rho$: its speed times its density.',
+      'Added over the whole passage, the flux is 1: the packet goes by once.',
+      'The transmitted packet moves at $v_2 = \\hbar k_2/m$, so its share carries the factor $k_2/k_1$.',
+      'The reflected packet is also slower or faster, so $R = \\tfrac{k_2}{k_1}|r|^2$ as well.',
+    ],
+    wrong: 3,
+    why: 'The reflected packet returns at the incident speed, so $R = |r|^2$ with no ratio. At $E = \\tfrac43V_0$ that is $\\tfrac19$; with the factor $\\tfrac12$ the shares would add to $\\tfrac{17}{18}$ (Unit 18.2).',
+    trains: DE18,
+  },
+  {
+    id: 'l18-below',
+    title: 'A tail inside the step',
+    steps: [
+      'Below the step the wave on the right is $Ce^{-\\kappa x}$, with $\\kappa = \\sqrt{2m(V_0 - E)}/\\hbar$.',
+      'Matching gives $r = \\tfrac{k - i\\kappa}{k + i\\kappa}$, which has size 1.',
+      'The density $|C|^2e^{-2\\kappa x}$ is not zero on the right, so some particles get through.',
+      'The density falls by a factor $e$ over $1/2\\kappa$, which is $0.25$ for $\\kappa = 2$.',
+    ],
+    wrong: 2,
+    why: 'A real exponential carries no current, and $|r| = 1$ means $R = 1$: every particle comes back. A density is not a transmission (Unit 18.3).',
+    trains: BE18,
+  },
+  {
+    id: 'l18-tunnel',
+    title: 'The thick-barrier formula, thin',
+    steps: [
+      'The exact transmission is $T = \\left[1 + \\tfrac{V_0^2}{4E(V_0 - E)}\\sinh^2\\kappa a\\right]^{-1}$.',
+      'For $\\kappa a \\gg 1$, $\\sinh^2\\kappa a \\approx \\tfrac14e^{2\\kappa a}$ and $T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}$.',
+      'As $a \\to 0$ this form tends to 1, the value for no barrier, so it serves for thin barriers too.',
+      'For $E = V_0/2$ and $\\kappa a = 1$ the exact value is $0.4200$.',
+    ],
+    wrong: 2,
+    why: 'As $a \\to 0$ the thick form tends to $16E(V_0 - E)/V_0^2$, which is 4 for $E = V_0/2$. At $\\kappa a = 1$ it gives $0.541$ against the exact $0.420$ (Unit 18.4).',
+    trains: TU18,
+  },
+  {
+    id: 'l19-match',
+    title: 'T and the size of τ',
+    steps: [
+      'Matching the function and slope at both edges gives four conditions for $r$, $A$, $B$ and $\\tau$.',
+      'The current is the same in all three regions, so $T$ is the transmitted current over the incident one.',
+      'The transmitted wave $\\tau e^{ik_3x}$ carries $k_3|\\tau|^2$ and the incident one $k_1$.',
+      'So $T = |\\tau|^2$ even when the two outer regions have different potentials.',
+    ],
+    wrong: 3,
+    why: 'The ratio is $T = \\tfrac{k_3}{k_1}|\\tau|^2$, and $k_3 \\neq k_1$ when the outer potentials differ. With $V = 0$ on both sides, $|\\tau| = 0.648$ gives $T = 0.4200$ (Unit 19.3).',
+    trains: MA19,
+  },
+  {
+    id: 'l19-thick',
+    title: 'Doubling the width',
+    steps: [
+      'For a thick barrier $T \\simeq 16\\,\\tfrac{E(V_0 - E)}{V_0^2}\\,e^{-2\\kappa a}$.',
+      'Doubling the width $a$ doubles the exponent $2\\kappa a$.',
+      'So $T$ is halved, since the exponent is doubled and not squared.',
+      'A taller barrier or a heavier particle raises $\\kappa$ and lowers $T$ in the same way.',
+    ],
+    wrong: 2,
+    why: 'A doubled exponent squares the exponential factor, so $T$ drops steeply and is not halved. From $\\kappa a = 1.5$ to $3$ the exact $T$ falls to $0.0546$ of its value (Unit 19.4).',
+    trains: TH19,
+  },
+  {
+    id: 'l19-energy',
+    title: 'Does the particle borrow energy?',
+    steps: [
+      'Inside the barrier $V_0 = 4$ exceeds $E = 2$, and the solutions are $e^{\\pm\\kappa x}$.',
+      'The kinetic energy there is negative, so the particle borrows energy while it is inside.',
+      'The waves on both sides of the barrier have the same $k$, with $\\tfrac{k^2}{2} = 2$.',
+      'The barrier changes the amplitude of the transmitted wave, not its energy.',
+    ],
+    wrong: 1,
+    why: 'The state has one energy at every point: $\\tfrac{k^2}{2} = V_0 - \\tfrac{\\kappa^2}{2} = 2$. A negative kinetic energy is only the sign of the curvature. The barrier filters; it does not lend (Unit 19.5).',
+    trains: EN19,
+  },
+  {
+    id: 'l20-reverse',
+    title: 'Does any energy fit?',
+    steps: [
+      'A bound state is normalisable, so the wave beyond each wall must decay.',
+      'Inside the well the solution is $A\\sin kx + B\\cos kx$ for any energy.',
+      'A sine fits inside the well at every $k$, so any energy gives a bound state.',
+      'Only special values of $k$ join the inside to a decaying tail at both ends, and these are the levels.',
+    ],
+    wrong: 2,
+    why: 'Fitting inside is not enough: the wave must also join a decaying tail on each side. Only special energies do, which is why bound energies are quantized (Unit 20.1).',
+    trains: RE20,
+  },
+  {
+    id: 'l20-infinite',
+    title: 'The slope at an infinite wall',
+    steps: [
+      'In the infinite well $V$ is infinite outside, so $\\varphi = 0$ outside.',
+      'Continuity of $\\varphi$ gives $\\varphi(0) = \\varphi(a) = 0$, so $k_n = n\\pi/a$.',
+      'At each wall $\\varphi\'$ must vanish too, as at a finite step.',
+      'The levels are $E_n = \\tfrac{n^2\\pi^2\\hbar^2}{2ma^2}$, so level 3 lies 9 times above level 1.',
+    ],
+    wrong: 2,
+    why: 'At an infinitely high wall the slope jumps, so the finite-step rule does not apply. The sine has slope $k_n$ there; imposing zero slope as well would leave no state (Unit 20.2).',
+    trains: IN20,
+  },
+  {
+    id: 'l20-finite',
+    title: 'A tail beyond the wall',
+    steps: [
+      'Beyond the walls of a finite well the state is a real decaying exponential $e^{-\\kappa|x|}$.',
+      'A real function has zero current, since $j \\propto \\mathrm{Im}(\\varphi^*\\varphi\')$.',
+      'So the tail is a current of particles leaving the well.',
+      'The chance outside is small but not zero: $0.0204$ for the lowest level of the well with $V_0 = 8$ and $a = 2$.',
+    ],
+    wrong: 2,
+    why: 'The tail has zero current, so nothing leaves. The density outside is a chance of finding the particle there, and the state does not change in time (Unit 20.3).',
+    trains: FI20,
+  },
+  {
+    id: 'l20-compare',
+    title: 'Which lies higher, the finite level or the infinite one?',
+    steps: [
+      'Take the lowest level of a finite well and of an infinite well of the same width $a$.',
+      'In the finite well the wavefunction leaks into the walls, so it fits a longer effective width.',
+      'A longer effective width raises the energy, so the finite level lies above $\\pi^2\\hbar^2/2ma^2$.',
+      'Raising the walls shrinks the leak and moves the finite level toward the infinite one.',
+    ],
+    wrong: 2,
+    why: 'Energy goes as $1/L^2$, so a longer width lowers it. The finite level lies below its twin: $0.636$ of it for $V_0 = 8$ and $a = 2$ (Unit 20.4).',
+    trains: CM20,
   },
 ]
 

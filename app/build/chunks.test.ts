@@ -184,6 +184,7 @@ const BANNED_BABYLON: [RegExp, string][] = [
  *   openers/OpenerByName.tsx, which reads the table beside OpenerScrub; the entry keeps only the titles (openers/openerTitles.ts, the unit
  *   section's accessible name; openerCopy.ts takes each title from it). 488 810 / 165 988 (27 chunks) = -1.8 % raw, -2.0 % gzip.
  *   Budget UNCHANGED (497 500 / 170 000: +1.8 % / +2.4 % headroom).
+ *   2026-11-17, 448 Arcade L14-L20 (25 Spot-the-error rounds in arcade/games.ts, lazy under rule (n)): 491 335 / 167 169 (27 files). Budget UNCHANGED.
  * The entry stylesheet grew 92 707 → 97 713 raw (switcher + theme-cryostat.css); 709's faces (fonts709, 14.7 KB of
  * @font-face) and page styles (course709.css) load only with 709 pages.
  * Set ≈ 5 % above the measured build; raise it only with a reason (and never for 709 content: that is rule (h)).

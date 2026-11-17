@@ -10,9 +10,15 @@ import { boxPairPeriod, omegaFree, omegaLinear } from '../physics/wave14'
 import { crestSpeed, groupVelocity, spreadScale } from '../physics/wave15'
 import { GRID, boxEnergy, cellChances, freeEvolve, meanX, packet, spreadP, spreadX } from '../physics/wave'
 import { commutatorRate, gaussianExact } from '../physics/wave16'
+import { barrierAmplitudes, evanescentCurrent, penetrationDepth } from '../physics/wave18'
+import { barrierT, barrierThick, decayConstant, forceMean, stepAmplitudes, stepRT } from '../physics/scatter'
 import { V as V14 } from '../content/L14.values'
 import { V as V15 } from '../content/L15.values'
 import { V as V16 } from '../content/L16.values'
+import { V as V17 } from '../content/L17.values'
+import { V as V18 } from '../content/L18.values'
+import { V as V19 } from '../content/L19.values'
+import { V as V20 } from '../content/L20.values'
 
 const close = (a: number, b: number, eps = 1e-9) => expect(Math.abs(a - b), `${a} vs ${b}`).toBeLessThan(eps)
 const rounds = (lec: string) => ERROR_ROUNDS.filter((r) => r.trains.lecture === lec)
@@ -29,9 +35,13 @@ const IDS: Record<string, string[]> = {
   L14: ['l14-components', 'l14-schrodinger', 'l14-dispersion', 'l14-stationary'],
   L15: ['l15-packet-evolution', 'l15-group-velocity', 'l15-dispersion', 'l15-gaussian'],
   L16: ['l16-evolve', 'l16-spread', 'l16-ehrenfest'],
+  L17: ['l17-mean-force', 'l17-step', 'l17-current'],
+  L18: ['l18-packet', 'l18-detector', 'l18-below', 'l18-tunnel'],
+  L19: ['l19-match', 'l19-thick', 'l19-energy'],
+  L20: ['l20-reverse', 'l20-infinite', 'l20-finite', 'l20-compare'],
 }
 
-describe('Spot the error: Lectures 14–16 (shape)', () => {
+describe('Spot the error: Lectures 14–20 (shape)', () => {
   for (const [lec, ids] of Object.entries(IDS)) {
     it(`${lec}: ${ids.length} rounds, each on a built unit, four steps, one wrong, a why that names the unit`, () => {
       expect(rounds(lec).map((r) => r.id)).toEqual(ids)
@@ -131,5 +141,117 @@ describe('Spot the error: Lectures 14–16 (the engine)', () => {
     close(meanX(freeEvolve(PK(0, 1, 3), GRID, 2), GRID), 6, 1e-6)
     close(V15.l15FreeMean2, 6, 1e-6)
     says('l16-ehrenfest', '$6$ when $t = 2$')
+  })
+})
+
+describe('Spot the error: Lectures 17–20 (the engine)', () => {
+  it('l17-mean-force: for F = γx² and a Gaussian at 2 with σ = 1, ⟨F⟩ = 5γ and F(⟨x⟩) = 4γ', () => {
+    const psi = PK(2, 1)
+    close(forceMean(psi, GRID, (x) => x * x), 5, 1e-6)
+    close(meanX(psi, GRID) ** 2, 4, 1e-6)
+    close(V17.l17GaussMeanF, 5, 1e-6)
+    close(V17.l17GaussForceAtMean, 4, 1e-6)
+    says('l17-mean-force', '$5\\gamma$', '$4\\gamma$', '= 5$')
+  })
+  it('l17-step: at E = 4V₀/3, k₂/k₁ = 1/2, r = 1/3, τ = 4/3 and T = ½·16/9 = 8/9', () => {
+    const s = stepAmplitudes(8, 6)
+    close(s.k2 / s.k1, 0.5)
+    close(s.r.re, 1 / 3)
+    close(s.tau.re, 4 / 3)
+    close(s.T, 8 / 9)
+    close((s.k2 / s.k1) * (16 / 9), 8 / 9)
+    says('l17-step', '\\tfrac13', '\\tfrac43', '\\tfrac89', '\\tfrac{16}{9}', '\\tfrac12')
+  })
+  it('l17-current: the current is one constant, (8/9)k₁, on both sides of the step at E = 4V₀/3 (and not zero)', () => {
+    const s = stepAmplitudes(8, 6)
+    close(s.k1 * (1 - s.R), (8 / 9) * s.k1)
+    close(s.k2 * s.tau.re ** 2, (8 / 9) * s.k1)
+    expect(s.k1 * (1 - s.R)).toBeGreaterThan(0)
+    close(stepRT(8, 6).T, 8 / 9)
+    says('l17-current', '\\tfrac89k_1')
+  })
+  it('l18-packet: amplitudes add as 1 + r = τ (r + τ = 5/3), chances as R + T = 1/9 + 8/9 = 1', () => {
+    const s = stepAmplitudes(8, 6)
+    close(1 + s.r.re, s.tau.re)
+    close(s.r.re + s.tau.re, 5 / 3)
+    close(s.R + s.T, 1)
+    close(s.R, 1 / 9)
+    says('l18-packet', '\\tfrac53', '\\tfrac19', '\\tfrac89')
+  })
+  it('l18-detector: R = |r|² = 1/9 has no speed factor; with the factor ½ the shares would add to 17/18; a packet goes by once', () => {
+    const s = stepAmplitudes(8, 6)
+    close(s.R, 1 / 9)
+    close(s.R * (s.k2 / s.k1) + s.T, 17 / 18)
+    close(V18.l18DetTotal, 1, 1e-9)
+    says('l18-detector', '\\tfrac19', '\\tfrac{17}{18}', '\\tfrac12', 'is 1:')
+  })
+  it('l18-below: below the step |r| = 1, no current flows, and the density falls by e over 1/2κ = 0.25 for κ = 2', () => {
+    const s = stepAmplitudes(2, 4)
+    close(Math.hypot(s.r.re, s.r.im), 1)
+    close(s.R, 1)
+    close(s.T, 0)
+    close(evanescentCurrent(2, 4, 0.3), 0, 1e-12)
+    close(penetrationDepth(2, Math.exp(-1)), 0.25)
+    close(V18.l18DecayLenDensity, 0.25)
+    says('l18-below', '$0.25$', '$\\kappa = 2$')
+  })
+  it('l18-tunnel: for E = V₀/2 and κa = 1 the exact T is 0.4200, the thick form 0.541, and 16E(V₀−E)/V₀² = 4 as a → 0', () => {
+    const E = 1
+    const V0 = 2
+    const a = 1 / decayConstant(E, V0)
+    close(barrierT(E, V0, a), V18.l18BarrierT1, 1e-9)
+    expect(f(barrierT(E, V0, a), 4)).toBe('0.4200')
+    expect(f(barrierThick(E, V0, a), 3)).toBe('0.541')
+    close((16 * E * (V0 - E)) / (V0 * V0), 4)
+    says('l18-tunnel', '0.4200', '0.541', '0.420')
+  })
+  it('l19-match: with V = 0 on both sides T = |τ|² (|τ| = 0.648, T = 0.4200); otherwise the ratio k₃/k₁ enters', () => {
+    const b = barrierAmplitudes(2, 4, 0.5)
+    close(Math.hypot(b.F.re, b.F.im), V19.l19AbsT, 1e-9)
+    close(V19.l19AbsT ** 2, barrierT(2, 4, 0.5), 1e-9)
+    expect(f(V19.l19AbsT, 3)).toBe('0.648')
+    expect(f(barrierT(2, 4, 0.5), 4)).toBe('0.4200')
+    says('l19-match', '0.648', '0.4200')
+  })
+  it('l19-thick: doubling κa from 1.5 to 3 multiplies the exact T by 0.0546 (not ½), and the thick-form exponent e^{−2κa} is squared', () => {
+    const T = (ka: number) => barrierT(1, 2, ka / decayConstant(1, 2))
+    close(T(3) / T(1.5), V19.l19DoubleFactor, 1e-9)
+    expect(f(T(3) / T(1.5), 4)).toBe('0.0546')
+    expect(T(3) / T(1.5)).toBeLessThan(0.1)
+    close(Math.exp(-4 * 1.5), Math.exp(-2 * 1.5) ** 2, 1e-15)
+    says('l19-thick', '0.0546', '1.5', '$3$')
+  })
+  it('l19-energy: E = 2 = k²/2 outside and V₀ − κ²/2 = 4 − 2 inside, with k = κ = 2', () => {
+    const kappa = decayConstant(2, 4)
+    close(kappa, 2)
+    close(V19.l19KS, 2)
+    close(4 - (kappa * kappa) / 2, 2)
+    close(V19.l19EnergyOut, 2)
+    says('l19-energy', '$V_0 = 4$', '$E = 2$', '= 2$')
+  })
+  it('l20-reverse: only special k fit (the finite well of V₀ = 8, a = 2 has a lowest level 0.784, not any energy)', () => {
+    expect(V20.l20E1Fin).toBeGreaterThan(0)
+    expect(round('l20-reverse').why).toContain('special energies')
+  })
+  it('l20-infinite: E₃/E₁ = 9, and the sine of level n has slope kₙ = nπ/a ≠ 0 at the wall', () => {
+    close(boxEnergy(4, 3) / boxEnergy(4, 1), 9)
+    close(V20.l20BoxE3overE1, 9)
+    const a = 4
+    const n = 2
+    const k = (n * Math.PI) / a
+    close(k * Math.cos(0), k)
+    expect(k).toBeGreaterThan(0)
+    says('l20-infinite', '9 times')
+  })
+  it('l20-finite: the lowest level of the well V₀ = 8, a = 2 has 0.0204 of its chance outside the walls', () => {
+    close(V20.l20TailGround, 0.0204264, 5e-5)
+    expect(f(V20.l20TailGround, 4)).toBe('0.0204')
+    says('l20-finite', '0.0204', '$V_0 = 8$', '$a = 2$')
+  })
+  it('l20-compare: the finite level lies below its infinite twin, 0.636 of it for V₀ = 8, a = 2', () => {
+    close(V20.l20E1Fin / boxEnergy(2, 1), V20.l20E1Ratio, 1e-6)
+    expect(V20.l20E1Ratio).toBeLessThan(1)
+    expect(f(V20.l20E1Ratio, 3)).toBe('0.636')
+    says('l20-compare', '0.636')
   })
 })
