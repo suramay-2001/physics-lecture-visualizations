@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "BUILD-LOG.md": {
-    "mtime": 1794806195.5570762,
-    "ast_hash": "8b455fa178910ec499979434b3e6f4de",
+    "mtime": 1794886893.019638,
+    "ast_hash": "1218bcc462d6d272c953f39b5ee0a749",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -2320,8 +2320,8 @@
     "semantic_hash": ""
   },
   "app/src/arcade/games.ts": {
-    "mtime": 1792115080.9443803,
-    "ast_hash": "cd876970e70e1646a476da303107e3f0",
+    "mtime": 1794886837.56084,
+    "ast_hash": "aa53584624314b614b229e617a0da03e",
     "semantic_hash": ""
   },
   "app/src/arcade/golf.ts": {
@@ -11005,8 +11005,8 @@
     "semantic_hash": ""
   },
   "app/src/content/L14.ts": {
-    "mtime": 1794851062.3656998,
-    "ast_hash": "999536b97674503f509aaec6f9638ffe",
+    "mtime": 1794852832.9221482,
+    "ast_hash": "60fc462449861ea256053a066629c8eb",
     "semantic_hash": ""
   },
   "app/src/content/L14.values.ts": {
@@ -15765,8 +15765,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/wave19.ts": {
-    "mtime": 1794850818.4186087,
-    "ast_hash": "cf2e2f513ddfb7813af34bb3a6a54d38",
+    "mtime": 1794852832.928467,
+    "ast_hash": "ec54510f9e1a27f1e3528bc8c5637ae8",
     "semantic_hash": ""
   },
   "app/src/physics/wave20.test.ts": {
@@ -15775,8 +15775,8 @@
     "semantic_hash": ""
   },
   "app/src/physics/wave20.ts": {
-    "mtime": 1794851062.3741357,
-    "ast_hash": "8c49529aca37f5e61ca6d042cd6625a7",
+    "mtime": 1794852832.9300687,
+    "ast_hash": "db2dcb1f6bddafca3c3433743f3bcc23",
     "semantic_hash": ""
   },
   "app/src/stage/svg/wavefunctionStationary.test.tsx": {
@@ -15805,33 +15805,33 @@
     "semantic_hash": ""
   },
   "app/src/content/L20.story.ts": {
-    "mtime": 1794851062.3667755,
-    "ast_hash": "77d8d05d9e61750b87bd15598c8753b4",
+    "mtime": 1794852832.9253452,
+    "ast_hash": "55bbc392e88da2bd03445291ad1aacc4",
     "semantic_hash": ""
   },
   "app/src/content/L20.test.ts": {
-    "mtime": 1794851062.3671327,
-    "ast_hash": "13d8d0a6a54928fc50faf7baf2f3c093",
+    "mtime": 1794852832.9258468,
+    "ast_hash": "ec5f9bdad9e3e9b3a8bd538f44d9b5d9",
     "semantic_hash": ""
   },
   "app/src/content/L20.ts": {
-    "mtime": 1794851062.3674257,
-    "ast_hash": "a3d64426019b663fb7efb05a323cd79d",
+    "mtime": 1794852832.9262648,
+    "ast_hash": "7e0f8272e0bda4a9bfb7c5a429359212",
     "semantic_hash": ""
   },
   "app/src/content/L20.values.ts": {
-    "mtime": 1794851062.3678527,
-    "ast_hash": "8a0a7e1878b744d552e0cc324f312d5b",
+    "mtime": 1794852832.9267898,
+    "ast_hash": "8eb06be75c165c1edfe3c5c77af2a8be",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims-448/l20.json": {
-    "mtime": 1794851327.953469,
-    "ast_hash": "13b75d822ded8f2265a691f186f9c5ad",
+    "mtime": 1794852832.9277174,
+    "ast_hash": "46b48d1bb36422ab20421fcd919e4bc7",
     "semantic_hash": ""
   },
   "pipeline/claims_448/l20.py": {
-    "mtime": 1794851062.4420044,
-    "ast_hash": "ff38f90bbb89c9a83c11b84b71c277e6",
+    "mtime": 1794852832.9319756,
+    "ast_hash": "f6c360841618a0f72b2f4e2e1d171203",
     "semantic_hash": ""
   },
   "docs/context/relay/2026-11-16-448-L20.md": {
@@ -15840,43 +15840,58 @@
     "semantic_hash": ""
   },
   "app/src/content/L19.review.ts": {
-    "mtime": 1794850818.4134784,
-    "ast_hash": "90f2fbdaf3b3c3b070f7cc131d4c1c06",
+    "mtime": 1794852832.9229052,
+    "ast_hash": "cd7847fd16170513044db1de89a0c012",
     "semantic_hash": ""
   },
   "app/src/content/L19.story.ts": {
-    "mtime": 1794850818.4138138,
-    "ast_hash": "cf614b54cadf91ce5eb1df7f5386ccbf",
+    "mtime": 1794852832.9234748,
+    "ast_hash": "3907fbe52d3b7e1a5e09af50b48701db",
     "semantic_hash": ""
   },
   "app/src/content/L19.test.ts": {
-    "mtime": 1794850818.4141004,
-    "ast_hash": "f53ef1453b307db2a139f80bf12a25a5",
+    "mtime": 1794852832.9240277,
+    "ast_hash": "7c590fe41f402b4789fa4b1de8a8605b",
     "semantic_hash": ""
   },
   "app/src/content/L19.ts": {
-    "mtime": 1794850818.4143713,
-    "ast_hash": "17abf8e8ae385c712796b2e347a4c4ab",
+    "mtime": 1794852832.9245183,
+    "ast_hash": "92ab9e62448762a4956cdda05fcdacf6",
     "semantic_hash": ""
   },
   "app/src/content/L19.values.ts": {
-    "mtime": 1794850818.414729,
-    "ast_hash": "1be682f14570bbcd2f6b2751208cbc9f",
+    "mtime": 1794852832.9249136,
+    "ast_hash": "5face8ddcb1e57aaf15ae3175a4e5f5c",
     "semantic_hash": ""
   },
   "app/src/physics/__fixtures__/claims-448/l19.json": {
-    "mtime": 1794851326.333106,
-    "ast_hash": "874225c4cfb5a5276f2c5c87cf8a111e",
+    "mtime": 1794852832.927332,
+    "ast_hash": "7d4bcffe5a7571b32dc1a01531275b0f",
     "semantic_hash": ""
   },
   "pipeline/claims_448/l19.py": {
-    "mtime": 1794850818.419771,
-    "ast_hash": "f47150aa101664414a8b9b384f79d322",
+    "mtime": 1794852832.93142,
+    "ast_hash": "c8148246ba104207d78d90ef26616c1d",
     "semantic_hash": ""
   },
   "docs/context/relay/2026-11-16-448-L19.md": {
     "mtime": 1794850818.4194264,
     "ast_hash": "dee1bab8af9eb407ba46fcc4799c0af7",
+    "semantic_hash": ""
+  },
+  "app/src/arcade/games14.test.ts": {
+    "mtime": 1794886837.5612338,
+    "ast_hash": "e1a2866e69b18433b381360f56dfd0b3",
+    "semantic_hash": ""
+  },
+  "docs/context/relay/2026-11-17-448-arcade-L14L20.md": {
+    "mtime": 1794886837.5615277,
+    "ast_hash": "b49e576c8c1b57fcc0c9c075b1cfd314",
+    "semantic_hash": ""
+  },
+  "docs/roles/audits/448-L19L20-review.md": {
+    "mtime": 1794852832.9307964,
+    "ast_hash": "2adb668e782e91f1e0942522f4a3dc4c",
     "semantic_hash": ""
   }
 }

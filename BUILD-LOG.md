@@ -60,9 +60,15 @@ notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. S
 **Next action:** none queued. When new 448 notes arrive (L21+), follow the L19–L20 batch below: ingest → one planner
 for the batch → judge rulings → one stage/engine agent if a stage addition is ruled → one builder per lecture in parallel
 → Sonnet merge agent → one review + fix → gate, full preview e2e, unpiped audit → push. Scratchpad briefs do not survive
-a new session: rewrite them from `skills/05-chapter-build` and the brief texts recorded in the rulings files.
-Known follow-ups (not requested): Arcade levels for 448 L14–L20; L20's optional oscillator preview (`l20-oscillator`)
-must be revisited for ownership if L21's notes teach the oscillator.
+a new session: the briefs used for L19–L20 are kept, path-free, in `docs/patterns/briefs-448/` (01 planner … 07 arcade).
+Known follow-up: L20's optional oscillator preview (`l20-oscillator`) must be revisited for ownership if L21's notes
+teach the oscillator. Decision summary for the owner: private artifact "Spin Lab Decision Record" (not in the repo).
+
+**DONE (2026-11-17): 448 Arcade for L14–L20.** 25 Spot-the-error rounds (L14 4, L15 4, L16 3, L17 3, L18 4, L19 3,
+L20 4) in `arcade/games.ts`, drawn from the plans' Arcade lines and the units' review-card traps; every correction is
+engine-checked in `arcade/games14.test.ts`. No cross-lecture duplicates (L19 took `l19-match`, not L18's tail round);
+`SC13`/`TI13` stay in L13 (those units still teach the points). `games.ts` is already lazy (rule n): entry 491 335 raw.
+Gate 340 files / 17 875 tests; full preview e2e 408 passed. The judge re-derived every corrected number by hand. New game types ("Squeeze", "Detector") stay deferred.
 
 **DONE (2026-11-16): 448 L19–L20.** Notes ingested as `sources/L19` (finite-barrier tunnelling, 9 pp) and `sources/L20`
 (bound states, 12 pp). Plans `proposals/P-L19-story.md`, `P-L20-story.md`; rulings `decisions/448-L19L20.md` R1–R10:
