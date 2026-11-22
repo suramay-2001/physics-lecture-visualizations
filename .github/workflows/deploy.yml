@@ -40,6 +40,12 @@ jobs:
       - name: Leak audit (whole history)
         if: github.event_name != 'pull_request' # a PR checkout adds GitHub's own merge commit
         run: python3 pipeline/audit_public.py --verbatim
+      - name: Leak audit (this pull request's own commits)
+        if: github.event_name == 'pull_request' # BASE..HEAD skips GitHub's merge commit; no secrets are used in this job
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 pipeline/audit_public.py --range "$BASE_SHA..$HEAD_SHA"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist
