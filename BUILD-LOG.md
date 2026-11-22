@@ -100,7 +100,7 @@ LESSONS: the merge agent's SVG-only lists must be derived from kinds AND widgets
 macOS has no `timeout`: run long git/vitest steps in the background instead.
 
 **Next action (2026-11-06): 448 L14–L18, then Arcade and films for 709 Q19–Q27.** Owner: build the new 448 notes
-(`~/Documents/Physics 448 notes/Lecture_14–18.pdf`, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
+(the owner's local copy of the 448 L14–L18 notes PDF, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
 states; free particles, wavepackets, group velocity, dispersion; Gaussian packets and Ehrenfest; classical mean motion
 and quantum reflection; reflection and tunnelling), then Arcade rounds and films for Q19–Q27. 448 HW6/HW7 submitted
 (`homework-status.md`). Budget 35 points (meter 3 % at start; weekly reset Fri 11-06 19:00 UTC). Overlap to resolve: the

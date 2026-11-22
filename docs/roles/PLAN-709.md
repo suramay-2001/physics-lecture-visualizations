@@ -5,7 +5,7 @@ The user is taking Physics 709 (Fall 2026) and wants its lecture notes and two t
 and cinematic chapters, like the finished Physics 448 "Spin Lab". The goal is intuition from the ground up: every
 term and every derivation explained, full professional notation, grounded in 9th-grade math and physics.
 Sources:
-- `~/Downloads/Physics709_F26.pdf`: a growing lecture-notes PDF. Today it holds 17 pp. / 3 lectures (9/2, 9/9, 9/14),
+- the owner's local copy of the 709 lecture-notes PDF: a growing lecture-notes PDF. Today it holds 17 pp. / 3 lectures (9/2, 9/9, 9/14),
   a QM review that overlaps 448 almost entirely (Stern–Gerlach, Hilbert space, Gram–Schmidt, spin-½, change of basis,
   photon polarization, operators, projectors, Bloch sphere, Hermitian/eigen, uncertainty).
 - Bergou–Hillery–Saffman, *Quantum Information Processing* 2e: 15 chapters, from qubits through hardware.
