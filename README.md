@@ -1,13 +1,16 @@
 # Spin Lab
 
-Interactive study notes for two university quantum courses, built as one web app:
+Interactive study notes for two university quantum courses, built as one web app. An independent student project, not affiliated with or endorsed by the course, its instructors or the university; course material is used with the instructors' permission.
 
-- **Physics 448: spin-½.** Seven lectures that start at the Stern–Gerlach experiment and end at rotations, compatible
-  measurements and uncertainty.
-- **Physics 709: Introduction to Quantum Computing.** A full-semester map in the "Cryostat" identity, built through
-  Part V:
-  - **Foundations (F1–F6):** complex numbers; vectors and inner products; matrices and linear maps; eigenvalues and the
-    spectral theorem; probability; tensor products.
+
+- **Physics 448: spin-½.** Twenty lectures (L1–L20) that start at the Stern–Gerlach experiment and run through rotations,
+  compatible measurements and uncertainty, then wavefunctions, the Schrödinger equation, packets, scattering and bound
+  states.
+- **Physics 709: Introduction to Quantum Computing.** A full-semester map in the "Cryostat" identity, complete: the
+  Foundations (F1–F8) and the quantum chapters Q1–Q27, plus the lecture notes (N1–N11) and the Optics Lab (O1–O6). Parts
+  I to V are listed below; the later chapters (Q15–Q27) continue the map.
+  - **Foundations (F1–F8):** complex numbers; vectors and inner products; matrices and linear maps; eigenvalues and the
+    spectral theorem; probability; tensor products (F1–F6), then F7 and F8.
   - **Part I, quantum mechanics review (Q1–Q3):** Stern–Gerlach, bases and turning frames, measurement and the Bloch
     sphere.
   - **Part II, qubits and circuits (Q4–Q6):** gates and circuits, Deutsch's algorithm, two qubits and the Bell basis.
@@ -34,6 +37,7 @@ spheres, Hilbert-space planes, Stern–Gerlach beams, amplitude bars and quantum
 - **Arcade.** Short practice games: spot the error, Stern–Gerlach puzzles, Bloch-sphere golf.
 - **Lab.** Hands-on benches: a Stern–Gerlach bench, an operator lab and an expression grapher.
 - **Glossary, formula board, concept map and review cards** for each course.
+- **Papers.** Research papers explained one at a time in the two-track model: background chapters B1–B4 and paper P1.
 
 ## Correctness rules
 
@@ -54,8 +58,9 @@ The courses paraphrase and cite (section and printed page) these works, plus the
 - Townsend, *A Modern Approach to Quantum Mechanics* (2e)
 - Susskind & Friedman, *The Theoretical Minimum*
 
-None of the source texts are in this repository. `sources/` is git-ignored, and a verbatim test fails the build if app
-text shares an 8-word run with a source.
+None of the source texts are in this repository. `sources/` is git-ignored, and a verbatim test fails if app
+text shares an 8-word run with a source. It runs wherever `sources/` is present (the owner's machine and the merge
+gate) and is skipped where it is absent, which includes CI.
 
 ## Running it
 

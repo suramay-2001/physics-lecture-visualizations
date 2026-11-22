@@ -65,7 +65,7 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
     sentenceCaps: { ground: 25 },
     theme: 'glass',
     footer:
-      'Interactive companion to Physics 448 lecture notes. Explanations are paraphrased; book references point to sections, so read the originals. Your progress is saved only in this browser.',
+      'Interactive companion to Physics 448 lecture notes. Explanations are paraphrased; book references point to sections, so read the originals. Your progress is saved only in this browser. An independent student project, not affiliated with or endorsed by the course, its instructors or the university; course material is used with the instructors’ permission.',
   },
   qc709: {
     id: 'qc709',
@@ -81,7 +81,7 @@ export const COURSES: { readonly [K in CourseId]: CourseDef } = {
     sentenceCaps: { ground: 25, formal: 40 },
     theme: 'cryostat',
     footer:
-      'Interactive companion to Physics 709 lecture notes and its textbooks. Explanations are paraphrased; book references point to sections and printed pages, so read the originals. Your progress is saved only in this browser.',
+      'Interactive companion to Physics 709 lecture notes and its textbooks. Explanations are paraphrased; book references point to sections and printed pages, so read the originals. Your progress is saved only in this browser. An independent student project, not affiliated with or endorsed by the course, its instructors or the university; course material is used with the instructors’ permission.',
   },
   // The Papers section (rulings papers.md; docs/specs/papers-platform.md): research papers explained one at a time, in the 709
   // two-track model. P1, P2 … are paper lectures; B1, B2 … the background chapters several papers share (R2).
