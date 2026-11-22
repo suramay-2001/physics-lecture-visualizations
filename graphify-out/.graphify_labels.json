@@ -711,6 +711,7 @@
   "709": "make_q24_fixtures.py",
   "710": "osc_ops",
   "711": "2026-11-17-448-arcade-L14L20.md",
+  "712": "phi0",
   "713": "make_b4_fixtures.py",
   "714": "2026-11-16-448-L20.md",
   "715": "2026-11-06-448-L14.md",
@@ -723,11 +724,15 @@
   "722": "2026-11-07-448-L17.md",
   "723": "2026-11-07-448-L18.md",
   "724": "448-L14L18.md",
+  "725": "rot",
   "726": "qc-q19-walker.ts",
   "727": "qc-q20-cloner.ts",
   "728": "qc-q23-holevo-gap.ts",
   "729": "qc-q24-rabi-ball.ts",
   "730": "qc-q25-blockade.ts",
   "731": "qc-q26-hom.ts",
-  "732": "qc-q27-transmon.ts"
+  "732": "qc-q27-transmon.ts",
+  "733": "two_level_cut",
+  "734": "04-merge-agent.md",
+  "735": "05-reviewer.md"
 }
