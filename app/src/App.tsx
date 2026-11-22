@@ -257,6 +257,11 @@ export default function App() {
       <StageHostSlot />
       <footer className="footer">
         <p>{c.footer}</p>
+        <p>
+          <a href={`${import.meta.env.BASE_URL}licenses/third-party.txt`}>Third-party licences</a>
+          {' · '}
+          <a href={`${import.meta.env.BASE_URL}licenses/fonts/README.txt`}>Font licences</a>
+        </p>
       </footer>
     </>
   )
