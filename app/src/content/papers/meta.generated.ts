@@ -451,6 +451,68 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B6",
+    "number": 6,
+    "title": "Readout in the error-correction cycle: time, idle noise and loss",
+    "units": [
+      {
+        "id": "b6-cycle",
+        "title": "What one round is made of",
+        "question": "How long does a round take, and what share of it is the camera?",
+        "challenges": [
+          "b6-c-frac",
+          "b6-c-ratio",
+          "b6-c-which"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b6-twirl",
+        "title": "Waiting costs: idle error as three chances",
+        "question": "What does a qubit lose while the camera works?",
+        "challenges": [
+          "b6-t-pz",
+          "b6-t-inf",
+          "b6-t-dom"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b6-ucurve",
+        "title": "Reading error against waiting error",
+        "question": "Why is there a best reading time, and why is the exponent (d+1)/2?",
+        "challenges": [
+          "b6-u-exp",
+          "b6-u-amp",
+          "b6-u-rep"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b6-pipelining",
+        "title": "Hiding the classical work",
+        "question": "When does overlapping classification with the next round shorten a run?",
+        "challenges": [
+          "b6-p-ser",
+          "b6-p-pipe",
+          "b6-p-slow"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b6-loss-reset",
+        "title": "Atoms that leave; reset or not",
+        "question": "What changes when a reading has three outcomes, and when can reset be skipped?",
+        "challenges": [
+          "b6-l-loss",
+          "b6-l-erase",
+          "b6-l-min"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -512,6 +574,13 @@ export const PAPER_CARDS: PaperCard[] = [
     "id": "B5",
     "kind": "background",
     "title": "From pixels to bits: classifying and denoising array images",
+    "references": 4,
+    "prerequisites": 13
+  },
+  {
+    "id": "B6",
+    "kind": "background",
+    "title": "Readout in the error-correction cycle: time, idle noise and loss",
     "references": 4,
     "prerequisites": 13
   }

@@ -12,7 +12,7 @@ import { RECIPE_IDS, runRecipe, type RecipeRef } from './recipes'
 vi.setConfig({ testTimeout: 60_000 })
 
 const K = claims.values as Record<string, number>
-const X = checks.values as Record<string, number>
+const X = checks.values as unknown as Record<string, number>
 const R = (recipe: string, params: object = {}): RecipeRef => ({ recipe, params }) as RecipeRef
 const out = (ref: RecipeRef, name: string): number => {
   const r = runRecipe(ref)

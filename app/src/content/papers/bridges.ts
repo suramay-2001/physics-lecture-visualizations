@@ -49,5 +49,9 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-o10-collect': { course: 'qc709', lecture: 'O10', unit: 'o10-collect', label: 'how many photons reach the camera' },
   'pp-o11-hist': { course: 'qc709', lecture: 'O11', unit: 'o11-hist', label: 'two Poisson histograms and a cutoff' },
   'pp-o11-exposure': { course: 'qc709', lecture: 'O11', unit: 'o11-exposure', label: 'more light, fewer errors' },
-  'pp-o11-camera': { course: 'qc709', lecture: 'O11', unit: 'o11-camera', label: 'the camera’s own noise' },
+  // B6 (readout in the error-correction cycle): the track's loss pages, the digitised Pauli errors, the neutral-atom hardware
+  'pp-o9-loss': { course: 'qc709', lecture: 'O9', unit: 'o9-loss', label: 'atoms lost to the vacuum, and the survival of an image' },
+  'pp-o11-loss': { course: 'qc709', lecture: 'O11', unit: 'o11-loss', label: 'the loss a long exposure costs' },
+  'pp-q21-digitize': { course: 'qc709', lecture: 'Q21', unit: 'q21-digitize', label: 'any error is a mix of X, Y, Z and nothing' },
+  'pp-o11-camera':{ course: 'qc709', lecture: 'O11', unit: 'o11-camera', label: 'the camera’s own noise' },
 }

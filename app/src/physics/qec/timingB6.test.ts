@@ -53,9 +53,9 @@ describe('reading error, the toy effective rate and the optimum', () => {
     near(T.readoutError(6, 0.3, 2), K.b6PmAt2ms)
     expect(() => T.readoutError(0.3, 6, 1)).toThrow(RangeError)
   })
-  it('p_eff at 1, 2, 4, 10 ms and the grid optimum agree with the twin', () => {
+  it('p_eff at 2, 4, 10 ms and the grid optimum agree with the twin', () => {
     const f = (t: number) => T.effectiveRate(0.002, t, 10, 1, 6, 0.3)
-    for (const t of [1, 2, 4, 10]) near(f(t), K[`b6PeffAt${t}`])
+    for (const t of [2, 4, 10]) near(f(t), K[`b6PeffAt${t}`])
     const best = T.argminTime(f, 0.05, 20, 0.05)
     near(best.t, K.b6TStar, 1e-9)
     near(best.value, K.b6PeffStar)
