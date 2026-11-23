@@ -8,6 +8,8 @@
  */
 import { HBAR, H_PLANCK, K_BOLTZMANN, bohrMagneton } from '../../physics/constants'
 import { C6_NA_AU, AU_C6, langevinPotential, partialWaves, ramseyChance } from '../../physics/optics/collisions'
+import { motLoad, parityDistribution, poissonP1, tweezerDepth, tweezerFreqs, tweezerPotential, waistFromFreqs } from '../../physics/optics/arrays'
+import { collectionEfficiency, errorVsExposure } from '../../physics/optics/imaging'
 import {
   CS_D2,
   NA_D2,
@@ -90,7 +92,7 @@ export const OPTICS_CURVE_BOUNDS: { readonly [K in OpticsCurveName]?: { min: num
 }
 
 /* ----------------------------------------------------------------------------- the twelve series functions */
-export const OPTICS_SERIES_FNS = ['scatterVsDetuning', 'molassesForceVsV', 'sisyphusPotential', 'vsrForce', 'quadrupoleU', 'airyLevels', 'heuristicLevels', 'dipoleDepth', 'dipoleScatter', 'motForceVsZ', 'ramseyFringe', 'langevinPotential'] as const
+export const OPTICS_SERIES_FNS = ['scatterVsDetuning', 'molassesForceVsV', 'sisyphusPotential', 'vsrForce', 'quadrupoleU', 'airyLevels', 'heuristicLevels', 'dipoleDepth', 'dipoleScatter', 'motForceVsZ', 'ramseyFringe', 'langevinPotential', 'motLoadFill', 'tweezerU', 'parityP1', 'collectionVsNA', 'errVsExposure'] as const
 export type OpticsSeriesFn = (typeof OPTICS_SERIES_FNS)[number]
 /** The parameters these series take (a series names the ones its function needs): s, saturation per beam · delta, δ/γ · beam, which of the two beams · mg, ±½ · B, gauss · kind, σ⁺σ⁻ or lin⊥lin · axis · v, m/s · T, s · ell, the partial wave. */
 export interface OpticsSeriesParams {
@@ -104,6 +106,11 @@ export interface OpticsSeriesParams {
   v?: number
   T?: number
   ell?: number
+  /** O7: the MOT filling time τ, ms · O11: the bright (rb) and background (rg) rates, kcps · O8 and O9: which curve (the exact or the harmonic well; the parity law or the plain Poisson). */
+  tau?: number
+  rb?: number
+  rg?: number
+  mode?: 'exact' | 'harmonic' | 'parity' | 'poisson'
 }
 type Q = OpticsSeriesParams
 
@@ -136,7 +143,7 @@ const pos = (name: string) => (v: unknown) => (isNum(v) && v > 0 ? '' : `${name}
 const any = (name: string) => (v: unknown) => (isNum(v) ? '' : `${name} must be a finite number`)
 const oneOf = (name: string, set: readonly unknown[]) => (v: unknown) => (set.includes(v) ? '' : `${name} must be one of ${set.join(', ')}`)
 const none = () => ''
-const P: OpticsSeriesSpec['params'] = { s: none, delta: none, beam: none, mg: none, B: none, kind: none, axis: none, v: none, T: none, ell: none }
+const P: OpticsSeriesSpec['params'] = { s: none, delta: none, beam: none, mg: none, B: none, kind: none, axis: none, v: none, T: none, ell: none, tau: none, rb: none, rg: none, mode: none }
 const g = (n: number, d = 2): string => String(Number(n.toFixed(d)))
 
 export const OPTICS_SERIES: { readonly [K in OpticsSeriesFn]: OpticsSeriesSpec } = {
@@ -237,6 +244,53 @@ export const OPTICS_SERIES: { readonly [K in OpticsSeriesFn]: OpticsSeriesSpec }
     value: (q, x) => (langevinPotential(6, C6_NA, NA_MASS / 2, q.ell as number, x * 1e-9) / K_BOLTZMANN) * 1e6,
     label: (q) => `ℓ = ${q.ell}`,
     signed: true,
+  },
+  // N(t)/N_ss = 1 − e^{−t/τ} against t (ms), for the filling time τ (ms) (O7)
+  motLoadFill: {
+    x: { from: 0, to: 600, label: 't (ms)' },
+    params: { ...P, tau: pos('tau') },
+    value: (q, x) => motLoad(1, (q.tau as number) * 1e-3, x * 1e-3) / ((q.tau as number) * 1e-3),
+    label: (q) => `τ = ${g(q.tau as number, 0)} ms`,
+    signed: false,
+  },
+  // U(r)/k_B (mK) of the cesium tweezer of page O8 (1061 nm, 1.4 mW, waist from the printed 29.30 and 5.64 kHz) against r (µm): the Gaussian well, or its harmonic approximation
+  tweezerU: {
+    x: { from: -3, to: 3, label: 'r (µm)' },
+    params: { ...P, mode: oneOf('mode', ['exact', 'harmonic']) },
+    value: (q, x) => {
+      const lam = 1061e-9
+      const w0 = waistFromFreqs(29.3e3, 5.64e3, lam)
+      const U0 = tweezerDepth(1.4e-3, w0, lam)
+      const r = x * 1e-6
+      const U = q.mode === 'harmonic' ? -U0 + (tweezerFreqs(U0, CS_D2.massKg, w0, lam).fr * 2 * Math.PI) ** 2 * CS_D2.massKg * r * r / 2 : tweezerPotential(U0, w0, lam, r)
+      return (U / K_BOLTZMANN) * 1e3
+    },
+    label: (q) => (q.mode === 'harmonic' ? 'harmonic well' : 'Gaussian well'),
+    signed: true,
+  },
+  // the chance of one atom in a tweezer against the Poisson mean μ (O9): the parity law (1 − e^{−2μ})/2, or the plain Poisson μe^{−μ}
+  parityP1: {
+    x: { from: 0, to: 6, label: 'μ' },
+    params: { ...P, mode: oneOf('mode', ['parity', 'poisson']) },
+    value: (q, x) => (q.mode === 'poisson' ? poissonP1(x) : parityDistribution(x).p1),
+    label: (q) => (q.mode === 'poisson' ? 'Poisson, no collisions' : 'with pair loss'),
+    signed: false,
+  },
+  // the share of isotropic light an ideal lens gathers against its numerical aperture (O10)
+  collectionVsNA: {
+    x: { from: 0, to: 0.95, label: 'NA' },
+    params: P,
+    value: (_q, x) => collectionEfficiency(x),
+    label: () => 'ideal lens, isotropic',
+    signed: false,
+  },
+  // the smallest error of a count cutoff against the exposure (µs) for a bright atom of signal rate rb and background rg (kcps) (O11)
+  errVsExposure: {
+    x: { from: 20, to: 400, label: 'exposure (µs)' },
+    params: { ...P, rb: pos('rb'), rg: pos('rg') },
+    value: (q, x) => errorVsExposure((q.rb as number) * 1e3, (q.rg as number) * 1e3, x * 1e-6).err,
+    label: (q) => `${g(q.rb as number, 1)} / ${g(q.rg as number, 2)} kcps`,
+    signed: false,
   },
 }
 

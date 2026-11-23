@@ -129,9 +129,26 @@ export function fillChance(N: number, M: number, p: number): number {
 /** The smallest number of sites N for which the chance to load at least M of them is at least `conf`. */
 export function sitesNeeded(M: number, p: number, conf: number): number {
   if (!(p > 0 && p < 1 && conf > 0 && conf < 1) || !Number.isInteger(M) || M < 1) throw new RangeError('sitesNeeded: whole M >= 1, 0 < p < 1, 0 < conf < 1')
-  let N = M
-  while (fillChance(N, M, p) < conf) N++
-  return N
+  // fillChance rises with N (one more site can only help), so the first N that reaches `conf` is found by bracketing and bisection
+  if (fillChance(M, M, p) >= conf) return M
+  let lo = M // fails
+  let hi = 2 * M
+  while (fillChance(hi, M, p) < conf) {
+    lo = hi
+    hi *= 2
+  }
+  return bisectFirst(lo, hi, M, p, conf)
+}
+/** The smallest N in (lo, hi] with fillChance(N, M, p) ≥ conf, given that lo fails and hi passes. */
+function bisectFirst(lo: number, hi: number, M: number, p: number, conf: number): number {
+  let a = lo
+  let b = hi
+  while (b - a > 1) {
+    const mid = Math.floor((a + b) / 2)
+    if (fillChance(mid, M, p) >= conf) b = mid
+    else a = mid
+  }
+  return b
 }
 /** One round of refilling: the empty fraction e becomes e(1 − q) + (1 − e)ε (an empty site is refilled with chance q, a filled one lost with chance ε). */
 export const refillStep = (e: number, eps: number, q: number): number => e * (1 - q) + (1 - e) * eps

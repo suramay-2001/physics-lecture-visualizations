@@ -11,9 +11,13 @@ import { APP_DIR, fs, path } from '../security/node'
 import OpticsBench from './OpticsBench'
 import { readoutRows, resetParams, setParam, sliderText } from './opticsBench/model'
 import { decimalsOf, fixed, niceDomain, niceStep, niceTicks, pathOf, sample, scale, yExtent } from './opticsBench/plot'
-import presetsSource from './opticsBench/presets.ts?raw'
+import presetsMain from './opticsBench/presets.ts?raw'
+import presetsTrackSource from './opticsBench/presetsTrack.ts?raw'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsPreset } from './opticsBench/presets'
 import { opticsPresetProblems, opticsPresetsProblems, opticsWidgetProblems } from './opticsBench/validate'
+
+/** The preset sources the lints read: the table's own file and the experiment track's (O7 to O11). */
+const presetsSource = `${presetsMain}\n${presetsTrackSource}`
 
 /** The widget's stylesheet as written (vitest does not hand a processed .css through `?raw`). */
 const css = fs.readFileSync(path.join(APP_DIR, 'src/widgets/opticsBench.css'), 'utf8')
