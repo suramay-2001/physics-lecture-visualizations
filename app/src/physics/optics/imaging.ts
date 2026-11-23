@@ -288,7 +288,8 @@ export function filterWeights(filter: FrameFilter, size: number, psf: number, ph
 }
 /**
  * A Wiener smoother with a known Gaussian point spread function and white noise, on a rows × cols frame with periodic edges: each spatial frequency is multiplied by
- * S/(S + N), where S = `sourcePower` × (the PSF's transfer function)² and N = `noiseVar`; the mean (frequency 0) is kept. Linear, so it never invents a peak the frame lacks.
+ * S/(S + N), where S = `sourcePower` × (the PSF's transfer function)² and N = `noiseVar` (both per frequency of the unnormalised DFT: for n atoms of amplitude A and
+ * white noise of variance v per pixel, S₀ = n A² and N = rows × cols × v); the mean (frequency 0) is kept. Linear, so it never invents a peak the frame lacks.
  */
 export function wienerSmooth(img: readonly number[], rows: number, cols: number, psf: number, sourcePower: number, noiseVar: number): number[] {
   const re = new Array<number>(rows * cols).fill(0)
