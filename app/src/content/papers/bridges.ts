@@ -42,4 +42,6 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-b4-pbc': { course: 'papers', lecture: 'B4', unit: 'b4-pbc', label: 'programs as Pauli rotations and measurements' },
   'pp-q7-ghz': { course: 'qc709', lecture: 'Q7', unit: 'q7-ghz', label: 'the GHZ state' },
   'pp-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'a Hamiltonian generates the evolution' },
+  'pp-q25-readout': { course: 'qc709', lecture: 'Q25', unit: 'q25-readout', label: 'reading an atom by counting photons against a cutoff' },
+  'pp-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a matrix as a table of weights' },
 }

@@ -1854,14 +1854,16 @@ export interface CameraFrameInputs {
   sigma: number | null
   seed: number
   roi: number | null
-  panels: { show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised'; filter: CameraFrameFilter | null }[]
+  panels: { show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised' | 'rf'; filter: CameraFrameFilter | null }[]
   denoise: 'none' | 'wiener'
+  /** kernel sizes of the 'rf' panel's stack (empty without one) */
+  layers: number[]
   readouts: CameraFrameReadout[]
   shot?: CameraFrameShot
 }
 /** One drawn panel: row-major values with the range the grey scale spans and the unit its legend names. */
 export interface CameraFramePanel {
-  show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised'
+  show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised' | 'rf'
   filter: CameraFrameFilter | null
   title: string
   unit: string

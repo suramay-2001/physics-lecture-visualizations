@@ -389,6 +389,68 @@ export const PAPERS_META: LectureMeta[] = [
         "equations": []
       }
     ]
+  },
+  {
+    "id": "B5",
+    "number": 5,
+    "title": "From pixels to bits: classifying and denoising array images",
+    "units": [
+      {
+        "id": "b5-roi",
+        "title": "A spot on a grid of pixels",
+        "question": "What does one atom look like on the camera, and what does a neighbour do to it?",
+        "challenges": [
+          "b5-r-centre",
+          "b5-r-roi5",
+          "b5-r-dim"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b5-matched-filter",
+        "title": "Weighting pixels: the best sum",
+        "question": "Which weights on the pixels give the fewest wrong answers?",
+        "challenges": [
+          "b5-m-w",
+          "b5-m-d2",
+          "b5-m-ratio"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b5-cnn",
+        "title": "Learning the weights, then a small network",
+        "question": "Can weights be learned from labelled shots, and what do networks add?",
+        "challenges": [
+          "b5-c-conv",
+          "b5-c-rf",
+          "b5-c-wratio"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b5-wiener",
+        "title": "Cleaning a picture with a linear filter",
+        "question": "Why can smoothing then thresholding not beat the right weighted sum?",
+        "challenges": [
+          "b5-w-centre",
+          "b5-w-shrink",
+          "b5-w-lin"
+        ],
+        "equations": []
+      },
+      {
+        "id": "b5-pix2pix",
+        "title": "Picture-to-picture learning, and its risks",
+        "question": "What does a conditional GAN learn, and how can it invent an atom?",
+        "challenges": [
+          "b5-p-gan",
+          "b5-p-l1",
+          "b5-p-post"
+        ],
+        "equations": []
+      }
+    ]
   }
 ]
 
@@ -445,5 +507,12 @@ export const PAPER_CARDS: PaperCard[] = [
     "title": "Magic states and Pauli-based computation",
     "references": 8,
     "prerequisites": 29
+  },
+  {
+    "id": "B5",
+    "kind": "background",
+    "title": "From pixels to bits: classifying and denoising array images",
+    "references": 4,
+    "prerequisites": 13
   }
 ]
