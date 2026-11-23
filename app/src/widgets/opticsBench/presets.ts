@@ -63,6 +63,7 @@ import {
 } from '../../physics/optics/cooling'
 
 import { B5_PRESETS } from './presetsB5'
+import { B6_PRESETS } from './presetsB6'
 import { TRACK_PRESETS } from './presetsTrack' // the nine presets of the experiment track (pages O7 to O11), a separate file only for length
 
 export interface OpticsSlider {
@@ -507,6 +508,7 @@ export const OPTICS_PRESETS: Readonly<Record<string, OpticsPreset>> = {
   'ramsey-fountain': ramseyFountain,
   'matter-wave-onset': matterWaveOnset,
   ...B5_PRESETS,
+  ...B6_PRESETS,
   ...TRACK_PRESETS,
 }
 
