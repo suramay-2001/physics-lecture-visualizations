@@ -26,4 +26,6 @@ export const CORRECTION_CHECKS: Readonly<Record<string, CorrectionCheck>> = {
   p1FactRatio: (v, printed) => near(v.p1FactRatio, 10, 1e-6) && printed === 2e-8,
   // P1 E6 (Fig. 10a, row d = 5): n = 45 printed, but N_T = 7.0 needs n = 50
   p1RowD5Nt: (v, printed) => near(v.p1RowD5Nt, 7.8, 0.05) && near(v.p1RowD5NtN50, printed, 0.05) && v.p1RowD5N === 45 && v.p1RowD5N50 === 50,
+  // P2 E2 (p. 13, Fig. 15): the text's 0.19 s at 1.5 ms is no bar (nearest 8.9 ms away), 0.19/0.152 is 1.25, and the plotted 2 % pair gives 1.775
+  p2TextGap190: (v, printed) => near(v.p2TextGap190, 8.9, 1e-9) && near(v.p2TextRatio, 1.25, 1e-9) && near(v.p2Ratio2, 1.775, 5e-4) && printed === 0.19,
 }

@@ -14,11 +14,12 @@ import { decimalsOf, fixed, niceDomain, niceStep, niceTicks, pathOf, sample, sca
 import presetsMain from './opticsBench/presets.ts?raw'
 import presetsB5Source from './opticsBench/presetsB5.ts?raw'
 import presetsTrackSource from './opticsBench/presetsTrack.ts?raw'
+import presetsP2Source from './opticsBench/presetsP2.ts?raw'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsPreset } from './opticsBench/presets'
 import { opticsPresetProblems, opticsPresetsProblems, opticsWidgetProblems } from './opticsBench/validate'
 
 /** The preset sources the lints read: the table's own file and the experiment track's (O7 to O11). */
-const presetsSource = `${presetsMain}\n${presetsB5Source}\n${presetsTrackSource}`
+const presetsSource = `${presetsMain}\n${presetsB5Source}\n${presetsTrackSource}\n${presetsP2Source}`
 
 /** The widget's stylesheet as written (vitest does not hand a processed .css through `?raw`). */
 const css = fs.readFileSync(path.join(APP_DIR, 'src/widgets/opticsBench.css'), 'utf8')
@@ -231,6 +232,7 @@ describe('SSR render of the demo preset', () => {
     expect(clean(renderToString(<OpticsBench preset="toString" />))).toContain('role="alert"')
   })
 })
+
 
 describe('source lints', () => {
   /** The text of each preset from its `curves:` entry to the end of the object, strings and comments removed. */

@@ -64,6 +64,7 @@ import {
 
 import { B5_PRESETS } from './presetsB5'
 import { TRACK_PRESETS } from './presetsTrack' // the nine presets of the experiment track (pages O7 to O11), a separate file only for length
+import { P2_PRESETS } from './presetsP2'
 
 export interface OpticsSlider {
   /** The key the preset's functions read from `p`: letters and digits, starting with a letter. */
@@ -508,6 +509,7 @@ export const OPTICS_PRESETS: Readonly<Record<string, OpticsPreset>> = {
   'matter-wave-onset': matterWaveOnset,
   ...B5_PRESETS,
   ...TRACK_PRESETS,
+  ...P2_PRESETS,
 }
 
 export const OPTICS_PRESET_IDS: readonly string[] = Object.keys(OPTICS_PRESETS)

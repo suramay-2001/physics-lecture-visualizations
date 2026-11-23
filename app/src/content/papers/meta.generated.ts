@@ -110,6 +110,82 @@ export const PAPERS_META: LectureMeta[] = [
     ]
   },
   {
+    "id": "P2",
+    "number": 2,
+    "title": "GANDALF: reading atoms faster by cleaning the picture first",
+    "units": [
+      {
+        "id": "p2-bottleneck",
+        "title": "Readout is the slow step",
+        "question": "Why does reading the atoms set the speed of error correction?",
+        "challenges": [],
+        "equations": []
+      },
+      {
+        "id": "p2-dataset",
+        "title": "Two cameras, one array",
+        "question": "What data tests a denoiser, and what does “1.5 ms” mean here?",
+        "challenges": [],
+        "equations": []
+      },
+      {
+        "id": "p2-denoiser",
+        "title": "Denoise first, classify second",
+        "question": "What does GANDALF learn, and how is it trained?",
+        "challenges": [
+          "p2-ch-params"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p2-classifiers",
+        "title": "Small classifiers on clean pictures",
+        "question": "Which classifier follows the denoiser, and at what cost?",
+        "challenges": [
+          "p2-ch-eta"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p2-results",
+        "title": "Accuracy and scaling",
+        "question": "How much faster can readout be, and does the denoiser scale?",
+        "challenges": [
+          "p2-ch-batch",
+          "p2-ch-spot"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p2-pipeline",
+        "title": "Hiding the classical work",
+        "question": "How do Eqs. 4 and 5 take the denoising and classification off the critical path?",
+        "challenges": [
+          "p2-ch-eq5",
+          "p2-ch-saving",
+          "p2-ch-tc"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p2-logical",
+        "title": "From readout error to logical error",
+        "question": "Why does the readout time enter the logical error rate twice?",
+        "challenges": [
+          "p2-ch-idle"
+        ],
+        "equations": []
+      },
+      {
+        "id": "p2-trust",
+        "title": "What to trust",
+        "question": "Which of the paper’s claims survive our arithmetic, and which stay open?",
+        "challenges": [],
+        "equations": []
+      }
+    ]
+  },
+  {
     "id": "B1",
     "number": 1,
     "title": "The surface code: a memory you can keep",
@@ -479,6 +555,29 @@ export const PAPER_CARDS: PaperCard[] = [
     "licence": "arXiv non-exclusive distribution licence 1.0. This lecture paraphrases and cites the paper by section, page, figure or table; it never reproduces its text or figures.",
     "references": 14,
     "prerequisites": 72
+  },
+  {
+    "id": "P2",
+    "kind": "paper",
+    "title": "GANDALF: reading atoms faster by cleaning the picture first",
+    "shortTitle": "GANDALF",
+    "authors": [
+      "Mude",
+      "Phuttitarn",
+      "Maurya",
+      "Sinha",
+      "Saffman",
+      "Tannu"
+    ],
+    "arxiv": {
+      "id": "2510.25982",
+      "version": 2
+    },
+    "date": "2025-12",
+    "institution": "University of Wisconsin–Madison (Saffman also Infleqtion)",
+    "licence": "arXiv non-exclusive licence: paraphrased and cited; no figure republished; every picture is redrawn from engine data or is a printed number marked Reported.",
+    "references": 12,
+    "prerequisites": 20
   },
   {
     "id": "B1",

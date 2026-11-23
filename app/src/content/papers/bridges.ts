@@ -50,4 +50,7 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-o11-hist': { course: 'qc709', lecture: 'O11', unit: 'o11-hist', label: 'two Poisson histograms and a cutoff' },
   'pp-o11-exposure': { course: 'qc709', lecture: 'O11', unit: 'o11-exposure', label: 'more light, fewer errors' },
   'pp-o11-camera': { course: 'qc709', lecture: 'O11', unit: 'o11-camera', label: 'the camera’s own noise' },
+  'pp-b5-pix2pix': { course: 'papers', lecture: 'B5', unit: 'b5-pix2pix', label: 'the conditional-GAN objective, and a prior that invents an atom' },
+  'pp-b5-wiener': { course: 'papers', lecture: 'B5', unit: 'b5-wiener', label: 'a linear cleaner adds nothing to the best weights' },
+  'pp-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'likelihood-ratio weights and the matched filter' },
 }
