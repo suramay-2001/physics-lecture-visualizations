@@ -5,14 +5,16 @@
  * same seed always draws the same frame. It is a simulation, never a measurement (the passport and the fidelity notes say so). Lazy chunk (stage/svg/kinds.ts); fidelity `camera-frame-*`.
  */
 import { CAMERA_FRAME_FILTERS, CAMERA_FRAME_NOISE, CAMERA_FRAME_READOUTS, CAMERA_FRAME_SHOW, type CameraFrameState } from '../../content/stage'
-import { cameraFrame, filterWeights, randomBits, sitesFromBits, wienerSmooth } from '../../physics/optics/imaging'
+import { cameraFrame, filterWeights, psfShare, randomBits, sitesFromBits, wienerSmooth, type FrameFilter } from '../../physics/optics/imaging'
+import { populationFilter, receptiveField } from '../../physics/readout/classify'
 import type { SvgReadout } from '../svgKinds'
 import type { CameraFrameInputs, CameraFramePanel, ResolvedCameraFrame } from '../types'
 import { fix } from './draw'
 
 export const CAMERA_FRAME_LIMITS = { rows: [1, 12], cols: [1, 12], photons: [0, 200], psf: [0.3, 1.5], background: [0, 5], gain: [1, 1000], sigma: [0, 100], roi: [1, 5], sites: 16, panels: 3, defaultRoi: 3 } as const
+export const CAMERA_LAYER_LIMITS = { count: 6, kernel: [1, 7] } as const
 export const CAMERA_FRAME_DEFAULTS = { photons: 20, psf: 0.8, background: 0, seed: 1 } as const
-const FIELDS = ['kind', 'rows', 'cols', 'occupancy', 'sites', 'photons', 'psf', 'background', 'noise', 'gain', 'sigma', 'seed', 'roi', 'show', 'panels', 'panel', 'denoise', 'readouts', 'shot'] as const
+const FIELDS = ['kind', 'rows', 'cols', 'occupancy', 'sites', 'photons', 'psf', 'background', 'noise', 'gain', 'sigma', 'seed', 'roi', 'show', 'panels', 'panel', 'denoise', 'layers', 'readouts', 'shot'] as const
 
 const isInt = (x: unknown): x is number => typeof x === 'number' && Number.isInteger(x)
 const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x)
@@ -47,6 +49,7 @@ export function cameraFrameInputs(st: CameraFrameState): CameraFrameInputs {
     roi,
     panels,
     denoise,
+    layers: st.layers ? [...st.layers] : [],
     readouts: st.readouts ? [...st.readouts] : ['atoms'],
     shot: st.shot,
   }
@@ -79,11 +82,33 @@ export function cameraFrameFrom(inp: CameraFrameInputs): ResolvedCameraFrame {
     }
     if (p.show === 'weights') {
       const values = new Array<number>(n).fill(0)
+      if (roi && p.filter === 'learned') {
+        // the population least-squares filter of the first atom among all the atoms (each present with chance ½), over the ROI pixels; scaled so the largest weight is 1
+        const profile = (s: { r: number; c: number }): number[] => {
+          const out: number[] = []
+          for (let i = 0; i < roi.size; i++) for (let j = 0; j < roi.size; j++) out.push(inp.photons * psfShare(roi.r0 + i, s.r, inp.psf) * psfShare(roi.c0 + j, s.c, inp.psf))
+          return out
+        }
+        const w = populationFilter(inp.sites.map(profile), 0, 0.5, inp.background)
+        const top = Math.max(1e-12, ...w.map(Math.abs))
+        for (let i = 0; i < roi.size; i++) for (let j = 0; j < roi.size; j++) values[(roi.r0 + i) * inp.cols + roi.c0 + j] = w[i * roi.size + j] / top
+        return { show: 'weights', filter: p.filter, title: 'weights · learned', unit: 'relative weight', values, lo: Math.min(0, ...values), hi: Math.max(1e-9, ...values) }
+      }
       if (roi) {
-        const w = filterWeights(p.filter as NonNullable<typeof p.filter>, roi.size, inp.psf, inp.photons, inp.background)
+        const w = filterWeights(p.filter as FrameFilter, roi.size, inp.psf, inp.photons, inp.background)
         for (let i = 0; i < roi.size; i++) for (let j = 0; j < roi.size; j++) values[(roi.r0 + i) * inp.cols + roi.c0 + j] = w[i * roi.size + j]
       }
       return { show: 'weights', filter: p.filter, title: `weights · ${p.filter}`, unit: 'weight', values, lo: 0, hi: Math.max(1e-9, ...values) }
+    }
+    if (p.show === 'rf') {
+      // the receptive field of one output of the stack: a box of side r centred on the first atom (or the frame's middle), clipped to the frame
+      const r = receptiveField(inp.layers.map((k) => ({ k, stride: 1 })))
+      const cr = inp.sites.length ? Math.round(inp.sites[0].r) : Math.floor(inp.rows / 2)
+      const cc = inp.sites.length ? Math.round(inp.sites[0].c) : Math.floor(inp.cols / 2)
+      const half = (r - 1) / 2
+      const values = new Array<number>(n).fill(0)
+      for (let i = 0; i < inp.rows; i++) for (let j = 0; j < inp.cols; j++) if (Math.abs(i - cr) <= half && Math.abs(j - cc) <= half) values[i * inp.cols + j] = 1
+      return { show: 'rf', filter: null, title: `receptive field · ${r}×${r}`, unit: 'seen by one output', values, lo: 0, hi: 1 }
     }
     // denoised: a Wiener smoother (known PSF, white noise) on the counts; the signal and noise powers come from the same inputs
     const A = gainScale * inp.photons
@@ -190,6 +215,16 @@ export function validateCameraFrameStage(st: CameraFrameState): string[] {
       if (p.filter === 'llr' && !(isNum(o.background) && o.background > 0)) errs.push(`camera-frame ${w}: the llr filter needs a background above 0`)
     } else if (p.filter !== undefined) errs.push(`camera-frame ${w}: a filter only goes with weights`)
     if (p.show === 'denoised' && o.denoise !== 'wiener') errs.push(`camera-frame ${w}: denoised needs denoise: 'wiener'`)
+  })
+  if (o.layers !== undefined) {
+    const ls = o.layers
+    if (!Array.isArray(ls) || ls.length < 1 || ls.length > CAMERA_LAYER_LIMITS.count || !ls.every((k) => isInt(k) && k % 2 === 1 && inRange(k, CAMERA_LAYER_LIMITS.kernel)))
+      errs.push(`camera-frame layers: 1 to ${CAMERA_LAYER_LIMITS.count} odd kernel sizes ${CAMERA_LAYER_LIMITS.kernel[0]}…${CAMERA_LAYER_LIMITS.kernel[1]}`)
+    if (!panelList.some((p) => p.show === 'rf')) errs.push("camera-frame layers: only with an 'rf' panel")
+  }
+  if (panelList.some((p) => p.show === 'rf') && o.layers === undefined) errs.push("camera-frame: an 'rf' panel needs layers")
+  panelList.forEach((p, i) => {
+    if (p.show === 'weights' && p.filter === 'learned' && !(hasAtom && roiOn)) errs.push(`camera-frame ${o.panel !== undefined ? `panel[${i}]` : 'show'}: the learned filter needs an atom and a region of interest`)
   })
   if (o.show === 'weights') errs.push('camera-frame show: weights need a filter, so use panel: [{ show: \'weights\', filter }]')
   if (o.denoise === 'wiener' && !panelList.some((p) => p.show === 'denoised') && o.show === undefined && o.panel === undefined) errs.push("camera-frame denoise: 'wiener' needs a denoised panel")

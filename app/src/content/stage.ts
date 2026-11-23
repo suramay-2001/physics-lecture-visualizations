@@ -1636,13 +1636,14 @@ export interface WalkGraphState {
  * (0-based, at most 16; replaces `occupancy`). `photons`: mean photons per atom over its whole point spread function (0-200, default 20); `psf`: its standard deviation in pixels
  * (0.3-1.5, default 0.8); `background`: mean photons per pixel (0-5, default 0); `noise`: 'none' (the means), 'poisson' (photon counting) or 'emccd' (needs `gain`, 1-1000 counts per
  * photoelectron, and `sigma`, read noise 0-100 counts); `seed`: a whole number (default 1). `roi`: true or `{ size }` (1-5, default 3) outlines the pixels around the first atom.
+ * B5 (additive): the filter 'learned' (the population least-squares weights, p = ½, of the first atom among all the atoms in the frame: physics/readout/classify.ts `populationFilter`; needs a ROI), the show 'rf' (the receptive field of `layers`) and `layers`.
  * `show` (one panel): 'occupancy' (or 'truth'), 'photons' (the means), 'counts' (the draw), 'weights' (a filter's weights over the ROI), 'denoised' (the Wiener-smoothed counts; needs
  * `denoise: 'wiener'`); default 'counts' with noise, else 'photons'. `panel` (1-3, instead of `show`; `panels` repeats its length): `{ show, filter? }` each, `filter` ('square', 'gauss',
  * 'llr', 'centre') only for 'weights'. `readouts`: 'atoms' (the number of atoms, default) and 'roi' (the expected photons in the ROI, from the means, never from the draw).
  */
-export const CAMERA_FRAME_SHOW = ['occupancy', 'truth', 'photons', 'counts', 'weights', 'denoised'] as const
+export const CAMERA_FRAME_SHOW = ['occupancy', 'truth', 'photons', 'counts', 'weights', 'denoised', 'rf'] as const
 export type CameraFrameShow = (typeof CAMERA_FRAME_SHOW)[number]
-export const CAMERA_FRAME_FILTERS = ['square', 'gauss', 'llr', 'centre'] as const
+export const CAMERA_FRAME_FILTERS = ['square', 'gauss', 'llr', 'centre', 'learned'] as const
 export type CameraFrameFilter = (typeof CAMERA_FRAME_FILTERS)[number]
 export const CAMERA_FRAME_NOISE = ['none', 'poisson', 'emccd'] as const
 export type CameraFrameNoise = (typeof CAMERA_FRAME_NOISE)[number]
@@ -1666,6 +1667,8 @@ export interface CameraFrameState {
   panels?: 1 | 2 | 3
   panel?: { show: CameraFrameShow; filter?: CameraFrameFilter }[]
   denoise?: 'none' | 'wiener'
+  /** B5 (additive): the kernel sizes (odd, 1-7, stride 1) of a stack of convolution layers, input first; the 'rf' panel shades the receptive field of one output of the stack around the first atom (or the frame's middle). */
+  layers?: number[]
   readouts?: CameraFrameReadout[]
   shot?: CameraFrameShot
 }
