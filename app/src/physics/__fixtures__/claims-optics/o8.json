@@ -1,0 +1,33 @@
+{
+ "about": "Claim values for the Optics Lab page O8 (one atom in a beam of light), reduced-matrix-element polarizability and the reported inputs. Regenerate: python3 pipeline/claims_optics/o_track.py",
+ "values": {
+  "o8WaistUm": 1.24,
+  "o8RayleighUm": 4.56,
+  "o8AiryUm": 0.996,
+  "o8SpacingOverWaist": 5.8,
+  "o8AlphaAu": 1165.0,
+  "o8AlphaAu1064": 1152.0,
+  "o8Depth14": 0.152,
+  "o8DepthFromFreq": 0.208,
+  "o8PowerForFreq": 1.92,
+  "o8FrAt14": 25.0,
+  "o8FzAt14": 4.81,
+  "o8DepthPaperWaist": 0.171,
+  "o8Sigma20": 192.0,
+  "o8Eta": 0.266,
+  "o8EtaSq": 0.0705,
+  "o8DepthOverT20": 7.59,
+  "o8Rsc": 1.45,
+  "o8RecoilGainK": 128.0,
+  "o8HeatTime": 819.0,
+  "o8HeatMin": 13.7,
+  "o8RepWaistUm": 1.17,
+  "o8RepDepthmK": 0.18,
+  "o8RepFrKHz": 29.3,
+  "o8RepFzKHz": 5.64,
+  "o8RepPowerMW": 1.4,
+  "o8RepLifeMin": 22.9,
+  "o8RepSpacingUm": 7.2,
+  "o8RepNa": 0.65
+ }
+}

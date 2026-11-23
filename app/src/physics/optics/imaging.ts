@@ -350,3 +350,59 @@ export function wienerSmooth(img: readonly number[], rows: number, cols: number,
     }
   return outRe
 }
+
+/* ------------------------------------------------ the cutoff on counts (experiment track, pages O10 and O11) ------------------------------------------------ */
+/**
+ * Reading one site from a count n with a cutoff `nc`: "atom" when n ≥ nc. A bright atom (Poisson mean `mb`) is missed with chance eb = P(n < nc), a dark site
+ * (mean `md`) is misread with chance ed = P(n ≥ nc) (the tail is summed upward, so a tiny tail is exact); the error is half the sum (equal priors).
+ */
+export function thresholdError(mb: number, md: number, nc: number): { err: number; eb: number; ed: number } {
+  if (!(mb >= 0 && md >= 0) || !Number.isInteger(nc) || nc < 0) throw new RangeError('thresholdError: means >= 0, a whole cutoff >= 0')
+  const eb = nc === 0 ? 0 : poissonCdf(nc - 1, mb)
+  let ed = 0
+  const top = nc + Math.ceil(md + 14 * Math.sqrt(md + 1) + 40)
+  for (let k = top; k >= nc; k--) ed += poissonPmf(k, md)
+  if (nc === 0) ed = 1
+  return { err: (eb + ed) / 2, eb, ed: Math.min(1, ed) }
+}
+/** The cutoff (a whole count) with the smallest error, scanned from 0 up past both histograms; ties go to the lower cutoff. */
+export function bestThreshold(mb: number, md: number): { err: number; eb: number; ed: number; cutoff: number } {
+  const top = Math.ceil(mb + md + 12 * Math.sqrt(mb + md + 1) + 20)
+  let best = { ...thresholdError(mb, md, 0), cutoff: 0 }
+  for (let nc = 1; nc <= top; nc++) {
+    const e = thresholdError(mb, md, nc)
+    if (e.err < best.err) best = { ...e, cutoff: nc }
+  }
+  return best
+}
+/**
+ * The best cutoff's error for a bright atom of signal rate `rb` and a background rate `rg` (counts per second) seen for `tau` seconds: the bright mean is (rb + rg)τ,
+ * the dark mean rgτ. The two histograms separate as √τ (their distance in standard deviations), so the error falls faster than exponentially in the exposure.
+ */
+export function errorVsExposure(rb: number, rg: number, tau: number): { err: number; cutoff: number; eb: number; ed: number; mb: number; md: number } {
+  const mb = (rb + rg) * tau
+  const md = rg * tau
+  const b = bestThreshold(mb, md)
+  return { ...b, mb, md }
+}
+/** The separation of the bright and dark histograms in standard deviations, d′ = (m_b − m_d)/√(m_b + m_d). */
+export const dPrime = (mb: number, md: number): number => (mb - md) / Math.sqrt(mb + md)
+/**
+ * The mean and variance of an EMCCD count (read noise ignored): a Poisson number of photoelectrons (mean μ), each multiplied by an exponential gain g, has
+ * mean μ g and variance 2 μ g²: an excess noise factor, variance/(μ g²), of exactly 2.
+ */
+export const emccdMoments = (mean: number, gain: number): { mean: number; variance: number; enf: number } => ({ mean: mean * gain, variance: 2 * mean * gain * gain, enf: (2 * mean * gain * gain) / (mean * gain * gain) })
+/**
+ * A toy readout-loss trade (a labelled model of page O11, not a measurement): the misread error of `errorVsExposure` plus an atom loss 1 − e^{−λ_L τ} at loss rate `lamL` (s⁻¹).
+ * The exposure is searched on a grid from `fromUs` to `toUs` microseconds in steps of `stepUs`; the best total, and its misread part, are returned.
+ */
+export function toyOptimum(rb: number, rg: number, lamL: number, fromUs = 30, toUs = 600, stepUs = 2): { tau: number; total: number; misread: number } {
+  let best = { tau: fromUs * 1e-6, total: Infinity, misread: 0 }
+  for (let us = fromUs; us < toUs; us += stepUs) {
+    const tau = us * 1e-6
+    const m = errorVsExposure(rb, rg, tau).err
+    const total = m + (1 - Math.exp(-lamL * tau))
+    if (total < best.total) best = { tau, total, misread: m }
+  }
+  return best
+}

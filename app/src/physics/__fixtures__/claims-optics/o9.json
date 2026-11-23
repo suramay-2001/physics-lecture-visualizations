@@ -1,0 +1,25 @@
+{
+ "about": "Claim values for the Optics Lab page O9 (one atom per trap), scipy Poisson and binomial laws, enumeration and a Monte Carlo of the parity loss. Regenerate: python3 pipeline/claims_optics/o_track.py",
+ "values": {
+  "o9P1Mu1": 0.4323,
+  "o9P0Mu1": 0.5677,
+  "o9PoissonMax": 0.3679,
+  "o9P1Mu2": 0.4908,
+  "o9P1Mu5": 0.49998,
+  "o9Sites100": 229.0,
+  "o9Sites100p50": 235.0,
+  "o9Sites50": 122.0,
+  "o9PCert200": 0.659,
+  "o9PCert220": 0.962,
+  "o9ExpAtoms": 6144.0,
+  "o9Empty5": 0.0473,
+  "o9EmptyEq": 0.0196,
+  "o9AllFilled100": 0.138,
+  "o9LossPerSec": 4.47,
+  "o9LostPerImage": 0.643,
+  "o9RepFill": 0.512,
+  "o9RepSpread": 0.034,
+  "o9RepSurv": 0.9998952,
+  "o9RepLifeMin": 22.9
+ }
+}

@@ -26,12 +26,17 @@ const EXAMPLE: Record<OpticsSeriesFn, PlotSeries> = {
   motForceVsZ: { fn: 'motForceVsZ', params: { v: 0.5 } },
   ramseyFringe: { fn: 'ramseyFringe', params: { T: 0.35 } },
   langevinPotential: { fn: 'langevinPotential', params: { ell: 1 } },
+  motLoadFill: { fn: 'motLoadFill', params: { tau: 100 } },
+  tweezerU: { fn: 'tweezerU', params: { mode: 'exact' } },
+  parityP1: { fn: 'parityP1', params: { mode: 'parity' } },
+  collectionVsNA: { fn: 'collectionVsNA' },
+  errVsExposure: { fn: 'errVsExposure', params: { rb: 54.4, rg: 0.52 } },
 }
 
 describe('optics plot additions', () => {
-  it('18 names: 6 curves and 12 series functions, none shared with an older name', () => {
+  it('23 names: 6 curves and 17 series functions (five added by the experiment track), none shared with an older name', () => {
     expect(OPTICS_CURVE_NAMES).toHaveLength(6)
-    expect(OPTICS_SERIES_FNS).toHaveLength(12)
+    expect(OPTICS_SERIES_FNS).toHaveLength(17)
     expect(new Set([...OPTICS_SERIES_FNS, ...PLOT_SERIES_FNS]).size).toBe(OPTICS_SERIES_FNS.length + PLOT_SERIES_FNS.length)
   })
   it.each(OPTICS_CURVE_NAMES)('curve %s validates and every drawn point is finite (and positive on the log curves)', (fn) => {
@@ -63,6 +68,16 @@ describe('optics plot additions', () => {
     expect(r.series![0].points.every((p) => Number.isFinite(p.y))).toBe(true)
     expect(r.xLabel).toBe(OPTICS_SERIES[fn].x.label)
     expect(r.range).toEqual({ from: OPTICS_SERIES[fn].x.from, to: OPTICS_SERIES[fn].x.to })
+  })
+  it('the experiment track series: the fill is 1 − e^{−t/τ}, the harmonic well touches the Gaussian at the centre, the parity law beats Poisson at μ = 1, the lens share is 12 % at NA 0.65, and the error falls with the exposure', () => {
+    const v = (fn: OpticsSeriesFn, params: PlotSeries['params'], x: number) => OPTICS_SERIES[fn].value(params as never, x)
+    expect(v('motLoadFill', { tau: 100 }, 100)).toBeCloseTo(1 - Math.exp(-1), 12)
+    expect(v('tweezerU', { mode: 'exact' }, 0)).toBeCloseTo(v('tweezerU', { mode: 'harmonic' }, 0), 12)
+    expect(v('tweezerU', { mode: 'exact' }, 0)).toBeLessThan(0)
+    expect(v('tweezerU', { mode: 'harmonic' }, 2)).toBeGreaterThan(v('tweezerU', { mode: 'exact' }, 2)) // the Gaussian flattens, the parabola keeps rising
+    expect(v('parityP1', { mode: 'parity' }, 1)).toBeGreaterThan(v('parityP1', { mode: 'poisson' }, 1))
+    expect(v('collectionVsNA', {}, 0.65)).toBeCloseTo(0.12, 3)
+    expect(v('errVsExposure', { rb: 54.4, rg: 0.52 }, 260)).toBeLessThan(v('errVsExposure', { rb: 54.4, rg: 0.52 }, 100))
   })
   it('six series share one figure; the force of the two beams is the sum of its parts; a signed axis goes below 0', () => {
     const three: PlotSeries[] = (['plus', 'minus', 'sum'] as const).map((beam) => ({ fn: 'molassesForceVsV', params: { s: 1, delta: -0.5, beam } }))

@@ -12,6 +12,7 @@ import { PAPER_BRIDGES } from '../content/papers/bridges'
 import { PAPER_CHAPTERS } from '../content/papers/index'
 import { PAPER_GLOSSARY } from '../content/papers/pack'
 import { QC_CHAPTERS } from '../content/qc709/index'
+import { OPTICS_CHAPTERS } from '../content/qc709/optics/index'
 import { derivationSteps } from '../content/track'
 import { bridgeRefs, glossRefs, readingOrder } from '../content/walk'
 
@@ -39,7 +40,7 @@ describe('papers bridges', () => {
       if (!/^pp-[a-z0-9-]+$/.test(id) || courseOfId(id) !== 'papers') bad.push(`${id}: bridge ids start pp-`)
       if (!used.some((u) => u.id === id)) bad.push(`${id}: unused`)
       // ruling papers-B3B4 R5: a background chapter may bridge to another Papers chapter (B3 to B1); the target must be a written unit of an EARLIER chapter than the one using it
-      const pool = t.course === 'sl448' ? LECTURES : t.course === 'papers' ? PAPER_CHAPTERS : QC_CHAPTERS
+      const pool = t.course === 'sl448' ? LECTURES : t.course === 'papers' ? PAPER_CHAPTERS : [...QC_CHAPTERS, ...OPTICS_CHAPTERS]
       const l = pool.find((x) => x.id === t.lecture)
       const unit = l?.units.find((x) => x.id === t.unit)
       if (!unit) bad.push(`${id}: no unit ${t.unit} in ${t.lecture}`)

@@ -1,0 +1,22 @@
+{
+ "about": "Claim values for the Optics Lab page O7 (from vapour to a cold cloud), ODE stopping distance, numeric MOT damping and the reported inputs. Regenerate: python3 pipeline/claims_optics/o_track.py",
+ "values": {
+  "o7IsatCs": 1.1,
+  "o7MotBetaK2": 0.023,
+  "o7MotOmegaHz": 190.0,
+  "o7MotZeemanMm": 5.93,
+  "o7CaptureV": 53.8,
+  "o7Load2Tau": 0.865,
+  "o7Load95": 3.0,
+  "o7U1Pgc": 7.51,
+  "o7TlimLin": 0.939,
+  "o7TlimSig": 0.728,
+  "o7DopplerOverTlim": 134.0,
+  "o7DopplerPgcmK": 2.45,
+  "o7RepIsat": 1.1,
+  "o7RepCloudMm": 1.6,
+  "o7RepMotDetuning": 3.17,
+  "o7RepBeamCm": 2.5,
+  "o7RepPgcDetuning": 19.5
+ }
+}

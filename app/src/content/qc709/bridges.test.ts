@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { bridgeGloss, bridgePlace, type BridgeTarget } from '../bridgeRegistry'
 import { COURSES, courseOfId, tracksOfChapter } from '../courses'
 import { LECTURES } from '../index'
+import { PAPER_CHAPTERS } from '../papers/index'
 import type { GlossEntry, Lecture } from '../schema'
 import { derivationSteps } from '../track'
 import { bridgeRefs, inlineTokens, readingOrder } from '../walk'
@@ -34,7 +35,7 @@ export function usedBridges(chapters: readonly Lecture[], glossary: readonly Glo
 /** Where a target does not resolve in its course ([] = it lands on a real unit / beat). */
 export function targetProblems(id: string, t: BridgeTarget, qcChapters: readonly Lecture[]): string[] {
   const bad: string[] = []
-  const pool = t.course === 'sl448' ? LECTURES : qcChapters
+  const pool = t.course === 'sl448' ? LECTURES : t.course === 'papers' ? PAPER_CHAPTERS : qcChapters
   const l = pool.find((x) => x.id === t.lecture)
   if (courseOfId(t.lecture) !== t.course) bad.push(`${id}: ${t.lecture} is not a ${COURSES[t.course].code} chapter`)
   if (!l) return [...bad, `${id}: no chapter ${t.lecture} in ${COURSES[t.course].code}`]

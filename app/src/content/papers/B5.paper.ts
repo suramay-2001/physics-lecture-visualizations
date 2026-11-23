@@ -564,8 +564,8 @@ export const B5: PaperSpec = {
         {
           "id": "b5-roi:b2",
           "phase": "books",
-          "text": "Add up the pixels in a box around the atom. A 3 by 3 box holds 82 % of the light and a 5 by 5 box 99 %. The photon count of the whole spot comes from the experiment track of the Optics Lab (unit O10).",
-          "formal": "The mean light in a $k\\times k$ box is $N$ times the product of two one-axis sums of shares: $0.8180$ of $N$ for $3\\times3$ and $0.9891$ for $5\\times5$. $N$ itself is the photon budget of the Optics Lab experiment track (O10).",
+          "text": "Add up the pixels in a box around the atom. A 3 by 3 box holds 82 % of the light and a 5 by 5 box 99 %. The photon count of the whole spot comes from the experiment track of the Optics Lab (<<pp-o10-need|unit O10: how many photons make a bright atom>>).",
+          "formal": "The mean light in a $k\\times k$ box is $N$ times the product of two one-axis sums of shares: $0.8180$ of $N$ for $3\\times3$ and $0.9891$ for $5\\times5$. $N$ itself is the photon budget of the Optics Lab experiment track (<<pp-o10-need|O10: the photons of a bright atom>>).",
           "caption": "the 3 by 3 box around the atom",
           "captionFormal": "ROI $3\\times3$: $0.8180$ of $N$",
           "stage": {
@@ -636,7 +636,7 @@ export const B5: PaperSpec = {
           "id": "b5-roi:b3",
           "phase": "books",
           "text": "Add the counts in the box and call the atom \"there\" when the total reaches a cut. The box and its total are the [[pp-roi|region of interest]]. At the best cut a flat 3 by 3 box misreads the atom 0.46 % of the time.",
-          "formal": "The statistic is $S=\\sum_{ij\\in\\mathrm{ROI}} n_{ij}$ over the [[pp-roi|region of interest]]. A sum of Poisson counts is Poisson, with dark mean $9b$ and bright mean $9b+N f$, so the single-site threshold of <<pp-q25-readout|Q25>> applies unchanged: at the best cut the error is $0.457\\%$.",
+          "formal": "The statistic is $S=\\sum_{ij\\in\\mathrm{ROI}} n_{ij}$ over the [[pp-roi|region of interest]]. A sum of Poisson counts is Poisson, with dark mean $9b$ and bright mean $9b+N f$, so the single-site threshold of <<pp-q25-readout|Q25>> applies unchanged (<<pp-o11-hist|two Poisson histograms and a cutoff>>): at the best cut the error is $0.457\\%$.",
           "caption": "one simulated frame of counts; the box is outlined",
           "captionFormal": "one seeded draw of Poisson counts (illustrative), ROI outlined",
           "stage": {
@@ -932,7 +932,7 @@ export const B5: PaperSpec = {
           "id": "b5-roi:b6",
           "phase": "deeper",
           "text": "Why is the spot a Gaussian? A real lens makes a ring pattern with a bright core, and a Gaussian is a good stand-in for the core. The choice only shapes the weights, so we treat it as a modelling input.",
-          "formal": "Diffraction gives an Airy pattern whose core a Gaussian approximates. The width $\\sigma$ is a modelling input here; the optics that fix it belong to the Optics Lab experiment track (O10), and nothing below depends on the tails.",
+          "formal": "Diffraction gives an Airy pattern whose core a Gaussian approximates. The width $\\sigma$ is a modelling input here; the optics that fix it belong to the Optics Lab experiment track (<<pp-o10-collect|O10: how many photons reach the camera>>), and nothing below depends on the tails.",
           "caption": "the spot shape is an input, not a result",
           "captionFormal": "Gaussian stand-in for the Airy core",
           "stage": {
@@ -1586,7 +1586,7 @@ export const B5: PaperSpec = {
           "id": "b5-matched-filter:b4",
           "phase": "books",
           "text": "More light helps by a square root. Double the light and the background together and the errors fall; four times the exposure doubles the separation (2.00). With twice the exposure the best weights err 0.0095 % of the time, with half the exposure 3.1 %. The flat box at twice the exposure errs 0.0124 %. The [[pp-dprime|separation d′]] alone predicts an error of 1.6 in ten to the 6 here, far too small: use the exact sum.",
-          "formal": "In the weak-signal limit $d'^2=\\sum_i s_i^2/b_i=86.6$ ([[pp-dprime|separation]]). Scaling $s$ and $b$ by $\\tau$ gives $d'\\propto\\sqrt\\tau$ (<<pp-f5-spread|the square-root law of spread>>): the ratio at $\\tau=4$ is $2.00$. Likelihood-ratio error: $3.11\\%$ at half the exposure, $0.0095\\%$ at twice; flat box at twice $0.0124\\%$. The normal estimate is $1.64\\times10^{-6}$: Poisson tails are fatter.",
+          "formal": "In the weak-signal limit $d'^2=\\sum_i s_i^2/b_i=86.6$ ([[pp-dprime|separation]]). Scaling $s$ and $b$ by $\\tau$ gives $d'\\propto\\sqrt\\tau$ (<<pp-f5-spread|the square-root law of spread>>): the ratio at $\\tau=4$ is $2.00$. Likelihood-ratio error: $3.11\\%$ at half the exposure, $0.0095\\%$ at twice; flat box at twice $0.0124\\%$. The normal estimate is $1.64\\times10^{-6}$: Poisson tails are fatter. The Optics Lab works the same trade on the camera: <<pp-o11-exposure|more light, fewer errors>>, and <<pp-o11-camera|the camera's own noise>>.",
           "caption": "error against exposure: flat box, Gaussian shape, best weights",
           "captionFormal": "exact error against $\\tau$ (photons and background $\\times\\tau$), our model",
           "stage": {

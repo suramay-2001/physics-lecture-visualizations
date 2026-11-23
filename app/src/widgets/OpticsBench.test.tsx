@@ -11,10 +11,14 @@ import { APP_DIR, fs, path } from '../security/node'
 import OpticsBench from './OpticsBench'
 import { readoutRows, resetParams, setParam, sliderText } from './opticsBench/model'
 import { decimalsOf, fixed, niceDomain, niceStep, niceTicks, pathOf, sample, scale, yExtent } from './opticsBench/plot'
-import presetsSource0 from './opticsBench/presets.ts?raw'
+import presetsMain from './opticsBench/presets.ts?raw'
 import presetsB5Source from './opticsBench/presetsB5.ts?raw'
+import presetsTrackSource from './opticsBench/presetsTrack.ts?raw'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsPreset } from './opticsBench/presets'
 import { opticsPresetProblems, opticsPresetsProblems, opticsWidgetProblems } from './opticsBench/validate'
+
+/** The preset sources the lints read: the table's own file and the experiment track's (O7 to O11). */
+const presetsSource = `${presetsMain}\n${presetsB5Source}\n${presetsTrackSource}`
 
 /** The widget's stylesheet as written (vitest does not hand a processed .css through `?raw`). */
 const css = fs.readFileSync(path.join(APP_DIR, 'src/widgets/opticsBench.css'), 'utf8')
@@ -228,12 +232,9 @@ describe('SSR render of the demo preset', () => {
   })
 })
 
-/** presets.ts and the chapter files beside it (presetsB5.ts), read as one text */
-const presetsSource = `${presetsSource0}\n${presetsB5Source}`
-
 describe('source lints', () => {
   /** The text of each preset from its `curves:` entry to the end of the object, strings and comments removed. */
-  const checked = [...presetsSource.matchAll(/\n {2}curves: \(p\) =>[\s\S]*?\n\}/g)].map((m) =>
+  const checked = [...presetsSource.matchAll(/\n {2}curves: \(p?\) =>[\s\S]*?\n\}/g)].map((m) =>
     m[0]
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/.*$/gm, '')

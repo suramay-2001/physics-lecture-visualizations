@@ -44,4 +44,10 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'a Hamiltonian generates the evolution' },
   'pp-q25-readout': { course: 'qc709', lecture: 'Q25', unit: 'q25-readout', label: 'reading an atom by counting photons against a cutoff' },
   'pp-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a matrix as a table of weights' },
+  // Optics Lab experiment track (relay 2026-11-23: B5 names O10 and O11 in words until both exist)
+  'pp-o10-need': { course: 'qc709', lecture: 'O10', unit: 'o10-need', label: 'how many photons make a bright atom' },
+  'pp-o10-collect': { course: 'qc709', lecture: 'O10', unit: 'o10-collect', label: 'how many photons reach the camera' },
+  'pp-o11-hist': { course: 'qc709', lecture: 'O11', unit: 'o11-hist', label: 'two Poisson histograms and a cutoff' },
+  'pp-o11-exposure': { course: 'qc709', lecture: 'O11', unit: 'o11-exposure', label: 'more light, fewer errors' },
+  'pp-o11-camera': { course: 'qc709', lecture: 'O11', unit: 'o11-camera', label: 'the camera’s own noise' },
 }

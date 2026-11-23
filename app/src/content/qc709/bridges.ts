@@ -209,4 +209,11 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-q25-o2-limit': { course: 'qc709', lecture: 'O2', unit: 'o2-limit', label: 'recoil heating against friction: the Doppler limit' },
   'qc-q25-o3-gradient': { course: 'qc709', lecture: 'O3', unit: 'o3-gradient', label: 'cooling below the Doppler limit with polarization gradients' },
   'qc-q25-o5-dipole': { course: 'qc709', lecture: 'O5', unit: 'o5-dipole', label: 'a far-detuned beam as a trap' },
+  // Optics Lab experiment track O7 to O11 (P-optics-experiment-track §8, ruling G1): the three Q25 units the run sheet leans on (an optics -> chapter link is a manual row)
+  'qc-o-q25-cooling': { course: 'qc709', lecture: 'Q25', unit: 'q25-cooling', label: 'stopping, cooling and holding an atom' },
+  'qc-o-q25-readout': { course: 'qc709', lecture: 'Q25', unit: 'q25-readout', label: 'reading a qubit with light' },
+  'qc-o-q25-atom-gates': { course: 'qc709', lecture: 'Q25', unit: 'q25-atom-gates', label: 'rotations, Raman light and Rydberg blockade' },
+  // Papers B5 (From pixels to bits), the other direction of the pp-o10 / pp-o11 rows (relay 2026-11-23: the experiment track names it in words until it is built)
+  'qc-o-b5-roi': { course: 'papers', lecture: 'B5', unit: 'b5-roi', label: 'a spot on a grid of pixels' },
+  'qc-o-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'weighting pixels: the best sum' },
 }
