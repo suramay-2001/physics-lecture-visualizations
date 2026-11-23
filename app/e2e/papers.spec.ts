@@ -80,6 +80,8 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   // B4, magic states and Pauli-based computation, is written too
   await expect(page.locator('.paper-card[data-paper="B4"] h3')).toContainText('Magic states')
   await expect(page.locator('.planned-background')).not.toContainText('magic states')
+  // B5, from pixels to bits (classifying and denoising array images), is written too
+  await expect(page.locator('.paper-card[data-paper="B5"] h3')).toContainText('From pixels to bits')
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })
