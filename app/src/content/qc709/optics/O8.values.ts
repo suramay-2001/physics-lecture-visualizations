@@ -39,6 +39,7 @@ export const V = {
   o8FrAt14: r(f14.fr / 1e3, 1), // kHz
   o8FzAt14: r(f14.fz / 1e3, 2), // kHz
   o8DepthPaperWaist: r((tweezerDepth(1.4e-3, 1.17e-6, LAM) / K_BOLTZMANN) * 1e3, 3), // mK at 1.4 mW with the waist the paper itself infers
+  o8DepthSpreadPct: r((Math.max(U14, tweezerDepth(1.4e-3, 1.17e-6, LAM), depthFromRadialFreq(FR, M, w0)) / Math.min(U14, tweezerDepth(1.4e-3, 1.17e-6, LAM), depthFromRadialFreq(FR, M, w0)) - 1) * 100, 0), // per cent: highest over lowest of the three depths
   /* o8-motion */
   o8Sigma20: r(thermalRms(M, omegaR, 20e-6) * 1e9, 0), // nm at 20 µK
   o8Eta: r(lambDicke(M, omegaR, waveNumber(CS_D2)), 3), // for the 852 nm photon

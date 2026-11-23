@@ -47,12 +47,16 @@ export const O7: Lecture = notesLecture({
           text: 'The run starts in a glass cell. A dispenser heated by a current feeds a two-dimensional trap, which pushes a slow beam of cesium into the cell. A modern array uses it instead of the oven and the slower of page O1, which is why the beam arrives already cold. Six crossed laser beams and a field gradient then make the three-dimensional [[qc-op-mot|magneto-optical trap]], and the tweezers are already on. Set the beams and the field, wait, and measure the fluorescence of the cloud (Manetsch et al., Methods, p. 21, and Ext. Data Fig. 1c, p. 12; <<qc-o-q25-cooling|the Q25 cooling unit>>).',
         },
         {
-          text: `The printed order is short. The trap collects about ten million atoms in 100 ms. A step of polarization-gradient cooling then lasts 40 ms, followed by a wait of 40 ms for the leftover vapour to drop away. Imaging takes 80 ms. What goes wrong is the clock: one shot is ruled by cooling, clean-up and imaging, not by gates. That is our reading of the printed steps; the paper says itself that its clean-up is not optimised. The beams are set in units of the saturation intensity $I_0$, which for the stretched-state transition is $\\pi h c\\gamma/3\\lambda^3$ for linewidth $\\gamma$ and wavelength $\\lambda$.`,
+          text: `The printed order is short. The trap collects about ten million atoms in ${V.o7RepLoadMs} ms. A step of polarization-gradient cooling then lasts ${V.o7RepPgcMs} ms, followed by a wait of ${V.o7RepDropMs} ms for the leftover vapour to drop away. Imaging takes ${V.o7RepImageMs} ms. What goes wrong is the clock: one shot is ruled by cooling, clean-up and imaging, not by gates. That is our reading of the printed steps; the paper says itself that its clean-up is not optimised. The beams are set in units of the saturation intensity $I_0$, which for the stretched-state transition is $\\pi h c\\gamma/3\\lambda^3$ for linewidth $\\gamma$ and wavelength $\\lambda$.`,
         },
         {
           text: `How you know the formula is right: the paper prints $I_0$ as about ${d(V.o7RepIsat, 1)} mW/cm², and the formula with the stated cesium data gives ${d(V.o7IsatCs, 2)} mW/cm². The two numbers are side by side, as the paper's is a reported value and ours is computed; it is the same formula, so they should agree and they do (<<qc-q25-o2-limit|the Doppler-limit unit of O2>>).`,
           claims: [
             claim('o7IsatCs', 'the saturation intensity of the stretched-state transition of cesium is 1.10 mW/cm²', () => near(V.o7IsatCs, 1.1, 0.005)),
+            claim('o7RepLoadMs', 'reported by Manetsch et al., p. 21: the trap collects about ten million atoms in 100 ms', () => V.o7RepLoadMs === 100),
+            claim('o7RepPgcMs', 'reported by Manetsch et al., p. 21: the cooling step lasts 40 ms', () => V.o7RepPgcMs === 40),
+            claim('o7RepDropMs', 'reported by Manetsch et al., p. 21: the wait that follows lasts 40 ms', () => V.o7RepDropMs === 40),
+            claim('o7RepImageMs', 'reported by Manetsch et al., p. 21: the imaging light shines for 80 ms', () => V.o7RepImageMs === 80),
             claim('o7RepIsat', 'reported by Manetsch et al., p. 21: the saturation intensity is about 1.1 mW/cm²', () => near(V.o7RepIsat, 1.1, 1e-12)),
           ],
         },
@@ -76,22 +80,30 @@ export const O7: Lecture = notesLecture({
           ],
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'motLoadFill', params: { tau: 100 } }, { fn: 'motLoadFill', params: { tau: 200 } }] },
-            caption: 'The cloud as a share of its steady state against the loading time in milliseconds, for a time constant of 100 ms and one of 200 ms.',
+            caption: 'The cloud as a share of its steady state against the loading time in milliseconds, for a time constant of 100 ms and one of 200 ms, both model inputs and not measured values.',
           },
         },
         {
-          text: `The settings come from the paper. The field gradient is 20 G/cm, the detuning is $\\delta=-${d(V.o7RepMotDetuning, 2)}\\gamma$, and the total intensity is ten times $I_0$ over six beams of ${d(V.o7RepBeamCm, 1)} cm, which we read as ten sixths of $I_0$ per beam. The force of page O5 gives a damping of ${d(V.o7MotBetaK2, 4)} in units of $\\hbar k^2$ for the wave number $k$, a natural frequency of ${d(V.o7MotOmegaHz, 0)} Hz, and a Zeeman half-size $\\hbar|\\delta|/\\mu' A$ of ${d(V.o7MotZeemanMm, 2)} mm (<<qc-q25-o5-dipole|the trap unit of O5>>). Wavelength, linewidth and mass of cesium are standard values (Steck, alkali D-line data; NIST), stated here as inputs. A beam of that width stops an atom of up to ${d(V.o7CaptureV, 1)} m/s.`,
+          text: `The settings come from the paper. The field gradient is ${V.o7RepGradientGcm} G/cm, the detuning is $\\delta=-${d(V.o7RepMotDetuning, 2)}\\gamma$, and the total intensity is ${V.o7RepMotI0} times $I_0$ over six beams of ${d(V.o7RepBeamCm, 1)} cm, which we read as ten sixths of $I_0$ per beam. We take an effective magnetic moment of one Bohr magneton and the gradient in SI units, both our inputs. The force of page O5 gives a damping of ${d(V.o7MotBetaK2, 4)} in units of $\\hbar k^2$ for the wave number $k$, a natural frequency of ${d(V.o7MotOmegaHz, 0)} Hz, and a Zeeman half-size $\\hbar|\\delta|/\\mu' A$ of ${d(V.o7MotZeemanMm, 2)} mm (<<qc-q25-o5-dipole|the trap unit of O5>>). Wavelength, linewidth and mass of cesium are standard values (Steck, alkali D-line data; NIST), stated here as inputs.`,
           claims: [
             claim('o7MotBetaK2', 'the damping of the run’s trap is 0.0230 in units of ħk²', () => near(V.o7MotBetaK2, 0.023, 0.00005)),
             claim('o7MotOmegaHz', 'the natural frequency of the run’s trap is 190 Hz', () => near(V.o7MotOmegaHz, 190, 0.5)),
             claim('o7MotZeemanMm', 'the Zeeman half-size is 5.93 mm', () => near(V.o7MotZeemanMm, 5.93, 0.005)),
-            claim('o7CaptureV', 'a 2.5 cm beam captures speeds up to 53.8 m/s', () => near(V.o7CaptureV, 53.8, 0.05)),
+            claim('o7RepGradientGcm', 'reported by Manetsch et al., p. 21: the field gradient is 20 G/cm', () => V.o7RepGradientGcm === 20),
+            claim('o7RepMotI0', 'reported by Manetsch et al., p. 21: the total intensity of the trap beams is 10 I₀', () => V.o7RepMotI0 === 10),
             claim('o7RepMotDetuning', 'reported by Manetsch et al., p. 21: the detuning of the trap is −3.17 linewidths', () => near(V.o7RepMotDetuning, 3.17, 1e-12)),
             claim('o7RepBeamCm', 'reported by Manetsch et al., p. 21: each beam is 2.5 cm in diameter', () => near(V.o7RepBeamCm, 2.5, 1e-12)),
           ],
         },
         {
-          text: `What goes wrong is that the picture is too simple. The paper prints a cloud of about ${d(V.o7RepCloudMm, 1)} mm in 1/e² diameter, which is far below our Zeeman size, because the linear picture ignores the light that atoms scatter and push each other with. We print the two numbers side by side, one reported and one computed, with no verdict, and keep the linear picture only for the spring, the damping and the speeds. Try it. The bench draws the cloud filling, and the readouts give the steady state and the time to 95 per cent.`,
+          text: `A beam of that width stops an atom of at most ${d(V.o7CaptureV, 1)} m/s even with a fully saturated force, and of about ${d(V.o7CaptureVRun, 1)} m/s at the settings just printed.`,
+          claims: [
+            claim('o7CaptureV', 'a 2.5 cm beam captures speeds of at most 53.8 m/s, with a fully saturated force', () => near(V.o7CaptureV, 53.8, 0.05)),
+            claim('o7CaptureVRun', 'at the run’s settings a 2.5 cm beam captures speeds of about 10.6 m/s', () => near(V.o7CaptureVRun, 10.6, 0.05)),
+          ],
+        },
+        {
+          text: `What goes wrong is that the picture is too simple. The paper prints a cloud of about ${d(V.o7RepCloudMm, 1)} mm in 1/e² diameter, which is far below our Zeeman size. The Zeeman half-size is the radius at which the field cancels the detuning, not the cloud size, and a cloud smaller than it is set by its temperature in the spring. We print the two numbers side by side, one reported and one computed, with no verdict, and keep the linear picture only for the spring, the damping and the speeds. Try it. The bench draws the cloud filling, and the readouts give the steady state and the time to 95 per cent.`,
           claims: [claim('o7RepCloudMm', 'reported by Manetsch et al., p. 21: the cloud is about 1.6 mm in 1/e² diameter', () => near(V.o7RepCloudMm, 1.6, 1e-12))],
           widget: { kind: 'optics-bench', props: { preset: 'mot-load' }, caption: 'The filling of a magneto-optical trap against time.' },
         },
@@ -108,8 +120,9 @@ export const O7: Lecture = notesLecture({
       summary: 'Turning off the field, raising the detuning and lowering the intensity let the polarization gradients cool the cloud far under the plain Doppler limit.',
       body: [
         {
-          text: `After the loading the run switches off the field, lowers the intensity to seven times $I_0$ and moves the detuning to $-${d(V.o7RepPgcDetuning, 1)}\\gamma$ for 40 ms. Set those three dials and the polarization-gradient cooling of page O3 takes over. That page's model gives a scale and not a prediction. The light shift is $|U_1|=$ ${d(V.o7U1Pgc, 2)} µK. The limits for the two beam arrangements are ${d(V.o7TlimLin, 3)} µK for lin⊥lin light and ${d(V.o7TlimSig, 3)} µK for σ⁺σ⁻ light, from the coefficients $C$ of that page (<<qc-q25-o3-gradient|the polarization-gradient unit of O3>>; <<qc-o-q25-cooling|the Q25 cooling unit>>).`,
+          text: `After the loading the run switches off the field, lowers the intensity to ${V.o7RepPgcI0} times $I_0$ and moves the detuning to $-${d(V.o7RepPgcDetuning, 1)}\\gamma$ for ${V.o7RepPgcMs} ms. Set those three dials and the polarization-gradient cooling of page O3 takes over. That page's model gives a scale and not a prediction. The light shift is $|U_1|=$ ${d(V.o7U1Pgc, 2)} µK. The limits for the two beam arrangements are ${d(V.o7TlimLin, 3)} µK for lin⊥lin light and ${d(V.o7TlimSig, 3)} µK for σ⁺σ⁻ light, from the coefficients $C$ of that page (<<qc-q25-o3-gradient|the polarization-gradient unit of O3>>; <<qc-o-q25-cooling|the Q25 cooling unit>>).`,
           claims: [
+            claim('o7RepPgcI0', 'reported by Manetsch et al., p. 21: the intensity of the step is 7 I₀', () => V.o7RepPgcI0 === 7),
             claim('o7RepPgcDetuning', 'reported by Manetsch et al., p. 21: the detuning of the step is −19.5 linewidths', () => near(V.o7RepPgcDetuning, 19.5, 1e-12)),
             claim('o7U1Pgc', 'the light shift at the polarization-gradient step is 7.51 µK', () => near(V.o7U1Pgc, 7.51, 0.005)),
             claim('o7TlimLin', 'the lin⊥lin limit is 0.939 µK', () => near(V.o7TlimLin, 0.939, 0.0005)),

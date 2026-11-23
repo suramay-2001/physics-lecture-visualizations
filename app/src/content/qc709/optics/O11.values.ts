@@ -53,6 +53,8 @@ export const V = {
   o11RepMs: 0.26, // ms: "0.26 ms of probe time", Chow p. 3
   o11RepF80: 0.9999374, // "99.99374(8)%", Manetsch p. 4
   o11RepS80: 0.9998952, // "99.98952(1)%", Manetsch p. 4
+  o11RepDet80: 15.5, // |Δ| in units of Γ: the 2D PGC imaging detuning "Δ = −15.5Γ" (80 ms), Manetsch p. 21
+  o11RepDet20: 9.5, // |Δ| in units of Γ: "a PGC detuning of Δ = −9.5Γ" for the 20 ms data, p. 21
   o11RepF20: 0.999571, // "99.9571(4)%", Manetsch p. 21 (20 ms)
   o11RepS20: 0.99176, // "99.176(1)%", Manetsch p. 21 (20 ms)
 } as const

@@ -17,7 +17,9 @@ export { close, d, pct, tf, uf } from '../../claimKit'
 export { n0, near, r } from './format'
 
 /** The run's MOT settings (Manetsch Methods): 10 I₀ over six beams is s = 10/6 per beam (our reading), δ = −3.17Γ, 20 G/cm. */
-const mot = motLinear(CS_D2, { s: 10 / 6, dl: -3.17, A: 0.2, muPrime: bohrMagneton() })
+const S_MOT = 10 / 6
+const DL_MOT = -3.17
+const mot = motLinear(CS_D2, { s: S_MOT, dl: DL_MOT, A: 0.2, muPrime: bohrMagneton() })
 const U1 = Math.abs(lightShiftGround(CS_D2, 7 / 6, -19.5)) // J: the PGC step at −19.5Γ, 7 I₀ over six beams, C² = 1 (the scale of O3, not a prediction)
 const hbark2 = HBAR * waveNumber(CS_D2) ** 2
 
@@ -29,6 +31,7 @@ export const V = {
   o7MotOmegaHz: r(mot.omega / (2 * Math.PI), 0), // Hz
   o7MotZeemanMm: r(mot.size * 1e3, 2), // mm: ħ|δ|/μ′A
   o7CaptureV: r(capture(CS_D2, 0.025).v, 1), // m/s over a 2.5 cm beam
+  o7CaptureVRun: r(capture(CS_D2, 0.025).v * Math.sqrt(S_MOT / (1 + S_MOT + 4 * DL_MOT ** 2)), 1), // m/s: one beam's force at s = 10/6, δ = −3.17γ, as a share of the saturated maximum
   o7Load2Tau: r(motLoad(1, 1, 2), 3), // N/N_ss at t = 2τ
   o7Load95: r(loadTimeTo(0.95, 1), 2), // in units of τ
   /* o7-pgc */
@@ -43,6 +46,13 @@ export const V = {
   o7RepMotDetuning: 3.17, // |Δ| in units of Γ: "Δ = −3.17Γ" (the MOT beams)
   o7RepBeamCm: 2.5, // cm: "Each beam has a size of 2.5 cm in diameter"
   o7RepPgcDetuning: 19.5, // |Δ| in units of Γ: "Δ = −19.5Γ" (the 3D PGC step)
+  o7RepGradientGcm: 20, // G/cm: the quadrupole field gradient, p. 21
+  o7RepLoadMs: 100, // ms: "~10⁷ atoms in the 3D MOT in 100 ms", p. 21
+  o7RepPgcMs: 40, // ms: the 3D PGC step duration, p. 21
+  o7RepDropMs: 40, // ms: the wait after the step, p. 21
+  o7RepImageMs: 80, // ms: the imaging time, p. 21
+  o7RepMotI0: 10, // I₀: "a total intensity of 10I₀" (the MOT beams), p. 21
+  o7RepPgcI0: 7, // I₀: "lower the intensity to 7I₀" (the PGC step), p. 21
 } as const
 
 export type ValueKey = keyof typeof V

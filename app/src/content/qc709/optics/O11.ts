@@ -48,7 +48,7 @@ export const O11: Lecture = notesLecture({
           widget: { kind: 'optics-bench', props: { preset: 'count-histograms' }, caption: 'The two count histograms of a bright atom and a dark site, with the cutoff.' },
         },
         {
-          text: 'What goes wrong is that no cutoff is free. A low cutoff misreads the dark sites, which are the majority of sites in an array that is half empty. A high cutoff misses bright atoms. The best cutoff sits where the two tails are of about equal weight. This is the whole of the reading problem for a single site. The next section asks how the error falls when you light the atom for longer, and a later page replaces the cutoff by weights over many pixels at once (<<qc-o-b5-matched-filter|weighting pixels: the best sum>>).',
+          text: `What goes wrong is that no cutoff is free. A low cutoff misreads the dark sites. A high cutoff misses bright atoms. The best cutoff sits where moving it one step either way would add more error on one side than it removes on the other, and the two tails need not be equal: here they are ${d(V.o11ExEb * 100, 3)} % and ${d(V.o11ExEd * 100, 3)} %. This is the whole of the reading problem for a single site. The next section asks how the error falls when you light the atom for longer, and a later page replaces the cutoff by weights over many pixels at once (<<qc-o-b5-matched-filter|weighting pixels: the best sum>>).`,
         },
       ],
     },
@@ -95,11 +95,11 @@ export const O11: Lecture = notesLecture({
       id: 'o11-camera',
       label: '§3',
       title: 'The camera’s own noise',
-      pages: 'pp. 3–10',
+      pages: 'p. 3',
       summary: 'A camera that amplifies each electron adds a random spread, and for a few photoelectrons that spread, not the photons, sets the error.',
       body: [
         {
-          text: `An electron-multiplying camera turns each detected photon into a [[qc-op-photoelectron|photoelectron]] and multiplies it by a random [[qc-op-em-gain|gain]]. The multiplication of one electron follows an exponential law of mean $g$, so the sum for n electrons is an Erlang law, and a Gaussian read noise is added on top (Martinez-Dorantes et al., supplement). For a Poisson number of electrons the variance is exactly twice the mean times $g^2$, an excess noise factor of ${d(V.o11Enf, 2)} (<<qc-q9-distance|the unit on how well two states can be told apart>>).`,
+          text: `An electron-multiplying camera turns each detected photon into a [[qc-op-photoelectron|photoelectron]] and multiplies it by a random [[qc-op-em-gain|gain]]. The multiplication of one electron follows an exponential law of mean $g$, so the sum for n electrons is an Erlang law. A Gaussian read noise is added on top. The Erlang law is a textbook result, which we state without a citation. For a Poisson number of electrons the variance is exactly twice the mean times $g^2$, an excess noise factor of ${d(V.o11Enf, 2)} (<<qc-q9-distance|the unit on how well two states can be told apart>>).`,
           claims: [claim('o11Enf', 'the excess noise factor of the multiplication is 2.00', () => near(V.o11Enf, 2, 0.005))],
         },
         {
@@ -118,11 +118,11 @@ export const O11: Lecture = notesLecture({
       id: 'o11-loss',
       label: '§4',
       title: 'The best exposure',
-      pages: 'pp. 3–10',
+      pages: 'pp. 4–21',
       summary: 'A longer exposure reads better and loses more atoms, so the total error has a minimum, which a toy model of the loss makes visible.',
       body: [
         {
-          text: `Light that reads the atom also heats it, and a long exposure loses atoms. A toy model, labelled so, adds a loss chance $1-e^{-\\lambda_L\\tau}$ to the misread error of the last sections, at a loss rate $\\lambda_L$ of 4 per second. That rate is invented for the toy, and it is not a measurement. The total is least at ${V.o11ToyTau} µs, where it is ${d(V.o11ToyTotal * 100, 3)} %, and of that the misread part is ${d(V.o11ToyMisread * 100, 4)} %. Try it. Slide the rates and the loss.`,
+          text: `Light that reads the atom also heats it, and a long exposure loses atoms. A toy model, labelled so, adds a loss chance $1-e^{-\\lambda_L\\tau}$ to the misread error of the last sections, at a loss rate $\\lambda_L$ of 4 per second. That rate is invented for the toy, and it is not a measurement. The total is least at ${V.o11ToyTau} µs (on a grid of 2 µs), where it is ${d(V.o11ToyTotal * 100, 3)} %, and of that the misread part is ${d(V.o11ToyMisread * 100, 4)} %. Try it. Slide the rates and the loss.`,
           claims: [
             claim('o11ToyTau', 'the total of the toy is least at 234 µs', () => V.o11ToyTau === 234),
             claim('o11ToyTotal', 'the total error there is 0.120 %', () => near(V.o11ToyTotal, 0.0012, 0.000005)),
@@ -131,13 +131,15 @@ export const O11: Lecture = notesLecture({
           widget: { kind: 'optics-bench', props: { preset: 'exposure-optimum' }, caption: 'The misread error, the loss of the atom and their total against the exposure.' },
         },
         {
-          text: `The quantity that the experiments plot is the fidelity times the survival. Manetsch et al. report a fidelity of ${d(V.o11RepF80 * 100, 5)} % and a survival of ${d(V.o11RepS80 * 100, 5)} % at 80 ms (p. 4), which multiply to ${d(V.o11FS80, 6)}. For 20 ms they report ${d(V.o11RepF20 * 100, 4)} % and ${d(V.o11RepS20 * 100, 3)} % (p. 21), which multiply to ${d(V.o11FS20, 6)}. The products are computed from the reported inputs, and they show that the shorter image gives up survival for time.`,
+          text: `The quantity that the experiments plot is the fidelity times the survival. Manetsch et al. report a fidelity of ${d(V.o11RepF80 * 100, 5)} % and a survival of ${d(V.o11RepS80 * 100, 5)} % at 80 ms (p. 4), which multiply to ${d(V.o11FS80, 6)}. For 20 ms they report ${d(V.o11RepF20 * 100, 4)} % and ${d(V.o11RepS20 * 100, 3)} % (p. 21), which multiply to ${d(V.o11FS20, 6)}. The products are computed from the reported inputs, and they show that the shorter image gives up survival for time. The setting changed too: the 20 ms image was taken at a detuning of −${d(V.o11RepDet20, 1)}γ and the 80 ms image at −${d(V.o11RepDet80, 1)}γ (p. 21).`,
           claims: [
             claim('o11RepF80', 'reported by Manetsch et al., p. 4: the fidelity at 80 ms is 99.99374 %', () => near(V.o11RepF80, 0.9999374, 1e-12)),
             claim('o11RepS80', 'reported by Manetsch et al., p. 4: the survival at 80 ms is 99.98952 %', () => near(V.o11RepS80, 0.9998952, 1e-12)),
             claim('o11FS80', 'the product at 80 ms is 0.999833', () => near(V.o11FS80, 0.999833, 0.0000005)),
             claim('o11RepF20', 'reported by Manetsch et al., p. 21: the fidelity at 20 ms is 99.9571 %', () => near(V.o11RepF20, 0.999571, 1e-12)),
             claim('o11RepS20', 'reported by Manetsch et al., p. 21: the survival at 20 ms is 99.176 %', () => near(V.o11RepS20, 0.99176, 1e-12)),
+            claim('o11RepDet20', 'reported by Manetsch et al., p. 21: the 20 ms image used a detuning of −9.5 linewidths', () => near(V.o11RepDet20, 9.5, 1e-12)),
+            claim('o11RepDet80', 'reported by Manetsch et al., p. 21: the 80 ms image used a detuning of −15.5 linewidths', () => near(V.o11RepDet80, 15.5, 1e-12)),
             claim('o11FS20', 'the product at 20 ms is 0.991335', () => near(V.o11FS20, 0.991335, 0.0000005)),
           ],
         },

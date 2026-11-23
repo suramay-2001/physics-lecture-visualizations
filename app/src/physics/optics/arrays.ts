@@ -82,8 +82,9 @@ export function tweezerFreqs(U: number, massKg: number, w0: number, lam: number)
 /** The depth (J) a measured radial frequency (Hz) implies at waist `w0`: U = M ω_r² w₀²/4. */
 export const depthFromRadialFreq = (fr: number, massKg: number, w0: number): number => (massKg * (2 * Math.PI * fr) ** 2 * w0 * w0) / 4
 /**
- * The photon scattering rate of the trap light, s⁻¹ (rotating-wave, each line j with its light shift U_j = π c² Γ_j (2J′ + 1) I₀/(4 ω_j³ Δ_j) and Δ_j = ω_j − ω):
- * R = Σ_j (U_j/ħ)(Γ_j/Δ_j) (the book's two-level form, summed; the counter-rotating terms are left out of the rate).
+ * The photon scattering rate of the trap light, s⁻¹, far detuned, with the counter-rotating terms (the same two terms as the polarizability): each line j
+ * contributes its share w_j = (2J′ + 1)/6 of the strength (2/3 for D2, 1/3 for D1) of the two-level rate
+ * R_j = (3π c²/(2ħ ω_j³)) (ω/ω_j)³ (Γ_j/(ω_j − ω) + Γ_j/(ω_j + ω))² I₀, and the line rates add (the lines scatter into different final states).
  */
 export function tweezerScatter(P: number, w0: number, lamTrap: number, lines: readonly PolLine[] = CS_LINES): number {
   const om = (2 * Math.PI * C_LIGHT) / lamTrap
@@ -91,9 +92,8 @@ export function tweezerScatter(P: number, w0: number, lamTrap: number, lines: re
   let R = 0
   for (const { atom, Jp } of lines) {
     const w = (2 * Math.PI * C_LIGHT) / atom.lambdaM
-    const D = w - om
-    const U = (Math.PI * C_LIGHT ** 2 * atom.gamma * (2 * Jp + 1) * I0) / (4 * w ** 3 * D)
-    R += (U / HBAR) * (atom.gamma / D)
+    const br = atom.gamma / (w - om) + atom.gamma / (w + om)
+    R += (((2 * Jp + 1) / 6) * 3 * Math.PI * C_LIGHT ** 2 * (om / w) ** 3 * br * br * I0) / (2 * HBAR * w ** 3)
   }
   return R
 }

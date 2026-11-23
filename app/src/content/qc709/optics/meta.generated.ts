@@ -518,7 +518,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "challenges": [],
         "equations": [],
         "pages": "p. 21",
-        "paras": 4,
+        "paras": 5,
         "feeds": [
           {
             "chapter": "Q24",
@@ -548,7 +548,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
     "number": 8,
     "title": "One atom in a beam of light",
     "book": "Manetsch et al., a tweezer array of 6100 qubits, arXiv:2403.12021, Methods",
-    "pages": "pp. 3–25",
+    "pages": "pp. 2–25",
     "topics": [
       "the focus of a tweezer and its size",
       "the depth from the atom’s polarizability",
@@ -562,7 +562,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A laser focused by an objective makes a bright spot a little over a micrometre wide, and the two measured trap frequencies are enough to size it.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–25",
+        "pages": "pp. 2–25",
         "paras": 4,
         "feeds": []
       },
@@ -582,7 +582,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A cloud at twenty microkelvin sits in the middle of the well, and a photon of the imaging light shakes it only a little.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–25",
+        "pages": "pp. 3–4",
         "paras": 3,
         "feeds": [
           {
@@ -597,7 +597,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "The trap light scatters a few photons a second and each one heats the atom, which sets a floor under every lifetime that the vacuum has not already set.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–25",
+        "pages": "pp. 3–4",
         "paras": 3,
         "feeds": [
           {
@@ -642,7 +642,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A camera image finds the occupied sites and moving tweezers rearrange them, which works whenever at least as many sites are loaded as the target needs.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–33",
+        "pages": "pp. 2–33",
         "paras": 3,
         "feeds": [
           {
@@ -657,7 +657,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "Each round refills some empty sites and loses a few atoms, and the empty fraction settles at a level set by the ratio of the two chances.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–33",
+        "pages": "pp. 2–3",
         "paras": 3,
         "feeds": [
           {
@@ -672,7 +672,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "Atoms are lost at a steady rate to the vacuum and in a small share with every image, and the reloading has to keep up with both.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–33",
+        "pages": "pp. 2–21",
         "paras": 2,
         "feeds": [
           {
@@ -688,7 +688,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
     "number": 10,
     "title": "Light from one atom",
     "book": "Chow, Little and Jau, state detection of alkali atoms in tweezers, arXiv:2206.00144",
-    "pages": "pp. 3–10",
+    "pages": "pp. 3–20",
     "topics": [
       "how many photons one atom scatters",
       "the share a lens collects",
@@ -702,7 +702,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "An atom lit near its resonance scatters up to half a linewidth’s worth of photons a second, fewer when the light is weak or off resonance.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–5",
+        "pages": "p. 3",
         "paras": 4,
         "feeds": []
       },
@@ -712,7 +712,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "An ideal lens gathers a share of the isotropic light set by its numerical aperture, and the whole chain of a real camera collects a good deal less.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–5",
+        "pages": "pp. 3–20",
         "paras": 3,
         "feeds": [
           {
@@ -727,7 +727,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A bright atom shows no counts with a chance that falls as the exponential of its mean count, which fixes how many photons it must scatter.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–7",
+        "pages": "p. 3",
         "paras": 3,
         "feeds": [
           {
@@ -742,7 +742,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "Each scattered photon heats the atom by two recoils and may drop it into the wrong hyperfine level, so the photons you can spend are limited.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 5–10",
+        "pages": "pp. 3–5",
         "paras": 3,
         "feeds": [
           {
@@ -758,7 +758,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
     "number": 11,
     "title": "Counting atoms",
     "book": "Chow, Little and Jau, state detection of alkali atoms in tweezers, arXiv:2206.00144",
-    "pages": "pp. 3–10",
+    "pages": "pp. 3–21",
     "topics": [
       "two count histograms and a cutoff",
       "how the error falls with the exposure",
@@ -802,7 +802,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A camera that amplifies each electron adds a random spread, and for a few photoelectrons that spread, not the photons, sets the error.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–10",
+        "pages": "p. 3",
         "paras": 3,
         "feeds": [
           {
@@ -817,7 +817,7 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "question": "A longer exposure reads better and loses more atoms, so the total error has a minimum, which a toy model of the loss makes visible.",
         "challenges": [],
         "equations": [],
-        "pages": "pp. 3–10",
+        "pages": "pp. 4–21",
         "paras": 3,
         "feeds": [
           {
@@ -843,8 +843,8 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "O11",
       "unit": "o11-loss",
-      "label": "Optics Lab O11, §4, pp. 3–10",
-      "where": "§4, pp. 3–10"
+      "label": "Optics Lab O11, §4, pp. 4–21",
+      "where": "§4, pp. 4–21"
     }
   ],
   "q24-bloch-eq": [
@@ -857,42 +857,42 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "O9",
       "unit": "o9-loss",
-      "label": "Optics Lab O9, §4, pp. 3–33",
-      "where": "§4, pp. 3–33"
+      "label": "Optics Lab O9, §4, pp. 2–21",
+      "where": "§4, pp. 2–21"
     }
   ],
   "q24-lindblad": [
     {
       "lecture": "O8",
       "unit": "o8-heat",
-      "label": "Optics Lab O8, §4, pp. 3–25",
-      "where": "§4, pp. 3–25"
+      "label": "Optics Lab O8, §4, pp. 3–4",
+      "where": "§4, pp. 3–4"
     },
     {
       "lecture": "O9",
       "unit": "o9-refill",
-      "label": "Optics Lab O9, §3, pp. 3–33",
-      "where": "§3, pp. 3–33"
+      "label": "Optics Lab O9, §3, pp. 2–3",
+      "where": "§3, pp. 2–3"
     },
     {
       "lecture": "O10",
       "unit": "o10-limit",
-      "label": "Optics Lab O10, §4, pp. 5–10",
-      "where": "§4, pp. 5–10"
+      "label": "Optics Lab O10, §4, pp. 3–5",
+      "where": "§4, pp. 3–5"
     }
   ],
   "q25-atom-gates": [
     {
       "lecture": "O8",
       "unit": "o8-motion",
-      "label": "Optics Lab O8, §3, pp. 3–25",
-      "where": "§3, pp. 3–25"
+      "label": "Optics Lab O8, §3, pp. 3–4",
+      "where": "§3, pp. 3–4"
     },
     {
       "lecture": "O9",
       "unit": "o9-sort",
-      "label": "Optics Lab O9, §2, pp. 3–33",
-      "where": "§2, pp. 3–33"
+      "label": "Optics Lab O9, §2, pp. 2–33",
+      "where": "§2, pp. 2–33"
     }
   ],
   "q25-cooling": [
@@ -913,8 +913,8 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "O10",
       "unit": "o10-need",
-      "label": "Optics Lab O10, §3, pp. 3–7",
-      "where": "§3, pp. 3–7"
+      "label": "Optics Lab O10, §3, p. 3",
+      "where": "§3, p. 3"
     },
     {
       "lecture": "O11",
@@ -927,8 +927,8 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "O10",
       "unit": "o10-collect",
-      "label": "Optics Lab O10, §2, pp. 3–5",
-      "where": "§2, pp. 3–5"
+      "label": "Optics Lab O10, §2, pp. 3–20",
+      "where": "§2, pp. 3–20"
     }
   ],
   "q5-interferometer": [
@@ -1027,8 +1027,8 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
     {
       "lecture": "O11",
       "unit": "o11-camera",
-      "label": "Optics Lab O11, §3, pp. 3–10",
-      "where": "§3, pp. 3–10"
+      "label": "Optics Lab O11, §3, p. 3",
+      "where": "§3, p. 3"
     }
   ]
 }

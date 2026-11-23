@@ -36,7 +36,7 @@ const CONF = 0.99 // the confidence of a filled target
 const PARITY_LARGE = 50 // a Poisson mean so large that the parity law has reached its ceiling
 const SITES_ALL = 100 // the target size of the refill preset
 const M_TARGET = 5 // a mean count of five makes a bright atom: the rule of page O10
-const DEPUMP = 3.7e-4 // the stated depumping chance per scattered photon (Chow et al., see page O10)
+const DEPUMP = 3.7e-4 // the stated depumping chance per COLLECTED photon (Chow et al., see page O10); the curve is drawn against the detected count
 const T_REF = 20e-6 // K: the cloud temperature of the tweezer preset
 const SPAN_COUNTS = 40 // the histogram's x range ends at this count
 const TAU_MIN = 30 // µs: the smallest exposure the toy optimum searches
@@ -54,8 +54,8 @@ const motLoadPreset: OpticsPreset = {
   title: 'Filling a magneto-optical trap',
   question: 'How long must you wait for the cloud, and how many atoms does it hold?',
   sliders: [
-    { key: 'tau', label: 'Loss time constant τ', min: 20, max: 400, step: 10, default: 100, unit: 'ms' },
-    { key: 'R', label: 'Capture rate R', min: 1, max: 500, step: 1, default: 100, unit: '10⁶ s⁻¹' },
+    { key: 'tau', label: 'Loss time constant τ (model input)', min: 20, max: 400, step: 10, default: 100, unit: 'ms' },
+    { key: 'R', label: 'Capture rate R (model input)', min: 1, max: 500, step: 1, default: 100, unit: '10⁶ s⁻¹' },
   ],
   x: { label: 'Loading time t', unit: 'ms', from: 0, to: 1000 },
   y: { label: 'Atoms in the cloud', unit: '10⁶' },
@@ -78,7 +78,7 @@ const pgcWindow: OpticsPreset = {
   question: 'How far below the Doppler limit does the step reach, and where on the detuning axis?',
   sliders: [
     { key: 'dl', label: 'Detuning δ/γ', min: -30, max: -3, step: 0.5, default: -19.5, unit: '' },
-    { key: 's', label: 'Saturation s per beam', min: 0.2, max: 3, step: 0.1, default: 1.2, unit: '' },
+    { key: 's', label: 'Saturation s per beam', min: 1 / 6, max: 3, step: 1 / 6, default: 7 / 6, unit: '' },
   ],
   x: { label: 'Detuning δ/γ', unit: '', from: -30, to: -3 },
   y: { label: 'Sub-Doppler limit', unit: 'µK' },
@@ -103,7 +103,7 @@ const tweezerWell: OpticsPreset = {
   question: 'How deep is the well, how fast does an atom oscillate in it, and how long does the trap light itself take to heat it out?',
   sliders: [
     { key: 'P', label: 'Power at the atom', min: 0.2, max: 5, step: 0.1, default: 1.4, unit: 'mW' },
-    { key: 'w0', label: 'Waist w₀', min: 0.7, max: 2, step: 0.01, default: 1.24, unit: 'µm' },
+    { key: 'w0', label: 'Waist w₀', min: 0.7006, max: 2.0006, step: 0.01, default: 1.2406, unit: 'µm' },
     { key: 'lam', label: 'Wavelength', min: 900, max: 1100, step: 1, default: 1061, unit: 'nm' },
   ],
   x: { label: 'Radial position r', unit: 'µm', from: -3, to: 3 },
@@ -195,7 +195,7 @@ const photonBudgetPreset: OpticsPreset = {
   sliders: [
     { key: 's', label: 'Saturation s', min: 0.1, max: 10, step: 0.1, default: 2, unit: '' },
     { key: 'dl', label: 'Detuning δ/γ', min: -8, max: 0, step: 0.1, default: -2, unit: '' },
-    { key: 'NA', label: 'Numerical aperture', min: 0.2, max: 0.9, step: 0.05, default: 0.55, unit: '' },
+    { key: 'NA', label: 'Numerical aperture (ideal-collection readout only)', min: 0.2, max: 0.9, step: 0.05, default: 0.55, unit: '' },
     { key: 'eta', label: 'Total detection efficiency η', min: 0.002, max: 0.2, step: 0.002, default: 0.05, unit: '' },
   ],
   x: { label: 'Exposure τ', unit: 'ms', from: 0, to: 3 },
@@ -203,7 +203,7 @@ const photonBudgetPreset: OpticsPreset = {
   y2: { label: 'Chance of not being pumped away', unit: '', from: 0, to: 1 },
   curves: (p) => [
     { label: 'mean detected m (left axis)', f: (t) => photonBudget(CS_D2, p.s, p.dl, p.eta, t / U.ms).detected },
-    { label: 'no depumping yet (right axis)', f: (t) => depumpSurvival(photonBudget(CS_D2, p.s, p.dl, p.eta, t / U.ms).scattered, DEPUMP), axis: 'right' },
+    { label: 'no depumping yet, per collected photon (right axis)', f: (t) => depumpSurvival(photonBudget(CS_D2, p.s, p.dl, p.eta, t / U.ms).detected, DEPUMP), axis: 'right' },
   ],
   readouts: (p) => [
     { label: 'Scattering rate R', value: photonBudget(CS_D2, p.s, p.dl, p.eta, 1).R / U.mega, unit: '10⁶ s⁻¹', digits: 2 },

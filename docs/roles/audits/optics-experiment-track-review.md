@@ -116,3 +116,26 @@ G3 items: no 720 nK and no Cs Raman N_Γ appears; the 362 nK in the ruling is th
 the reverse `pp-o10-*`, `pp-o11-*` rows point at existing O10/O11 units. Return-beat `ret` behaviour was not exercised (no browser run).
 **7-word overlap:** none against `sources/mvs/text.md` or any `sources/ref-gdf-*` PDF (longest shared runs are 5 words and generic). **Voice:** one voice, first person plural, only the two sentences in nit 1 exceed 40 words.
 **Challenges:** the five pages carry no challenge blocks, so there are no keys or tolerances to check.
+
+## Fix pass
+
+Files: `app/src/content/qc709/optics/O7.ts` to `O11.ts` (and the `.values.ts` tables), `app/src/physics/optics/arrays.ts`, `app/src/widgets/opticsBench/presetsTrack.ts`,
+`pipeline/claims_optics/o_track.py` (fixtures regenerated, byte-identical on a second run), `meta.generated.ts` (`UPDATE_META=1` twice). Judge rulings applied.
+
+- **S1** done (option a). `O10.ts:147-158` (per collected photon; 2,702 collected = about 2.8e5 scattered, keyed `o10DepumpScat`; the recoil limit says "scattered"), `O10.values.ts`, `presetsTrack.ts:39` and the right-axis curve now uses `.detected`.
+- **S2** done. `O7.ts:99-103`, new keyed `o7CaptureVRun` (10.6 m/s, engine scaling by the saturation factor); 53.8 kept as the saturated upper bound.
+- **S3** done. `O9.ts:121-122`: "fall from one", "about a fifth", keyed `o9RefillTenRatio` (0.18).
+- **S4** done. `O10.ts:112-118`: ten times for a tenth as many; the two efficiencies here differ by 5.2 (keyed `o10CollRatio`), 0.30 ms against 0.0578 ms (keyed `o10TauM5Chow`). The judge's "ten times" is kept as the general statement, with the 5.2 for this pair stated beside it, because 0.96 % against 5 % is not a factor of ten.
+- **N1** done. `arrays.ts` `tweezerScatter` is the full two-term form (weights (2J′+1)/6), twin by the radiated-power route; 0.97 s⁻¹, 1,228 s, 20.5 min; `O8.ts:147-158`, preset readout follows.
+- **N2** done. `O8.ts:123` ("a value we chose for this page").
+- **N3** done. New reported keys `o7RepGradientGcm, o7RepLoadMs, o7RepPgcMs, o7RepDropMs, o7RepImageMs, o7RepMotI0, o7RepPgcI0, o9RepAtoms, o9RepSortParMs, o9RepSortSeqMs, o10RepKwonIsoCE` (plus `o11RepDet20/80`), each checked by text extraction on its cited page of the saved reference (Manetsch pp. 2, 8, 21, 33; Kwon p. 8).
+- **N4** done. (a) `O7.ts:~90` Bohr magneton and SI gradient named as our inputs; (b) D1 line and the 2J′+1 weights declared at `O8.ts:~96`; (c) `mot-load` slider labels and the `O7.ts` figure caption say "model input".
+- **N5** done. `presetsTrack.ts` `pgc-window` default s = 7/6 (grid step 1/6), `tweezer-well` default w₀ = 1.2406 µm.
+- **N6** done (reworded). `O10.ts:124` and the aperture slider label.
+- **N7** done. `O9.ts:134-141`, keyed `o9VacPerImage` (0.357); "mostly the same loss".
+- **N8** done. `O7.ts:106`.
+- **N9** done. `O8.ts:110-111`, keyed `o8DepthSpreadPct` (37 per cent).
+- **N10** done. `O11.ts:134`, keyed `o11RepDet20`, `o11RepDet80` (p. 21).
+- **N11** done. `O11.ts:102`: the citation is dropped (textbook law).
+- **Nit 1** done (both sentences split). **Nit 2** done (`O10.ts:136`, 1.7 times at 0.96 %, 9 times at 5 %, keyed). **Nit 3** done (`O11.ts:51-52`). **Nit 4** done (`O8.ts:~126`). **Nit 5** done ("pp. 3 and 20", "(rubidium)" at `O10.ts:69` and the Kwon efficiency sentence). **Nit 6** done where the order rule allows: section ranges narrowed on O8 to O11 (the rule that a section may not start before the one above it keeps some wide). **Nit 7** done ("on a grid of 2 µs", `O11.ts:134`; the ten-sixths reading kept).
+- Checks: `npx tsc -b` 0; `npx vitest run src/content src/physics src/stage src/widgets` and `build/` green; 7-word overlap sweep on the changed prose: 0 hits.

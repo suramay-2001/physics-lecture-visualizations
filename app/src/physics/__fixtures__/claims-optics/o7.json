@@ -6,6 +6,7 @@
   "o7MotOmegaHz": 190.0,
   "o7MotZeemanMm": 5.93,
   "o7CaptureV": 53.8,
+  "o7CaptureVRun": 10.6,
   "o7Load2Tau": 0.865,
   "o7Load95": 3.0,
   "o7U1Pgc": 7.51,
@@ -17,6 +18,13 @@
   "o7RepCloudMm": 1.6,
   "o7RepMotDetuning": 3.17,
   "o7RepBeamCm": 2.5,
-  "o7RepPgcDetuning": 19.5
+  "o7RepPgcDetuning": 19.5,
+  "o7RepGradientGcm": 20,
+  "o7RepLoadMs": 100,
+  "o7RepPgcMs": 40,
+  "o7RepDropMs": 40,
+  "o7RepImageMs": 80,
+  "o7RepMotI0": 10,
+  "o7RepPgcI0": 7
  }
 }

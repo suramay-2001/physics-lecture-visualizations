@@ -46,11 +46,11 @@ export const O8: Lecture = notesLecture({
       id: 'o8-beam',
       label: '§1',
       title: 'The size of the focus',
-      pages: 'pp. 3–25',
+      pages: 'pp. 2–25',
       summary: 'A laser focused by an objective makes a bright spot a little over a micrometre wide, and the two measured trap frequencies are enough to size it.',
       body: [
         {
-          text: `The trap is a [[qc-op-tweezer|tweezer]]: a laser of wavelength 1061 nm, focused by an objective of numerical aperture ${d(V.o8RepNa, 2)} into one bright spot for each site, with the spots about ${d(V.o8RepSpacingUm, 1)} µm apart. The paper reports about ${d(V.o8RepPowerMW, 1)} mW per tweezer at the atoms (Manetsch et al., pp. 2–3 and 20). Set the wavelength, the aperture and the power; measure the vibration frequencies of an atom in the spot; and ask what spot size they imply.`,
+          text: `The trap is a [[qc-op-tweezer|tweezer]]: a laser of wavelength 1061 nm, focused by an objective of numerical aperture ${d(V.o8RepNa, 2)} into one bright spot for each site, with the spots about ${d(V.o8RepSpacingUm, 1)} µm apart. The paper reports about ${d(V.o8RepPowerMW, 1)} mW per tweezer at the atoms (Manetsch et al., pp. 3 and 20). Set the wavelength, the aperture and the power; measure the vibration frequencies of an atom in the spot; and ask what spot size they imply.`,
           claims: [
             claim('o8RepNa', 'reported by Manetsch et al., p. 2: the objective has a numerical aperture of 0.65', () => near(V.o8RepNa, 0.65, 1e-12)),
             claim('o8RepSpacingUm', 'reported by Manetsch et al., p. 3: the sites are about 7.2 µm apart', () => near(V.o8RepSpacingUm, 7.2, 1e-12)),
@@ -87,7 +87,7 @@ export const O8: Lecture = notesLecture({
       summary: 'Far below both cesium lines the depth is the polarizability times the intensity, and a two-line model gives a depth near the reported average.',
       body: [
         {
-          text: `Far from resonance the well has the depth $U=\\frac{\\alpha I_0}{2\\epsilon_0 c}$ for polarizability $\\alpha$, peak intensity $I_0=2P/\\pi w_0^2$ and power $P$. For cesium at 1061 nm both fine-structure lines count, with the weights of their strengths and with the counter-rotating terms. The two-level formula of page O5 is not used here, because it ignores the second line. This two-line sum is a stated model, not data. It gives $\\alpha=$ ${d(V.o8AlphaAu, 0)} atomic units, and ${d(V.o8AlphaAu1064, 0)} at 1064 nm, the common value for the nearby laser (<<qc-l12-driven|the driven-atom unit>>).`,
+          text: `Far from resonance the well has the depth $U=\\frac{\\alpha I_0}{2\\epsilon_0 c}$ for polarizability $\\alpha$, peak intensity $I_0=2P/\\pi w_0^2$ and power $P$. For cesium at 1061 nm both fine-structure lines count, with the weights of their strengths and with the counter-rotating terms. The two-level formula of page O5 is not used here, because it ignores the second line. This two-line sum is a stated model, not data. Its inputs are the wavelengths and linewidths of the D2 line and of the D1 line, taken from Steck’s tables, with the weights 2J′+1 of the two excited levels, all stated here as inputs. It gives $\\alpha=$ ${d(V.o8AlphaAu, 0)} atomic units, and ${d(V.o8AlphaAu1064, 0)} at 1064 nm, the common value for the nearby laser (<<qc-l12-driven|the driven-atom unit>>).`,
           claims: [
             claim('o8AlphaAu', 'the polarizability of cesium at 1061 nm is 1165 atomic units', () => near(V.o8AlphaAu, 1165, 0.5)),
             claim('o8AlphaAu1064', 'the polarizability at 1064 nm is 1152 atomic units', () => near(V.o8AlphaAu1064, 1152, 0.5)),
@@ -107,7 +107,8 @@ export const O8: Lecture = notesLecture({
           ],
         },
         {
-          text: 'Every number here has the same caveat. Our depth uses one power and a waist inferred from two frequencies, while the paper’s mean depth is an average over about twelve thousand sites that differ from one another. The reported value sits between the model numbers, and we draw no verdict from that. How you know the depth is right is the agreement of three independent routes, the power, the waist and the frequencies, to about the same number. Try it. Slide the power, the waist and the wavelength.',
+          text: `Every number here has the same caveat. Our depth uses one power and a waist inferred from two frequencies, while the paper’s mean depth is an average over about twelve thousand sites that differ from one another. The reported value sits between the model numbers, and we draw no verdict from that. How you know the depth is right is how far the three routes, the power, the waist and the frequencies, spread: here about ${d(V.o8DepthSpreadPct, 0)} per cent from the lowest to the highest. Try it. Slide the power, the waist and the wavelength.`,
+          claims: [claim('o8DepthSpreadPct', 'the three depths spread by 37 per cent, lowest to highest', () => near(V.o8DepthSpreadPct, 37, 0.5))],
           widget: { kind: 'optics-bench', props: { preset: 'tweezer-well' }, caption: 'The well of one tweezer on cesium, exact and harmonic.' },
           figure: {
             stage: { kind: 'plot', series: [{ fn: 'tweezerU', params: { mode: 'exact' } }, { fn: 'tweezerU', params: { mode: 'harmonic' } }] },
@@ -120,11 +121,11 @@ export const O8: Lecture = notesLecture({
       id: 'o8-motion',
       label: '§3',
       title: 'Cold enough to stay in the well',
-      pages: 'pp. 3–25',
+      pages: 'pp. 3–4',
       summary: 'A cloud at twenty microkelvin sits in the middle of the well, and a photon of the imaging light shakes it only a little.',
       body: [
         {
-          text: `How far does the atom wander? The thermal size is $\\sigma=\\sqrt{k_BT/M\\omega_r^2}$ for temperature $T$ and mass $M$, which is ${d(V.o8Sigma20, 0)} nm at 20 µK, much less than the waist. The depth over the temperature is ${d(V.o8DepthOverT20, 2)} at 20 µK, so the atom stays far from the rim. This is the scale of the model of page O7, not a measurement; the paper reports an atomic temperature of its own, at a reduced trap depth and for another purpose, which we do not print.`,
+          text: `How far does the atom wander? The thermal size is $\\sigma=\\sqrt{k_BT/M\\omega_r^2}$ for temperature $T$ and mass $M$, which is ${d(V.o8Sigma20, 0)} nm at 20 µK, much less than the waist. The depth over the temperature is ${d(V.o8DepthOverT20, 2)} at 20 µK, so the rim is ${d(V.o8DepthOverT20, 2)} thermal energies above the bottom of the well. The 20 µK is a value we chose for this page, not a measurement; the paper reports an atomic temperature of its own, at a reduced trap depth and for another purpose, which we do not print.`,
           claims: [
             claim('o8Sigma20', 'the thermal size at 20 µK is 192 nm', () => near(V.o8Sigma20, 192, 0.5)),
             claim('o8DepthOverT20', 'the depth is 7.59 times the thermal energy at 20 µK', () => near(V.o8DepthOverT20, 7.59, 0.005)),
@@ -146,21 +147,21 @@ export const O8: Lecture = notesLecture({
       id: 'o8-heat',
       label: '§4',
       title: 'What the trap light itself does',
-      pages: 'pp. 3–25',
+      pages: 'pp. 3–4',
       summary: 'The trap light scatters a few photons a second and each one heats the atom, which sets a floor under every lifetime that the vacuum has not already set.',
       body: [
         {
-          text: `Scattered trap light heats the atom by one recoil pair for each photon. The scattering rate of the two lines, with the rotating-wave form, is $R=$ ${d(V.o8Rsc, 2)} per second at 1.4 mW. Each trap photon at 1061 nm adds ${d(V.o8RecoilGainK, 0)} nK of energy, written $2E_R/k_B$ for the recoil energy $E_R$. Heating alone then needs ${d(V.o8HeatTime, 0)} s, or ${d(V.o8HeatMin, 1)} minutes, to take the atom to the rim (<<qc-q24-lindblad|the unit on why a driven atom forgets>>).`,
+          text: `Scattered trap light heats the atom by one recoil pair for each photon. The scattering rate of the two lines, in the far-detuned form with both rotating terms, is $R=$ ${d(V.o8Rsc, 2)} per second at 1.4 mW. Each trap photon at 1061 nm adds ${d(V.o8RecoilGainK, 0)} nK of energy, written $2E_R/k_B$ for the recoil energy $E_R$. Heating alone then needs ${d(V.o8HeatTime, 0)} s, or ${d(V.o8HeatMin, 1)} minutes, to take the atom to the rim (<<qc-q24-lindblad|the unit on why a driven atom forgets>>).`,
           claims: [
-            claim('o8Rsc', 'the trap light scatters 1.45 photons a second', () => near(V.o8Rsc, 1.45, 0.005)),
+            claim('o8Rsc', 'the trap light scatters 0.97 photons a second', () => near(V.o8Rsc, 0.97, 0.005)),
             claim('o8RecoilGainK', 'each trap photon adds 128 nK', () => near(V.o8RecoilGainK, 128, 0.5)),
-            claim('o8HeatTime', 'heating by the trap light alone takes 819 s', () => near(V.o8HeatTime, 819, 0.5)),
-            claim('o8HeatMin', 'that is 13.7 minutes', () => near(V.o8HeatMin, 13.7, 0.05)),
+            claim('o8HeatTime', 'heating by the trap light alone takes 1228 s', () => near(V.o8HeatTime, 1228, 0.5)),
+            claim('o8HeatMin', 'that is 20.5 minutes', () => near(V.o8HeatMin, 20.5, 0.05)),
             claim('o8RepPowerMW', 'reported by Manetsch et al., p. 3: about 1.4 mW reaches each atom', () => near(V.o8RepPowerMW, 1.4, 1e-12)),
           ],
         },
         {
-          text: `How you know it matters is the lifetime. The paper reports a trap lifetime of ${d(V.o8RepLifeMin, 1)} minutes, which it traces to the vacuum (Manetsch et al., p. 4). Our heating time is of the same order and comes from a different mechanism. We print the two side by side, one computed and one reported, with no verdict: both are far above the second that one run of the cycle takes.`,
+          text: `How you know it matters is the lifetime. The paper reports a trap lifetime of ${d(V.o8RepLifeMin, 1)} minutes, which it traces to the vacuum (Manetsch et al., p. 4). Our heating time, about the same size as that lifetime, comes from a different mechanism. We print the two side by side, one computed and one reported, with no verdict: both are far above the second that one run of the cycle takes.`,
           claims: [claim('o8RepLifeMin', 'reported by Manetsch et al., p. 4: the vacuum-limited lifetime is 22.9 minutes', () => near(V.o8RepLifeMin, 22.9, 1e-12))],
         },
         {

@@ -14,7 +14,9 @@ export { n0, near, r } from './format'
 
 const trace = refillTrace(5, 0.01, 0.5)
 const eq = refillEquilibrium(0.01, 0.5)
-const loss = lossBudget(6139, 22.9 * 60, 0.9998952)
+const ATOMS = 6139 // the paper's printed mean number of loaded atoms (p. 2)
+const TAU = 22.9 * 60 // s: the printed vacuum lifetime (p. 4)
+const loss = lossBudget(ATOMS, TAU, 0.9998952)
 
 export const V = {
   /* o9-parity */
@@ -33,15 +35,20 @@ export const V = {
   /* o9-refill */
   o9Empty5: r(trace[5], 4), // empty fraction after five rounds (ε = 0.01, q = ½, a model)
   o9EmptyEq: r(eq, 4), // the fixed point ε/(q + ε)
+  o9RefillTenRatio: r(refillEquilibrium(0.01, 0.1) / refillEquilibrium(0.01, 0.01), 2), // empty fraction at refill 10 x loss over that at refill = loss
   o9AllFilled100: r((1 - eq) ** 100, 3), // the chance that 100 sites each filled at the equilibrium rate are all filled
   /* o9-loss */
   o9LossPerSec: r(loss.perSecond, 2), // atoms lost per second from 6,139 atoms at τ = 22.9 min
   o9LostPerImage: r(loss.perImage, 3), // atoms lost per image at the printed survival
+  o9VacPerImage: r(ATOMS * (1 - Math.exp(-0.08 / TAU)), 3), // atoms: the vacuum alone over the 80 ms of an image, at the printed lifetime
   /* reported (Manetsch et al., arXiv:2403.12021v4) */
   o9RepFill: 0.512, // "loading probability of 51.2%", p. 3
   o9RepSpread: 0.034, // "relative standard deviation of 3.4% across the sites", p. 3
   o9RepSurv: 0.9998952, // "99.98952(1)%", per-image survival, p. 4
   o9RepLifeMin: 22.9, // "22.9(1) min", p. 4
+  o9RepAtoms: 6139, // mean loaded atoms, p. 2 (Fig. 1d caption)
+  o9RepSortParMs: 137, // "~137 ms", sorting in parallel, p. 8 and p. 33
+  o9RepSortSeqMs: 522, // "~522 ms", the four quadrants one after another, p. 8 and p. 33
 } as const
 
 export type ValueKey = keyof typeof V

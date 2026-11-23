@@ -67,7 +67,7 @@ export const O9: Lecture = notesLecture({
       id: 'o9-sort',
       label: '§2',
       title: 'Moving atoms into a target',
-      pages: 'pp. 3–33',
+      pages: 'pp. 2–33',
       summary: 'A camera image finds the occupied sites and moving tweezers rearrange them, which works whenever at least as many sites are loaded as the target needs.',
       body: [
         {
@@ -79,16 +79,21 @@ export const O9: Lecture = notesLecture({
           ],
         },
         {
-          text: `The chance rises steeply. With 200 sites the chance to fill the target is ${d(V.o9PCert200, 3)}, and with 220 sites it is ${d(V.o9PCert220, 3)}. A target of 50 sites needs ${V.o9Sites50} sites at the same chance. The array of the paper has about twelve thousand sites. At the printed chance it holds about ${n0(V.o9ExpAtoms)} atoms on average, next to the 6,139 the paper reports (p. 2). That is a number to count on, not a chance to hope for (<<qc-o-q25-atom-gates|the Q25 unit on gates between atoms>>).`,
+          text: `The chance rises steeply. With 200 sites the chance to fill the target is ${d(V.o9PCert200, 3)}, and with 220 sites it is ${d(V.o9PCert220, 3)}. A target of 50 sites needs ${V.o9Sites50} sites at the same chance. The array of the paper has about twelve thousand sites. At the printed chance it holds about ${n0(V.o9ExpAtoms)} atoms on average, next to the ${n0(V.o9RepAtoms)} the paper reports (p. 2). That is a number to count on, not a chance to hope for (<<qc-o-q25-atom-gates|the Q25 unit on gates between atoms>>).`,
           claims: [
             claim('o9PCert200', 'with 200 sites the chance to fill a target of 100 is 0.659', () => near(V.o9PCert200, 0.659, 0.0005)),
             claim('o9PCert220', 'with 220 sites it is 0.962', () => near(V.o9PCert220, 0.962, 0.0005)),
             claim('o9Sites50', 'a target of 50 sites needs 122 sites', () => V.o9Sites50 === 122),
             claim('o9ExpAtoms', 'twelve thousand sites hold 6,144 atoms on average', () => V.o9ExpAtoms === 6144),
+            claim('o9RepAtoms', 'reported by Manetsch et al., p. 2: 6,139 single atoms are loaded on average', () => V.o9RepAtoms === 6139),
           ],
         },
         {
-          text: 'How long it takes is an estimate and is labelled so. The paper estimates about 137 ms to sort the array of twelve thousand sites in parallel. It estimates about 522 ms to sort its four quadrants one after another, from the time budget of its supplement (Manetsch et al., pp. 8 and 33). What goes wrong is that every move of an atom takes time, during which the other atoms wait and are lost to the vacuum. Try it. The bench draws the chance to fill the target against the number of sites.',
+          text: `How long it takes is an estimate and is labelled so. The paper estimates about ${V.o9RepSortParMs} ms to sort the array of twelve thousand sites in parallel. It estimates about ${V.o9RepSortSeqMs} ms to sort its four quadrants one after another, from the time budget of its supplement (Manetsch et al., pp. 8 and 33). What goes wrong is that every move of an atom takes time, during which the other atoms wait and are lost to the vacuum. Try it. The bench draws the chance to fill the target against the number of sites.`,
+          claims: [
+            claim('o9RepSortParMs', 'reported by Manetsch et al., p. 8: sorting the array in parallel takes about 137 ms', () => V.o9RepSortParMs === 137),
+            claim('o9RepSortSeqMs', 'reported by Manetsch et al., p. 33: sorting the four quadrants one after another takes about 522 ms', () => V.o9RepSortSeqMs === 522),
+          ],
           widget: { kind: 'optics-bench', props: { preset: 'sort-success' }, caption: 'The chance that a target of atoms can be filled against the number of sites.' },
         },
       ],
@@ -97,7 +102,7 @@ export const O9: Lecture = notesLecture({
       id: 'o9-refill',
       label: '§3',
       title: 'Keeping the array full',
-      pages: 'pp. 3–33',
+      pages: 'pp. 2–3',
       summary: 'Each round refills some empty sites and loses a few atoms, and the empty fraction settles at a level set by the ratio of the two chances.',
       body: [
         {
@@ -113,7 +118,8 @@ export const O9: Lecture = notesLecture({
           widget: { kind: 'optics-bench', props: { preset: 'refill-rounds' }, caption: 'The empty fraction of a refilled array against the round.' },
         },
         {
-          text: 'Try it. Slide the loss and the refill chance, and watch the empty fraction climb from zero to its settled level in a few rounds. A refill that is ten times the loss leaves about a tenth of the empty sites that a refill equal to the loss would. The settled value, and not the number of rounds, is the quantity to design for, because the number of rounds only decides how soon you arrive.',
+          text: `Try it. Slide the loss and the refill chance, and watch the empty fraction fall from one to its settled level in a few rounds. A refill that is ten times the loss leaves about a fifth (${d(V.o9RefillTenRatio, 2)}) of the empty sites that a refill equal to the loss would. The settled value, and not the number of rounds, is the quantity to design for, because the number of rounds only decides how soon you arrive.`,
+          claims: [claim('o9RefillTenRatio', 'a refill ten times the loss leaves 0.18 of the empty sites that a refill equal to the loss leaves', () => near(V.o9RefillTenRatio, 0.18, 0.005))],
         },
       ],
     },
@@ -121,16 +127,17 @@ export const O9: Lecture = notesLecture({
       id: 'o9-loss',
       label: '§4',
       title: 'The price of an image',
-      pages: 'pp. 3–33',
+      pages: 'pp. 2–21',
       summary: 'Atoms are lost at a steady rate to the vacuum and in a small share with every image, and the reloading has to keep up with both.',
       body: [
         {
-          text: `Every atom leaves at a rate $1/\\tau$ for the vacuum lifetime $\\tau$, and each image loses a share $1-S$ of the atoms for the survival chance $S$. The paper reports a lifetime of ${d(V.o9RepLifeMin, 1)} minutes and a survival of ${d(V.o9RepSurv * 100, 5)} % for each image (Manetsch et al., p. 4). With 6,139 atoms that is ${d(V.o9LossPerSec, 2)} atoms lost every second to the vacuum and ${d(V.o9LostPerImage, 3)} atoms lost with every image. These two are computed from the reported inputs (<<qc-q24-bloch-eq|the unit on where a decaying system settles>>).`,
+          text: `Every atom leaves at a rate $1/\\tau$ for the vacuum lifetime $\\tau$, and each image loses a share $1-S$ of the atoms for the survival chance $S$. The paper reports a lifetime of ${d(V.o9RepLifeMin, 1)} minutes and a survival of ${d(V.o9RepSurv * 100, 5)} % for each image (Manetsch et al., p. 4). With ${n0(V.o9RepAtoms)} atoms that is ${d(V.o9LossPerSec, 2)} atoms lost every second to the vacuum and ${d(V.o9LostPerImage, 3)} atoms lost with every image. These two are computed from the reported inputs. They are mostly the same loss: of the ${d(V.o9LostPerImage, 3)} lost per image, about ${d(V.o9VacPerImage, 3)} is the vacuum acting during the 80 ms of the image (<<qc-q24-bloch-eq|the unit on where a decaying system settles>>).`,
           claims: [
             claim('o9RepLifeMin', 'reported by Manetsch et al., p. 4: the vacuum lifetime is 22.9 minutes', () => near(V.o9RepLifeMin, 22.9, 1e-12)),
             claim('o9RepSurv', 'reported by Manetsch et al., p. 4: an image leaves 99.98952 per cent of the atoms', () => near(V.o9RepSurv, 0.9998952, 1e-12)),
             claim('o9LossPerSec', 'with 6,139 atoms the vacuum takes 4.47 a second', () => near(V.o9LossPerSec, 4.47, 0.005)),
             claim('o9LostPerImage', 'each image loses 0.643 atoms', () => near(V.o9LostPerImage, 0.643, 0.0005)),
+            claim('o9VacPerImage', 'of those, the vacuum acting during the 80 ms of the image takes 0.357', () => near(V.o9VacPerImage, 0.357, 0.0005)),
           ],
         },
         {

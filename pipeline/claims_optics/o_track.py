@@ -77,6 +77,7 @@ o7 = {
     "o7MotOmegaHz": rnd(math.sqrt(kappa / CS_M) / two_pi, 0),
     "o7MotZeemanMm": rnd(hb * abs(dl_mot) * CS_G / (muB * A_mot) * 1e3, 2),
     "o7CaptureV": rnd(vc, 1),
+    "o7CaptureVRun": rnd(vc * math.sqrt(s_mot / (1 + s_mot + 4 * dl_mot**2)), 1),
     "o7Load2Tau": rnd(sol_load.y[0, -1], 3),
     "o7Load95": rnd(-math.log(0.05), 2),
     "o7U1Pgc": rnd(U1 * 1e6, 2),
@@ -90,6 +91,13 @@ o7 = {
     "o7RepMotDetuning": 3.17,
     "o7RepBeamCm": 2.5,
     "o7RepPgcDetuning": 19.5,
+    "o7RepGradientGcm": 20,
+    "o7RepLoadMs": 100,
+    "o7RepPgcMs": 40,
+    "o7RepDropMs": 40,
+    "o7RepImageMs": 80,
+    "o7RepMotI0": 10,
+    "o7RepPgcI0": 7,
 }
 
 # ------------------------------------------------------------------ O8
@@ -113,14 +121,15 @@ def depth_J(P, w0, lam_trap=LAM_T):
 
 
 def rsc(P, w0, lam_trap=LAM_T):
+    """Radiated-power route: each line j is a two-level dipole of polarizability a_j = 6 pi eps0 c^3 Gamma_j/(w_j^2 (w_j^2 - w^2)) (both rotating terms),
+    scattered power w^4 a_j^2 I/(6 pi eps0^2 c^4), weight (2J'+1)/6, rate = power/(hbar w); the line rates add."""
     om = two_pi * c / lam_trap
     I0 = 2 * P / (np.pi * w0**2)
     tot = 0.0
     for lam, G, Jp in ((D1_LAM, D1_G, 0.5), (CS_LAM, CS_G, 1.5)):
         w = two_pi * c / lam
-        D = w - om
-        Uj = np.pi * c**2 * G * (2 * Jp + 1) / (4 * w**3 * D) * I0
-        tot += Uj * G / (hb * D)
+        a_j = 6 * np.pi * eps0 * c**3 * G / (w**2 * (w**2 - om**2))
+        tot += (2 * Jp + 1) / 6 * om**4 * a_j**2 * I0 / (6 * np.pi * eps0**2 * c**4) / (hb * om)
     return tot
 
 
@@ -144,6 +153,7 @@ o8 = {
     "o8FrAt14": rnd(math.sqrt(4 * U14 / (CS_M * w0**2)) / two_pi / 1e3, 1),
     "o8FzAt14": rnd(math.sqrt(2 * U14 / (CS_M * zR**2)) / two_pi / 1e3, 2),
     "o8DepthPaperWaist": rnd(depth_J(1.4e-3, 1.17e-6) / kB * 1e3, 3),
+    "o8DepthSpreadPct": rnd((max(U14, depth_J(1.4e-3, 1.17e-6), Uf) / min(U14, depth_J(1.4e-3, 1.17e-6), Uf) - 1) * 100, 0),
     "o8Sigma20": rnd(math.sqrt(kB * 20e-6 / (CS_M * w_r**2)) * 1e9, 0),
     "o8Eta": rnd(k852 * math.sqrt(hb / (2 * CS_M * w_r)), 3),
     "o8EtaSq": rnd((k852 * math.sqrt(hb / (2 * CS_M * w_r))) ** 2, 4),
@@ -203,14 +213,19 @@ o9 = {
     "o9ExpAtoms": rnd(12000 * 0.512, 0),
     "o9Empty5": rnd(trace[5], 4),
     "o9EmptyEq": rnd(eq, 4),
+    "o9RefillTenRatio": rnd((0.01 / (0.1 + 0.01)) / (0.01 / (0.01 + 0.01)), 2),
     "o9AllFilled100": rnd((1 - eq) ** 100, 3),
     "o9LossPerSec": rnd(6139 / tau_vac, 2),
     "o9LostPerImage": rnd(6139 * (1 - S_img), 3),
+    "o9VacPerImage": rnd(6139 * (1 - math.exp(-0.08 / tau_vac)), 3),
     # reported (Manetsch et al., arXiv:2403.12021v4): p. 3 (51.2 %, 3.4 %), p. 2 (6,139 atoms, Fig. 1d caption), p. 4 (survival), p. 4 (lifetime 22.9 min)
     "o9RepFill": 0.512,
     "o9RepSpread": 0.034,
     "o9RepSurv": 0.9998952,
     "o9RepLifeMin": 22.9,
+    "o9RepAtoms": 6139,  # p. 2, Fig. 1d caption
+    "o9RepSortParMs": 137,  # p. 8 and p. 33
+    "o9RepSortSeqMs": 522,
 }
 
 # ------------------------------------------------------------------ O10
@@ -231,9 +246,15 @@ o10 = {
     "o10Floor7": rnd(stats.poisson.pmf(0, 7), 6),
     "o10NScat5": rnd(5 / 0.0096, 0),
     "o10NScat7": rnd(7 / 0.0096, 0),
+    "o10NScat5Setup": rnd(5 / 0.05, 0),
+    "o10TauM5Chow": rnd(5 / 0.0096 / R_ex * 1e3, 2),
+    "o10CollRatio": rnd(0.05 / 0.0096, 1),
     "o10TauM5": rnd(5 / (R_ex * 0.05) * 1e3, 4),
     "o10GainK": rnd(gain_K * 1e9, 0),
     "o10PhotonsToDepth": rnd(0.18e-3 / gain_K, 0),
+    "o10DepthOverNeedChow": rnd(0.18e-3 / gain_K / (5 / 0.0096), 1),
+    "o10DepthOverNeedSetup": rnd(0.18e-3 / gain_K / (5 / 0.05), 0),
+    "o10DepumpScat": rnd(-1 / math.log(1 - 3.7e-4) / 0.0096 / 1e5, 1),
     "o10DepumpN": rnd(-1 / math.log(1 - 3.7e-4), 0),
     "o10Surv500": rnd((1 - 3.7e-4) ** 500, 3),
     # reported: Chow et al., arXiv:2206.00144, p. 3 (collection efficiency 0.96(1) %), p. 5 (depump chance 3.7e-4 per collection event, shown in units of 1e-4);
@@ -243,6 +264,7 @@ o10 = {
     "o10RepKwonHi": 0.020,
     "o10RepDepump": 3.7,
     "o10RepDepthmK": 0.18,
+    "o10RepKwonIsoCE": 0.0417,
     "o10RepNa40": 0.4,
     "o10RepNa55": 0.55,
     "o10RepNa65": 0.65,
@@ -344,6 +366,8 @@ o11 = {
     "o11RepMs": 0.26,
     "o11RepF80": 0.9999374,
     "o11RepS80": 0.9998952,
+    "o11RepDet80": 15.5,
+    "o11RepDet20": 9.5,
     "o11RepF20": 0.999571,
     "o11RepS20": 0.99176,
 }
