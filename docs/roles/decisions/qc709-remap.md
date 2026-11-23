@@ -23,7 +23,7 @@ the chapters through Part V, plus Foundations F2–F6. Usage cap for the week: a
    - Everywhere else, Φ/Ψ stay primary, tagged "(notes, N&C: β₀₀)" on first use per chapter.
 10. **The Bloch vector of ρ is r:** keep it, with one Rosetta line in Q8 ("the notes write n").
 11. **Trace distance and fidelity in Q9,** as a Bergou-only unit: YES.
-12. **HW2 walkthroughs:** FULL, as mapped, since HW2 is submitted. Ask the user before using any HW3 item.
+12. **HW2 walkthroughs:** FULL, as mapped, since the private homework record allows it. Ask the user before using any HW3 item.
 13. **Bergou ⚑ P10.1(a) as a cited aside in Q7:** allowed. Re-check when HW3 is ingested.
 14. **The cut line:** adopt the user's cap. Check usage after every batch; Part V builds slip to next week if the cap would
     be crossed.

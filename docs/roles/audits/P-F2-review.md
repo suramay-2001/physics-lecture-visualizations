@@ -41,7 +41,7 @@ Reviewer: independent P verifier (read-only; not the builder). Skill: `skills/06
   - Axler 4e: 6.2–6.4 (pp. 183–184), 6.7–6.17 (pp. 186–190), §6A Ex. 15 (p. 192), 6.22–6.32 (pp. 197–201).
   - N&C §2.1.1 (pp. 62–63, Eqs. 2.5–2.9, Ex. 2.1) and §2.1.4 (pp. 65–66, Eqs. 2.13–2.17).
   - 709 notes n1 pp. 3–5 (Figs. 2–3, the weighted M) and n2 pp. 6–9 (Gram–Schmidt Fig. 4, Eqs. 1.1–1.2, Fig. 5, completeness).
-  - HW1 P5 (submitted, so a full walkthrough is allowed).
+  - HW1 P5 (the private homework record allows a full walkthrough).
   - Offsets: Axler = PDF − 14 and N&C = PDF − 28, both confirmed on the page heads.
   - REVISED L5–L7 is n/a: F2 has phase `'core'` and no lecture source; its own notes citations were checked instead.
 - **Widgets and stages:** read from source, with no screenshots and no Playwright (per the brief).

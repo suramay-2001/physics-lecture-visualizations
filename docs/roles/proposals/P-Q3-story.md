@@ -447,7 +447,7 @@ within every unit the order is L → B → C.
 
 ## 4. Challenges per unit
 
-Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** every assigned item is submitted;
+Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** the private homework record allows it;
 none is open (`homework-status.md`).
 
 ### `q3-born`
@@ -739,7 +739,7 @@ Label constant: `const Q3x = (unit, label) => ({ lecture: 'Q3', unit, label })`.
 
 ## 12. Questions for the judge
 
-**Q1. Homework now submitted.** The map planned "⟨+n|−n⟩ stated, not worked" (HW1 P4(b)), ruling 3 framed the
+**Q1. Homework status (private record).** The map planned "⟨+n|−n⟩ stated, not worked" (HW1 P4(b)), ruling 3 framed the
 `l7-spreads` bridge carefully (HW1 P1), and `qc709-nc.md` #1 made D2 hints-only (448 `l3-eig-real`).
 `homework-status.md` now records all three as submitted. This plan works each in full (bl:b3, D2, D3, D4). *Recommend:*
 confirm; 448's own `l3-eig-real`, `l4-g-sy` and HW1-twin challenges stay hints-only in 448, unchanged.

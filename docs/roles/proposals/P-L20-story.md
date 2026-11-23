@@ -4,7 +4,7 @@ Role P, proposal only (nothing under `app/` is touched). One track (448), senten
 Siblings: `P-L19-story.md` (barrier; its S1 is built first), `P-L14-story.md` (stationary states; its box unit moves here). Numbers: `planL19L20-numpy.py` (scratchpad; brentq roots of the smooth matching forms, a finite-difference Hamiltonian diagonalisation as a third route, scipy quad, closed forms; 184 values for both lectures, every assert passes, two runs byte-identical).
 
 **Sources read.** Notes `sources/L20/text.md` pp. 1–12 (page image checked: p. 8; the text layer has stray NUL bytes but reads exactly; the algebra of pp. 3–9 and App. A re-derived). Townsend 2e via `digest-G4.md`: §6.8 pp. 213–218 (Eqs. 6.86–6.98, Figs. 6.7–6.9), §6.9 pp. 219–224 (Eqs. 6.99–6.110, Figs. 6.10–6.11, Ex. 6.6), Problems 6.11–6.20. Susskind: none. Built: `L14.ts`/`L14.story.ts` units `l14-stationary` and `l14-box` (moved here, below), `L16` (the harmonic `potential`), `L18`–`L19` (barrier, evanescent waves). **Page images of Townsend:** pp. 213–224 were checked on images in the digest; pp. 237–244 (problems) are OCR-only (ruling T6): the builder re-reads Problems 6.16–6.19 before citing.
-Homework types: HW7 P2 (the energy cost of a discontinuous wavefunction). HW8 (due Nov 12, the day of this lecture) is not ingested: Q3.
+Homework types: HW7 P2 (the energy cost of a discontinuous wavefunction). HW8 is not ingested: Q3.
 **Conventions.** ħ = m = 1 in the engine; the notes' u(x) is φ(x) (L14's name for an energy eigenfunction); Townsend's q is κ; the infinite well sits on 0 < x < a (notes) and the finite well on |x| < a/2 (notes, Townsend §6.8); claim keys `l20…`; moved items take `l20` keys.
 
 ## Ownership (decisions proposed; the judge rules)
@@ -151,7 +151,7 @@ Recomputed and holding: En and normalisation (pp. 3–4), the finite-well condit
 **Builder (one agent, worktree, ≤ 170 steps):** ~165 if the moves are included: 5 units / 30 beats incl. 3 moved / 5 derivations (~65), engine and twin (~30), 18 challenges + 5 practice incl. 2 moved (~30), the moves and pins in L13/L14/glossary/concepts/bridges/Q27/O4/O5/e2e (~25), tests and meta (~15). **Splitting the stage** (S1 of L19, S2 and S3 here) into one platform agent before both builders (skill 10, ~45 steps) keeps this builder at ~150; the plan assumes it. L20 builds after L19 and after the L14 fix pass has merged.
 1. Ownership: move `l14-box` into L20 with the key and pin renames (recommended), or keep it in L14 and let L20's `l20-infinite` link back (then L20 unit 2 has no derivation, which the notes call the indispensable result: not recommended)?
 2. Approve S2, S3 and `wave20.ts` (recommended), or the points-plot fallback?
-3. **Ask the user whether HW8 (due Nov 12; sheet not ingested) is submitted.** The notes say it contains the below-barrier scattering problem; if open, the barrier-type challenges of L19 and `l20-pr-delta` here become hints-only until recorded.
+3. **Ask the user whether HW8 is closed.** The notes say it contains the below-barrier scattering problem; if open, the barrier-type challenges of L19 and `l20-pr-delta` here become hints-only until recorded.
 4. Unit 5 (optional oscillator preview) as four optional beats ending at the notes' own question (recommended), or omit it for L21 to open from scratch?
 5. Keep `l20-finite:b7` (the finite-count thresholds, from the notes' appendix) as a Go-deeper beat?
 6. L14 ends with 5 units and 4 practice questions after the move: confirm it satisfies L14's test count (builder edits `L14.test.ts`).

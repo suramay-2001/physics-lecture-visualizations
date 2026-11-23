@@ -9,7 +9,7 @@ Numbers: `plan-G2-numpy.py` (scratchpad, numpy + scipy only, independent of the 
 One voice (no Formal track); ground-up sentences <= 25 words; phase order `lecture` -> `books` -> `clue` -> `deeper`; every new beat is `phase: 'books'` and cites "Townsend Sec. x.y, p. N, Eq. (a.b)" (printed page = PDF page - 16).
 New beat ids use the letter suffix (`b7a`) after the unit's last `books` beat and before its first clue. Each derivation ends its last `tex` on the result's right-hand side, has >= 2 distinct `view`s of kinds the beat's stage shows, each `why` one plain sentence. Links to other units are in words ("Unit 5.2"), never `<<...>>` (448 bridges only target 709).
 Rosetta lines go into the first new beat that meets the clash. Numbers: every learner-visible number is a `V` key printed with `d/pct/tf/uf` and backed by a keyed claim with a numpy twin (section 6). Nothing from `sources/` enters `app/`.
-Homework: HW1-HW6 are submitted (`homework-status.md`), so practice questions carry full walkthroughs; they are NEW problems with fresh numbers. The "mirrors" tags below are planning data only: no homework text, number or id appears in `app/`.
+Homework: the private homework record allows it (`homework-status.md`), so practice questions carry full walkthroughs; they are NEW problems with fresh numbers. The "mirrors" tags below are planning data only: no homework text, number or id appears in `app/`.
 Reused names from G1's plan (P-448-townsend-G1): `ChallengeBase.practice?: true` (tag "Practice - homework style"; lint: non-empty walkthrough, no `assigned`; ids `lN-p-*`; claim keys `lNP<Name>`). `LabDevice.merge` is not needed here (L5's amplitudes-versus-chances point links back to G1's L3 ledger in words).
 Claim-key prefixes: `l5T...`..`l8T...` for beat numbers, `lNP...` for practice answers (G1 uses `l1Tn...`, `l3P...`; no clash).
 
@@ -19,7 +19,7 @@ Claim-key prefixes: `l5T...`..`l8T...` for beat numbers, `lNP...` for practice a
 - `l5-inverse` (5.2) <- Sec. 2.4 p. 50 (Eqs. 2.74-2.80); Sec. 3.6 pp. 94-98 (Eqs. 3.91-3.101, Fig. 3.7). Used: `b5` (A_jk = A_kj*). New: the S_n eigenproblem for any direction in the x-y plane (`b5a`).
 - `l5-coordinates` (5.3) <- Sec. 2.5 pp. 52-55 (Eqs. 2.83-2.99). Used: `b6` (identity inserted). Nothing new: the active-versus-passive reading is L6's (`l6-active:b6a`).
 - `l5-operators` (5.4) <- Sec. 2.4 p. 51 (Eqs. 2.81-2.82, Fig. 2.8); Sec. 2.5 pp. 55-57 (Eqs. 2.98-2.102, Ex. 2.5). Used: `b7` (the sign of |-x> in Eq. 2.100). New: product and adjoint rules in bra-ket form (`b7a`).
-- `l5-invariance` (5.5) <- Sec. 2.5 p. 56; Sec. 2.6; Sec. 2.8 pp. 67-70 (Eqs. 2.128-2.150). Used: `b4`. Nothing new: the Hermitian-eigenvalue proof (Eqs. 2.128-2.133) is Lectures 3-4's (submitted homework); amplitudes versus chances (Eqs. 2.142-2.143) is G1's L3 interference ledger. Link back in words.
+- `l5-invariance` (5.5) <- Sec. 2.5 p. 56; Sec. 2.6; Sec. 2.8 pp. 67-70 (Eqs. 2.128-2.150). Used: `b4`. Nothing new: the Hermitian-eigenvalue proof (Eqs. 2.128-2.133) is Lectures 3-4's (assigned homework; see the private record); amplitudes versus chances (Eqs. 2.142-2.143) is G1's L3 interference ledger. Link back in words.
 - Ownership: L5 owns the matrix-element table, S-dagger A S, and the S_n eigenproblem for n in the x-y plane. L4 keeps S_x, S_y and the Pauli matrices; Townsend's S_+- road to the same matrices is taught once, in `l7-ladder:b4` (L5 links forward in words).
 
 **2 Formalism** (3 beats, 3 derivations)

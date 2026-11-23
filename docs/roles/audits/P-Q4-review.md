@@ -90,7 +90,7 @@ Lecture 5 (9/21, pp. 21–26, §II "Multiparticle systems") overlaps Q4 almost e
 
 Rosetta line needed in `circuits:b2`: the notes' |Φ⟩ (p. 22) and |β₀₀⟩ (p. 25), N&C's β₀₀ and Bergou's |Ψ₊⟩ (Bergou eq. 3.4, verified) are all our Φ⁺.
 
-**Missing [L] beats for new notes content** (HW2 is submitted, so full walkthroughs are allowed):
+**Missing [L] beats for new notes content** (the private homework record allows it, so full walkthroughs are allowed):
 1. **Composition is multiplicative; product states are rare** (L5 pp. 21–22).
    - A product state has 4 real parameters against 6 for a general two-qubit state.
    - For N qubits the ratio is 2N/(2^{N+1}−2), about 1 % at N = 10 (recomputed: 20/2046 = 0.98 %).
@@ -107,7 +107,7 @@ Rosetta line needed in `circuits:b2`: the notes' |Φ⟩ (p. 22) and |β₀₀⟩
    - Add as `circuits:b2a`.
 8. **The Bell-measurement circuit** (p. 26, Fig. 7).
    - CNOT then H⊗I sends β_xy → |xy⟩, with the notes' derivation.
-   - Add as `measure:b3a`, unless the re-map gives it to the L6 Bell chapter. HW2 P2 is submitted.
+   - Add as `measure:b3a`, unless the re-map gives it to the L6 Bell chapter. The private homework record allows a walkthrough.
 
 ## Derivation view plans (standing rule: ≥ 2 distinct views per track)
 

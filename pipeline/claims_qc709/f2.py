@@ -167,7 +167,7 @@ values = {
     "f2GsComplexSize": abs(e_gsC[0][1]),
     "f2IndepFalse": float(is_independent([np.array([1, 1], dtype=complex), np.array([2, 2], dtype=complex)])),
     "f2GsDepLen": float(len(orthonormalize_qr([np.array([1, 1], dtype=complex), np.array([2, 2], dtype=complex)]))),
-    # f2-gs-spin1 (709 HW1 P5, submitted)
+    # f2-gs-spin1 (709 HW1 P5)
     "f2GsSpin1": float(eigvals_sx1[1]),
     "f2GsSpin1E0": e_gsSpin1[2][0].real,
     "f2GsSpin1SxNorm": float(np.linalg.norm(SX1 @ e_gsSpin1[2])),

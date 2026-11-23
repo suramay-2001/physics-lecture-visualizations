@@ -10,7 +10,7 @@ unit (`deeperProblems` lint: a unit never opens with one, and a deeper beat intr
 cited only). **Page images checked:** pp. 126, 127, 129, 130. N&C (printed = PDF − 28): §5.1 pp. 217–221 (Eqs. 5.1–5.11, product form
 5.4, Fig. 5.1, Box 5.1, Exs. 5.2, 5.5); §5.2 pp. 221–225 (Figs. 5.2–5.3, Eqs. 5.20–5.35, Ex. 5.8 ⚑); §5.3.1 pp. 226–230 (Eqs. 5.36–5.44,
 Box 5.2); §5.4.3 pp. 240–242 (Fig. 5.5, Eq. 5.77); chapter notes p. 246 (Simon → Shor); §6.3 pp. 261–263 (counting, Eq. 6.33). No 709
-notes cover Ch. 7; HW1/HW2 submitted, no HW3; no sheet assigns any problem used here, so every walkthrough is full.
+notes cover Ch. 7; the private homework record applies, no HW3; no sheet assigns any problem used here, so every walkthrough is full.
 
 **Ownership.** F7 owns ⊕, the bit dot product and GF(2) elimination (`qc-f7-xor`, `qc-f7-gf2`; F7 gf2:b4 already solves $s = 110$ from
 001, 111). F8 owns roots of unity, the DFT matrix, geometric sums and the $2/\pi$ bound, binary and continued fractions, gcd and the

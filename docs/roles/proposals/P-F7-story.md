@@ -13,7 +13,7 @@ uncomputation, Eqs. 3.7–3.8 p. 158; Toffoli Fig. 3.17 p. 159; NAND and FANOUT 
 by name p. 153). Bergou (printed = PDF − 15 in Ch. 1, − 10 in Ch. 7, − 8 in Ch. 9; checked on each page's own number): §1.2
 p. 3 (AND merges 00, 01, 10, so no quantum version); §1.4 p. 5 (f-CNOT); P1.3–P1.4 p. 12 (⚑: cited only); §7.1 p. 118
 (Eqs. 7.1–7.2, $x \cdot z$), p. 120 (Eqs. 7.10–7.11); §7.4 p. 126 (bitwise $\oplus$); §9.2 pp. 170–171 (check matrix, weight,
-syndrome, distance). No 709 notes or homework touch F7 (HW1/HW2 submitted, no HW3).
+syndrome, distance). No 709 notes or homework touch F7 (the private homework record applies, no HW3).
 
 **Ownership.** F7 is the canonical owner of classical bits: Boolean functions as truth tables, reversibility as a bijection,
 permutation matrices, Landauer, uncomputation, XOR as addition mod 2, $\mathbb F_2^n$ and its linear algebra, and cost

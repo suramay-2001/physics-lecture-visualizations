@@ -30,7 +30,7 @@ Reviewer: independent P verifier (read-only; not the builder). Skill: `skills/06
   - Axler 4e: 5.5–5.8, 5.27, Ex. 5B.11, 5.76, 6.2 (slot convention), 7.1–7.14, 7.18–7.24, 7.29/7.31, 7.34–7.39, 7.44–7.58, 7.70 and 7.93.
   - N&C: pp. 69–72 (Box 2.2) and p. 75 (§2.1.8).
   - Notes: n3 pp. 14–16 and n4 pp. 17–19.
-  - HW1 P5 (spin-1, submitted).
+  - HW1 P5 (spin-1; status per the private record).
   - 448 L3 p. 5 (the live Hermitian homework).
 - **Widgets read:** `OperatorAction`, `OperatorBuilder` and `BlochSphere.tsx`. For stage kinds: `operator-space` (a ±â eigen axis, so the eigenvectors sit at opposite ends), `bloch` and `matrix` `spectrum` (the readout "eigenvalues …").
 
@@ -54,7 +54,7 @@ Reviewer: independent P verifier (read-only; not the builder). Skill: `skills/06
    - **The problem:** HW1 P5 is spin-1 in three dimensions. Gram–Schmidt on $|{+}1z\rangle$ against $|{\pm}1x\rangle$ gives $|0x\rangle = (1,0,-1)/\sqrt2$ with $\hat S_x|0x\rangle = 0$, and part (c) asks why GS *had* to land on an eigenvector.
    - **The challenge:** it asks for a spin-½ Bloch θ "on the equator". Every equator point has θ = 90°, so the words give the answer.
    - **The key:** `f4GsAngleDeg = blochAngles(|+x⟩).θ`, which is not a Gram–Schmidt output (F2 item 2 class).
-   - **The walkthrough:** `assigned` hides it (`ChallengeCard.tsx:179`) and it is empty (`:269`), although HW1 is submitted.
+   - **The walkthrough:** `assigned` hides it (`ChallengeCard.tsx:179`) and it is empty (`:269`), although the private homework record allows it.
    - *Fix:*
      - Turn it into a choice on the real (c): "Why must Gram–Schmidt deliver an $S_x$ eigenvector?" The correct option: "$S_x$ is Hermitian, so its eigenvectors are orthonormal and complete; the only direction orthogonal to $|{\pm}1x\rangle$ is the third eigenvector."
      - Drop `assigned`, add a walkthrough, and retire `f4GsAngleDeg`.

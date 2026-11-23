@@ -471,7 +471,7 @@ Widgets reuse the stage kinds' own engine calls; prop names are the real ones.
 
 Format: tier · kind · id. Numbers computed in `F4.values.ts` with the named engine call; tolerance 0.005 unless stated,
 0 for exact integers. Hints climb nudge → key idea → setup. **Homework:** the map flags HW1 P4(a) and P5(c) (why
-Gram–Schmidt lands on the $S_x$ eigenvector) as submitted in 709/448; the one F4 item that touches that proof is
+Gram–Schmidt lands on the $S_x$ eigenvector) as covered by the private record in 709/448; the one F4 item that touches that proof is
 hints-only (`f4-h-gs`, §12 Q3).
 
 ### `f4-eigen`
@@ -849,7 +849,7 @@ shear) are all 2×2 and use `operators.eigen2`. *Ask:* keep every non-Hermitian/
 function; my plan does this), or add a general/normal n×n eigensolver for richer examples? *Recommend:* keep 2×2; if a
 later chapter needs normal-operator spectra, add it then with a `np.linalg.eig` twin.
 
-**Q3. HW1 P5(c)/P4(a).** The map flags the Gram–Schmidt-onto-$S_x$-eigenvector proof as submitted homework. F4's one
+**Q3. HW1 P5(c)/P4(a).** The map flags the Gram–Schmidt-onto-$S_x$-eigenvector proof as assigned homework (see the private record). F4's one
 touching item, `f4-h-gs`, is hints-only. *Ask:* keep it hints-only until the user says HW1 is past, then release the
 walkthrough? *Recommend:* yes, as F1 handled its 448 homework item.
 

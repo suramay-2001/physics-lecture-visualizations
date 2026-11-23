@@ -15,7 +15,7 @@ were reviewed together, run two agents in parallel (see "parallel-safe split" be
 ## Inputs
 - The review file (`docs/roles/audits/P-<ID>-review.md`) — the agent's scope is **every** item except any the
   judge explicitly rules to keep as-is (state that ruling in the brief so the agent doesn't re-litigate it).
-- Any judge ruling made on a review item (e.g. "item 19: D5 stays, the homework is already submitted").
+- Any judge ruling made on a review item (e.g. "item 19: D5 stays, the owner confirmed the assignment status").
 
 ## Steps
 1. Write the fix brief: touch-list of exactly the files this pass may edit (chapter content files, its numpy

@@ -26,7 +26,7 @@ Immediately after a chapter plan (`03-chapter-plan`) is written, and before `05-
    in *either* course — ask the user whether that assignment is still open, whatever proof route the plan uses.
    Do not assume "a different method makes it fine": `qc709-pilots.md`'s ruling-1 amendment exists because a
    *different route* to the *same result* still counts. If the assignment is open, the plan item ships
-   hints-only (`walkthrough: []`); if the user confirms it is submitted, the plan may keep a full walkthrough.
+   hints-only (`walkthrough: []`); if the user confirms the assignment is closed, the plan may keep a full walkthrough.
 5. **Approve the plan's map changes**, if any (citation fixes, unit reorders, a moved chapter) — list them in the
    ruling so the build agent applies exactly them, nothing improvised.
 6. **Set parallel-build rules** if two chapters build at once: which shared files each may *append to* only

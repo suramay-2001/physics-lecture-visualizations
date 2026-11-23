@@ -6,6 +6,7 @@ the next action, locked decisions, and evidence history. Do not re-derive decisi
 Hard rules that survive any context reset:
 - `sources/` is git-ignored on purpose: instructor notes and textbooks are copyrighted. The app
   paraphrases and cites (book § / page); never paste source text into `app/`.
+- Private, git-ignored notes live in `private/` (assignment status, usage log): read them when present; never commit them.
 - Every numeric answer a learner sees must come from `app/src/physics/` and be covered by a test.
   The engine itself is checked against numpy fixtures (`pipeline/make_fixtures.py`).
 - Physics visuals that make a claim are computed live in code. Generated media (Higgsfield) is

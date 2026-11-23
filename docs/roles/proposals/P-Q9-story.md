@@ -579,7 +579,7 @@ prop forms already used in 709.
 
 ## 4. Challenges per unit
 
-Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** HW2 is submitted, so HW2 P2(d) and
+Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** the private homework record allows it, so HW2 P2(d) and
 P7(e) have full walkthroughs (ruling 12), marked (HW2). Bergou's ⚑ Problems 2.4–2.5 are not used as challenges (§12 Q4).
 
 ### `q9-partial-trace`

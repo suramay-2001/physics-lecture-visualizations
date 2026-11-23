@@ -20,7 +20,7 @@ independent review of 709 chapter F1. Commit on your worktree branch; report; st
    Do NOT edit Q1's files (another review is running on them).
 
 ## Rulings (the judge)
-- Item 19: the user confirmed 448's Euler homework is already submitted, so D5 stays as it is
+- Item 19: the owner confirmed the assignment status (private record), so D5 stays as it is
   (docs/roles/decisions/qc709-pilots.md, amendment to ruling 1). f1-e-series stays hints-only.
 - Item 1: plain Unicode titles ... ADD a lint in content.test.tsx, for BOTH courses: no `$` and
   no TeX command in any lecture title or unit title.

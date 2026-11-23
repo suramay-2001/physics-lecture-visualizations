@@ -4,7 +4,7 @@ Role P, proposal only (nothing under `app/` is touched). One track (448), senten
 Helpers as `L13.story.ts`: `W`, `PK`, `PL`, `TW`, `K`, `BOX`; keys of moved beats keep `l13…` names, new ones start `l15`. L15 is built after L14 (it uses L14's plot curves `freeOmega`, `linearOmega`).
 
 **Sources read.** Notes `sources/L15/text.md` pp. 1–11 in full (footers read "n / 11"); page images read: pp. 6 (the two-wave envelope) and 10 (the Gaussian and the scaling argument). L14 pp. 9, 11 for the link-backs. Books: Townsend 2e §6.5 pp. 202–204, §6.6 pp. 204–210 (6.58, 6.67, 6.72–6.77, Ex. 6.4), §6.3 p. 199 (6.33), Problems 6.4, 6.6; Susskind & Friedman Lecture 9 §9.1–9.4 (by section).
-Homework `sl448-hw7` (the Gaussian problem) for the TYPE of one practice question (new numbers; submitted). The notes defer the exact Gaussian solution and Ehrenfest to Lecture 16 ("do not derive today", p. 11): L15 uses numbers from the engine and does not derive the closed form.
+Homework `sl448-hw7` (the Gaussian problem) for the TYPE of one practice question (new numbers). The notes defer the exact Gaussian solution and Ehrenfest to Lecture 16 ("do not derive today", p. 11): L15 uses numbers from the engine and does not derive the closed form.
 
 **Evidence.** `planL14L15-numpy.py` (scratchpad, 91 values for both plans, all asserts pass, byte-identical twice): route A = own numpy FFT grid (4096 points on [−32, 32)), `e^{-iHt}` by matrix exponential, tracked crests and envelopes; route B = closed forms, `erf`, `quad`. SI numbers use CODATA. A note found on the way: a packet of p₀ = 3 run to t = 6 reaches x = 18 and its far tail wraps the periodic window, so L15's width demos use p₀ = 1.5 (centre 9 at t = 6); momentum statistics are unaffected by the window.
 

@@ -17,7 +17,7 @@ together with `P-Q7-story.md`, which uses this chapter's Pauli strings and parit
 - Ownership (re-map §2.2): Q4 owns ⊗ on kets, ℂ²⊗ℂ², registers, CNOT, CZ and `qc-bell-state`. Q3 owns projectors,
   commutators and compatible observables. Q6 owns operator ⊗, d₁d₂, product and entangled states, the parameter count,
   the factoring test, the Bell basis, the Bell measurement, Π_xy, parities and the stabilizer notation.
-- Homework: HW2 is submitted (`homework-status.md`, 2026-10-02). P1 and P2(a)–(c) are worked in full here (ruling 12).
+- Homework: the private homework record allows it (`homework-status.md`, 2026-10-02). P1 and P2(a)–(c) are worked in full here (ruling 12).
 
 **Evidence.** Every number was computed twice, for both chapters at once.
 - The app's engine on main (`q67plan-engine.ts`, scratchpad, bundled with rolldown). E1 is in build, so each E1 call is
@@ -647,7 +647,7 @@ prop forms Q5 already uses.
 
 ## 4. Challenges per unit
 
-Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** HW2 is submitted, so its items have
+Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** the private homework record allows it, so its items have
 full walkthroughs (ruling 12); they are marked (HW2). No other sheet assigns anything here.
 
 ### `q6-many`

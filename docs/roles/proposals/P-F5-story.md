@@ -323,7 +323,7 @@ Widgets reuse the stage kinds' own engine calls (`info` module).
 ## 4. Challenges per unit
 
 Format: tier · kind · id. Numbers computed in `F5.values.ts` with the named `info` call; tolerance 0.005 unless stated,
-0 for exact integers. **Homework:** the map flags HW1 P1 and P3 (which plug in HW1's $|{+}n\rangle$) as submitted;
+0 for exact integers. **Homework:** the map flags HW1 P1 and P3 (which plug in HW1's $|{+}n\rangle$) as covered by the private record;
 F5's story never uses those specific numbers, and the one touching item (`f5-sp-spin`) is hints-only (§12 Q2).
 
 ### `f5-probability`
@@ -632,7 +632,7 @@ inline. *Ask:* leave `f5-joint` deferred (my plan; F5 stays short), or restore i
 ground-up owner before Q10? *Recommend:* defer; add it in a later pass if Q10's wiring wants a bridge target.
 
 **Q2. HW1 P1/P3.** The map flags these (which plug HW1's $|{+}n\rangle$ into $\langle S_z\rangle$/$\Delta S_z$) as
-submitted. F5's story uses the generic $\theta = 60^\circ$ example, never HW1's specific angle; the one touching item
+covered by the private record. F5's story uses the generic $\theta = 60^\circ$ example, never HW1's specific angle; the one touching item
 `f5-sp-spin` is hints-only. *Ask:* keep hints-only until the user says HW1 is past? *Recommend:* yes.
 
 **Q3. The information bit vs F7's logic bit.** F5 introduces the information bit ($H = 1$ for a fair coin); the deferred

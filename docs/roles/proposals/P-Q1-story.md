@@ -828,7 +828,7 @@ Label constant: `const Q1x = (unit, label) => ({ lecture: 'Q1', unit, label })`.
 includes the maximum over θ. This plan shows the example per magnet (½ at each) and from the furnace (⅛ per spot),
 never relative to the first filter's output, never as a function of a tilt, and never as a maximum. The Try-it
 `sg-lab` is editable, so a learner can tilt the middle magnet and read the fraction. *Ask:* is that acceptable (it is
-448's existing tool; HW1 was due 2026-09-16), or should the Q1 preset lock tilts (`editable:false` plus a two-axis
+448's existing tool; HW1 is past), or should the Q1 preset lock tilts (`editable:false` plus a two-axis
 menu)?
 
 **Q2. Q1 vs F2 ownership.** Q1 follows the notes' vector-space and inner-product pages, and F2 will build the same

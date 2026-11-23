@@ -127,7 +127,7 @@ Outcomes: (1) tell a discrete component from a continuous one and a chance from 
 - **time-operator**: `l13-ti-boost` (moved) core numeric ⟨p⟩ after e^{1.5ix} → 1.5 · `l13-ti-min` (moved) core numeric the lowest free energy → 0 · `l14-to-order` core order the steps of D3.
 - **stationary**: `l14-st-which` warm-up choice: in a stationary state \|ψ\|² is constant and the phase is not ✓ · `l14-st-mean` core numeric the time-average of the density of the 1 + 2 mix at x = 1 → 0.375 · `l14-st-order` core order the steps of D4 · `l14-pr-period`, `l14-pr-mean-energy` **practice**.
 - **box**: `l14-pr-box-energy`, `l14-pr-wall` (moved **practice**, Townsend 6.18, 6.16).
-**Practice (T1; 5 in the lecture; walkthroughs in full, all homeworks submitted; new numbers).**
+**Practice (T1; 5 in the lecture; walkthroughs in full, the private homework record allows it; new numbers).**
 | id | tag | prompt | answer (key, route) | mirrors |
 |---|---|---|---|---|
 | `l14-pr-kinetic` | homework, core numeric | A particle on a line has ψ = A(1 − \|x\|/L) for \|x\| < L, zero outside, with L = 2 ℓ (ħ = m = 1). Find ⟨p̂²/2m⟩. | 0.375 (`l14PrTentT`; twin: `quad` of ½∫\|ψ′\|²) ; a top hat of the same width has no finite value | the HW7 problem on kinetic energy and sharp edges |

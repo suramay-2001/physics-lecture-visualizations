@@ -4,7 +4,7 @@ Sources: Townsend 2nd ed., Ch 4 "Time Evolution" (printed pp. 111-140) and Ch 6 
 Digest (git-ignored, equations and figures): `sources/townsend/digest-G4.md`. Numpy ledger: scratchpad `plan-G4-numpy.py` (numpy only, run twice, identical output; keys below are its keys).
 Conventions carried: `448-L8L11.md` and `448-L12L13.md` (one voice, sentences <= 25 words, phases lecture -> books -> clue -> deeper, hbar = 1 in the engine and the UI appends it,
 S = sigma/2, T(a) for the translation operator, U(t) for time evolution). New beats are `books` beats with a letter id after the unit's existing books beat (`l11-unitary:b4a`).
-Paraphrase only. Homework: 448 HW1-HW6 are recorded submitted (`homework-status.md`), so practice questions carry full walkthroughs; they are NEW problems with fresh numbers.
+Paraphrase only. Homework: the private homework record allows it (`homework-status.md`), so practice questions carry full walkthroughs; they are NEW problems with fresh numbers.
 
 ## 0. Findings that shape the plan
 

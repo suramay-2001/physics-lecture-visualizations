@@ -52,7 +52,7 @@ Evidence (scratchpad `revQ6Q7-*`):
 
 ## Should-fix
 
-4. **HW2 walkthroughs are withheld** (rulings qc709-remap #12 and `homework-status.md`: HW2 submitted 2026-10-02).
+4. **HW2 walkthroughs are withheld** (rulings qc709-remap #12 and `homework-status.md`: the private homework record, 2026-10-02).
    - Six challenges carry `assigned` and `walkthrough: []`. `ChallengeCard.tsx:177-182` then shows "Assigned as homework … hints only":
      - `q6-b-p1a` (`Q6.ts:463`), `q6-b-p1c` (`:476`), `q6-b-stot` (`:491`);
      - `q6-c-p2a` (`:548`), `q6-c-p2c` (`:560`), `q6-p-p2b` (`:614`).

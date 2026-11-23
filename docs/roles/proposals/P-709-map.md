@@ -365,7 +365,7 @@ prediction?"
 - **Films** "A projector is a shadow, then a stretch" (P|ψ⟩, then renormalize); "Robertson touches its floor at |+z⟩".
 - **HW** HW1 P1 (probabilities, averages and ΔS for |+n⟩), P3 (tomography), P4 (σ_n eigenvectors, antipodes,
   anticommutation) and P2. All hints only. The story's general-n claims stop where the notes stop. **Judge flag:** the
-  bridge to l7-spreads shows (ΔS_i)² = (ħ²/4)(1−r_i²) in general, which answers P1(b). HW1 was due 2026-09-16, so the
+  bridge to l7-spreads shows (ΔS_i)² = (ħ²/4)(1−r_i²) in general, which answers P1(b). HW1 is past, so the
   risk is low; rule on it anyway.
 
 ## 3. Part II — Qubits and circuits (Bergou Ch. 1)
@@ -1167,7 +1167,7 @@ n ≤ 6. Density-matrix features stop at 5 qubits (32×32), and eigh at 64×64. 
 = the derivation itself shows the problem.
 
 **A. Course-level notes**
-- **A1. HW1 was due 2026-09-16, so it is already past.** The hints-only rule still holds. The one live conflict is the
+- **A1. HW1 is already past.** The hints-only rule still holds. The one live conflict is the
   Q3 bridge to l7-spreads.
 - **A2. The notes follow the plan's Q1–Q3 split exactly:** L1 is pp. 2–5, L2 pp. 6–10, L3 pp. 11–17. L3 already
   reaches spectral theory and the uncertainty relation, which is why Q3 has 6 units.

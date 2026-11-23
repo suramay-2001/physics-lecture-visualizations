@@ -16,7 +16,7 @@ Map entry: `P-709-map.md` §2 Q2; rulings: `decisions/qc709-map.md`, `qc709-pilo
   Eq. 2.25 p. 68, Ex. 2.20 p. 71.
 - Overlaps: 448 `l2-inner-product`, `l2-three-bases`, `l3-operators`, `l4-basis`, `l5-coordinates`, `l5-operators`,
   `l5-invariance`, `l6-generator`, `l7-two-angles`; 709 F1 (`f1-phase:b6` owns δ₋ = π) and Q1 (all five units).
-- Homework: every current sheet is submitted (`homework-status.md`), including HW1 P5 (spin-1 Gram–Schmidt). No guard
+- Homework: the private homework record allows it (`homework-status.md`), including HW1 P5 (spin-1 Gram–Schmidt). No guard
   binds Q2; its worked examples still differ from HW1's.
 
 **Evidence.** Every number was computed twice: by the app's engine (`q23plan-engine.ts`, bundled into the scratchpad

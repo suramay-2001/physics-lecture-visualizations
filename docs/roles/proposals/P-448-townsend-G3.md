@@ -5,7 +5,7 @@ Role P, proposal only (nothing under `app/` is touched). One track (448), senten
 **Source.** Townsend 2e Ch. 5 "A System of Two Spin-1/2 Particles", printed pp. 141–190 (printed = PDF − 16), read from the page images; all equations,
 figures and problems are transcribed in the git-ignored digest `sources/townsend/digest-G3.md`. Everything below is paraphrase plus equation numbers and page cites.
 **Evidence.** Every new number has a numpy route in the planner's script `plan-G3-numpy.py` (82 values, 70 of them claim keys; independent of the repo; 41 asserts all pass, 36 of them on Townsend's own
-equations and examples). The orchestrator copies it next to the claim twins at build time. **Homework.** `homework-status.md`: HW1–HW6 submitted, practice may carry walkthroughs;
+equations and examples). The orchestrator copies it next to the claim twins at build time. **Homework.** `homework-status.md`: the private homework record allows it, practice may carry walkthroughs;
 problem TYPES only are used ("H6-1b" = HW6 problem 1b's type); every practice prompt is new and uses fresh numbers.
 
 ## L9 Composite quantum systems (6 units, 39 beats today; Townsend cited nowhere yet)
@@ -54,7 +54,7 @@ Glosses: none new (Townsend's "direct product" is the existing `tensor-product`,
 - `l9-singlet`: `|1,0\rangle = \tfrac1{\sqrt2}(|ud\rangle+|du\rangle),\quad |0,0\rangle = \tfrac1{\sqrt2}(|ud\rangle-|du\rangle)` (Eqs. 5.30b, 5.31) · `|1,0\rangle = \tfrac1{\sqrt2}\big(|{+x},{+x}\rangle - |{-x},{-x}\rangle\big)` (5.38) ·
   `|0,0\rangle = -\tfrac1{\sqrt2}\big(|{+x},{-x}\rangle - |{-x},{+x}\rangle\big)` (5.39) · `\langle\mathrm{SWAP}\rangle = +1\ (\text{triplet}),\ -1\ (\text{singlet})` (p. 182) · entangled means `|\Psi\rangle \ne |a\rangle_1\otimes|b\rangle_2` (p. 183).
 
-### L9.5 Practice questions (5; new field `practice`, §S; each with a full walkthrough because HW6 is submitted)
+### L9.5 Practice questions (5; new field `practice`, §S; each with a full walkthrough because the private homework record allows it)
 | id | tier, kind, mirrors | prompt (fresh numbers) and answer |
 |---|---|---|
 | `l9-pq-expand` | warm-up, numeric (tol .005); H6-1a type | Alice's spin is prepared along $+x$, Bob's at polar angle $60^\circ$ from $z$ ($\cos30^\circ\|u\rangle + \sin30^\circ\|d\rangle$). Chance of "Alice down, Bob up"? **0.375**, key `l9PrQ1`, numpy `\|kron(a,b)[du]\|²`. |

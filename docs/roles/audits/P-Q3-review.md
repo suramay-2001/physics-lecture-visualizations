@@ -152,7 +152,7 @@ N = |+n⟩ at θ = 60°, φ = 45° (`N_STATE`); `matrix` fields provisional (W's
 - **Derivations:** D1–D5 true and in order in both tracks, each ending on its result; D5 matches the notes' Schwarz
   route (ruling Q3-3).
 - **Erratum N21** is real and still in the revised notes (p. 17); `check()` tests it. Rulings Q3-1 (worked problems; all
-  homework submitted), Q3-2, Q3-3, Q3-4 (one link-back, then P² = P and the sandwich) met.
+  homework per the private record), Q3-2, Q3-3, Q3-4 (one link-back, then P² = P and the sandwich) met.
 - **Citations:** N&C Eqs. 2.103–2.104 p. 88, Eq. 2.22 p. 67, Eq. 1.4 p. 15, Ex. 2.17 p. 70 ("one direction"), Box 2.2
   p. 72, Thm 2.2 p. 77, Box 2.4 p. 89, Ex. 2.59/2.60 p. 90; Bergou Eq. 1.2 p. 2, Eq. 2.20 p. 19, §5.2 p. 80 (postulates
   read out there); Axler 7.1 p. 228, 7.5 p. 230, 7.12 p. 233, 7.13–7.14 p. 234, 6.14 p. 189.

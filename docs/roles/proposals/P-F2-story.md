@@ -735,8 +735,8 @@ $U^\dagger U = I$ (parts d–e). This is exactly F2's `f2-gram-schmidt` and F3's
 `qc709-nc.md` ruling 1 / the pilots rule, a problem assigned in either course is hints-only. This plan therefore
 (a) uses only generic examples in the app (spin-½ real pair, the complex y pair, the dependent pair — never the spin-1
 $S_x$ construction), and (b) keeps the one spin-1 challenge `f2-gs-spin1` hints-only. *Ask:* `qc709-remap.md` ruling 12
-says HW2 is submitted, so its items get full walkthroughs. **Is HW1 likewise submitted?** *Recommendation:* treat HW1 as
-submitted (it is the first sheet, dated 2026-09-08, and the course is at L7; HW2 is already submitted). If so, release
+says the private homework record allows it, so its items get full walkthroughs. **Is HW1 likewise covered by the private record?** *Recommendation:* treat HW1 as
+covered by the private record (it is the first sheet, dated 2026-09-08, and the course is at L7). If so, release
 `f2-gs-spin1`'s walkthrough and allow an F3 change-of-basis challenge to show $U^\dagger U = I$ fully; if not, keep both
 hints-only. Either way the ramp's derivations stay on the generic examples.
 

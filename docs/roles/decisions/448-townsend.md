@@ -1,15 +1,14 @@
 # Rulings: the 448 Townsend pass over L1–L13 (judge, 2026-10-20)
 
 Owner (2026-10-20): update all thirteen 448 lectures with Townsend (2nd ed.) Ch 1–6 formalism, visualizations and
-formulas, and add sample questions based on the released homeworks; 448 HW1–HW6 submitted; the owner's solution scans are
-read locally for problem TYPES only; budget 25 weekly points. Plans: `docs/roles/proposals/P-448-townsend-G1.md` (L1–L4),
+formulas, and add sample questions based on the released homeworks; the private homework record applies; problem TYPES only are used; budget 25 weekly points. Plans: `docs/roles/proposals/P-448-townsend-G1.md` (L1–L4),
 `-G2.md` (L5–L8), `-G3.md` (L9–L10), `-G4.md` (L11–L13). Private digests (equations, figures, examples):
 `sources/townsend/digest-G{1..4}.md` (git-ignored). Every plan's open questions are answered with its recommendation
 unless a ruling below says otherwise.
 
 ## Shared
 - T1 **Practice questions** use the new optional `Challenge.practice: 'homework' | 'townsend'` (schema.ts; a dashed chip on
-  the card and the Help page; landed by the judge). 3–5 per lecture; walkthroughs in full (all homeworks submitted).
+  the card and the Help page; landed by the judge). 3–5 per lecture; walkthroughs in full (the private homework record allows it).
   'homework' = modeled on a released homework problem TYPE with new numbers; 'townsend' = modeled on an end-of-chapter
   problem type (cite the problem number in `refs`). Homework labels such as "H1-1.3a" never enter `app/`, `docs/context`
   or commit messages (G1 Q8); the student's work is never reproduced.

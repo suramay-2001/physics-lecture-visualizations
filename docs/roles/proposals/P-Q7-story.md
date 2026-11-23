@@ -14,7 +14,7 @@ opens Part III.
   Mermin's argument itself is in the notes only, as the re-map found.
 - Ownership (re-map §2.2): Q7 owns GHZ and Mermin's argument; Q6 owns Pauli strings, parities and stabilizer notation
   (link-backs); Q3 owns dispersion and compatible observables; Q10 owns CHSH and LHV statistics; Q12 links back for GHZ.
-- Homework: HW2 is submitted (`homework-status.md`): P5(b)–(c) and P7(a)–(d) are worked in full (ruling 12). Bergou ⚑
+- Homework: the private homework record allows it (`homework-status.md`): P5(b)–(c) and P7(a)–(d) are worked in full (ruling 12). Bergou ⚑
   P10.1(a) appears as a cited aside (ruling 13); no sheet assigns it.
 
 **Evidence.** The same two scripts as Q6 (`q67plan-engine.ts`, the app's engine on main with E1 stood in for by
@@ -478,7 +478,7 @@ No widget runs three qubits (Q6 §9.3 W2 would not either; §9.3 W3 below, defer
 
 ## 4. Challenges per unit
 
-Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. HW2 items (submitted; ruling 12) have full
+Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. HW2 items (private record; ruling 12) have full
 walkthroughs and are marked (HW2). The Bergou ⚑ P10.1(a) aside has no challenge.
 
 ### `q7-ghz`

@@ -74,7 +74,7 @@ Proposal only (role P, skill `02-part-map`). It amends `P-709-map.md` and its ru
 | `outline.ts`, `outline.test.ts` | the Part/chapter list of §2; `placeOf('Q8')` → Part III, 50 K; last id Q27; F2–F4 renumbered |
 | Q2, Q5 | no notes moves; derivation views and notation beats only (W-709 #7/#8 retrofit) |
 
-### 1.3 HW2 → chapters (SUBMITTED, full walkthroughs allowed)
+### 1.3 HW2 → chapters (full walkthroughs allowed per the private record)
 | Problem | Chapter · unit |
 |---|---|
 | P1(a)–(d) spin-1 x states from two spin-½; the singlet part of \|+x⟩⊗\|−x⟩ | Q6 `q6-bell-basis` (notes p. 26 names triplet/singlet); Q2 adds one forward line from its HW1 P5 twin |
@@ -446,6 +446,6 @@ session) rules each plan (`04`) and merges each branch (`08`, `09`) between step
 | 9 | Bell names: the notes use β_xy (= N&C) | **Keep ruling 1** (Φ/Ψ) with "notes, N&C: β₀₀"; only Bergou differs |
 | 10 | Bloch-vector letter: the notes write n for ρ's vector (2.14) | **Keep r** (C5), one Rosetta line in `q8-ball` |
 | 11 | Keep trace distance and fidelity in Q9 as a Bergou-only unit, though the notes have not reached them? | **Yes**: Q14's Helstrom bound needs the trace norm before Part X |
-| 12 | HW2 walkthroughs: P1–P2(c) in Q6, P3 in Q4 (retrofit), P4 and P6 in Q8, P5 in F2/Q7, P7 in Q7/Q9, P2(d) in Q9 | **Full walkthroughs** (submitted 2026-10-02); ask the user before using any HW3 item |
+| 12 | HW2 walkthroughs: P1–P2(c) in Q6, P3 in Q4 (retrofit), P4 and P6 in Q8, P5 in F2/Q7, P7 in Q7/Q9, P2(d) in Q9 | **Full walkthroughs** (private record); ask the user before using any HW3 item |
 | 13 | Bergou ⚑ P10.1(a) (GHZ stabilizer generators) as a cited aside in Q7 | **Allowed** (no sheet assigns it); re-check when HW3 is ingested |
 | 14 | The §7 cut line (Part V builds slip a week if usage > 55 % after batch 4) | **Adopt**: plans and engine work still land this week |

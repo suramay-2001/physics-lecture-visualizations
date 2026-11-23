@@ -1,7 +1,7 @@
 # Rulings: the 709 "Lecture notes" section and the new notes edition (judge, 2026-10-17)
 
 Owner's decisions (2026-10-17): a new in-site 709 "Lecture notes" section, one prose page per class lecture (L1–L7 short,
-L8–L11 full), engine-backed numbers, links into the chapter units; HW3 submitted (`homework-status.md`); budget 20 weekly
+L8–L11 full), engine-backed numbers, links into the chapter units; the private homework record allows it (`homework-status.md`); budget 20 weekly
 points for the whole batch. Platform design: `docs/roles/proposals/W-709-notes.md` (adopted as written except where a
 ruling below says otherwise). Content and chapter deltas: `docs/roles/proposals/P-709-remap-L8L11.md` (rulings P1–Pn below,
 added when that plan is judged).
@@ -56,7 +56,7 @@ added when that plan is judged).
   them.
 - P9 **Build split**: builder A = TSV + §1.3 + engine gaps + Q8 + Q9 deltas; builder B (after A merges) = Q10 + Q12
   deltas; builder C (after the platform and A, B merge) = notes content N1–N11 from §6, replacing the platform's seed.
-- P10 **Homework**: HW2, HW3 submitted; every derivation and example in L8–L11 may be worked in full.
+- P10 **Homework**: HW2 and HW3 per the private homework record; every derivation and example in L8–L11 may be worked in full.
 - P11 **Bergou problems** for the new units are cited only.
 - P12 **The notes pages** follow §6 (lengths: L1–L7 150–300 words, L8 ≈ 1,100, L9 ≈ 900, L10 ≈ 1,500, L11 ≈ 1,000),
   with the α-family table on N10 built from claims (no hand-typed decimals) and Aspect/Weihs cited by name, journal

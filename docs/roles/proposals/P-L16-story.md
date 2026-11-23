@@ -87,12 +87,12 @@ Claim keys stay stable; each moved key is deleted from `L13.values.ts` in the sa
 | spread | `{kind:'two-clocks', props:{upper:3, lower:1, start:'+x'}}` (stand-in for components with different phase rates) | 1. Two hands with different speeds fall apart: that is spreading. |
 | ehrenfest | `{kind:'bloch', props:{state:'+x'}}` (a stand-in: it draws a spin, not a packet; say so in the caption) | 1. Turn it about z: the average ⟨S⟩ follows a classical arrow exactly, because the spin Hamiltonian is linear in S. Unit 17.1 says when a packet does the same. |
 
-## 4. Challenges (keys from the engine; hints nudge → key idea → setup; no homework is open: HW6/HW7 are submitted, `homework-status.md`)
+## 4. Challenges (keys from the engine; hints nudge → key idea → setup; no homework is open: the private homework record allows it, `homework-status.md`)
 - **start**: `l16-st-dp` warm-up numeric Δp for σ = ½ → 1 · `l16-st-fixed` core choice: "|φ(p, t)|² of a free packet changes with t" → false ✓ · `l16-st-centre` core numeric ⟨x⟩ at t = 3 for x₀ = 1, p₀ = 0 → 1.
 - **evolve**: `l16-ev-ts` warm-up numeric t_s for σ = 1.5 (ħ = m = 1) → 4.5 · `l16-ev-centre` core numeric the centre at t = 2 for p₀ = 3, x₀ = 1 → 7 · `l16-ev-order` core order D1.
 - **spread**: `l16-sp-dx` warm-up numeric Δx at t = t_s for σ = 2 → 2.828 · `l16-sp-peak` core numeric the peak density at t = t_s for σ = 1 → 0.282 · sc-sd (moved) · sc-electron (moved) · `l16-sp-prod` core numeric ΔxΔp at t = 2t_s for σ = 1 → 1.118 · `l16-sp-which` core choice: "the uncertainty principle forces the packet to spread" → false ✓.
 - **ehrenfest**: `l16-eh-dx` warm-up numeric d⟨x⟩/dt for ⟨p⟩ = 1.5, m = 1 → 1.5 · ti-ehren (moved; stretch) · `l16-eh-order` core order the four steps of D3 · `l16-eh-which` core choice: "Ehrenfest's equations hold only for Gaussian packets" → false ✓.
-**Practice (T1; walkthroughs in full; HW6/HW7 submitted):**
+**Practice (T1; walkthroughs in full; the private homework record allows it):**
 - `l16-pr-width` core, `practice: 'homework'` (HW7 P1 type, new numbers): a packet with σ = 0.5 and p₀ = 2 (ħ = m = 1): ⟨p²⟩ from |φ|² and the mean kinetic energy ⟨p̂²⟩/2m → 2.5 (key `l16PrKinetic`; ledger two routes: closed form and grid).
 - `l16-pr-double` stretch, `practice: 'townsend'` (Problem 6.4 type, `refs`: Problem 6.4, p. 238): an electron packet with σ = 0.5 nm: after how many femtoseconds has Δx doubled? → √3 t_s = 7.48 fs (`l16PrDoubleFs`; tolerance 0.02 for three significant figures).
 - `l16-pr-quartic` core, `practice: 'townsend'` (Problem 6.1 type): V = x⁴/4, Gaussian packet at x₀ = 1, σ = ½, p₀ = 0: d⟨p⟩/dt → −1.75 (`l16PrQuarticDpdt`, the commutator on the grid equals −⟨x³⟩ = −(x₀³ + 3x₀σ²); also shown: the force at the centre is −1, set up for Unit 17.1).

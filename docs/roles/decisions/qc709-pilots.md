@@ -24,6 +24,6 @@ the map:
 
 **Amendment to ruling 1 (2026-09-28, the user's answer).**
 - **Question:** the F1 review (item 19) noted that 448 L2 p. 7 asks for cos θ + i sin θ = e^{iθ} and names no method, so F1's limit proof (D5) proves the assigned statement by another route.
-- **The user's answer:** that 448 homework is **already submitted**.
+- **The user's answer:** the status of that 448 homework is recorded in the private record.
 - **Ruling:** F1 keeps D5 in full, in both tracks. The power-series walkthrough (`f1-e-series`) stays hints-only regardless.
 - **Standing rule:** for any future overlap between a proof and an assigned statement, ask the user whether the assignment is still open, whatever the method.

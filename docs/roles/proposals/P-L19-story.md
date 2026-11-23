@@ -122,7 +122,7 @@ Recomputed and holding: the ansatz, the four conditions, A and B (p. 4), the eli
 1. **Revision note in the printed text (p. 6).** "Replace the first board environment…" is an instructor's editing note left in; no content. Ignored.
 2. **Notation.** The notes' t is τ here (M4); Townsend's q is κ, his F, G, C are A, B, τ.
 3. **Wording (p. 8).** The notes say "the displayed prefactor form inapplicable" as E → V₀; true, and the app shows the exact limit.
-4. **Homework (pp. 1, 9 of L19; p. 1 of L20).** HW8, due Nov 12, includes a below-barrier scattering problem "with today's setup": the sheet is not ingested, so it starts OPEN (`homework-status.md`). See Q3.
+4. **Homework (pp. 1, 9 of L19; p. 1 of L20).** HW8 includes a below-barrier scattering problem "with today's setup": the sheet is not ingested, so it starts OPEN (`homework-status.md`). See Q3.
 
 ## 9. Engine, stage and widget gaps
 **9.1 Engine** (new file `physics/wave19.ts`; tests + twin `pipeline/claims_448/l19.py` → `claims-448/l19.json`; reused: `barrierT`, `barrierThick`, `decayConstant`, `barrierAmplitudes` (its B, F, G, C are our r, A, B, τ), `barrierInnerCurrent`, `barrierWidthForT`, `wkbExponent`, `momentumAverage`, `evolveV`, `HBAR2_OVER_2M_EV_A2`): `transmissionAmplitude(E, V0, a)` (the closed form of the notes; twin: the 4 × 4 `numpy.linalg.solve`); `barrierStateSamples(xs, E, V0, a)` → ψ(x) of the stationary solution, incident amplitude 1 (twin: the same solve); `barrierTAny(E, V0, a)` (below, at and above the top: sin² form; twin closed forms); `meanEnergy(psi, g, V)` = ⟨p²/2 + V⟩ (twin: second-difference Hamiltonian on the Crank–Nicolson run, 1e-6); `deltaBarrierT(g, k)`; `gamowExponent(E, Z, R)` = `wkbExponent` with a Coulomb V (twin: scipy quad and the closed arccos form, agree to 1e-8); MeV·fm constants in `constants.ts`. Tolerances 1e-9 closed forms; 2e-3 for time-dependent runs.
@@ -140,6 +140,6 @@ Recomputed and holding: the ansatz, the four conditions, A and B (p. 4), the eli
 **Builder (one agent, worktree, ≤ 170 steps):** ~140: 5 units / 25 beats / 2 derivations (~55), engine and twin (~25), 16 challenges + 3 practice (~30), glossary, concepts, e2e, bridges (~15), tests (~15). Needs S1 (stage agent, ~25 steps, shared with L20's S2 and S3) merged first; builds after L18 is fixed.
 1. Ownership: the barrier result stays in L18 and L19 adds the direct-elimination amplitudes and the stationary picture (recommended), or move `l18-tunnel` b2–b3 and the thick form into L19?
 2. Approve S1 and the engine file (recommended), or the points-plot fallback?
-3. **Ask the user whether HW8 (due Nov 12) is submitted.** If open, `l19-pr-width` (the closest to "below-barrier scattering") and the barrier challenges become hints-only until the answer is recorded.
+3. **Ask the user whether HW8 is closed.** If open, `l19-pr-width` (the closest to "below-barrier scattering") and the barrier challenges become hints-only until the answer is recorded.
 4. Alpha decay is a stated model (Z = 90, R = 7.4 fm), no reported half-lives (T4): approve?
 5. Keep `l19-energy:b5` (energy filtering, beyond the notes) as Go-deeper?

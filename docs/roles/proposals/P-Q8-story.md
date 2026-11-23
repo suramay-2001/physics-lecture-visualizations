@@ -664,7 +664,7 @@ in 709 (Q1's `sg-lab`, Q3's `bloch` and `operator-builder`, Q5's `phase-dial`).
 
 ## 4. Challenges per unit
 
-Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** HW2 is submitted, so its items have
+Tolerance 0.005 unless stated. Hints climb nudge → key idea → setup. **Homework:** the private homework record allows it, so its items have
 full walkthroughs (ruling 12); they are marked (HW2). No other sheet assigns anything here; Bergou's §2.8 problems are not
 used as challenges (§12 Q6).
 

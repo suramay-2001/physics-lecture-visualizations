@@ -200,5 +200,5 @@ introduces † on matrices (`change:b4`), and Q3 `observables:b4` introduces the
     the citation stands.
 - **Bridges:** all 9 ids (10 links) resolve. The labels Spin Lab 1.3, 2.2, 2.5, 3.1, 4.1, 5.3 and 5.4 match 448's unit order.
 - **Arcade:** the five spot-the-error rounds have the right wrong step and a true `why`.
-- **Homework:** none is open (HW1 and HW2 are submitted), and no 448 assigned challenge is worked.
+- **Homework:** none is open (the private homework record allows it), and no 448 assigned challenge is worked.
 - **Widgets:** the `projector` widget uses plane angles, so "basis 45° passes half" is right.

@@ -720,8 +720,8 @@ Label constant: `const F3x = (unit, label) => ({ lecture: 'F3', unit, label })`.
 change-of-basis matrix $U_{ij} = \langle\alpha'_i|\alpha_j\rangle$ and checks $U^\dagger U = I$. F3's
 `f3-change-of-basis` owns this math. This plan uses only the spin-Â½ zâx change ($U = H$) in the app, never the spin-1
 construction, and challenge `f3-cb-unitary` shows $U^\dagger U = I$ on $H$ (generic), with a full walkthrough.
-*Ask:* is HW1 submitted (so full walkthroughs are allowed, as `qc709-remap.md` ruling 12 grants HW2)? *Recommendation:*
-treat HW1 as submitted (first sheet, 2026-09-08; course at L7; HW2 submitted). If not, keep `f3-cb-unitary` hints-only.
+*Ask:* is HW1 covered by the private record (so full walkthroughs are allowed, as `qc709-remap.md` ruling 12 grants HW2)? *Recommendation:*
+treat HW1 as covered by the private record (first sheet, 2026-09-08; course at L7). If not, keep `f3-cb-unitary` hints-only.
 Either way the spin-1 $S_x$ construction stays in the homework, and F3's ramp uses $H$.
 
 **Q2. Hermitian â real eigenvalues stays out of F3.** `qc709-nc.md` ruling 1 makes "Hermitian â real eigenvalues" 448

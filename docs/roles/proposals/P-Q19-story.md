@@ -7,7 +7,7 @@ Ch. 7, so the "lecture" phase is Bergou alone; ramp `[B]`, clues `[C]`, Go-deepe
 **Sources read** (paraphrased; printed pages; Bergou Ch. 7 printed = PDF − 10). Bergou §7.6 pp. 130–139 (Eqs. 7.45–7.79, Figs. 7.7–7.8), §7.7 pp. 140–141
 (7.80–7.82), §7.8 pp. 141–142 (7.83–7.86), problems P7.1–P7.3 p. 142 (⚑ cited only: P7.1 star graph with a loop; P7.2 and P7.3 belong to Q18 and Q16).
 N&C (printed = PDF − 28) only for Trotter: §4.7 pp. 206–208 (Thm 4.3 Eq. 4.98 p. 207; Eqs. 4.103–4.104 p. 208). **Page images checked** (PDF pp. 142–152 = printed
-132–142): every equation 7.46–7.86 re-derived or re-run below; pp. 130–131 are prose. No 709 homework covers §7.6–7.8 (homework-status.md: HW1–HW3 submitted,
+132–142): every equation 7.46–7.86 re-derived or re-run below; pp. 130–131 are prose. No 709 homework covers §7.6–7.8 (homework-status.md: the private homework record allows it,
 no Ch. 7 sheet), so every walkthrough is full. VQE is in neither book: named in one sentence only (R8).
 
 **Ownership.** F5 owns probability and binomial spread; F4 the unitary matrix and eigenvalues; 448 L11 the generator $e^{-iHt}$ (`qc-l11-generator`,

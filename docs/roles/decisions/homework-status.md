@@ -1,29 +1,14 @@
-# Homework status (the user's answers; the source of truth for every homework guard)
+# Homework status (rule only; the per-assignment status is private)
 
 **Standing rule:**
 - A problem assigned in EITHER course's homework gets hints only, never a walkthrough, while it is OPEN.
-- Before a plan or build works through an assigned problem by ANY method, ask the user whether it is still open.
-- Record the answer here.
+- Before a plan or build works through an assigned problem by ANY method, ask the owner whether it is still open.
 - New homework sheets start OPEN when ingested.
+- The walkthroughs of 448's three assigned challenges stay hints-only in 448 itself unless the owner asks.
 
-| Assignment | What it asks | Status | Recorded | Consequence |
-|---|---|---|---|---|
-| 448 L2 p. 7 (`l2-c-euler`) | cos θ + i sin θ = e^{iθ}, treating i as an unknown | **submitted** | 2026-09-28 | F1 keeps its full limit proof (D5). |
-| 448 L3 p. 5 (`l3-eig-real`) | A Hermitian operator has real eigenvalues | **submitted** | 2026-09-28 | Q3 and F4 may prove it (the notes do, p. 15). This supersedes the hints-only ruling in `qc709-nc.md` #1. |
-| 448 L5 p. 1 (`l4-g-sy`) | The eigenvalues and eigenvectors of S_y | **submitted** | 2026-09-28 | Q2 and Q3 may derive \|±y⟩. |
-| 709 HW1 (due 9/16) | P1 ⟨S⟩ and ΔS for \|+n⟩; P2 the z → n̂ → −z fraction and its maximum; P3 tomography; P4 σ_n eigenvectors, antipodes, anticommutation; P5 spin-1 Gram–Schmidt | **submitted** | 2026-09-28 | Q3 may work P1-type material in full. The P2 guards on the SG bench and in Q1 may be relaxed, but nothing needs to change. F2 and F4 work P5 in full. |
-| 709 HW2 (due 9/30) | P1 spin-1 x basis from two spin-½; P2 Bell-basis measurement; P3 CNOT/CZ; P4 ρ of a p/(1−p) mixture, tr ρ²; P5 binomial statistics of N qubits; P6 Bloch ball ρ = ½(1 + a·σ); P7 GHZ and Mermin | **submitted** | 2026-10-02 | The Lecture 5–7 chapters may work all of these in full. |
-| 448 L8–L11 notes (ingested 2026-10-08) | No problem set provided; the notes hold only in-class and exit checks | **none assigned** | 2026-10-08 | The L8–L11 chapters may use the notes' own checks as challenges with walkthroughs. A 448 problem set for these lectures, if one arrives, starts OPEN (hints only). |
-| 448 HW1–HW6 (HW5 not provided; only HW2 exists as a typed sheet) | HW2: Susskind Ex. 2.3, Euler's formula from f(θ), real eigenvalues of a Hermitian matrix; HW1, 3, 4, 6: topics read from the user's own solution scans | **submitted** | 2026-10-20 | Practice questions modeled on these topics may carry full walkthroughs. The scans are the user's private solutions: read locally for problem TYPES only, never copied, quoted, rendered into the repo or committed; practice questions are new problems with fresh numbers. |
-| 448 HW6 (due 10/15) and HW7 (due 10/20) (typed sheets ingested as `sl448-hw6`, `sl448-hw7`, 2026-11-06) | Time evolution and spin dynamics (HW6); position and momentum representations, wave mechanics in one dimension (HW7) | **submitted** | 2026-11-06 | L11–L18 may work these problem types in full, and practice questions may be modeled on them (new numbers, never the problems themselves). |
-| 709 HW3 (sheet not ingested) | Includes the pure-state concurrence C = 2\|Λ₀₀Λ₁₁ − Λ₀₁Λ₁₀\| from the general definition (notes p. 51 says so) | **submitted** | 2026-10-17 | Q12 and the 709 Lecture notes section may derive it in full. Any other HW3 problem: ask before working it. |
-| 709 notes L8–L11 (new edition, 58 pp., ingested 2026-10-17) | No problem set beyond HW3 above | **none assigned** | 2026-10-17 | The notes' own examples may be worked in full. |
-| 448 L12–L13 notes (ingested 2026-10-15) | No problem set provided; the notes hold in-class checks only | **none assigned** | 2026-10-15 | The L12–L13 chapters may use the notes' own checks as worked examples. |
-| 448 HW8 (due 11/12; sheet not ingested) | Includes a below-barrier scattering problem in the Lecture 19 setup (the L19 notes say so) | **submitted** | 2026-11-16 | L19–L20 may work barrier and bound-state problem types in full; practice questions stay new problems with fresh numbers. |
+The owner keeps the per-assignment status privately, in the git-ignored `private/homework-status.md` (never committed).
+Read it when present; when it is absent, treat every assignment as OPEN and ask.
 
-The walkthroughs of 448's three assigned challenges stay hints-only in 448 itself unless the user asks: releasing them would
-be a new decision.
-
-**Publishing (2026-09-29):** the user checked with the course instructors, who said it is okay to upload the course-derived
-material and the homework-related content to the GitHub repo. The standing hints-only rule for OPEN assignments above is
-unchanged.
+**Publishing (2026-09-29):** the owner checked with the course instructors, who said it is okay to upload the
+course-derived material and the homework-related content to the public repo. The hints-only rule for OPEN
+assignments is unchanged.
