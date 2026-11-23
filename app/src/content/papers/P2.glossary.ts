@@ -147,12 +147,5 @@ export const GLOSSARY: GlossEntry[] = [
       "T_{\\text{unp}}",
       "T_{\\text{pip}}"
     ]
-  },
-  {
-    "id": "pp-idle-error",
-    "term": "waiting (idle) error",
-    "gloss": "The errors a data atom collects while it waits for the reading to finish.",
-    "formal": "Pauli-twirled decoherence over the readout time, set by $T_1$ and $T_2$; it rises with $t_r$.",
-    "first": "p2-logical:b1"
   }
 ]

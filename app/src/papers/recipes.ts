@@ -52,6 +52,7 @@ import {
 import { TDG_RECIPES } from './recipes.tdg'
 import { B5_RECIPES } from './recipes.b5'
 import { P2_RECIPES } from './recipes.p2'
+import { B6_RECIPES } from './recipes.b6'
 import { bbCodeRecipe, bbPresentationsRecipe, bbScheduleRecipe, bbShiftRecipe, bpDecodeRecipe, qldpcFamilyRecipe } from './recipes.qec.b2'
 
 /** The registry's own version: bumped when a recipe is removed or the ref format changes (a recipe's own `version` covers the rest). */
@@ -272,6 +273,7 @@ export const RECIPES = {
   ...TDG_RECIPES,
   ...B5_RECIPES,
   ...P2_RECIPES,
+  ...B6_RECIPES,
 } as const
 
 export type RecipeId = keyof typeof RECIPES

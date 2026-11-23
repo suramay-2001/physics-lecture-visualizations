@@ -84,6 +84,8 @@ test('the switcher lists Papers third; the shelf shows the paper card and the pl
   await expect(page.locator('.paper-card[data-paper="B5"] h3')).toContainText('From pixels to bits')
   // P2, the GANDALF paper lecture, is written too
   await expect(page.locator('.paper-card[data-paper="P2"] h3')).toContainText('GANDALF')
+  // B6, readout in the error-correction cycle (time, idle noise and loss), is written too
+  await expect(page.locator('.paper-card[data-paper="B6"] h3')).toContainText('Readout in the error-correction cycle')
   await expectNoErrors(errors)
   await expectNoCsp(page)
 })

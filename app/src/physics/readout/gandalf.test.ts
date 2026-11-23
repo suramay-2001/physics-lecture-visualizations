@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import claims from '../__fixtures__/claims-papers/p2.json'
 import checks from '../__fixtures__/readout-p2.json'
-import { pauliTwirl, pipelineSim } from '../qec/timing'
+import { idleTotal, pauliTwirl, pipelineSim } from '../qec/timing'
 import * as G from './gandalf'
 
 const K = claims.values as Record<string, number>
@@ -112,7 +112,7 @@ describe('the toy post-selection and the toy trade-off (our inputs)', () => {
     near(tw.pX, X['eng.twirl.pX.4'])
     near(tw.pY, X['eng.twirl.pY.4'])
     near(tw.pZ, X['eng.twirl.pZ.4'])
-    near(pauliTwirl(1, toy.T1, toy.T2).total, X['eng.twirl.total.1.2'])
+    near(idleTotal(1, toy.T1, toy.T2), X['eng.twirl.total.1.2'])
     near(G.effectiveRate(4, toy).total, X['eng.peff.4ms'])
     const pL = (t: number): number => G.logicalToy(G.effectiveRate(t, toy).total, 0.1, 0.03, 11)
     const m = G.argminGrid(pL, 0.5, 10, 950)

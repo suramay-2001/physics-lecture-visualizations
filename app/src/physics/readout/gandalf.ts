@@ -5,7 +5,7 @@
  * of two overlapping score clouds, and a toy trade-off between reading error and idle error (our inputs, labelled; never fitted to the paper's Fig. 14). Times are in ms unless a name says µs.
  */
 import { normalTail, poissonCdf } from '../optics/imaging'
-import { pauliTwirl, pipelinedTotal, readoutFraction, unpipelinedTotal } from '../qec/timing'
+import { idleTotal, pipelinedTotal, readoutFraction, unpipelinedTotal } from '../qec/timing'
 
 const pos = (x: number, what: string): void => {
   if (!(Number.isFinite(x) && x >= 0)) throw new RangeError(`${what}: a finite number >= 0`)
@@ -176,7 +176,7 @@ export interface TradeInputs {
 }
 /** p_eff(t) = p_g + p_idle(t) + p_m(t): the effective chance of a fault on one data atom in a cycle whose readout takes t ms (our toy). */
 export function effectiveRate(t: number, o: TradeInputs): { pg: number; idle: number; meas: number; total: number } {
-  const idle = pauliTwirl(t, o.T1, o.T2).total
+  const idle = idleTotal(t, o.T1, o.T2)
   const meas = Math.min(0.5, (o.mScale ?? 1) * poissonOverlapError(o.rb * t, o.rd * t))
   return { pg: o.pg, idle, meas, total: o.pg + idle + meas }
 }

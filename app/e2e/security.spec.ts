@@ -43,7 +43,10 @@ const ROUTES = ['#/', '#/lecture/L1', '#/lecture/L2', '#/lecture/L3', '#/lecture
   // the background chapter B5 (from pixels to bits): the chapter, its References used and its prerequisite map
   '#/papers/ch/B5', '#/papers/refs/B5', '#/papers/prereq/B5',
   // the paper lecture P2 (GANDALF): the chapter, its References used and its prerequisite map
-  '#/papers/ch/P2', '#/papers/refs/P2', '#/papers/prereq/P2']
+  '#/papers/ch/P2', '#/papers/refs/P2', '#/papers/prereq/P2',
+
+  // the background chapter B6 (readout in the error-correction cycle): the chapter, its References used and its prerequisite map
+  '#/papers/ch/B6', '#/papers/refs/B6', '#/papers/prereq/B6']
 
 // `vite preview` serves whatever dist/ holds: on a missing or stale build, fail once with the reason instead of
 // testing old code (round-3 #1; same guard as the vitest dist checks).

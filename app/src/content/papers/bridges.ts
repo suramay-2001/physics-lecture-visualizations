@@ -53,4 +53,8 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-b5-pix2pix': { course: 'papers', lecture: 'B5', unit: 'b5-pix2pix', label: 'the conditional-GAN objective, and a prior that invents an atom' },
   'pp-b5-wiener': { course: 'papers', lecture: 'B5', unit: 'b5-wiener', label: 'a linear cleaner adds nothing to the best weights' },
   'pp-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'likelihood-ratio weights and the matched filter' },
+  // B6 (readout in the error-correction cycle): the track's loss pages, the digitised Pauli errors, the neutral-atom hardware
+  'pp-o9-loss': { course: 'qc709', lecture: 'O9', unit: 'o9-loss', label: 'atoms lost to the vacuum, and the survival of an image' },
+  'pp-o11-loss': { course: 'qc709', lecture: 'O11', unit: 'o11-loss', label: 'the loss a long exposure costs' },
+  'pp-q21-digitize': { course: 'qc709', lecture: 'Q21', unit: 'q21-digitize', label: 'any error is a mix of X, Y, Z and nothing' },
 }
