@@ -46,3 +46,6 @@ films/output/
 docs/context/generated/
 graphify-out/20*/
 private/
+
+# LinkedIn kit and demo recordings (local only)
+promo/
