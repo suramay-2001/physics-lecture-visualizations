@@ -233,7 +233,7 @@ describe('SSR render of the demo preset', () => {
 
 describe('source lints', () => {
   /** The text of each preset from its `curves:` entry to the end of the object, strings and comments removed. */
-  const checked = [...presetsSource.matchAll(/\n {2}curves: \(p\) =>[\s\S]*?\n\}/g)].map((m) =>
+  const checked = [...presetsSource.matchAll(/\n {2}curves: \(p?\) =>[\s\S]*?\n\}/g)].map((m) =>
     m[0]
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/.*$/gm, '')
