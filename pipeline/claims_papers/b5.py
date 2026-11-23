@@ -121,7 +121,7 @@ values['b5ErrSquareTau2'] = stat_error([1, 1, 1], 2 * bright, 2 * dark)
 values['b5MfSigma'] = SIG
 values['b5MfBackground'] = BG
 values['b5ClueW'] = math.log(1 + 3 / 1)
-values['b5ClueD2'] = 16 / 1 + 1 / 1
+values['b5ClueD2'] = float(np.sum(np.array([4.0, 1.0]) ** 2 / np.array([1.0, 1.0])))
 values['b5ClueRatio9'] = math.sqrt(9)
 extra['ch.mf.w'] = math.log(4)
 extra['ch.mf.d2'] = 17.0
@@ -240,6 +240,17 @@ values['b5ClueL1'] = 200 * 0.02
 extra['ch.p2.gan'] = -math.log(0.25)
 extra['ch.p2.l1'] = 200 * 0.02
 extra['ch.p2.post'] = float(expit(-2 + math.log(4)))
+
+# ---------------------------------------------------------------- inputs the prose quotes (labelled model inputs and clue inputs, echoed by the recipes)
+values['b5MfPixelS'] = 1.2
+values['b5BlurCentreW'] = float(K[3, 3])
+values['b5GanInD'] = 0.2
+values['b5ClueInD'] = 0.25
+values['b5ClueInL1'] = 0.02
+values['b5ClueInPrior'] = 0.8
+values['b5HalPrior90'] = 0.9
+values['b5InSigmaA'] = 0.6
+values['b5InSigmaB'] = 1.2
 
 # ---------------------------------------------------------------- engine checks (not claim keys)
 extra['eng.psfShare.0.0.9'] = pix(0, 0.9)

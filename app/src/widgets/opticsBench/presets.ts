@@ -62,6 +62,8 @@ import {
   type AtomLine,
 } from '../../physics/optics/cooling'
 
+import { B5_PRESETS } from './presetsB5'
+
 export interface OpticsSlider {
   /** The key the preset's functions read from `p`: letters and digits, starting with a letter. */
   key: string
@@ -503,6 +505,7 @@ export const OPTICS_PRESETS: Readonly<Record<string, OpticsPreset>> = {
   'mot-force': motForcePreset,
   'ramsey-fountain': ramseyFountain,
   'matter-wave-onset': matterWaveOnset,
+  ...B5_PRESETS,
 }
 
 export const OPTICS_PRESET_IDS: readonly string[] = Object.keys(OPTICS_PRESETS)

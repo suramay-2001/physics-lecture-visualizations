@@ -96,9 +96,17 @@ export const pixelFrameRecipe = def({
     seed: optional(int(0, 1_000_000)),
     roi: optional(int(1, 5)),
     show: optional(oneOf(['photons', 'counts', 'occupancy'] as const)),
+    panels: optional(list(shape({ show: oneOf(['photons', 'counts', 'occupancy', 'weights'] as const), filter: optional(oneOf(['square', 'gauss', 'llr', 'centre', 'learned'] as const)) }), 1, 3)),
   }),
   rules: (p) => {
     const bad: string[] = []
+    if (p.panels !== undefined && p.show !== undefined) bad.push('params.panels: give show or panels, not both')
+    p.panels?.forEach((q, i) => {
+      if (q.show === 'weights' && (q.filter === undefined || p.roi === undefined)) bad.push(`params.panels[${i}]: weights need a filter and a roi`)
+      if (q.show !== 'weights' && q.filter !== undefined) bad.push(`params.panels[${i}]: a filter only goes with weights`)
+      if (q.show === 'counts' && (p.noise ?? 'none') === 'none') bad.push(`params.panels[${i}]: 'counts' needs noise 'poisson'`)
+      if (q.filter === 'llr' && !(p.background > 0)) bad.push(`params.panels[${i}]: the llr filter needs a background above 0`)
+    })
     p.sites.forEach((s, i) => {
       if (s[0] >= p.rows || s[1] >= p.cols) bad.push(`params.sites[${i}]: inside the ${p.rows} × ${p.cols} frame`)
     })
@@ -142,7 +150,7 @@ export const pixelFrameRecipe = def({
       noise: p.noise ?? 'none',
       seed: p.seed ?? 7,
       ...(p.roi !== undefined ? { roi: { size: p.roi }, readouts: ['atoms', 'roi'] as ('atoms' | 'roi')[] } : {}),
-      show: p.show ?? ((p.noise ?? 'none') === 'poisson' ? 'counts' : 'photons'),
+      ...(p.panels !== undefined ? { panel: p.panels.map((q) => ({ show: q.show, ...(q.filter ? { filter: q.filter } : {}) })) } : { show: p.show ?? ((p.noise ?? 'none') === 'poisson' ? 'counts' : 'photons') }),
     }
     return { stage, values }
   },
@@ -168,9 +176,12 @@ export const filterCompareRecipe = def({
     view: oneOf(FC_VIEWS),
     pixelS: optional(num(0.01, 20)),
     pixelN: optional(int(0, 40)),
+    pairS: optional(list(num(0, 100), 2, 2)),
+    pairB: optional(list(num(0.01, 100), 2, 2)),
   }),
   rules: (p) => {
     const bad: string[] = []
+    if ((p.pairS === undefined) !== (p.pairB === undefined)) bad.push('params.pairS: give pairS and pairB together')
     if ((p.view === 'errors' || p.view === 'tau') && p.tau > 4) bad.push('params.tau: the exact enumeration takes tau up to 4')
     if (p.view === 'tau' && p.tau !== 1) bad.push("params.tau: view 'tau' sweeps the exposure itself (leave tau at 1)")
     if ((p.pixelS !== undefined || p.pixelN !== undefined) && p.view !== 'llr-line' && p.view !== 'pmf') bad.push("params.pixelS, params.pixelN: only with view 'llr-line' or 'pmf'")
@@ -197,7 +208,9 @@ export const filterCompareRecipe = def({
       dprimeRatio: Math.sqrt(d2 / d21),
       normalErrM: ne.m,
       normalErrE: ne.e,
+      pixelS: pixS,
       llrPixel: llrOnePixel(pixN, pixS, p.background),
+      ...(p.pairS && p.pairB ? { pairD2: dprime2(p.pairS, p.pairB) } : {}),
       llrPixelWeight: Math.log1p(pixS / p.background),
       squarePoisson: poissonSumError(m.bright[0] + 4 * m.bright[1] + 4 * m.bright[2], 9 * m.b).err,
     }
@@ -279,6 +292,8 @@ export const learnedFilterRecipe = def({
     const { q, shrink } = isolatedQ(sA, p.background, p.p)
     const [ra, rb] = p.ratio ?? [4, 1]
     const values: Record<string, number> = {
+      sigma: p.sigma,
+      background: p.background,
       q,
       shrink,
       wRatio: ra / (p.background + p.p * ra) / (rb / (p.background + p.p * rb)),
@@ -475,7 +490,7 @@ export const cganTermsRecipe = def({
       [pt(1, p.lambda * p.l1, 'λ·L1', p.l1Reported ? 'reported' : 'computed'), pt(2, g.generator, '−ln D', 'computed'), pt(3, half.generator, 'ln 2 (D = ½)', 'computed')],
       { xLabel: 'terms of the loss', yLabel: 'size of the term' },
     )
-    return { stage, values: { ganTerm: g.generator, ganEq: half.generator, judgeFake: g.judgeFake, l1Scaled: p.lambda * p.l1, smoothFloor: smoothedBceFloor(p.target ?? 0.9), l1: p.l1, lambda: p.lambda } }
+    return { stage, values: { D: p.D, ganTerm: g.generator, ganEq: half.generator, judgeFake: g.judgeFake, l1Scaled: p.lambda * p.l1, smoothFloor: smoothedBceFloor(p.target ?? 0.9), l1: p.l1, lambda: p.lambda } }
   },
 })
 
@@ -494,7 +509,7 @@ export const priorPosteriorRecipe = def({
     const points = [0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95].map((x) => pt(x, posteriorBright(p.llr, x), undefined, 'computed', 'posterior'))
     points.push(pt(p.prior, post, 'this prior', 'computed', 'chosen'))
     const stage = pts(points, { xLabel: 'prior chance of an atom', yLabel: 'chance after the frame', yLines: [{ y: 0.5, label: 'coin flip' }] })
-    return { stage, values: { posterior: post, flip: flipPrior(p.llr), shift: Math.abs(logitShift(p.prior, p.prior2 ?? 0.1)), llrMagnitude: Math.abs(p.llr) } }
+    return { stage, values: { prior: p.prior, posterior: post, flip: flipPrior(p.llr), shift: Math.abs(logitShift(p.prior, p.prior2 ?? 0.1)), llrMagnitude: Math.abs(p.llr) } }
   },
 })
 
