@@ -73,7 +73,6 @@ const ROWS: Row[] = [
   [F(3), 'ratio', 'p2Ratio3'],
   [F(3), 'equalDiff', 'p2EqualTro'],
   [F(3, 'text'), 'gap190', 'p2TextGap190'],
-  [F(3, 'text'), 'gap152', 'p2TextGap152'],
   [F(3, 'text'), 'textRatio', 'p2TextRatio'],
   [R('trade-toy', { view: 'logical', d: 11 }), 'interior', 'p2UMin'],
   [R('trade-toy', { view: 'ratio', d: 11 }), 'grows', 'p2RatioGrows'],

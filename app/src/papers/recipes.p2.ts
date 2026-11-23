@@ -184,6 +184,9 @@ export const fig15ReadbackRecipe = def({
         gap190: nearestGap(190),
         gap152: nearestGap(152),
         textRatio: ratio(190, 152),
+        tdc,
+        tgIn: tg,
+        trFixed,
       },
     }
   },

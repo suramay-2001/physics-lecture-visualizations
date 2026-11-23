@@ -39,6 +39,7 @@ values['p2SnrSqrt'] = math.sqrt(10.0)  # SNR = N / sqrt(N) = sqrt(N) with N prop
 # ---------------------------------------------------------------- unit 2: the dataset (Sec. 3.1, p. 5; Sec. 6, p. 11)
 values['p2ExpLo'] = 15.0 / 10.0
 values['p2ExpHi'] = 100.0 / 10.0
+values['p2Atten15'] = 15.0 / 10.0
 values['p2Sites'] = 3000 * 9
 values['p2Split'] = 65 + 15 + 20
 values['p2Sites14'] = 14 * 27000
@@ -53,7 +54,10 @@ values['p2GenParams1'] = sum(w(s) for s in enc) + 3 * w(res) + sum(w(s) for s in
 values['p2GenParams2'] = sum(w(s) for s in enc) + 6 * w(res) + sum(w(s) for s in dec)
 values['p2DiscParams'] = sum(w(s) for s in disc)
 values['p2MisRatio'] = 15.0 / 4.0
-values['p2WienerGain'] = 1.0
+import json as _j
+values['p2BlurFrac'] = _j.load(open(OUT / 'claims-papers' / 'b5.json'))['values']['b5BlurFrac']  # B5's own twin (a Gaussian-kernel convolution route): blur then the centre pixel keeps this share of the raw separation
+values['p2L1Scaled'] = 200 * 0.0362
+values['p2GanEq'] = -math.log(0.5)
 extra['ch.enc3'] = w(enc[2])
 
 # ---------------------------------------------------------------- unit 4: the classifiers (Fig. 9)
@@ -113,9 +117,11 @@ for i in range(3):
     values[f'p2Ratio{i + 1}'] = float(pip[i] / gan[i])
 values['p2EqualTro'] = event_loop(100, 0.01, 1.5, 0.5) - event_loop(100, 0.01, 1.5, 0.1)
 values['p2TextGap190'] = float(np.min(np.abs(np.concatenate([unp, pip, gan]) - 190.0)))
-values['p2TextGap152'] = float(np.min(np.abs(np.concatenate([unp, pip, gan]) - 152.0)))
+values['p2TdcAssumed'] = 0.1
+values['p2TrFixed'] = 1.5
+values['p2EqualBase'] = event_loop(100, 0.01, 1.5, 0.5)
+values['p2EqualGan'] = event_loop(100, 0.01, 1.5, 0.1)
 values['p2TextRatio'] = 0.19 / 0.152
-values['p2NearestTo190'] = 181.1
 extra['ch.eq5'] = values['p2TPip']
 extra['ch.saving'] = values['p2Saving']
 extra['ch.tc'] = values['p2TclImplied']
@@ -153,9 +159,8 @@ extra['eng.twirl.pX.4'], extra['eng.twirl.pY.4'], extra['eng.twirl.pZ.4'] = (flo
 extra['eng.twirl.total.1.2'] = twirl_total(1.0)[0]
 
 # ---------------------------------------------------------------- unit 8: the ledger (the same arithmetic again under the trust unit's own keys)
-for k, src in (('p2TrustCross5', 'p2CrossRatio5'), ('p2TrustCross9', 'p2CrossRatio9'), ('p2TrustRatio2', 'p2Ratio2'), ('p2TrustTextRatio', 'p2TextRatio'),
-               ('p2TrustParMF', 'p2ParRatioMF'), ('p2TrustSites', 'p2Sites'), ('p2TrustSites14', 'p2Sites14'), ('p2TrustGapNA', 'p2GapNA'),
-               ('p2TrustEtaCNN', 'p2EtaCNN'), ('p2TrustSave', 'p2Save'), ('p2TrustLat34', 'p2Lat34'), ('p2TrustGen2', 'p2GenParams2'), ('p2TrustTextGap', 'p2TextGap190')):
+for k, src in (('p2TrustCross5', 'p2CrossRatio5'), ('p2TrustCross9', 'p2CrossRatio9'), ('p2TrustRatio2', 'p2Ratio2'), ('p2TrustTextGap', 'p2TextGap190'),
+               ('p2TrustParMF', 'p2ParRatioMF'), ('p2TrustGen2', 'p2GenParams2'), ('p2TrustSites14', 'p2Sites14')):
     values[k] = values[src]
 extra['eng.eta60.9'] = 1.0 / (1.0 - 0.609)
 

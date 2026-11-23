@@ -44,4 +44,7 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-l11-generator': { course: 'sl448', lecture: 'L11', unit: 'l11-generator', label: 'a Hamiltonian generates the evolution' },
   'pp-q25-readout': { course: 'qc709', lecture: 'Q25', unit: 'q25-readout', label: 'reading an atom by counting photons against a cutoff' },
   'pp-f3-matrix-of-map': { course: 'qc709', lecture: 'F3', unit: 'f3-matrix-of-map', label: 'a matrix as a table of weights' },
+  'pp-b5-pix2pix': { course: 'papers', lecture: 'B5', unit: 'b5-pix2pix', label: 'the conditional-GAN objective, and a prior that invents an atom' },
+  'pp-b5-wiener': { course: 'papers', lecture: 'B5', unit: 'b5-wiener', label: 'a linear cleaner adds nothing to the best weights' },
+  'pp-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'likelihood-ratio weights and the matched filter' },
 }
