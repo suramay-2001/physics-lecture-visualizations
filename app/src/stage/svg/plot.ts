@@ -485,6 +485,8 @@ export interface PlotInputs {
   yLines: { y: number; label?: string }[]
   yScale: 'linear' | 'log'
   xScale?: 'linear' | 'log'
+  /** GANDALF platform G2: the named curve is drawn as a staircase. */
+  step?: boolean
   shot?: PlotState['shot']
 }
 
@@ -570,7 +572,7 @@ function seriesFrom(inp: PlotInputs): ResolvedPlot {
   const kind = SERIES_X[list[0].fn]
   const xScale = inp.xScale ?? 'linear'
   const xs = inp.xs ?? seriesXs(kind, inp.range, inp.samples, xScale)
-  const series: ResolvedPlotSeries[] = list.map((s) => ({ fn: s.fn, label: seriesLabel(s), params: { ...(s.params ?? {}) }, points: xs.map((x) => ({ x, y: seriesValue(s, x) })), discrete: isDiscreteX(kind) }))
+  const series: ResolvedPlotSeries[] = list.map((s) => ({ fn: s.fn, label: seriesLabel(s), params: { ...(s.params ?? {}) }, points: xs.map((x) => ({ x, y: seriesValue(s, x) })), discrete: isDiscreteX(kind), ...(s.step ? { step: true } : {}) }))
   const points = series[0].points
   const markers = inp.markers.map((m) => ({ x: m.x, y: seriesValue(list[0], m.x), yVs: null, label: m.label }))
   const ys = [...series.flatMap((s) => s.points.map((p) => p.y)), ...inp.yLines.map((l) => l.y), ...inp.bands.flatMap((b) => [b.yFrom, b.yTo])]
@@ -646,6 +648,7 @@ export function plotFrom(inp: PlotInputs): ResolvedPlot {
     xLabel: CURVE_X[fn] ?? null,
     ...(CURVE_XDIGITS[fn] ? { xDigits: CURVE_XDIGITS[fn] } : {}),
     ...(logX ? { xScale: 'log' as const } : {}),
+    ...(inp.step ? { step: true } : {}),
     ...(inp.reportedMarks?.length ? { reportedMarks: inp.reportedMarks } : {}),
     shot: inp.shot,
   }
@@ -663,7 +666,7 @@ function inputsAt(st: PlotState | PlotSeriesState): PlotInputs {
   }
   if (st.series) return { series: st.series, ...(st.xs ? { xs: st.xs } : {}), range: rangeOfSeries(st, SERIES_X[st.series[0].fn], st.series[0].fn), samples: st.samples ?? PLOT_LIMITS.samplesDefault, ...common }
   const c = st.curve as NonNullable<PlotState['curve']>
-  return { fn: c.fn, vs: c.vs, range: c.x ?? DEFAULT_RANGE[c.fn], samples: c.samples ?? PLOT_LIMITS.samplesDefault, ...common }
+  return { fn: c.fn, vs: c.vs, range: c.x ?? DEFAULT_RANGE[c.fn], samples: c.samples ?? PLOT_LIMITS.samplesDefault, ...(c.step ? { step: true } : {}), ...common }
 }
 
 /** Nothing in `PlotState` sweeps across a beat's hold (P-Q10-story §9.2: x/samples are plain numbers): s is unused. */
@@ -744,7 +747,7 @@ const pick = <T>(a: T, b: T, t: number): T => (t < 0.5 ? a : b)
 
 function inputsOf(r: ResolvedPlot): PlotInputs {
   return {
-    ...(r.series ? { series: r.series.map((s) => ({ fn: s.fn, params: s.params, label: s.label })), ...(r.xs ? { xs: r.xs } : {}) } : { fn: r.fn as PlotCurveName, vs: r.vs?.fn }),
+    ...(r.series ? { series: r.series.map((s) => ({ fn: s.fn, params: s.params, label: s.label, ...(s.step ? { step: true } : {}) })), ...(r.xs ? { xs: r.xs } : {}) } : { fn: r.fn as PlotCurveName, vs: r.vs?.fn, ...(r.step ? { step: true } : {}) }),
     range: r.range,
     samples: (r.series && r.series[0].discrete) || (!r.series && isWholeCurve(r.fn as PlotCurveName, r.vs?.fn)) ? PLOT_LIMITS.samplesDefault : r.points.length - 1,
     markers: r.markers.map((m) => ({ x: m.x, label: m.label })),
@@ -765,7 +768,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
   const A = inputsOf(a)
   const B = inputsOf(b)
   // a different curve, series list or sample count is a structural change (as a different Euler rate is in complex-plane): pick
-  if (A.fn !== B.fn || A.vs !== B.vs || JSON.stringify(A.series) !== JSON.stringify(B.series) || JSON.stringify(A.xs) !== JSON.stringify(B.xs) || A.samples !== B.samples || A.yScale !== B.yScale || A.xScale !== B.xScale || JSON.stringify(A.reportedMarks) !== JSON.stringify(B.reportedMarks))
+  if (A.fn !== B.fn || A.vs !== B.vs || A.step !== B.step || JSON.stringify(A.series) !== JSON.stringify(B.series) || JSON.stringify(A.xs) !== JSON.stringify(B.xs) || A.samples !== B.samples || A.yScale !== B.yScale || A.xScale !== B.xScale || JSON.stringify(A.reportedMarks) !== JSON.stringify(B.reportedMarks))
     return plotFrom(pick(A, B, t))
   const markers = A.markers.length === B.markers.length ? A.markers.map((m, i) => ({ x: lerp(m.x, B.markers[i].x, t), label: pick(m.label, B.markers[i].label, t) })) : pick(A.markers, B.markers, t)
   const bands =
@@ -780,6 +783,7 @@ export function interpPlotStage(a: ResolvedPlot, b: ResolvedPlot, t: number): Re
     vs: A.vs,
     series: A.series,
     xs: A.xs,
+    ...(A.step ? { step: true } : {}),
     range,
     samples: A.samples,
     markers,
@@ -804,6 +808,7 @@ function seriesProblems(list: PlotSeries[], st: PlotSeriesState): string[] {
   if (!Array.isArray(list) || list.length < 1 || list.length > PLOT_LIMITS.series) return [`plot series: one to ${PLOT_LIMITS.series} series`]
   list.forEach((s, i) => {
     const where = `plot series[${i}]`
+    if (s && s.step !== undefined && typeof s.step !== 'boolean') errs.push(`${where}.step: true or false`)
     if (s && isOpticsSeries(s.fn)) {
       errs.push(...opticsSeriesProblems(where, s.fn, (s.params ?? {}) as Record<string, unknown>))
       if (s.label !== undefined && (typeof s.label !== 'string' || s.label.length < 1 || s.label.length > PLOT_LIMITS.labelLen)) errs.push(`${where}.label: 1–${PLOT_LIMITS.labelLen} characters`)
@@ -870,6 +875,7 @@ export function validatePlotStage(st: PlotState | PlotSeriesState | PlotPointsSt
     if ('xRange' in st && st.xRange !== undefined) errs.push('plot xRange: only series mode has it (a curve takes curve.x)')
     if ('xs' in st && st.xs !== undefined) errs.push('plot xs: only series mode has it')
     if (!(curve.fn in CURVE_FNS)) errs.push(`plot curve.fn: unknown curve "${curve.fn}" (the engine function has not landed)`)
+    if (curve.step !== undefined && typeof curve.step !== 'boolean') errs.push('plot curve.step: true or false')
     if (curve.vs !== undefined) {
       if (!(curve.vs in CURVE_FNS)) errs.push(`plot curve.vs: unknown curve "${curve.vs}"`)
       else if (curve.vs === curve.fn) errs.push('plot curve.vs: a different curve from curve.fn')

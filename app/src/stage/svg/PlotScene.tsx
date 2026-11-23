@@ -4,6 +4,7 @@
  * lines, the curve itself and its markers. Structure is silver; the curve and its markers are the state colour.
  */
 import type { SvgSceneProps } from '../svgKinds'
+import { stepPathOf } from '../../widgets/opticsBench/plot'
 import { wrapLine } from './CodeScene'
 import { Label, type Pt, fix, sup } from './draw'
 import { plotReadouts, xText } from './plot'
@@ -92,7 +93,8 @@ export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: 
   const at = (p: { x: number; y: number }): Pt => ({ x: sx(p.x), y: sy(p.y) })
   const f = (a: string) => focus === a
 
-  const path = r.points.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')
+  const lineOf = (pts: { x: number; y: number }[], step: boolean | undefined): string => (step ? stepPathOf(pts, sx, sy) : pts.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' '))
+  const path = lineOf(r.points, r.step)
 
   return (
     <g className="svgk-scene" data-kind="plot">
@@ -176,7 +178,7 @@ export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: 
       {series &&
         series.map((sr, i) => {
           const st = SERIES_STYLE[i % SERIES_STYLE.length]
-          const d = sr.points.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')
+          const d = lineOf(sr.points, sr.step)
           return (
             <g key={`s${i}`} data-anchor="series" data-series={i} role="img" aria-label={`${sr.label}: ${sr.points.length} points from ${xText(sr.points[0].x)} to ${xText(sr.points[sr.points.length - 1].x)}`} className={f('series') ? 'svgk-focus' : undefined}>
               <title>{sr.label}</title>
@@ -202,7 +204,7 @@ export function PlotScene({ state: r, mode, width, height, focus, bare, slot }: 
       })}
       {r.vs && r.names && (
         <g data-anchor="curve-vs">
-          <path d={r.vs.points.map((p, k) => `${k ? 'L' : 'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')} fill="none" className="fg-op" strokeWidth={2.2} strokeDasharray="6 4" />
+          <path d={lineOf(r.vs.points, r.step)} fill="none" className="fg-op" strokeWidth={2.2} strokeDasharray="6 4" />
           <Label at={{ x: x1 - 4, y: sy(r.vs.points[r.vs.points.length - 1].y) - 6 }} anchor="end" cls="fg-lbl" color="var(--fg-op)">
             {r.names.vs}
           </Label>

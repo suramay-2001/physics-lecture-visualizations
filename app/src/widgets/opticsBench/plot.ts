@@ -83,5 +83,28 @@ export function pathOf(points: readonly Pt[], sx: (x: number) => number, sy: (y:
   return d
 }
 
+/**
+ * A staircase path through the samples (a histogram or probability mass function drawn as steps): each sample's y is held across the cell between the midpoints to its neighbours
+ * (the first and last cells are half cells, so the path never leaves the sampled range). A gap (a non-finite y) breaks the path as in `pathOf`.
+ */
+export function stepPathOf(points: readonly Pt[], sx: (x: number) => number, sy: (y: number) => number): string {
+  const n = points.length
+  let d = ''
+  let pen = false
+  for (let i = 0; i < n; i++) {
+    const p = points[i]
+    if (!Number.isFinite(p.y)) {
+      pen = false
+      continue
+    }
+    const a = i === 0 ? p.x : (points[i - 1].x + p.x) / 2
+    const b = i === n - 1 ? p.x : (p.x + points[i + 1].x) / 2
+    const y = sy(p.y).toFixed(2)
+    d += `${pen ? 'L' : 'M'}${sx(a).toFixed(2)} ${y}L${sx(b).toFixed(2)} ${y}`
+    pen = true
+  }
+  return d
+}
+
 /** A linear scale from [d0, d1] to [r0, r1]. */
 export const scale = (d0: number, d1: number, r0: number, r1: number) => (v: number) => r0 + ((v - d0) / (d1 - d0)) * (r1 - r0)

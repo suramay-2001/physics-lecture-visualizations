@@ -64,6 +64,7 @@ export function opticsPresetProblems(id: string, p: OpticsPreset): string[] {
     if (right.length > 0 && !p.y2) bad(`${label}: curve "${right[0].label}" reads the right axis but the preset has no y2`)
     if (p.y2 && right.length === 0) bad(`${label}: the preset declares y2 but no curve reads it (axis: 'right')`)
     if (curves.length > 0 && right.length === curves.length) bad(`${label}: every curve reads the right axis (at least one reads the left)`)
+    for (const c of curves) if (c.step !== undefined && typeof c.step !== 'boolean') bad(`${label}: curve "${c.label}" has step ${JSON.stringify(c.step)} (true or false)`)
     for (const c of curves) {
       if (!plainText(c.label)) bad(`${label}: a curve label must be plain text`)
       if (names.has(c.label)) bad(`${label}: duplicate curve label "${c.label}"`)

@@ -20,7 +20,7 @@ import { Slider, WidgetFrame } from '../ui/primitives'
 import './opticsBench.css'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsParams, type OpticsPreset } from './opticsBench/presets'
 import { readoutRows, resetParams, setParam, sliderText } from './opticsBench/model'
-import { decimalsOf, fixed, niceDomain, niceTicks, pathOf, sample, scale, yExtent, type Pt } from './opticsBench/plot'
+import { decimalsOf, fixed, niceDomain, niceTicks, pathOf, sample, scale, stepPathOf, yExtent, type Pt } from './opticsBench/plot'
 
 export interface OpticsBenchProps {
   /** The preset id in widgets/opticsBench/presets.ts, e.g. `lorentzian`. */
@@ -114,7 +114,7 @@ function Plot({ preset, params }: { preset: OpticsPreset; params: OpticsParams }
         <rect className="ob-frame" x={M.l} y={M.t} width={plotW} height={H - M.t - M.b} />
         <g clipPath={`url(#${clip})`}>
           {sampled.map((pts, i) => (
-            <path key={i} className={`ob-curve ob-curve-${i}`} d={pathOf(pts, sx, rightOf[i] ? sz : sy)} fill="none" data-axis={axisWords(i).split(' ')[0]} />
+            <path key={i} className={`ob-curve ob-curve-${i}`} d={(curves[i].step ? stepPathOf : pathOf)(pts, sx, rightOf[i] ? sz : sy)} fill="none" data-axis={axisWords(i).split(' ')[0]} />
           ))}
         </g>
         {markers.map((m, i) => (

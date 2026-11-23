@@ -82,6 +82,8 @@ export interface OpticsCurve {
   f: (x: number) => number
   /** Which vertical axis the curve is read against: `'left'` (the default) is `y`, `'right'` is the preset's `y2`. */
   axis?: 'left' | 'right'
+  /** Draw the curve as a staircase (a histogram or a probability mass function): each sample's value is held across its cell. */
+  step?: boolean
 }
 
 export interface OpticsMarker {
