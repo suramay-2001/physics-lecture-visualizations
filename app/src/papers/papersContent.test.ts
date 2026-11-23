@@ -10,11 +10,15 @@ import { lookupGloss } from '../content/glossRegistry'
 import { LECTURES } from '../content/index'
 import { PAPER_BRIDGES } from '../content/papers/bridges'
 import { PAPER_CHAPTERS } from '../content/papers/index'
+import { B5 } from '../content/papers/B5.paper'
+import { B6 } from '../content/papers/B6.paper'
+import { P2 } from '../content/papers/P2.paper'
 import { PAPER_GLOSSARY } from '../content/papers/pack'
 import { QC_CHAPTERS } from '../content/qc709/index'
 import { OPTICS_CHAPTERS } from '../content/qc709/optics/index'
 import { derivationSteps } from '../content/track'
 import { bridgeRefs, glossRefs, readingOrder } from '../content/walk'
+import { runRecipe } from './recipes'
 
 /** Every bridge id a paper uses, in every track, with where. */
 function usedBridges(): { id: string; where: string }[] {
@@ -70,5 +74,24 @@ describe('papers glossary', () => {
       }
       expect(lookupGloss(g.id), g.id).toBe(g)
     }
+  })
+})
+
+describe('papers clues', () => {
+  it('a clue beat stage prints no total, saving or ROI photon count (the answer waits for Show me)', () => {
+    const bad: string[] = []
+    let clues = 0
+    for (const spec of [B5, B6, P2])
+      for (const u of spec.units)
+        for (const b of u.story)
+          if (b.phase === 'clue') {
+            clues++
+            const r = runRecipe(b.stage, b.id)
+            if (!r.ok) continue
+            const ro = (r.stage as { readouts?: string[] }).readouts ?? []
+            for (const name of ro) if (['total', 'saving', 'roi'].includes(name)) bad.push(`${b.id}: stage prints "${name}"`)
+          }
+    expect(clues).toBeGreaterThan(10)
+    expect(bad).toEqual([])
   })
 })

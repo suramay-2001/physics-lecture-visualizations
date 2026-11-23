@@ -95,6 +95,8 @@ export const pixelFrameRecipe = def({
     noise: optional(oneOf(['none', 'poisson'] as const)),
     seed: optional(int(0, 1_000_000)),
     roi: optional(int(1, 5)),
+    /** Draw the ROI box without its photon-total readout (a clue's picture must not print the answer). */
+    quiet: optional(bool()),
     show: optional(oneOf(['photons', 'counts', 'occupancy'] as const)),
     panels: optional(list(shape({ show: oneOf(['photons', 'counts', 'occupancy', 'weights'] as const), filter: optional(oneOf(['square', 'gauss', 'llr', 'centre', 'learned'] as const)) }), 1, 3)),
   }),
@@ -149,7 +151,7 @@ export const pixelFrameRecipe = def({
       background: p.background,
       noise: p.noise ?? 'none',
       seed: p.seed ?? 7,
-      ...(p.roi !== undefined ? { roi: { size: p.roi }, readouts: ['atoms', 'roi'] as ('atoms' | 'roi')[] } : {}),
+      ...(p.roi !== undefined ? { roi: { size: p.roi }, readouts: (p.quiet ? ['atoms'] : ['atoms', 'roi']) as ('atoms' | 'roi')[] } : {}),
       ...(p.panels !== undefined ? { panel: p.panels.map((q) => ({ show: q.show, ...(q.filter ? { filter: q.filter } : {}) })) } : { show: p.show ?? ((p.noise ?? 'none') === 'poisson' ? 'counts' : 'photons') }),
     }
     return { stage, values }

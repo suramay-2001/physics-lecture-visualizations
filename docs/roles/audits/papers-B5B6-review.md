@@ -129,3 +129,22 @@ All else printed in the paper that the prose states is correct: no T₁, T₂ va
 - Bridges: every `<<…>>` id used by B5 and B6 are in `bridges.ts` and resolve to existing units (O9, O10, O11 ×4, Q13, Q21, Q25, F3, F5, B1 ×4, P2 ×3); each lands on the unit that teaches the named idea (checked by title).
 - G1: B5 owns frames, weights, CNN, Wiener, pix2pix; B6 owns timing, twirl, U-curve, pipelining, loss and reset; the single-site histogram, the exposure trade and the loss rate are bridged to O10, O11 and O9, not re-taught; B6's `timing.ts` is the one place `pauliTwirl` lives.
 - G3: no usage figures or assignment status in the specs; Gibbons' 720 nK and N_Γ do not appear.
+
+## Fix pass
+
+All paths under `app/src/content/papers/` unless stated. Line numbers are approximate after the edit.
+
+- **S1** done: `B5.glossary.ts` `pp-fidelity-cf` (gloss and formal) and `B5.paper.ts` `b5-cnn:b6` (Ground-up and formal) now write F_CF = 1 minus the average, zero for independent sites, growing with crosstalk.
+- **S2** done: `B5.paper.ts` `b5-cnn` try-it (about line 1996) now says small background makes the likelihood-ratio weights and the flat box come together, large background makes them follow the spot; the "plain box" clause is gone.
+- **S3** done: `B5.paper.ts` `b5-matched-filter` try-it (about 1141): "fall much more slowly ... and stay far above it".
+- **S4** done: `B6.paper.ts` `b6-pipelining:b5` stage is `view: pipelined` with the new `quiet: true` recipe parameter (empty readout, `recipes.b6.ts`); the two-row picture with totals and saving moves to `reveal.stage`. New test `app/src/papers/papersContent.test.ts` "papers clues" fails if any clue stage (B5, B6, P2) prints total, saving or ROI.
+- **N1** done: `B5.paper.ts` `b5-pix2pix:b4` (both tracks) and the `b5Rf70` claim text say the 70 size is printed and needs the last two layers at stride 1 (released code, appendix says stride 2); `iso-lambda` label 4.2; `iso-patch` cited as section 4.4.
+- **N2** done: `B5.paper.ts` walkthroughs of `b5-r-centre` (0.5953, 0.3544), `b5-r-roi5` (0.323, 0.233, 0.087), `b5-r-dim` (0.42, 0.24, 0.045; both-offset-2 pixel 0.002).
+- **N3** done: `b5-roi:b4` text, formal and the `b5CrossFrac2`/`b5CrossFrac4` claim texts say "a strip three pixels wide across the atom" (values unchanged).
+- **N4** done: `ken25` trails now cite §III, §IV, §IV, §II.B; the square-root growth is labelled our derivation.
+- **N5** done: `B5.glossary.ts` `pp-matched-filter` formal: weights follow the template, exactly ln(1 + s/b) for independent Poisson pixels.
+- **N6** done: Ground-up glosses for −ln D and the log-likelihood ratio (`b5-pix2pix:b6`), Bayes error and Poisson (`b5-matched-filter:b6`).
+- **N7** done: `B6.paper.ts` trail why of `bar25` and the matching formal sentence, and the `tom14` trail, reworded.
+- **N8** done: `b5-roi:b5` stage uses `quiet: true` (box drawn, no photon total); `b6-cycle:b5` stage quiet, total in a new `reveal.stage`. Both via the new optional `quiet` parameter in `app/src/papers/recipes.b5.ts` (pixel-frame) and `recipes.b6.ts` (cycle-budget, pipeline-schedule).
+- **n1** done (`b5-cnn:b2`: squared separation q). **n2** done (`b5-wiener:b2` formal names the variance μ). **n3** done (2.035). **n4** done (`phu-xfid`: 40 ms, Tables III and IV). **n5** no change (as the review says). **n6** done (`b6-l-min` prompt and key's why: known losses, half the time). **n7** done (`b5-roi:b3` trail: Gaussian mask, square mask in §II.B). **n8** done (`b5-wiener:b4`: "By composition").
+- Twins `pipeline/claims_papers/b5.py`, `b6.py` rerun: fixtures byte-identical (no numeric value changed).

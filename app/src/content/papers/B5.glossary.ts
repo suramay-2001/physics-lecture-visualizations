@@ -40,7 +40,7 @@ export const GLOSSARY: GlossEntry[] = [
     "id": "pp-matched-filter",
     "term": "matched filter",
     "gloss": "A weighted sum whose weights follow the expected spot.",
-    "formal": "A linear statistic whose weights are proportional to the template divided by the noise level.",
+    "formal": "A linear statistic whose weights follow the template; for independent Poisson pixels they are exactly $\\ln(1+s/b)$, close to $s/b$ only when the signal is weak.",
     "first": "b5-matched-filter:b2"
   },
   {
@@ -67,8 +67,8 @@ export const GLOSSARY: GlossEntry[] = [
   {
     "id": "pp-fidelity-cf",
     "term": "fidelity, cross-fidelity",
-    "gloss": "How often a site's bit is right, and how often errors travel together.",
-    "formal": "$F=1-\\tfrac12[P(B\\mid D)+P(D\\mid B)]$; $F_{CF}$ averages $P(D_k\\mid B_l)+P(B_k\\mid D_l)$ over site pairs.",
+    "gloss": "How often a site's bit is right, and a score that is zero when two sites do not affect each other and larger when errors travel together.",
+    "formal": "$F=1-\\tfrac12[P(B\\mid D)+P(D\\mid B)]$; $F_{CF}=1-\\text{average of }[P(D_k\\mid B_l)+P(B_k\\mid D_l)]$ over site pairs, which is $0$ when the two sites are independent and grows with crosstalk.",
     "first": "b5-cnn:b6"
   },
   {

@@ -650,7 +650,8 @@ export const B6: PaperSpec = {
               "layers": 6,
               "tGateUs": 1,
               "tMove": 0.1,
-              "tRead": 2
+              "tRead": 2,
+              "quiet": true
             }
           },
           "claims": [
@@ -670,6 +671,17 @@ export const B6: PaperSpec = {
             }
           ],
           "reveal": {
+            "caption": "the clue round, with its total",
+            "captionFormal": "six 1 µs layers, a 0.1 ms move and a 2 ms exposure, with the total",
+            "stage": {
+              "recipe": "cycle-budget",
+              "params": {
+                "layers": 6,
+                "tGateUs": 1,
+                "tMove": 0.1,
+                "tRead": 2
+              }
+            },
             "text": "The gates last 0.006 ms in all, so the share is 0.950. The exposure is 2000 times one gate.",
             "formal": "$f=2/(2+0.1+0.006)=0.950$; the ratio is $2000/1=2000$.",
             "claims": [
@@ -1286,7 +1298,7 @@ export const B6: PaperSpec = {
             {
               "ref": "tom14",
               "at": "Abstract",
-              "why": "The twirled channel overstates the logical error compared with full amplitude and phase damping, so the realistic threshold may be higher."
+              "why": "The twirled channel overstates the logical error compared with full amplitude and phase damping; Tomita and Svore conclude that real devices may tolerate more noise than the twirled estimate."
             }
           ]
         },
@@ -3177,7 +3189,9 @@ export const B6: PaperSpec = {
               "d": 7,
               "g": 0.02,
               "r": 0.5,
-              "c": 0.2
+              "c": 0.2,
+              "view": "pipelined",
+              "quiet": true
             }
           },
           "claims": [
@@ -3211,6 +3225,17 @@ export const B6: PaperSpec = {
             }
           ],
           "reveal": {
+            "caption": "the clue schedule, plain and overlapped",
+            "captionFormal": "seven rounds, one after another and overlapped",
+            "stage": {
+              "recipe": "pipeline-schedule",
+              "params": {
+                "d": 7,
+                "g": 0.02,
+                "r": 0.5,
+                "c": 0.2
+              }
+            },
             "text": "The plain run takes 5.04 ms and the overlapped run 3.84 ms. With c = 1 ms the overlapped run takes 7.52 ms. The saving stops growing at c = 0.52 ms.",
             "formal": "$T_{\\mathrm{serial}}=7(g+r+c)=5.04$; $T_{\\mathrm{pipe}}=(g+r)+c+6(g+r)=3.84$; at $c=1$: $(g+r)+c+6c=7.52$; the saving stops growing at $c=g+r=0.52$ ms.",
             "claims": [
@@ -3503,7 +3528,7 @@ export const B6: PaperSpec = {
           "id": "b6-loss-reset:b1",
           "phase": "books",
           "text": "A reading can say bright, dark or gone. A classifier trained only on bright and dark has no way to say gone, so it calls a lost atom dark. A decoder that is told which atoms were lost can do better, as in the loss-detection work the paper cites. Loss is an [[pp-loss-outcome|outcome of the reading]].",
-          "formal": "Loss is an [[pp-loss-outcome|outcome of the reading]] next to bright and dark. A classifier trained on two labels maps a lost atom to dark, so the third outcome has to be added to the labels. Baranes et al. introduce a delayed-erasure decoder that uses the information from delayed loss detection, even when the moment of the loss is unknown.",
+          "formal": "Loss is an [[pp-loss-outcome|outcome of the reading]] next to bright and dark. A classifier trained on two labels maps a lost atom to dark, so the third outcome has to be added to the labels. Baranes et al. build a decoder that uses a late signal that an atom left, even if when it left is unknown.",
           "caption": "the chance that no atom is lost, against rounds (reported input, our arithmetic)",
           "captionFormal": "$S^{n r}$ against the number of rounds $r$",
           "stage": {
@@ -3518,7 +3543,7 @@ export const B6: PaperSpec = {
             {
               "ref": "bar25",
               "at": "Abstract",
-              "why": "A delayed-erasure decoder uses information from delayed loss detection to correct loss errors even when the moment of the loss is unknown."
+              "why": "A decoder that uses a late signal that an atom left, even if when it left is unknown."
             }
           ]
         },
@@ -3960,7 +3985,7 @@ export const B6: PaperSpec = {
           "kind": "choice",
           "tier": "core",
           "title": "How many losses fail the vote",
-          "prompt": "In a vote of 7 copies, every lost copy has a known place. How many losses make the vote fail?",
+          "prompt": "In a vote of 7 copies, every lost copy has a known place. How many known losses make the vote fail half the time?",
           "options": [
             {
               "text": "4",
@@ -3970,7 +3995,7 @@ export const B6: PaperSpec = {
             {
               "text": "7",
               "correct": true,
-              "why": "Only when every copy is lost is there nothing left to vote with."
+              "why": "Only when every copy is lost is there nothing left to vote with, and then the guess is a coin flip."
             },
             {
               "text": "8",

@@ -512,7 +512,7 @@ export const B5: PaperSpec = {
             },
             {
               "key": "b5SigE",
-              "text": "an edge pixel gets 2.036 photons on average",
+              "text": "an edge pixel gets 2.035 photons on average",
               "from": {
                 "recipe": "pixel-frame",
                 "params": {
@@ -682,7 +682,7 @@ export const B5: PaperSpec = {
             {
               "ref": "ken25",
               "at": "Abstract",
-              "why": "A conventional readout thresholds a Gaussian or square mask over the pixels; the matched filter replaces the mask."
+              "why": "A conventional readout thresholds a Gaussian mask over the pixels (the square mask is in §II.B); the matched filter replaces the mask."
             }
           ],
           "fidelity": [
@@ -692,8 +692,8 @@ export const B5: PaperSpec = {
         {
           "id": "b5-roi:b4",
           "phase": "books",
-          "text": "A second bright atom two pixels away leaks light into your box; four pixels away it hardly does. A neighbour at two pixels puts 29 % of its light in the three-pixel window around your atom, at four pixels 0.27 %. That leaked light is [[pp-crosstalk|crosstalk]]. In a measured array the nearest-neighbour cross-fidelity went from 0.0138 at 9 µm to 0.0428 at 5 µm.",
-          "formal": "[[pp-crosstalk|Crosstalk]] is the share of atom A's light inside the window around atom B: $0.2892$ at separation 2 pixels and $0.0027$ at 4 pixels. Phuttitarn et al. report the average nearest-neighbour cross-fidelity of a square mask rising from 0.0138 to 0.0428 as the spacing shrinks from 9 µm to 5 µm.",
+          "text": "A second bright atom two pixels away leaks light into your box; four pixels away it hardly does. A neighbour at two pixels puts 29 % of its light in a strip three pixels wide across your atom, at four pixels 0.27 %. That leaked light is [[pp-crosstalk|crosstalk]]. In a measured array the nearest-neighbour cross-fidelity went from 0.0138 at 9 µm to 0.0428 at 5 µm.",
+          "formal": "[[pp-crosstalk|Crosstalk]] is the share of atom A's light inside a strip three pixels wide across atom B (the other axis taken as fully inside): $0.2892$ at separation 2 pixels and $0.0027$ at 4 pixels. Phuttitarn et al. report the average nearest-neighbour cross-fidelity of a square mask rising from 0.0138 to 0.0428 as the spacing shrinks from 9 µm to 5 µm.",
           "caption": "two atoms two pixels apart: each box catches the other's light",
           "captionFormal": "separation 2 pixels: $0.2892$ of A's light in B's window",
           "stage": {
@@ -719,7 +719,7 @@ export const B5: PaperSpec = {
           "claims": [
             {
               "key": "b5CrossFrac2",
-              "text": "a neighbour two pixels away puts 0.2892 of its light in the window",
+              "text": "a neighbour two pixels away puts 0.2892 of its light in a strip three pixels wide across the atom",
               "from": {
                 "recipe": "pixel-frame",
                 "params": {
@@ -744,7 +744,7 @@ export const B5: PaperSpec = {
             },
             {
               "key": "b5CrossFrac4",
-              "text": "a neighbour four pixels away puts 0.0027 of its light in the window",
+              "text": "a neighbour four pixels away puts 0.0027 of its light in a strip three pixels wide across the atom",
               "from": {
                 "recipe": "pixel-frame",
                 "params": {
@@ -771,7 +771,7 @@ export const B5: PaperSpec = {
           "reported": [
             {
               "id": "phu-xfid",
-              "text": "nearest-neighbour cross-fidelity, square mask, 9 and 5 micrometre spacing",
+              "text": "nearest-neighbour cross-fidelity, square mask, 9 and 5 micrometre spacing, at 40 ms readout (Tables III and IV)",
               "value": "0.0138 to 0.0428",
               "source": "phu24",
               "at": {
@@ -809,7 +809,8 @@ export const B5: PaperSpec = {
               "sigma": 0.6,
               "photons": 20,
               "background": 0.4,
-              "roi": 3
+              "roi": 3,
+              "quiet": true
             }
           },
           "claims": [
@@ -1011,13 +1012,13 @@ export const B5: PaperSpec = {
           ],
           "walkthrough": [
             {
-              "text": "In one axis the share within half a pixel of the centre is 0.5943."
+              "text": "In one axis the share within half a pixel of the centre is 0.5953."
             },
             {
               "text": "The central pixel gets the product of the row and column shares."
             },
             {
-              "text": "0.5943 squared is 0.3532, about 0.354."
+              "text": "0.5953 squared is 0.3544, about 0.354."
             }
           ]
         },
@@ -1060,7 +1061,7 @@ export const B5: PaperSpec = {
           ],
           "walkthrough": [
             {
-              "text": "One axis: the shares at offsets 0, 1, 2 are about 0.3, 0.24 and 0.06 (both signs)."
+              "text": "One axis: the shares at offsets 0, 1, 2 are about 0.323, 0.233 and 0.087 (both signs)."
             },
             {
               "text": "Their sum over five pixels is about 0.963."
@@ -1109,10 +1110,10 @@ export const B5: PaperSpec = {
           ],
           "walkthrough": [
             {
-              "text": "The one-axis shares are about 0.43 (offset 0), 0.23 (offset 1), 0.05 (offset 2)."
+              "text": "The one-axis shares are about 0.42 (offset 0), 0.24 (offset 1), 0.045 (offset 2)."
             },
             {
-              "text": "Pixels with both offsets 2 hold 0.003; with one offset 2 and one offset 1 or 0 they hold about 0.011 or 0.02."
+              "text": "Pixels with both offsets 2 hold 0.002; with one offset 2 and one offset 1 or 0 they hold about 0.011 or 0.02."
             },
             {
               "text": "Only the four corners are below 1 percent: the answer is 4."
@@ -1138,7 +1139,7 @@ export const B5: PaperSpec = {
           "preset": "exposure-bench"
         },
         "tryThis": [
-          "Raise the exposure and watch the flat-box error fall much faster than the estimate from d′ suggests at small signals.",
+          "Raise the exposure and watch the flat-box error fall much more slowly than the estimate from d′ suggests, and stay far above it.",
           "Read d′(τ) over d′(1) at τ = 3: it is the square root of 3, not 3."
         ]
       },
@@ -1235,7 +1236,7 @@ export const B5: PaperSpec = {
           "trail": [
             {
               "ref": "ken25",
-              "at": "the matched-filter section",
+              "at": "§III",
               "why": "A matched filter weights pixels by how much evidence each carries."
             }
           ]
@@ -1577,7 +1578,7 @@ export const B5: PaperSpec = {
           "trail": [
             {
               "ref": "ken25",
-              "at": "the comparison of mask and fitted filter",
+              "at": "§IV",
               "why": "The paper compares a Gaussian threshold with fitted weights; our exact numbers are for our model and not its data."
             }
           ]
@@ -1709,8 +1710,8 @@ export const B5: PaperSpec = {
           "trail": [
             {
               "ref": "ken25",
-              "at": "the matched-filter discussion",
-              "why": "The square-root growth of the separation with exposure is the reason longer readouts help; our exact errors show the size of the gain."
+              "at": "§II.B",
+              "why": "Longer readout times give higher fidelity. The square-root growth of the separation with exposure is our own derivation; our exact errors show the size of the gain."
             }
           ]
         },
@@ -1798,7 +1799,7 @@ export const B5: PaperSpec = {
         {
           "id": "b5-matched-filter:b6",
           "phase": "deeper",
-          "text": "No reading of the pixels can beat the Bayes error of the true image model. What a cleaner plus a threshold could still gain is information the sum ignores. Examples are crosstalk from neighbours, vanished atoms and camera noise that is not Poisson.",
+          "text": "No reading of the pixels can beat the Bayes error of the true image model, the fewest mistakes any rule could make on these pixels. What a cleaner plus a threshold could still gain is information the sum ignores. Examples are crosstalk from neighbours, vanished atoms and camera noise that does not follow the Poisson counting rule.",
           "formal": "A classifier sees only the pixels, so none beats the Bayes error of the true image law (here equal to the likelihood-ratio error above). A denoise-then-classify pipeline can gain only where the true law departs from the model: crosstalk, atom loss, non-Poisson camera noise, or a better prior.",
           "caption": "the ceiling is the likelihood-ratio bar",
           "captionFormal": "no sum of the pixels goes below the Bayes error (our model)",
@@ -1993,7 +1994,7 @@ export const B5: PaperSpec = {
         },
         "tryThis": [
           "The best weights are the bottom bar of the readout: no learned filter, linear or not, can read the box below that error in our model.",
-          "Make the background large: the likelihood-ratio weights and the flat box come together, which is why a fitted filter can look like a plain box."
+          "Make the background small: the logarithm flattens the weights, and the likelihood-ratio weights and the flat box come together. Make it large: they follow the spot instead."
         ]
       },
       "insight": "A filter can be fitted from labelled shots instead of derived. For one atom it comes out as the spot divided by the local brightness. With a close neighbour it learns to subtract the neighbour's pixels. A network adds a bend and a wider view, at a large cost in parameters.",
@@ -2062,7 +2063,7 @@ export const B5: PaperSpec = {
         {
           "id": "b5-cnn:b2",
           "phase": "books",
-          "text": "For an isolated atom the fitted weights look like the spot divided by the local brightness. Bright pixels near the middle get a little less than the spot alone would say. The total evidence per pixel, summed, is 33.9.",
+          "text": "For an isolated atom the fitted weights look like the spot divided by the local brightness. Bright pixels near the middle get a little less than the spot alone would say. The squared separation q, summed over the pixels, is 33.9.",
           "formal": "With prior $p$ one half, $\\mathrm{Cov}(n)=\\mathrm{diag}(\\mu)+p(1-p)ss^{\\mathsf T}$ and $\\mu=b+ps$. Sherman-Morrison gives $W\\propto s_i/\\mu_i$, with $q=s^{\\mathsf T}D^{-1}s=33.89$ on our strip.",
           "caption": "weights along a strip of pixels, isolated atom",
           "captionFormal": "$W_i\\propto s_i/(b+ps_i)$, strip of 7 pixels, atom at pixel 2",
@@ -2377,7 +2378,7 @@ export const B5: PaperSpec = {
           "trail": [
             {
               "ref": "ken25",
-              "at": "the array model and its filter plots",
+              "at": "§IV",
               "why": "The array filter uses its neighbours to cancel crosstalk; our strip shows the mechanism, not their data."
             }
           ]
@@ -2568,8 +2569,8 @@ export const B5: PaperSpec = {
         {
           "id": "b5-cnn:b6",
           "phase": "deeper",
-          "text": "Papers score a readout by its fidelity: one minus the average of the two kinds of misread. [[pp-fidelity-cf|Cross-fidelity]] counts errors that travel together between two sites. The improvement is often reported as a reduction against a baseline, and the baseline differs from paper to paper.",
-          "formal": "Fidelity $F$ is one minus the mean of the two misreads, $P(\\text{read bright}\\mid\\text{dark})$ and $P(\\text{read dark}\\mid\\text{bright})$ (our single-site \"error\" is their half-sum). [[pp-fidelity-cf|Cross-fidelity]] $F_{CF}$ averages $P(D_k\\mid B_l)+P(B_k\\mid D_l)$ over site pairs. The reduction $\\eta=1-(1-F)/(1-F_{\\text{base}})$ takes a Gaussian mask as its baseline in Phuttitarn and Kent but the per-site network in the GANDALF paper.",
+          "text": "Papers score a readout by its fidelity: one minus the average of the two kinds of misread. [[pp-fidelity-cf|Cross-fidelity]] is zero when two sites do not affect each other and larger when errors travel together. The improvement is often reported as a reduction against a baseline, and the baseline differs from paper to paper.",
+          "formal": "Fidelity $F$ is one minus the mean of the two misreads, $P(\\text{read bright}\\mid\\text{dark})$ and $P(\\text{read dark}\\mid\\text{bright})$ (our single-site \"error\" is their half-sum). [[pp-fidelity-cf|Cross-fidelity]] is $F_{CF}=1-\\text{average of }[P(D_k\\mid B_l)+P(B_k\\mid D_l)]$ over site pairs: $0$ when the two sites are independent, growing with crosstalk. The reduction $\\eta=1-(1-F)/(1-F_{\\text{base}})$ takes a Gaussian mask as its baseline in Phuttitarn and Kent but the per-site network in the GANDALF paper.",
           "caption": "fidelity compares a readout with a baseline",
           "captionFormal": "$F$, $F_{CF}$ and $\\eta$ need a named baseline",
           "stage": {
@@ -2857,7 +2858,7 @@ export const B5: PaperSpec = {
           "id": "b5-wiener:b2",
           "phase": "books",
           "text": "On the same strip a blur then the centre pixel is worse than the best weights. A smart linear cleaner can at best equal them. The separation d² is 33.9 for the best weights and 33.9 for a Wiener cleaner. Blur then centre gives 29.2, which is 86 % of the best. A three-pixel crop gives 32.0 and the centre pixel alone 15.4.",
-          "formal": "Gaussian-approximation separation $d^2=\\Delta^{\\mathsf T}\\Sigma^{-1}\\Delta$ of each pipeline's output: raw (best weights) $33.89$; Wiener smoother $33.89$ (equal: its rank-one output is the matched statistic); blur then centre $29.19$ ($0.861$ of the best); crop to 3 pixels $31.97$; centre alone $15.40$.",
+          "formal": "Gaussian-approximation separation $d^2=\\Delta^{\\mathsf T}\\Sigma^{-1}\\Delta$ (variance $\\mu$) of each pipeline's output: raw (best weights) $33.89$; Wiener smoother $33.89$ (equal: its rank-one output is the matched statistic); blur then centre $29.19$ ($0.861$ of the best); crop to 3 pixels $31.97$; centre alone $15.40$.",
           "caption": "separation d² of five linear pipelines (our model)",
           "captionFormal": "$d^2$ of the output of each linear pipeline, strip of 7 pixels, atom at pixel 2",
           "stage": {
@@ -3008,7 +3009,7 @@ export const B5: PaperSpec = {
           "id": "b5-wiener:b4",
           "phase": "books",
           "text": "Two linear steps make one linear step. A threshold on the result is a threshold on a weighted sum, which the best weights already beat. So a linear cleaner followed by a threshold adds nothing beyond the best weights.",
-          "formal": "By data processing, a linear map followed by a linear statistic is $(H^{\\mathsf T}u)^{\\mathsf T}x$ for some $u$; no $u$ beats the Bayes weights, with equality when $H^{\\mathsf T}u$ spans them. The GANDALF paper (<<pp-p2-denoiser|the lecture on it>>) says fixed filters (Gaussian, median, Wiener) blur sites at low counts; it shows no experiment, so this is our statement about linear pipelines, not a test of its claim.",
+          "formal": "By composition, a linear map followed by a linear statistic is $(H^{\\mathsf T}u)^{\\mathsf T}x$ for some $u$; no $u$ beats the Bayes weights, with equality when $H^{\\mathsf T}u$ spans them. The GANDALF paper (<<pp-p2-denoiser|the lecture on it>>) says fixed filters (Gaussian, median, Wiener) blur sites at low counts; it shows no experiment, so this is our statement about linear pipelines, not a test of its claim.",
           "caption": "no pipeline of linear steps goes above the first bar",
           "captionFormal": "a linear cascade is one linear statistic",
           "stage": {
@@ -3282,7 +3283,7 @@ export const B5: PaperSpec = {
               "source": "iso17",
               "at": {
                 "kind": "section",
-                "label": "4.1"
+                "label": "4.2"
               }
             },
             {
@@ -3401,8 +3402,8 @@ export const B5: PaperSpec = {
         {
           "id": "b5-pix2pix:b3",
           "phase": "books",
-          "text": "Skip links carry fine detail past the narrow middle of the generator, a shape called a [[pp-unet-patchgan|U-Net]]. The judge looks at small patches, which is a PatchGAN. Five 4 by 4 layers see a 70 by 70 patch. The paper's generator, counted with two convolutions in each block, has 4,695,744 weights against its printed 4.7 million; with one convolution only 2,926,272.",
-          "formal": "A [[pp-unet-patchgan|U-Net generator and PatchGAN discriminator]]: five $4\\times4$ layers (strides 2, 2, 2, 1, 1) see $70$ pixels along a side, as in Isola et al. For the GANDALF Table 2 generator our weight count is $4{,}695{,}744$ with two $3\\times3$ convolutions per residual block and $2{,}926{,}272$ with one, against the printed 4.7 million; its four stride-2 $3\\times3$ discriminator layers see $31$ pixels. The table does not say whether the discriminator output is patchwise.",
+          "text": "Skip links carry fine detail past the narrow middle of the generator, a shape called a [[pp-unet-patchgan|U-Net]]. The judge looks at small patches, which is a PatchGAN. The paper prints a 70 by 70 patch, which five 4 by 4 layers see if the last two have stride 1. The paper's generator, counted with two convolutions in each block, has 4,695,744 weights against its printed 4.7 million; with one convolution only 2,926,272.",
+          "formal": "A [[pp-unet-patchgan|U-Net generator and PatchGAN discriminator]]: five $4\\times4$ layers see $70$ pixels along a side if the last two use stride 1. The paper prints the $70\\times70$ size; the appendix text says stride 2, and the stride-1 layers are those of the authors' released code. For the GANDALF Table 2 generator our weight count is $4{,}695{,}744$ with two $3\\times3$ convolutions per residual block and $2{,}926{,}272$ with one, against the printed 4.7 million; its four stride-2 $3\\times3$ discriminator layers see $31$ pixels. The table does not say whether the discriminator output is patchwise.",
           "caption": "weights per layer of the paper's generator (our count)",
           "captionFormal": "parameters per layer, bias-free convolutions; residual convolutions counted six times",
           "stage": {
@@ -3459,7 +3460,7 @@ export const B5: PaperSpec = {
           "claims": [
             {
               "key": "b5Rf70",
-              "text": "five 4 by 4 layers with strides 2, 2, 2, 1, 1 see 70 pixels",
+              "text": "five 4 by 4 layers, the last two with stride 1, see 70 pixels",
               "from": {
                 "recipe": "conv-stack",
                 "params": {
@@ -3640,8 +3641,8 @@ export const B5: PaperSpec = {
               "value": "70×70",
               "source": "iso17",
               "at": {
-                "kind": "table",
-                "label": "3"
+                "kind": "section",
+                "label": "4.4"
               }
             },
             {
@@ -3789,7 +3790,7 @@ export const B5: PaperSpec = {
         {
           "id": "b5-pix2pix:b6",
           "phase": "clue",
-          "text": "What does the GAN term −ln D cost when the judge scores a fake D = 0.25? What is 200 times a mean L1 of 0.02? What is the chance of an atom after a frame with log-likelihood ratio −2 at a prior of 0.8?",
+          "text": "What does the GAN term −ln D (minus the natural logarithm of D) cost when the judge scores a fake D = 0.25? What is 200 times a mean L1 of 0.02? What is the chance of an atom after a frame with log-likelihood ratio −2 at a prior of 0.8? (The log-likelihood ratio is the natural logarithm of how much more likely the frame is with an atom than without.)",
           "formal": "Compute $-\\ln D$ for $D=0.25$; $\\lambda L_1$ for $\\lambda=200$, $L_1=0.02$; and the posterior for $\\mathrm{LLR}=-2$ at prior $0.8$.",
           "caption": "the terms at D = 0.25, L1 = 0.02",
           "captionFormal": "$-\\ln D$ and $\\lambda L_1$ for the clue's inputs",

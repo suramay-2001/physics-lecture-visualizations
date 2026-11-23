@@ -29,7 +29,7 @@ import {
   poissonBinomialTail,
 } from '../physics/qec/timing'
 import { choose } from '../physics/qec/curves'
-import { int, num, oneOf, optional, shape } from './params'
+import { bool, int, num, oneOf, optional, shape } from './params'
 import type { RecipeDef } from './recipes'
 
 const def = <P>(d: RecipeDef<P>): RecipeDef<P> => d
@@ -59,6 +59,8 @@ export const cycleBudgetRecipe = def({
     tRead: num(0.0001, 20),
     tReset: optional(num(0, 2)),
     view: optional(oneOf(['timeline', 'share'] as const)),
+    /** No total printed above the picture (a clue's picture must not print the answer). */
+    quiet: optional(bool()),
   }),
   run: (p) => {
     const gate = (p.layers * p.tGateUs) / 1000
@@ -97,7 +99,7 @@ export const cycleBudgetRecipe = def({
     add('move', move)
     add('acquire', p.tRead)
     add('reset', reset)
-    return { stage: { kind: 'timeline', rows: [{ label: 'one round', segments: segs }], unit: small ? 'µs' : 'ms', readouts: ['total'] }, values }
+    return { stage: { kind: 'timeline', rows: [{ label: 'one round', segments: segs }], unit: small ? 'µs' : 'ms', readouts: p.quiet ? [] : ['total'] }, values }
   },
 })
 
@@ -365,6 +367,8 @@ export const pipelineScheduleRecipe = def({
     r: num(0.001, 20),
     c: num(0.0001, 20),
     view: optional(oneOf(['serial', 'pipelined', 'both', 'vsC'] as const)),
+    /** No totals printed above the picture (a clue's picture must not print the answer). */
+    quiet: optional(bool()),
   }),
   run: (p) => {
     const serial = unpipelinedTotal(p.d, p.g, p.r, p.c)
@@ -400,7 +404,7 @@ export const pipelineScheduleRecipe = def({
       const s = pipedRows(p.d, p.g, p.r, p.c)
       rows.push({ label: 'gates, camera ', group: 'overlapped', segments: s.cam }, { label: 'classifier ', group: 'overlapped', segments: s.cls })
     }
-    return { stage: { kind: 'timeline', rows, unit: 'ms', readouts: view === 'both' ? ['total', 'saving'] : ['total'] }, values }
+    return { stage: { kind: 'timeline', rows, unit: 'ms', readouts: p.quiet ? [] : view === 'both' ? ['total', 'saving'] : ['total'] }, values }
   },
 })
 
