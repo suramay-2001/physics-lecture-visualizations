@@ -4,7 +4,7 @@
  * module never copies their formulas. What it adds: reading the paper's printed bars back into times, the η factor, throughput against latency, the boxes of the timeline kind, a toy post-selection
  * of two overlapping score clouds, and a toy trade-off between reading error and idle error (our inputs, labelled; never fitted to the paper's Fig. 14). Times are in ms unless a name says µs.
  */
-import { normalTail, poissonCdf } from '../optics/imaging'
+import { normalTail, poissonPmf } from '../optics/imaging'
 import { idleTotal, pipelinedTotal, readoutFraction, unpipelinedTotal } from '../qec/timing'
 
 const pos = (x: number, what: string): void => {
@@ -160,7 +160,17 @@ export function poissonOverlapError(mb: number, md: number): number {
   pos(md, 'md')
   let best = 1
   const top = Math.ceil(mb + md + 12 * Math.sqrt(mb + md + 1)) + 2
-  for (let k = 0; k <= top; k++) best = Math.min(best, 0.5 * (poissonCdf(k - 1, mb) + 1 - poissonCdf(k - 1, md)))
+  // Running sums in poissonCdf's own order (pmf 0, 1, …, k − 1 added left to right, then capped at 1), so every term is
+  // bit-identical to poissonCdf(k − 1, ·) while the scan costs O(top) instead of O(top²); the toy U-curve calls this ~10³ times.
+  let sb = 0
+  let sd = 0
+  for (let k = 0; k <= top; k++) {
+    const cb = k === 0 ? 0 : Math.min(1, sb)
+    const cd = k === 0 ? 0 : Math.min(1, sd)
+    best = Math.min(best, 0.5 * (cb + 1 - cd))
+    sb += poissonPmf(k, mb)
+    sd += poissonPmf(k, md)
+  }
   return best
 }
 export interface TradeInputs {
