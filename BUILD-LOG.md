@@ -57,17 +57,36 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action (2026-11-23): GANDALF batch — Optics Lab experiment track + Papers P2 + public-launch audit + LinkedIn kit.**
-Owner: (1) build out the Optics Lab from the
-Metcalf–van der Straten textbook (`sources/mvs`) from a research assistant's view as an **experiment track** (run sheet:
-oven → MOT → molasses → tweezer loading → fluorescence imaging → readout, each stage a live bench) developed in tandem with
-(2) the paper *Enabling fast and accurate neutral atom readout through image denoising* (GANDALF, arXiv:2510.25982v2,
-ingested as `sources/paper-gdf`, registered in `pipeline/course.papers.json`): deep research over its 40 references
-(skill `deep-research`; notes and report in the git-ignored `sources/research/`; owner approved saving ≤ ~15 open-access
-arXiv PDFs into `sources/ref-gdf-*`), then lectures in Papers (P2 + 2 background chapters); (3) a security audit for
-public viewing, fixes of leaks and attack vectors; (4) a LinkedIn post (links: live site URL placeholder + GitHub repo)
-and demo video recordings with presenting pointers (kept out of the repo). Order: audit ∥ research → plans + rulings →
-builds → review + fix → gate, e2e, audit → push → videos + post.
+**Next action:** the owner shares the live site URL → run `promo/header-check.md` (live headers: CSP, HSTS, frame-ancestors,
+COOP/CORP; `_headers` must 404) and, if a workers.dev address shows a personal handle, consider a custom domain and
+`"workers_dev": false`. Owner-side settings the audit could not verify: branch protection on `main`, secret scanning with
+push protection, private vulnerability reporting, Dependabot alerts, the `production` environment limited to `main`, the
+Cloudflare token's scope. When new 448 notes arrive, follow the L19–L20 recipe below.
+
+**DONE (2026-11-23): GANDALF batch — Optics Lab experiment track, Papers B5/B6/P2, public-launch hardening.**
+Rulings `docs/roles/decisions/gandalf-batch.md` G1–G6; plans `P-optics-experiment-track.md`, `P-B5-story.md`,
+`P-B6-story.md`, `P-P2-story.md`.
+- Research: the `deep-research` skill over the 40 references of GANDALF (arXiv:2510.25982v2, CC BY 4.0), four research
+  threads + one report, all in the git-ignored `sources/research/`; 15 open-access arXiv references saved in
+  `sources/ref-gdf-*` (owner-approved).
+- Optics Lab O7–O11 (a research assistant's run sheet: cold cloud → one atom per trap → photon budget → counting),
+  engines `physics/optics/arrays.ts`, `imaging.ts`; 9 bench presets; reviewed (`audits/optics-experiment-track-review.md`,
+  FIX-FIRST: depump per collected photon, saturated capture bound, full two-term trap scattering) and fixed.
+- Papers B5 "From pixels to bits" (`physics/readout/classify.ts`), B6 "Readout in the error-correction cycle"
+  (`physics/qec/timing.ts`, owns the Pauli twirl), P2 the GANDALF lecture (`physics/readout/gandalf.ts`): E1 a neutral
+  note (1.24×/1.25× from §7.1), E2 a Correction (the text's 0.19 s → 0.152 s matches no Fig. 15 bar; 1.77× = 321.5/181.1
+  at 2 %). Reviews `audits/papers-B5B6-review.md`, `papers-P2-review.md` (FIX-FIRST) and fixes merged.
+- Platform: SVG kinds `camera-frame`, `timeline`; `step` curves; recipes per chapter.
+- Security (`private` audit report → fixes): wrangler pinned and installed with scripts off in the deploy job; dev
+  advisories fixed in `app/` and `films/` (overrides for sharp/undici/vite); leak guard widened (home paths, all
+  `sources/**`, more extensions, any-TLD e-mails, staged media bytes, a PR-range scan in CI); Dependabot; third-party
+  licence file in `dist/licenses/`; KaTeX fonts OFL; "independent student project" line in footers, README and
+  `LICENSE-CONTENT`; dated `graphify-out/20*/` untracked. Private workflow details moved to the git-ignored `private/`.
+- Gate 355 files / 19,165 tests; full preview e2e 428 passed.
+LESSONS: a papers chapter compiles at load, so a recipe's cost is first-paint cost — `poissonOverlapError` was O(n²)
+via repeated CDFs (P2 took 3 s and failed the 5 s e2e wait); running sums in the same order are bit-identical and O(n).
+A fix pass that inserts a paragraph moves `bNN` ids: re-derive e2e bench/bridge paragraphs from the content.
+Our own research notes quote the repo, so `sources/research/` is excluded from every verbatim corpus.
 
 **Previous next action:** none queued. When new 448 notes arrive (L21+), follow the L19–L20 batch below: ingest → one planner
 for the batch → judge rulings → one stage/engine agent if a stage addition is ruled → one builder per lecture in parallel
