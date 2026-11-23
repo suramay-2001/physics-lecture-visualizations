@@ -1,0 +1,44 @@
+{
+  "source": "pipeline/claims_papers/b6.py",
+  "values": {
+    "ch.cycle.frac": 0.9085402786190188,
+    "ch.cycle.ratio": 1500.0,
+    "ch.erase.micro": 5.000000000000002,
+    "ch.erase.min7": 7,
+    "ch.fault.amp7": 16,
+    "ch.fault.exp15": 8,
+    "ch.fault.vote3.0.1": 0.028000000000000008,
+    "ch.loss.atoms7": 97,
+    "ch.loss.per100": 0.9700000000000001,
+    "ch.pipe.pipe": 9.49,
+    "ch.pipe.serial": 12.690000000000001,
+    "ch.pipe.slow": 14.51,
+    "ch.twirl.infPct": 1.960528042384093,
+    "ch.twirl.pzPct": 4.509374941931229,
+    "ch.ucurve.argmin.d3.d11.d25": 2.95,
+    "eng.esym.equal": 3.3679800000000005e-13,
+    "eng.esym.mixed.k3": 4.685000000000001e-06,
+    "eng.idleSmallT.1.0": 0.000525,
+    "eng.idleSmallT.100.0": 0.052500000000000005,
+    "eng.idleTotal.1.0": 0.0005247488333541167,
+    "eng.idleTotal.100.0": 0.050068832544728235,
+    "eng.noloss.7.1e-4.20": 0.823649914293005,
+    "eng.pipe.25": 51.001599999999996,
+    "eng.refine.tstar": 2.971951762402494,
+    "eng.share.at.2ms": 0.9084302325581395,
+    "eng.sim.25": 51.001599999999996,
+    "eng.tail.mixed.k4": 2.5554188868744862e-08,
+    "eng.twirl.chi.200ms": [
+      0.004950331673311188,
+      0.004950331673311188,
+      0.08568429178769789
+    ],
+    "eng.twirl.chi.4ms": [
+      9.99800026663944e-05,
+      9.99800026663944e-05,
+      0.0018960253253378447
+    ],
+    "eng.vote.5.0.1": 0.008560000000000002,
+    "eng.vote.7.0.05": 0.000193578125
+  }
+}
