@@ -31,7 +31,7 @@ export const P2: PaperSpec = {
     "date": "2025-12",
     "institution": "University of Wisconsin–Madison (Saffman also Infleqtion)",
     "source": "paper-gdf",
-    "licence": "arXiv non-exclusive licence: paraphrased and cited; no figure republished; every picture is redrawn from engine data or is a printed number marked Reported."
+    "licence": "CC BY 4.0 (as shown on the arXiv page). This lecture paraphrases and cites by section, page, figure or table and republishes no figure; attribution: Mude et al., arXiv:2510.25982v2."
   },
   "outcomes": [
     "State the readout bottleneck from the paper’s Tables 1 and 6.",
@@ -84,7 +84,7 @@ export const P2: PaperSpec = {
       },
       "depth": 1,
       "status": "read",
-      "reliedOn": "abstract and the filter equations",
+      "reliedOn": "Eqs. 1-5 and Tables I-II",
       "why": "A matched filter fitted from labelled shots as a cheap alternative to a CNN; the paper’s MF+NN builds on it.",
       "taughtIn": {
         "course": "papers",
@@ -101,7 +101,12 @@ export const P2: PaperSpec = {
       "depth": 1,
       "status": "read",
       "reliedOn": "Eqs. 9 and 10, p. 6",
-      "why": "The Pauli-twirl form of idle noise with T1 and T2 that the paper uses for waiting error; B6 teaches the twirl."
+      "why": "The Pauli-twirl form of idle noise with T1 and T2 that the paper uses for waiting error; B6 teaches the twirl.",
+      "taughtIn": {
+        "course": "papers",
+        "chapter": "B6",
+        "unit": "b6-twirl"
+      }
     },
     {
       "id": "goo24",
@@ -118,7 +123,7 @@ export const P2: PaperSpec = {
       "label": "Wintersperger et al. 2023",
       "depth": 1,
       "status": "cited",
-      "why": "Cited as the source of the neutral-atom column of Table 1; read only as a citation, because the source was not available to us.",
+      "why": "Cited as the source of the neutral-atom column of Table 1; abstract only (arXiv 2304.14360), because the full source was not available to us.",
       "taughtIn": {
         "course": "qc709",
         "chapter": "Q25",
@@ -132,8 +137,14 @@ export const P2: PaperSpec = {
         "id": "2502.20558"
       },
       "depth": 1,
-      "status": "cited",
-      "why": "Cited for tolerating atom loss when reloading is deferred by one round; B6 treats loss as a third outcome."
+      "status": "read",
+      "reliedOn": "Abstract and pp. 7-8",
+      "why": "Cited for tolerating atom loss when reloading is deferred by one round; B6 treats loss as a third outcome.",
+      "taughtIn": {
+        "course": "papers",
+        "chapter": "B6",
+        "unit": "b6-loss-reset"
+      }
     },
     {
       "id": "geh25",
@@ -142,8 +153,14 @@ export const P2: PaperSpec = {
         "id": "2408.00758"
       },
       "depth": 1,
-      "status": "cited",
-      "why": "Cited for the claim that reset can be skipped or deferred; the paper does not simulate reset."
+      "status": "read",
+      "reliedOn": "Abstract, p. 5 and Table I",
+      "why": "Cited for the claim that reset can be skipped or deferred; the paper does not simulate reset.",
+      "taughtIn": {
+        "course": "papers",
+        "chapter": "B6",
+        "unit": "b6-loss-reset"
+      }
     },
     {
       "id": "gid25",
@@ -668,7 +685,7 @@ export const P2: PaperSpec = {
           "trail": [
             {
               "ref": "gid25",
-              "at": "the run-time example in the paper’s introduction",
+              "at": "the T-gate bullet under Eq. 1, §2.3, p. 4",
               "why": "The paper’s Eq. 1 is a rough product; the RSA-scale example behind it is B6’s, not used here."
             }
           ]
@@ -3048,7 +3065,7 @@ export const P2: PaperSpec = {
           "id": "p2-pipeline:b2",
           "phase": "lecture",
           "text": "Add up one round and repeat it $d$ times: that is [[pp-pipeline-times|the unpipelined time]]. If the classical work hides behind the next look, a round costs only gates and look. The classical work is paid once at the end. B6 builds the same schedule from the bottom (<<pp-b6-pipelining|hiding the classical work>>).",
-          "formal": "[[pp-pipeline-times|Eq. 4]]: $T_{\\text{unp}}=d\\,(t_g+t_r+t_c)$. Eq. 5: $T_{\\text{pip}}=d\\,(t_r+t_g)+(t_{\\text{den}}+t_c)$. Their difference is $T_{\\text{unp}}-T_{\\text{pip}}=(d-1)\\,t_c-t_{\\text{den}}$ (derivation below). With the lab's default inputs of 100 rounds (our fit to Fig. 15, labelled) the totals are $341.0$ and $301.5$ ms and the saving $39.5$ ms.",
+          "formal": "[[pp-pipeline-times|Eq. 4]]: $T_{\\text{unp}}=d\\,(t_g+t_r+t_c)$. Eq. 5: $T_{\\text{pip}}=d\\,(t_r+t_g)+(t_{\\text{den}}+t_c)$. Their difference is $T_{\\text{unp}}-T_{\\text{pip}}=(d-1)\\,t_c-t_{\\text{den}}$ (derivation below). With illustrative inputs of ours for 100 rounds ($t_g=10$ µs, $t_r=3$ ms, $t_{\\text{den}}=100$ µs, $t_c=400$ µs) the totals are $341.0$ and $301.5$ ms and the saving $39.5$ ms.",
           "caption": "baseline against pipelined for 100 rounds (the lab’s inputs; only three rounds are drawn)",
           "captionFormal": "Eqs. 4 and 5 at $d=100$ (three rounds drawn); totals from the engine",
           "stage": {
@@ -3267,8 +3284,8 @@ export const P2: PaperSpec = {
         {
           "id": "p2-pipeline:b3",
           "phase": "lecture",
-          "text": "Fig. 15 prints nine totals for 100 rounds. Unpipelined bars read 451.0, 371.0 and 271.0 ms; pipelined 401.5, 321.5 and 221.5. The gap is 49.5 ms every time, which is 10.98 % of the first bar.",
-          "formal": "Fig. 15 (p. 13), tolerances $1$, $2$, $3\\,$ percent: unpipelined $451.0$, $371.0$, $271.0$ ms; pipelined baseline $401.5$, $321.5$, $221.5$ ms. The gap is $49.5$ ms at each, which is 10.98 % of 451.0 (“over 10 %”, p. 13). With $t_{\\text{den}}=0$ for the baseline, $(d-1)\\,t_c=49.5$ gives $t_c=0.5$ ms: the “500 µs for a 3×3 array” of p. 11, a consistency check that passes. Then $t_r+t_g=4.01$, $3.21$ and $2.21$ ms.",
+          "text": "Fig. 15 prints nine totals for 100 rounds. Unpipelined bars read 451.0, 371.0 and 271.0 ms; pipelined 401.5, 321.5 and 221.5. The gap is 49.5 ms every time, which is 10.98 % of the first bar. The printed axis says cycle time, but the caption and the values are 100-round totals.",
+          "formal": "Fig. 15 (p. 13; the axis is labelled cycle time, the caption and values say 100-round totals), tolerances $1$, $2$, $3\\,$ percent: unpipelined $451.0$, $371.0$, $271.0$ ms; pipelined baseline $401.5$, $321.5$, $221.5$ ms. The gap is $49.5$ ms at each, which is 10.98 % of 451.0 (“over 10 %”, p. 13). With $t_{\\text{den}}=0$ for the baseline, $(d-1)\\,t_c=49.5$ gives $t_c=0.5$ ms: the “500 µs for a 3×3 array” of p. 11, a consistency check that passes if Fig. 15’s baseline is that classifier. Then $t_r+t_g=4.01$, $3.21$ and $2.21$ ms.",
           "caption": "the printed totals of Fig. 15 (reported)",
           "captionFormal": "Fig. 15 bars as printed: unpipelined, pipelined baseline and GANDALF, three tolerances",
           "stage": {
@@ -3451,7 +3468,7 @@ export const P2: PaperSpec = {
         {
           "id": "p2-pipeline:b4",
           "phase": "lecture",
-          "text": "Fig. 15b gives GANDALF’s totals: 291.1, 181.1 and 151.1 ms. If its denoiser plus classifier takes 0.1 ms, which the paper does not print, these imply 2.91, 1.81 and 1.51 ms of readout plus gates. The best bar ratio is 1.775, the 2 percent pair.",
+          "text": "Fig. 15b gives GANDALF’s totals: 291.1, 181.1 and 151.1 ms. If its denoiser plus classifier takes 0.1 ms, which the paper does not print, these imply 2.91, 1.81 and 1.51 ms of readout plus gates. The best bar ratio is 1.775 (printed as 1.77), the 2 percent pair.",
           "formal": "Fig. 15b (p. 13): $291.1$, $181.1$, $151.1$ ms. Assuming $t_{\\text{den}}+t_c=0.1$ ms (ours, not printed) these give $t_r+t_g=2.91$, $1.81$, $1.51$ ms, so the one-percent bar goes with the printed $2.9$ ms. The ratios of the pipelined baseline's bars to GANDALF's are $1.38$, $1.775$ and $1.47$; the paper's “up to $1.77$” is the two-percent pair, the best of three (neutral note N12).",
           "caption": "readout plus gate time implied by the bars, with the denoiser-plus-classifier time assumed",
           "captionFormal": "$t_r+t_g$ from the bars: baseline ($t_c$ read back) and GANDALF (assumed $t_{\\text{den}}+t_c$)",
@@ -3601,7 +3618,7 @@ export const P2: PaperSpec = {
           "text": "At one fixed readout time of 1.5 ms, a pipelined baseline and GANDALF differ by only 0.4 ms. The large gain comes from reaching the accuracy at a shorter readout, not from the schedule. The text’s 0.19 s to 0.152 s matches no bar.",
           "formal": "With the same $t_r=1.5$ ms for both, the pipelined baseline takes $151.5$ ms and GANDALF $151.1$ ms, a difference of $0.4$ ms (our derived model, with its labelled fit). The gain of Fig. 15 therefore comes from the shorter readout the denoiser permits, not from the schedule. The text of §7.3 (p. 13) says “0.19 s to 0.152 s” at that readout time. No bar equals 0.19 s (the nearest is $8.9$ ms away), and $0.19/0.152=1.25$ is not the factor of the same paragraph. Also 0.152 s lies near the three-percent bar. See the correction below.",
           "caption": "the nine printed bars and the two numbers of the text",
-          "captionFormal": "Fig. 15 bars and the text’s 0.19 s and 0.152 s at tolerance three percent",
+          "captionFormal": "Fig. 15 bars and the text’s 0.19 s and 0.152 s at tolerance three percent (the text’s numbers are placed by us)",
           "stage": {
             "recipe": "fig15-readback",
             "params": {
@@ -4104,12 +4121,12 @@ export const P2: PaperSpec = {
               "at": {
                 "kind": "section",
                 "label": "7.2",
-                "page": 13
+                "page": 12
               }
             },
             {
               "id": "f14-35",
-              "text": "BB-code error reduction, shortest readout",
+              "text": "BB-code error reduction, 1.5 ms readout",
               "value": "up to 35.8x",
               "source": "paper-gdf",
               "at": {
@@ -4123,8 +4140,8 @@ export const P2: PaperSpec = {
         {
           "id": "p2-logical:b4",
           "phase": "lecture",
-          "text": "A worse classifier hurts most when the look is short. Both printed gains compare with the CNN baseline at short readout, where reading error, not waiting, dominates. In our toy the penalty shrinks as the readout grows.",
-          "formal": "Both gains are against CNN(Site) at the shortest times, where reading error rather than idling dominates the baseline's rate. Toy of ours: for a classifier worse by a fixed factor, the ratio of toy $p_L$ is largest at short readout and tends to one at long readout. The claim records 1 when the ratios at the three times decrease and stay above one.",
+          "text": "A worse classifier hurts most when the look is short. Both printed gains compare with the CNN baseline at short readouts: 4 ms for the surface code, the shortest time for the BB code. There reading error, not only waiting, still matters. In our toy the penalty shrinks as the readout grows.",
+          "formal": "Both gains are against CNN(Site) at the shorter readout times (4 ms for the surface code, 1500 µs for the BB code), where reading error rather than idling still matters. Toy of ours: for a classifier worse by a fixed factor, the ratio of toy $p_L$ is largest at short readout and tends to one at long readout. The claim records 1 when the ratios at the three times decrease and stay above one.",
           "caption": "toy penalty of a worse classifier against readout time (ours)",
           "captionFormal": "toy ratio of $p_L$ for a worse classifier to a better one, log scale (our inputs)",
           "stage": {
@@ -4588,7 +4605,7 @@ export const P2: PaperSpec = {
         "page": 13
       },
       "says": "At the shortest readout (1.5 ms), 100 rounds take 0.19 s for the baseline and 0.152 s once the denoiser and pipelining are used.",
-      "shouldSay": "Comparing the tables, we find no bar of Fig. 15 equal to 190 ms: the nearest is 8.9 ms away. The ratio 0.19 / 0.152 = 1.25 is not the 1.77 of the same paragraph. Its plotted two-percent pair gives 321.5 / 181.1 = 1.775, and 0.152 s lies near the three-percent bar, 151.1 ms."
+      "shouldSay": "Comparing the tables, we find no bar of Fig. 15 equal to 190 ms: the nearest is 8.9 ms away. The ratio 0.19 / 0.152 = 1.25 is not the 1.77 of the same paragraph, though that 1.77 is measured against the pipelined baseline, so the two need not agree. The plotted two-percent pair gives 321.5 / 181.1 = 1.775, and 0.152 s lies near the three-percent bar, 151.1 ms. Our model’s pipelined baseline at 1.5 ms is 151.5 ms, which also rounds to 0.152 s, so the 0.152 s does not say which schedule it is."
     }
   ]
 }

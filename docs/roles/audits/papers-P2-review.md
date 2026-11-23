@@ -48,3 +48,18 @@ Evidence: about 90 recomputed numbers with an independent numpy/scipy script (sc
 4. Both tracks agree throughout; every derivation has two views (the ground-up and formal lists use different views); Ground-up lengths are within the G6 limits in a spot check.
 5. Bridges land on the right units: b6-cycle at b2, b6-pipelining at pipeline b2, b6-loss-reset at pipeline b6, b6-twirl and b6-ucurve at logical b1, b5-wiener at denoiser b2, b5-pix2pix at denoiser b1/b5, b5-matched-filter at classifiers b1/b4, o10-collect at bottleneck b3, o11-hist and q25-readout at results b6, b1-threshold at logical b2, q21/q25 prerequisites exist. Nothing re-teaches B5, B6 or O material; P2 links and states its own argument (G1).
 6. The paper is described fairly: its contribution and its own limitations (imperfect dataset, one site and one run, no hallucination rate) are stated, and mismatches are described as statements about printed numbers.
+
+## Fix pass
+
+Paths: `app/src/content/papers/P2.paper.ts` unless stated.
+
+- **B1** done: `p2-logical:b4` (both tracks) says the 5x is the surface code at 4 ms and the 35.8x the BB code at 1.5 ms (written 1500 µs so the number ledger needs no new claim); b3 already said so.
+- **B2** done: card `licence` (line 34) and `paper-gdf` `license` in `pipeline/course.papers.json` now read CC BY 4.0 (as shown on the arXiv page), paraphrase and cite, no figure republished, attribution Mude et al., arXiv:2510.25982v2. No figure copied.
+- **S1** done: E2 `shouldSay` (about line 4600) adds the hedge (1.77 is against the pipelined baseline, so the two need not agree) and that our pipelined baseline at 1.5 ms, 151.5 ms, also rounds to 0.152 s. E2 stays a Correction, E1 a neutral note.
+- **S2** done: reference rows `bar25`, `geh25` now status read with `reliedOn` and `taughtIn` B6 `b6-loss-reset`; `tom14` `taughtIn` B6 `b6-twirl`; `ken25` reliedOn "Eqs. 1-5 and Tables I-II".
+- **S3** done: `gid25` trail at "the T-gate bullet under Eq. 1, §2.3, p. 4".
+- **S4** done: `p2-pipeline:b2` formal calls its totals illustrative inputs of ours (t_g 10 µs, t_r 3 ms, t_den 100 µs, t_c 400 µs); "our fit to Fig. 15" remains only in the read-back beats.
+- **S5** done: `p2-pipeline:b3` (both tracks) notes the axis is labelled cycle time while the caption and values are 100-round totals.
+- **Nits** done: `f14-5x` page 12; "(printed as 1.77)" in `p2-pipeline:b4` Ground-up; `win23` "abstract only (arXiv 2304.14360)"; the text-view caption says the text's numbers are placed by us; the 500 µs consistency check now carries "if Fig. 15's baseline is that classifier".
+- **Challenges**: no change needed. The review found none, but the unit `play` lists hold the plan's eight (`p2-ch-params`, `-eta`, `-batch`, `-spot`, `-eq5`, `-saving`, `-tc`, `-idle`), engine-backed with `answerFrom` and the tolerances of the plan; nothing was added.
+- Meta regenerated (`UPDATE_META=1`, twice, second run clean). Twin `pipeline/claims_papers/p2.py` rerun: fixtures byte-identical.

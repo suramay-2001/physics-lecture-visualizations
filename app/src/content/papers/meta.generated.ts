@@ -637,7 +637,7 @@ export const PAPER_CARDS: PaperCard[] = [
     },
     "date": "2025-12",
     "institution": "University of Wisconsin–Madison (Saffman also Infleqtion)",
-    "licence": "arXiv non-exclusive licence: paraphrased and cited; no figure republished; every picture is redrawn from engine data or is a printed number marked Reported.",
+    "licence": "CC BY 4.0 (as shown on the arXiv page). This lecture paraphrases and cites by section, page, figure or table and republishes no figure; attribution: Mude et al., arXiv:2510.25982v2.",
     "references": 12,
     "prerequisites": 20
   },
