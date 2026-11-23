@@ -227,7 +227,6 @@ o10 = {
     "o10CollNa40": rnd(coll(0.40), 4),
     "o10CollNa55": rnd(coll(0.55), 4),
     "o10CollNa65": rnd(coll(0.65), 4),
-    "o10CollNa70": rnd(coll(0.70), 4),
     "o10Floor5": rnd(stats.poisson.pmf(0, 5), 5),
     "o10Floor7": rnd(stats.poisson.pmf(0, 7), 6),
     "o10NScat5": rnd(5 / 0.0096, 0),
@@ -244,6 +243,9 @@ o10 = {
     "o10RepKwonHi": 0.020,
     "o10RepDepump": 3.7,
     "o10RepDepthmK": 0.18,
+    "o10RepNa40": 0.4,
+    "o10RepNa55": 0.55,
+    "o10RepNa65": 0.65,
 }
 
 # ------------------------------------------------------------------ O11
@@ -333,6 +335,8 @@ o11 = {
     "o11FS20": rnd(0.999571 * 0.99176, 6),
     # reported: Chow et al., arXiv:2206.00144, p. 3 (rates 5.44(3) x 10^4 and 5.2(3) x 10^2 per second, errors 0.005 % and 0.04 % at 0.26 ms);
     # Manetsch et al., arXiv:2403.12021v4, p. 4 (fidelity 99.99374(8) % and survival 99.98952(1) %, 80 ms) and Ext. Data Fig. 6 text, p. 21 (99.9571(4) %, 99.176(1) %, 20 ms)
+    "o11SetMb": 9.2,
+    "o11SetMd": 0.2,
     "o11RepRateB": 54.4,
     "o11RepRateD": 0.52,
     "o11RepEb": 0.00005,

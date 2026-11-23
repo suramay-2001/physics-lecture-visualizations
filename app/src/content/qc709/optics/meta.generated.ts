@@ -607,16 +607,258 @@ export const OPTICS_META: NotesLectureMeta[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "O9",
+    "number": 9,
+    "title": "One atom per trap",
+    "book": "Manetsch et al., a tweezer array of 6100 qubits, arXiv:2403.12021",
+    "pages": "pp. 2–33",
+    "topics": [
+      "why a tweezer loads about half the time",
+      "how many sites fill a target",
+      "refilling an array after losses",
+      "what an image costs in atoms"
+    ],
+    "units": [
+      {
+        "id": "o9-parity",
+        "title": "§1 Why about half",
+        "question": "In a tweezer small enough for collisions, atoms leave in pairs, so a trap ends with one atom or none, and about half the traps are full.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 2–3",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q8",
+            "unit": "q8-mixed"
+          }
+        ]
+      },
+      {
+        "id": "o9-sort",
+        "title": "§2 Moving atoms into a target",
+        "question": "A camera image finds the occupied sites and moving tweezers rearrange them, which works whenever at least as many sites are loaded as the target needs.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–33",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-atom-gates"
+          }
+        ]
+      },
+      {
+        "id": "o9-refill",
+        "title": "§3 Keeping the array full",
+        "question": "Each round refills some empty sites and loses a few atoms, and the empty fraction settles at a level set by the ratio of the two chances.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–33",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q24",
+            "unit": "q24-lindblad"
+          }
+        ]
+      },
+      {
+        "id": "o9-loss",
+        "title": "§4 The price of an image",
+        "question": "Atoms are lost at a steady rate to the vacuum and in a small share with every image, and the reloading has to keep up with both.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–33",
+        "paras": 2,
+        "feeds": [
+          {
+            "chapter": "Q24",
+            "unit": "q24-bloch-eq"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "O10",
+    "number": 10,
+    "title": "Light from one atom",
+    "book": "Chow, Little and Jau, state detection of alkali atoms in tweezers, arXiv:2206.00144",
+    "pages": "pp. 3–10",
+    "topics": [
+      "how many photons one atom scatters",
+      "the share a lens collects",
+      "how many photons make a bright atom",
+      "the heating and the depumping that stop you"
+    ],
+    "units": [
+      {
+        "id": "o10-rate",
+        "title": "§1 How many photons an atom gives",
+        "question": "An atom lit near its resonance scatters up to half a linewidth’s worth of photons a second, fewer when the light is weak or off resonance.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–5",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o10-collect",
+        "title": "§2 How many reach the camera",
+        "question": "An ideal lens gathers a share of the isotropic light set by its numerical aperture, and the whole chain of a real camera collects a good deal less.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–5",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q3",
+            "unit": "q3-born"
+          }
+        ]
+      },
+      {
+        "id": "o10-need",
+        "title": "§3 How many photons make a bright atom",
+        "question": "A bright atom shows no counts with a chance that falls as the exponential of its mean count, which fixes how many photons it must scatter.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–7",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-readout"
+          }
+        ]
+      },
+      {
+        "id": "o10-limit",
+        "title": "§4 Why not scatter more",
+        "question": "Each scattered photon heats the atom by two recoils and may drop it into the wrong hyperfine level, so the photons you can spend are limited.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 5–10",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q24",
+            "unit": "q24-lindblad"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "O11",
+    "number": 11,
+    "title": "Counting atoms",
+    "book": "Chow, Little and Jau, state detection of alkali atoms in tweezers, arXiv:2206.00144",
+    "pages": "pp. 3–10",
+    "topics": [
+      "two count histograms and a cutoff",
+      "how the error falls with the exposure",
+      "the noise of an amplifying camera",
+      "the best exposure when light also loses atoms"
+    ],
+    "units": [
+      {
+        "id": "o11-hist",
+        "title": "§1 Two Poisson histograms and a cutoff",
+        "question": "A site is read as occupied when its count reaches a cutoff, and the error is half the sum of the chances to misread a bright atom and a dark site.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 3",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-readout"
+          }
+        ]
+      },
+      {
+        "id": "o11-exposure",
+        "title": "§2 More light, fewer errors",
+        "question": "Both means grow in proportion to the exposure, so the two histograms pull apart as the square root of it and the error falls faster than any power.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 3",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q14",
+            "unit": "q14-min-error"
+          }
+        ]
+      },
+      {
+        "id": "o11-camera",
+        "title": "§3 The camera’s own noise",
+        "question": "A camera that amplifies each electron adds a random spread, and for a few photoelectrons that spread, not the photons, sets the error.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–10",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q9",
+            "unit": "q9-distance"
+          }
+        ]
+      },
+      {
+        "id": "o11-loss",
+        "title": "§4 The best exposure",
+        "question": "A longer exposure reads better and loses more atoms, so the total error has a minimum, which a toy model of the loss makes visible.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–10",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q14",
+            "unit": "q14-usd"
+          }
+        ]
+      }
+    ]
   }
 ]
 
 export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
+  "q14-min-error": [
+    {
+      "lecture": "O11",
+      "unit": "o11-exposure",
+      "label": "Optics Lab O11, §2, p. 3",
+      "where": "§2, p. 3"
+    }
+  ],
+  "q14-usd": [
+    {
+      "lecture": "O11",
+      "unit": "o11-loss",
+      "label": "Optics Lab O11, §4, pp. 3–10",
+      "where": "§4, pp. 3–10"
+    }
+  ],
   "q24-bloch-eq": [
     {
       "lecture": "O7",
       "unit": "o7-mot",
       "label": "Optics Lab O7, §2, p. 21",
       "where": "§2, p. 21"
+    },
+    {
+      "lecture": "O9",
+      "unit": "o9-loss",
+      "label": "Optics Lab O9, §4, pp. 3–33",
+      "where": "§4, pp. 3–33"
     }
   ],
   "q24-lindblad": [
@@ -625,6 +867,18 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o8-heat",
       "label": "Optics Lab O8, §4, pp. 3–25",
       "where": "§4, pp. 3–25"
+    },
+    {
+      "lecture": "O9",
+      "unit": "o9-refill",
+      "label": "Optics Lab O9, §3, pp. 3–33",
+      "where": "§3, pp. 3–33"
+    },
+    {
+      "lecture": "O10",
+      "unit": "o10-limit",
+      "label": "Optics Lab O10, §4, pp. 5–10",
+      "where": "§4, pp. 5–10"
     }
   ],
   "q25-atom-gates": [
@@ -633,6 +887,12 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o8-motion",
       "label": "Optics Lab O8, §3, pp. 3–25",
       "where": "§3, pp. 3–25"
+    },
+    {
+      "lecture": "O9",
+      "unit": "o9-sort",
+      "label": "Optics Lab O9, §2, pp. 3–33",
+      "where": "§2, pp. 3–33"
     }
   ],
   "q25-cooling": [
@@ -647,6 +907,28 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o7-pgc",
       "label": "Optics Lab O7, §3, p. 21",
       "where": "§3, p. 21"
+    }
+  ],
+  "q25-readout": [
+    {
+      "lecture": "O10",
+      "unit": "o10-need",
+      "label": "Optics Lab O10, §3, pp. 3–7",
+      "where": "§3, pp. 3–7"
+    },
+    {
+      "lecture": "O11",
+      "unit": "o11-hist",
+      "label": "Optics Lab O11, §1, p. 3",
+      "where": "§1, p. 3"
+    }
+  ],
+  "q3-born": [
+    {
+      "lecture": "O10",
+      "unit": "o10-collect",
+      "label": "Optics Lab O10, §2, pp. 3–5",
+      "where": "§2, pp. 3–5"
     }
   ],
   "q5-interferometer": [
@@ -711,6 +993,12 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o5-capture",
       "label": "Optics Lab O5, §5.2.2, pp. 61–62",
       "where": "§5.2.2, pp. 61–62"
+    },
+    {
+      "lecture": "O9",
+      "unit": "o9-parity",
+      "label": "Optics Lab O9, §1, pp. 2–3",
+      "where": "§1, pp. 2–3"
     }
   ],
   "q8-pure-rho": [
@@ -733,6 +1021,14 @@ export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
       "unit": "o3-theory",
       "label": "Optics Lab O3, §3.7–3.8, pp. 35–40",
       "where": "§3.7–3.8, pp. 35–40"
+    }
+  ],
+  "q9-distance": [
+    {
+      "lecture": "O11",
+      "unit": "o11-camera",
+      "label": "Optics Lab O11, §3, pp. 3–10",
+      "where": "§3, pp. 3–10"
     }
   ]
 }

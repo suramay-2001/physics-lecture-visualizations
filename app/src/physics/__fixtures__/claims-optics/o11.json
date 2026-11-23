@@ -19,6 +19,8 @@
   "o11ToyMisread": 0.000264,
   "o11FS80": 0.999833,
   "o11FS20": 0.991335,
+  "o11SetMb": 9.2,
+  "o11SetMd": 0.2,
   "o11RepRateB": 54.4,
   "o11RepRateD": 0.52,
   "o11RepEb": 5e-05,

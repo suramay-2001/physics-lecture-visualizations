@@ -7,7 +7,6 @@
   "o10CollNa40": 0.0417,
   "o10CollNa55": 0.0824,
   "o10CollNa65": 0.12,
-  "o10CollNa70": 0.1429,
   "o10Floor5": 0.00674,
   "o10Floor7": 0.000912,
   "o10NScat5": 521.0,
@@ -21,6 +20,9 @@
   "o10RepKwonLo": 0.016,
   "o10RepKwonHi": 0.02,
   "o10RepDepump": 3.7,
-  "o10RepDepthmK": 0.18
+  "o10RepDepthmK": 0.18,
+  "o10RepNa40": 0.4,
+  "o10RepNa55": 0.55,
+  "o10RepNa65": 0.65
  }
 }

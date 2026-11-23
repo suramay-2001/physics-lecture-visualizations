@@ -134,7 +134,7 @@ const parityLoading: OpticsPreset = {
   sliders: [{ key: 'mu', label: 'Mean number loaded μ', min: 0, max: 6, step: 0.05, default: 1, unit: '' }],
   x: { label: 'Mean number loaded μ', unit: '', from: 0, to: 6 },
   y: { label: 'Chance', unit: '', from: 0, to: 1 },
-  curves: (p) => [
+  curves: () => [
     { label: 'P(1) with pair loss', f: (mu) => parityDistribution(mu).p1 },
     { label: 'P(0) with pair loss', f: (mu) => parityDistribution(mu).p0 },
     { label: 'P(1) with no collisions', f: (mu) => poissonP1(mu) },

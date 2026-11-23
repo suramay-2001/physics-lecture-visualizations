@@ -27,7 +27,6 @@ export const V = {
   o10CollNa40: r(collectionEfficiency(0.4), 4), // fractions (printed as per cent)
   o10CollNa55: r(collectionEfficiency(0.55), 4),
   o10CollNa65: r(collectionEfficiency(0.65), 4),
-  o10CollNa70: r(collectionEfficiency(0.7), 4),
   /* o10-need */
   o10Floor5: r(zeroCountFloor(5), 5), // the chance of zero counts when the mean count is 5
   o10Floor7: r(zeroCountFloor(7), 6),
@@ -45,6 +44,9 @@ export const V = {
   o10RepKwonHi: 0.02,
   o10RepDepump: 3.7, // 10⁻⁴: "R = 1 − 3p1−εbright = 3.7 × 10⁻⁴", Chow p. 5
   o10RepDepthmK: 0.18, // mK: Manetsch p. 3
+  o10RepNa40: 0.4, // Kwon p. 2: "collected by a NA = 0.4 lens"
+  o10RepNa55: 0.55, // Manetsch p. 20: "NA = 0.55 at the imaging wavelength of 852 nm"
+  o10RepNa65: 0.65, // Manetsch p. 20: "NA = 0.65 at the trapping wavelengths"
 } as const
 
 export type ValueKey = keyof typeof V

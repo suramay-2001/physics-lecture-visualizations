@@ -43,6 +43,8 @@ export const V = {
   o11ToyMisread: r(toy.misread, 6),
   o11FS80: r(fidelityTimesSurvival(0.9999374, 0.9998952), 6),
   o11FS20: r(fidelityTimesSurvival(0.999571, 0.99176), 6),
+  o11SetMb: 9.2, // the page's example bright mean (signal nine plus a background of 0.2): a SETUP value
+  o11SetMd: 0.2, // the page's example dark mean: a SETUP value
   /* reported */
   o11RepRateB: 54.4, // kcps: "5.44(3) × 10⁴ s⁻¹", Chow p. 3
   o11RepRateD: 0.52, // kcps: "5.2(3) × 10² s⁻¹", Chow p. 3
