@@ -144,7 +144,7 @@ export const O11: Lecture = notesLecture({
           ],
         },
         {
-          text: 'This is where the track hands over. The cutoff on counts of this page is the simplest reader, and the pages on whole frames replace it by weights over many pixels (<<qc-o-b5-roi|a spot on a grid of pixels>>). The best exposure of this section is a trade that the later pages on readout in the error-correction cycle make quantitative, where the time spent reading is also the time the other atoms wait. A reading that may answer neither bright nor dark is the idea of the unit on unambiguous discrimination (<<qc-q14-usd|the unit on telling two states apart without ever being wrong>>).',
+          text: 'This is where the track hands over. The cutoff on counts of this page is the simplest reader, and the pages on whole frames replace it by weights over many pixels (<<qc-o-b5-roi|a spot on a grid of pixels>>). The best exposure here is a trade: the time spent reading is also the time the other atoms wait (<<qc-o-b6-cycle|what one round of error correction is made of>>). The GANDALF lecture carries it to a logical error (<<qc-o-p2-logical|from readout error to logical error>>). A reading that may answer neither bright nor dark is the idea of the unit on unambiguous discrimination (<<qc-q14-usd|the unit on telling two states apart without ever being wrong>>).',
         },
       ],
     },

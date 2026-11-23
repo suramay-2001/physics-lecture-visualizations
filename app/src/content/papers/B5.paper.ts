@@ -3008,7 +3008,7 @@ export const B5: PaperSpec = {
           "id": "b5-wiener:b4",
           "phase": "books",
           "text": "Two linear steps make one linear step. A threshold on the result is a threshold on a weighted sum, which the best weights already beat. So a linear cleaner followed by a threshold adds nothing beyond the best weights.",
-          "formal": "By data processing, a linear map followed by a linear statistic is $(H^{\\mathsf T}u)^{\\mathsf T}x$ for some $u$; no $u$ beats the Bayes weights, with equality when $H^{\\mathsf T}u$ spans them. The GANDALF paper says fixed filters (Gaussian, median, Wiener) blur sites at low counts; it shows no experiment, so this is our statement about linear pipelines, not a test of its claim.",
+          "formal": "By data processing, a linear map followed by a linear statistic is $(H^{\\mathsf T}u)^{\\mathsf T}x$ for some $u$; no $u$ beats the Bayes weights, with equality when $H^{\\mathsf T}u$ spans them. The GANDALF paper (<<pp-p2-denoiser|the lecture on it>>) says fixed filters (Gaussian, median, Wiener) blur sites at low counts; it shows no experiment, so this is our statement about linear pipelines, not a test of its claim.",
           "caption": "no pipeline of linear steps goes above the first bar",
           "captionFormal": "a linear cascade is one linear statistic",
           "stage": {

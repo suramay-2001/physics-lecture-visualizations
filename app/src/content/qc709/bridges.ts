@@ -215,5 +215,9 @@ export const BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'qc-o-q25-atom-gates': { course: 'qc709', lecture: 'Q25', unit: 'q25-atom-gates', label: 'rotations, Raman light and Rydberg blockade' },
   // Papers B5 (From pixels to bits), the other direction of the pp-o10 / pp-o11 rows (relay 2026-11-23: the experiment track names it in words until it is built)
   'qc-o-b5-roi': { course: 'papers', lecture: 'B5', unit: 'b5-roi', label: 'a spot on a grid of pixels' },
+  // B6 and P2 (the other direction of the track's forward links, relay 2026-11-23)
+  'qc-o-b6-cycle': { course: 'papers', lecture: 'B6', unit: 'b6-cycle', label: 'what one round of error correction is made of' },
+  'qc-o-b6-loss-reset': { course: 'papers', lecture: 'B6', unit: 'b6-loss-reset', label: 'atoms that leave, and reset or not' },
+  'qc-o-p2-logical': { course: 'papers', lecture: 'P2', unit: 'p2-logical', label: 'from readout error to logical error' },
   'qc-o-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'weighting pixels: the best sum' },
 }

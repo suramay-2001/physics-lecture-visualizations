@@ -52,6 +52,15 @@ export const PAPER_BRIDGES: Readonly<Record<string, BridgeTarget>> = {
   'pp-o11-camera': { course: 'qc709', lecture: 'O11', unit: 'o11-camera', label: 'the camera’s own noise' },
   'pp-b5-pix2pix': { course: 'papers', lecture: 'B5', unit: 'b5-pix2pix', label: 'the conditional-GAN objective, and a prior that invents an atom' },
   'pp-b5-wiener': { course: 'papers', lecture: 'B5', unit: 'b5-wiener', label: 'a linear cleaner adds nothing to the best weights' },
+  // B6 and P2 cross-links (relays 2026-11-23: each named the other in words until both were built)
+  'pp-b6-cycle': { course: 'papers', lecture: 'B6', unit: 'b6-cycle', label: 'what one round of error correction is made of' },
+  'pp-b6-twirl': { course: 'papers', lecture: 'B6', unit: 'b6-twirl', label: 'waiting costs: idle error as three chances' },
+  'pp-b6-ucurve': { course: 'papers', lecture: 'B6', unit: 'b6-ucurve', label: 'reading error against waiting error' },
+  'pp-b6-pipelining': { course: 'papers', lecture: 'B6', unit: 'b6-pipelining', label: 'hiding the classical work behind the next round' },
+  'pp-b6-loss-reset': { course: 'papers', lecture: 'B6', unit: 'b6-loss-reset', label: 'atoms that leave, and reset or not' },
+  'pp-p2-denoiser': { course: 'papers', lecture: 'P2', unit: 'p2-denoiser', label: 'denoise first, classify second' },
+  'pp-p2-pipeline': { course: 'papers', lecture: 'P2', unit: 'p2-pipeline', label: 'how the paper hides classification and reload' },
+  'pp-p2-logical': { course: 'papers', lecture: 'P2', unit: 'p2-logical', label: 'from readout error to logical error' },
   'pp-b5-matched-filter': { course: 'papers', lecture: 'B5', unit: 'b5-matched-filter', label: 'likelihood-ratio weights and the matched filter' },
   // B6 (readout in the error-correction cycle): the track's loss pages, the digitised Pauli errors, the neutral-atom hardware
   'pp-o9-loss': { course: 'qc709', lecture: 'O9', unit: 'o9-loss', label: 'atoms lost to the vacuum, and the survival of an image' },

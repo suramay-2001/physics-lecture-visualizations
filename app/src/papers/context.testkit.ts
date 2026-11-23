@@ -7,11 +7,12 @@ import { courseOfId } from '../content/courses'
 import { LECTURES } from '../content/index'
 import { PAPER_CHAPTERS } from '../content/papers/index'
 import { QC_CHAPTERS } from '../content/qc709/index'
+import { OPTICS_CHAPTERS } from '../content/qc709/optics/index'
 import { OUTLINE_CHAPTERS } from '../content/qc709/outline'
 import type { PaperContext } from './validate'
 
 export function paperContext(): PaperContext {
-  const all = [...LECTURES, ...QC_CHAPTERS, ...PAPER_CHAPTERS]
+  const all = [...LECTURES, ...QC_CHAPTERS, ...OPTICS_CHAPTERS, ...PAPER_CHAPTERS]
   return {
     unitsOf: (chapter) => all.find((l) => l.id === chapter)?.units.map((u) => u.id),
     // 709's semester map lists every planned chapter; the Papers section plans its background chapters in words until each is

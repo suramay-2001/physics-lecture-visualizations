@@ -205,11 +205,11 @@ export const P2: PaperSpec = {
     },
     {
       "id": "qec-cycle",
-      "label": "One round of checks (its timing is B6’s)",
+      "label": "What one round is made of: gates, reading, reset",
       "teach": {
         "course": "papers",
-        "chapter": "B1",
-        "unit": "b1-cycle"
+        "chapter": "B6",
+        "unit": "b6-cycle"
       },
       "needs": [
         "qec-basics"
@@ -217,11 +217,11 @@ export const P2: PaperSpec = {
     },
     {
       "id": "pauli-twirl-idle",
-      "label": "Waiting noise as a Pauli channel (the twirl is B6’s)",
+      "label": "Waiting noise as a Pauli channel (the twirl)",
       "teach": {
-        "course": "qc709",
-        "chapter": "Q13",
-        "unit": "q13-depolarizing"
+        "course": "papers",
+        "chapter": "B6",
+        "unit": "b6-twirl"
       },
       "needs": [
         "qec-basics"
@@ -242,8 +242,8 @@ export const P2: PaperSpec = {
       "label": "How many photons an atom gives a camera",
       "teach": {
         "course": "qc709",
-        "chapter": "Q25",
-        "unit": "q25-readout"
+        "chapter": "O10",
+        "unit": "o10-need"
       },
       "needs": [
         "neutral-atom-platform"
@@ -254,8 +254,8 @@ export const P2: PaperSpec = {
       "label": "Bright and dark counts, and a cutoff",
       "teach": {
         "course": "qc709",
-        "chapter": "Q25",
-        "unit": "q25-readout"
+        "chapter": "O11",
+        "unit": "o11-hist"
       },
       "needs": [
         "fluorescence-photon-budget"
@@ -626,7 +626,7 @@ export const P2: PaperSpec = {
         {
           "id": "p2-bottleneck:b2",
           "phase": "lecture",
-          "text": "A program runs for the number of T gates, times the [[pp-cycle-times|rounds $d$ per gate]], times the length of one [[pp-qec-cycle|cycle]]. A cycle is gates, then reading, then reset. Make the cycle a thousand times longer and the run is a thousand times longer.",
+          "text": "A program runs for the number of T gates, times the [[pp-cycle-times|rounds $d$ per gate]], times the length of one [[pp-qec-cycle|cycle]]. A cycle is gates, then reading, then reset. Make the cycle a thousand times longer and the run is a thousand times longer. B6 takes the cycle apart (<<pp-b6-cycle|what one round is made of>>).",
           "formal": "Eq. 1 (p. 4) approximates the run time by $N_T\\,d\\,t_{\\text{cycle}}$ for $N_T$ T gates, $d$ rounds and one [[pp-qec-cycle|cycle]]; Eq. 2 splits the cycle into syndrome gates, readout and reset. Name the [[pp-cycle-times|times]] $t_g$, $t_r$ (readout, acquisition), $t_c$ (classification), $t_{\\text{den}}$ (denoising) and the rounds $d$. A cycle $1000$ times longer lengthens the run $1000$ times.",
           "caption": "one cycle: gates, reading, reset (illustrative widths)",
           "captionFormal": "Eq. 2: $t_{\\text{cycle}}$ as three boxes (our illustrative widths, not data)",
@@ -677,7 +677,7 @@ export const P2: PaperSpec = {
           "id": "p2-bottleneck:b3",
           "phase": "lecture",
           "text": "An atom can scatter only so many photons each second, and the lens catches a small share. More laser power heats the atom and can throw it out of its trap. So we wait longer instead.",
-          "formal": "Photons collected $=$ scattering rate $\\times$ collection efficiency $\\times$ exposure $\\tau$ (pp. 1–3). Power is capped by heating and loss, so $\\tau$ grows. A Poisson count of mean $N\\propto\\tau$ has noise $\\sqrt N$, so the signal-to-noise ratio is $\\sqrt N\\propto\\sqrt\\tau$ (§3.2, p. 5): a tenfold exposure gives $3.16$ times the ratio (our arithmetic, $\\sqrt{10}$).",
+          "formal": "Photons collected $=$ scattering rate $\\times$ collection efficiency $\\times$ exposure $\\tau$ (pp. 1–3). Power is capped by heating and loss, so $\\tau$ grows (<<pp-o10-collect|how many photons reach the camera>>). A Poisson count of mean $N\\propto\\tau$ has noise $\\sqrt N$, so the signal-to-noise ratio is $\\sqrt N\\propto\\sqrt\\tau$ (§3.2, p. 5): a tenfold exposure gives $3.16$ times the ratio (our arithmetic, $\\sqrt{10}$).",
           "caption": "chance of a wrong bit against exposure (illustrative Poisson model, not the dataset)",
           "captionFormal": "toy Poisson overlap error against exposure, log axes (our inputs, not the dataset)",
           "stage": {
@@ -2882,7 +2882,7 @@ export const P2: PaperSpec = {
           "id": "p2-results:b6",
           "phase": "deeper",
           "text": "How good could any classifier be? Physics sets a floor. For Poisson counts at a given exposure, no rule beats the likelihood-ratio rule. The paper does not show how close its classifiers come to that floor.",
-          "formal": "A Bayes bound from the Poisson model of the experiment track (<<pp-q25-readout|reading an atom by counting photons against a cutoff>>) and B5's likelihood-ratio sum (<<pp-b5-matched-filter|B5>>) gives the least error of any classifier at an exposure. The paper does not compute it, so how near its classifiers get is open. The picture is B5's error against exposure in our model.",
+          "formal": "A Bayes bound from the Poisson model of the experiment track (<<pp-q25-readout|reading by counting photons>>, <<pp-o11-hist|two histograms and a cutoff>>) and B5's likelihood-ratio sum (<<pp-b5-matched-filter|B5>>) gives the least error of any classifier at an exposure. The paper does not compute it, so how near its classifiers get is open. The picture is B5's error against exposure in our model.",
           "caption": "wrong-bit chance of four weighted sums against exposure (our model)",
           "captionFormal": "exact errors against exposure; the likelihood-ratio line is the Bayes error (our model)",
           "stage": {
@@ -3047,7 +3047,7 @@ export const P2: PaperSpec = {
         {
           "id": "p2-pipeline:b2",
           "phase": "lecture",
-          "text": "Add up one round and repeat it $d$ times: that is [[pp-pipeline-times|the unpipelined time]]. If the classical work hides behind the next look, a round costs only gates and look. The classical work is paid once at the end.",
+          "text": "Add up one round and repeat it $d$ times: that is [[pp-pipeline-times|the unpipelined time]]. If the classical work hides behind the next look, a round costs only gates and look. The classical work is paid once at the end. B6 builds the same schedule from the bottom (<<pp-b6-pipelining|hiding the classical work>>).",
           "formal": "[[pp-pipeline-times|Eq. 4]]: $T_{\\text{unp}}=d\\,(t_g+t_r+t_c)$. Eq. 5: $T_{\\text{pip}}=d\\,(t_r+t_g)+(t_{\\text{den}}+t_c)$. Their difference is $T_{\\text{unp}}-T_{\\text{pip}}=(d-1)\\,t_c-t_{\\text{den}}$ (derivation below). With the lab's default inputs of 100 rounds (our fit to Fig. 15, labelled) the totals are $341.0$ and $301.5$ ms and the saving $39.5$ ms.",
           "caption": "baseline against pipelined for 100 rounds (the lab’s inputs; only three rounds are drawn)",
           "captionFormal": "Eqs. 4 and 5 at $d=100$ (three rounds drawn); totals from the engine",
@@ -3705,7 +3705,7 @@ export const P2: PaperSpec = {
           "id": "p2-pipeline:b6",
           "phase": "lecture",
           "text": "Classification can overlap the next acquisition if reloading atoms waits one round. The paper says this is safe because losing an atom is rare and does not create new correlated errors. Neither loss nor reload is simulated.",
-          "formal": "§5.3 (p. 11), citing two references: reset and atom loss can be tolerated, so reloading is deferred by one round and classification overlaps the next measurement. Neither loss nor reload is simulated in the paper (neutral note N13); treating a lost atom as a third outcome is B6's subject.",
+          "formal": "§5.3 (p. 11), citing two references: reset and atom loss can be tolerated, so reloading is deferred by one round and classification overlaps the next measurement. Neither loss nor reload is simulated in the paper (neutral note N13); treating a lost atom as a third outcome is B6's subject (<<pp-b6-loss-reset|atoms that leave, and reset or not>>).",
           "caption": "the pipelined schedule again: classical row beside the gates and acquisitions",
           "captionFormal": "pipelined boxes (illustrative widths); no loss or reload drawn",
           "stage": {
@@ -3908,8 +3908,8 @@ export const P2: PaperSpec = {
         {
           "id": "p2-logical:b1",
           "phase": "lecture",
-          "text": "A longer look is more accurate, but every data atom waits longer. [[pp-idle-error|Waiting]] adds errors, and a wrong reading adds errors. Both change the final result, so readout time enters the logical error twice.",
-          "formal": "Idle noise is modelled by a Pauli twirl with $T_1$ and $T_2$ ([[pp-idle-error|waiting error]]; p. 12, Tomita and Svore; the twirl is B6's subject). The paper prints no $T_1$, $T_2$, gate errors or rule that turns classifier errors into flips, so Fig. 14 cannot be reproduced from the paper. The curves here are a toy of ours with illustrative inputs: waiting rises, reading falls, their sum.",
+          "text": "A longer look is more accurate, but every data atom waits longer. [[pp-idle-error|Waiting]] adds errors, and a wrong reading adds errors. Both change the final result, so readout time enters the logical error twice. The trade is worked as a curve in <<pp-b6-ucurve|reading error against waiting error>>.",
+          "formal": "Idle noise is modelled by a Pauli twirl with $T_1$ and $T_2$ ([[pp-idle-error|waiting error]]; p. 12, Tomita and Svore; the twirl is B6's subject: <<pp-b6-twirl|waiting costs as three chances>>). The paper prints no $T_1$, $T_2$, gate errors or rule that turns classifier errors into flips, so Fig. 14 cannot be reproduced from the paper. The curves here are a toy of ours with illustrative inputs: waiting rises, reading falls, their sum.",
           "caption": "toy chances per cycle against readout time: waiting, reading and their sum (illustrative inputs, ours)",
           "captionFormal": "toy $p_{\\text{idle}}$, $p_m$ and $p_{\\text{eff}}$ against $t_r$ (our inputs; not fitted to the paper)",
           "stage": {

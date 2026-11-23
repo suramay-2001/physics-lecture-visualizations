@@ -141,7 +141,7 @@ export const O9: Lecture = notesLecture({
           ],
         },
         {
-          text: 'The rule of continuous operation follows. The reload rate must match the loss rate times the size of the array, or the array runs down. What goes wrong is a long image, because the number lost grows with the time the atoms are lit; the next two pages are about the light that an image needs. Loss is also a third outcome of a measurement, next to bright and dark, and the later pages on readout in the error-correction cycle treat it so.',
+          text: 'The rule of continuous operation follows. The reload rate must match the loss rate times the size of the array, or the array runs down. What goes wrong is a long image, because the number lost grows with the time the atoms are lit; the next two pages are about the light that an image needs. Loss is also a third outcome of a measurement, next to bright and dark, and the later chapter on readout in the error-correction cycle treats it so (<<qc-o-b6-loss-reset|atoms that leave, and reset or not>>).',
         },
       ],
     },

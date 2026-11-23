@@ -3840,8 +3840,8 @@ export const B6: PaperSpec = {
         {
           "id": "b6-loss-reset:b6",
           "phase": "deeper",
-          "text": "Faster, brighter imaging heats the atoms and raises the chance of losing them. The experiment track weighs this against the reading error with a toy loss rate on its page about loss in the exposure. This chapter only notes the coupling. The lecture P2 shows how the paper hides the classification and the reload behind the next round.",
-          "formal": "Faster, brighter imaging raises heating and loss, which couples the reading error to the loss rate (experiment track, <<pp-o11-loss|O11>>, with its toy loss model). B6 only notes the coupling. The lecture P2 shows how the paper's pipelined schedule hides classification and a deferred reload behind the next round.",
+          "text": "Faster, brighter imaging heats the atoms and raises the chance of losing them. The experiment track weighs this against the reading error with a toy loss rate on <<pp-o11-loss|its page about loss in the exposure>>. This chapter only notes the coupling. The lecture P2 shows (<<pp-p2-pipeline|how the paper hides classification and reload>>) how the paper hides the classification and the reload behind the next round.",
+          "formal": "Faster, brighter imaging raises heating and loss, which couples the reading error to the loss rate (experiment track, <<pp-o11-loss|O11>>, with its toy loss model). B6 only notes the coupling. The lecture P2 shows how the paper's pipelined schedule hides classification and a deferred reload behind the next round, and carries the reading error to a logical error (<<pp-p2-logical|from readout error to logical error>>).",
           "caption": "loss accumulates with every image (reported input)",
           "captionFormal": "the chance of no loss against rounds",
           "stage": {
