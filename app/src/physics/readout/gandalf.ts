@@ -11,6 +11,9 @@ const pos = (x: number, what: string): void => {
   if (!(Number.isFinite(x) && x >= 0)) throw new RangeError(`${what}: a finite number >= 0`)
 }
 
+/** The printed bars of Fig. 15 (p. 13): the total time in ms of `rounds` QEC rounds at readout-error tolerances 1, 2 and 3 %. Unpipelined baseline, pipelined baseline, GANDALF (pipelined). */
+export const FIG15 = { rounds: 100, unp: [451.0, 371.0, 271.0], pip: [401.5, 321.5, 221.5], gan: [291.1, 181.1, 151.1] } as const
+
 /** The paper's Eq. 4: d rounds of gates, acquisition and classification in a row. */
 export const cycleUnpipelined = (d: number, tg: number, tr: number, tc: number): number => unpipelinedTotal(d, tg, tr, tc)
 /** Eq. 5: the classical work of a round (denoise, then classify) is c = t_den + t_c, hidden behind the next acquisition (the generic total; equals d(t_r + t_g) + c while c <= t_g + t_r). */

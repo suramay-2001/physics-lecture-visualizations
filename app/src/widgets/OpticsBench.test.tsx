@@ -13,6 +13,7 @@ import { readoutRows, resetParams, setParam, sliderText } from './opticsBench/mo
 import { decimalsOf, fixed, niceDomain, niceStep, niceTicks, pathOf, sample, scale, yExtent } from './opticsBench/plot'
 import presetsSource0 from './opticsBench/presets.ts?raw'
 import presetsB5Source from './opticsBench/presetsB5.ts?raw'
+import presetsP2Source from './opticsBench/presetsP2.ts?raw'
 import { OPTICS_PRESETS, OPTICS_PRESET_IDS, defaultParams, hasPreset, type OpticsPreset } from './opticsBench/presets'
 import { opticsPresetProblems, opticsPresetsProblems, opticsWidgetProblems } from './opticsBench/validate'
 
@@ -229,7 +230,7 @@ describe('SSR render of the demo preset', () => {
 })
 
 /** presets.ts and the chapter files beside it (presetsB5.ts), read as one text */
-const presetsSource = `${presetsSource0}\n${presetsB5Source}`
+const presetsSource = `${presetsSource0}\n${presetsB5Source}\n${presetsP2Source}`
 
 describe('source lints', () => {
   /** The text of each preset from its `curves:` entry to the end of the object, strings and comments removed. */

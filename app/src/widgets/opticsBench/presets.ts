@@ -63,6 +63,7 @@ import {
 } from '../../physics/optics/cooling'
 
 import { B5_PRESETS } from './presetsB5'
+import { P2_PRESETS } from './presetsP2'
 
 export interface OpticsSlider {
   /** The key the preset's functions read from `p`: letters and digits, starting with a letter. */
@@ -506,6 +507,7 @@ export const OPTICS_PRESETS: Readonly<Record<string, OpticsPreset>> = {
   'ramsey-fountain': ramseyFountain,
   'matter-wave-onset': matterWaveOnset,
   ...B5_PRESETS,
+  ...P2_PRESETS,
 }
 
 export const OPTICS_PRESET_IDS: readonly string[] = Object.keys(OPTICS_PRESETS)

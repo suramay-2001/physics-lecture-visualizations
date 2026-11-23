@@ -7,6 +7,7 @@
  */
 import type { CameraFrameState, PlotPoint, PlotPointsState, StageState, TimelineState } from '../content/stage'
 import {
+  FIG15,
   argminGrid,
   batchTime,
   cyclePipelined,
@@ -126,8 +127,7 @@ export const readoutTimelineRecipe = def({
 /* fig15-readback: the printed bars of Fig. 15 and the times they imply                            */
 /* ---------------------------------------------------------------------------------------------- */
 
-/** The printed bars of Fig. 15 (p. 13), in ms for 100 rounds, at readout-error tolerances 1, 2 and 3 %: the same repeated by the claims through `uses`. */
-const F15 = { unp: [451.0, 371.0, 271.0], pip: [401.5, 321.5, 221.5], gan: [291.1, 181.1, 151.1] } as const
+const F15 = FIG15
 const nearestGap = (x: number): number => Math.min(...[...F15.unp, ...F15.pip, ...F15.gan].map((b) => Math.abs(b - x)))
 
 export const fig15ReadbackRecipe = def({
@@ -145,7 +145,7 @@ export const fig15ReadbackRecipe = def({
   }),
   run: (p) => {
     const i = p.tol - 1
-    const d = p.d ?? 100
+    const d = p.d ?? FIG15.rounds
     const tg = p.tg ?? 0.01
     const tdc = p.tdc ?? 0.1
     const tc = impliedClassTime(F15.unp[0], F15.pip[0], d)
