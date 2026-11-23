@@ -78,6 +78,13 @@ export type SpinLadderShot = (typeof SPIN_LADDER_SHOTS)[number]
 export const WALK_GRAPH_SHOTS = ['WG-STAR', 'WG-RING'] as const
 export type WalkGraphShot = (typeof WALK_GRAPH_SHOTS)[number]
 
+/** camera-frame (SVG): one simulated grey-level frame of a tweezer array (GANDALF platform G2). */
+export const CAMERA_FRAME_SHOTS = ['CF-FRAME'] as const
+export type CameraFrameShot = (typeof CAMERA_FRAME_SHOTS)[number]
+/** timeline (SVG): ordered boxes on a time axis (GANDALF platform G2). */
+export const TIMELINE_SHOTS = ['TL-LANES'] as const
+export type TimelineShot = (typeof TIMELINE_SHOTS)[number]
+
 export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   'lab-r3': LAB_SHOTS,
   'hilbert-plane': PLANE_SHOTS,
@@ -103,6 +110,8 @@ export const SHOTS: { readonly [K in StageKind]: readonly string[] } = {
   wavefunction: WAVEFUNCTION_SHOTS,
   'spin-ladder': SPIN_LADDER_SHOTS,
   'walk-graph': WALK_GRAPH_SHOTS,
+  'camera-frame': CAMERA_FRAME_SHOTS,
+  timeline: TIMELINE_SHOTS,
 }
 
 /** Term-link targets per kind (hover/focus on a term → the scene highlights this anchor, D §4.0). */
@@ -181,6 +190,10 @@ export const ANCHORS = {
   'spin-ladder': ['level', 'bar', 'arrow', 'matrix', 'cone'],
   // P-Q19-story §9.2 S1: a vertex (the centre or an outer one), a spoke (an edge of the star), the extra edge and a cut edge of the ring
   'walk-graph': ['vertex', 'spoke', 'extra', 'cut'],
+  // GANDALF platform G2: a pixel, the region of interest, an atom's ring and a filter's weights
+  'camera-frame': ['cell', 'roi', 'atom', 'weights'],
+  // GANDALF platform G2: a lane, a box, a vertical mark and the total line
+  timeline: ['lane', 'box', 'mark', 'total'],
 } as const satisfies { readonly [K in StageKind]: readonly string[] }
 
 export type AnchorOf<K extends StageKind> = (typeof ANCHORS)[K][number]

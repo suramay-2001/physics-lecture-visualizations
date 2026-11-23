@@ -63,7 +63,7 @@ import type { Axis, Sign } from '../physics/sg'
 import type { NamedKet } from '../physics/spin'
 import type { CourseId } from './courses'
 import type { Claim, Ref, WidgetSpec } from './schema'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from './stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CameraFrameShot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TimelineShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from './stageVocab'
 import type { AxisSpec, JValue } from '../physics/angmom'
 import type { BitsGate } from '../physics/qc/bits'
 import type { Circuit, GateName } from '../physics/qc/circuit'
@@ -80,7 +80,7 @@ export type StageKind448 = (typeof STAGE_KINDS_448)[number]
  * any of them; a new SVG kind joins this list, whichever course needs it. Their fidelity notes are shared too
  * (content/fidelity.svg.ts, registered with the kinds' lazy chunk).
  */
-export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder', 'walk-graph'] as const
+export const STAGE_KINDS_709 = ['complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane', 'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder', 'walk-graph', 'camera-frame', 'timeline'] as const
 export type StageKind709 = (typeof STAGE_KINDS_709)[number]
 export const STAGE_KINDS = [...STAGE_KINDS_448, ...STAGE_KINDS_709] as const
 export type StageKind = (typeof STAGE_KINDS)[number]
@@ -117,6 +117,8 @@ export const KIND_RENDER: { readonly [K in StageKind]: 'gl' | 'svg' } = {
   wavefunction: 'svg',
   'spin-ladder': 'svg',
   'walk-graph': 'svg',
+  'camera-frame': 'svg',
+  timeline: 'svg',
 }
 export const isSvgKind = (k: StageKind): boolean => KIND_RENDER[k] === 'svg'
 /** The kinds of a list drawn on the WebGL canvas / as SVG (order kept). */
@@ -840,6 +842,8 @@ export interface PlotSeries {
   params?: { d?: number; p?: number; preset?: PlotPreset; vote?: number; q?: number; m?: number } & OpticsSeriesParams
   /** The name the series carries in the legend (at most 24 characters); default the function's own. */
   label?: string
+  /** GANDALF platform G2 (additive): draw the series as a staircase (a histogram or probability mass function): each point's value is held across its cell. */
+  step?: boolean
 }
 /**
  * The one NAMED curve (every beat before B1). `PlotState` and `PlotSeriesState` are the two members of the `plot` union; each lists every field itself (the tooling that lists a kind's
@@ -858,6 +862,8 @@ export interface PlotState {
      * together (n² beside 2ⁿ). Each curve's end is labelled with its name. Markers sit on both curves. Needs a different curve from `fn`.
      */
     vs?: PlotCurveName
+    /** GANDALF platform G2 (additive): draw the curve (and `vs`) as a staircase, each sample's value held across its cell (a histogram or probability mass function). */
+    step?: boolean
   }
   series?: undefined
   xs?: undefined
@@ -1621,6 +1627,78 @@ export interface WalkGraphState {
   shot?: WalkGraphShot
 }
 
+/* ---- camera-frame (SVG; GANDALF platform G2): one grey-level camera frame of a tweezer array, drawn from physics/optics/imaging.ts ---- */
+/**
+ * A frame of `rows` x `cols` pixels (1-12 each) with atoms, a point spread function, a background and a noise model; every grey level is the engine's (`cameraFrame`:
+ * the mean photons per pixel, then ONE seeded draw, so the same seed always gives the same frame). It is a simulation, never a measurement.
+ *
+ * `occupancy`: a row-major string of rows x cols bits (a 1 is an atom on that pixel) or `{ p, seed }` (a seeded random filling); `sites`: explicit atoms `[row, column]`
+ * (0-based, at most 16; replaces `occupancy`). `photons`: mean photons per atom over its whole point spread function (0-200, default 20); `psf`: its standard deviation in pixels
+ * (0.3-1.5, default 0.8); `background`: mean photons per pixel (0-5, default 0); `noise`: 'none' (the means), 'poisson' (photon counting) or 'emccd' (needs `gain`, 1-1000 counts per
+ * photoelectron, and `sigma`, read noise 0-100 counts); `seed`: a whole number (default 1). `roi`: true or `{ size }` (1-5, default 3) outlines the pixels around the first atom.
+ * `show` (one panel): 'occupancy' (or 'truth'), 'photons' (the means), 'counts' (the draw), 'weights' (a filter's weights over the ROI), 'denoised' (the Wiener-smoothed counts; needs
+ * `denoise: 'wiener'`); default 'counts' with noise, else 'photons'. `panel` (1-3, instead of `show`; `panels` repeats its length): `{ show, filter? }` each, `filter` ('square', 'gauss',
+ * 'llr', 'centre') only for 'weights'. `readouts`: 'atoms' (the number of atoms, default) and 'roi' (the expected photons in the ROI, from the means, never from the draw).
+ */
+export const CAMERA_FRAME_SHOW = ['occupancy', 'truth', 'photons', 'counts', 'weights', 'denoised'] as const
+export type CameraFrameShow = (typeof CAMERA_FRAME_SHOW)[number]
+export const CAMERA_FRAME_FILTERS = ['square', 'gauss', 'llr', 'centre'] as const
+export type CameraFrameFilter = (typeof CAMERA_FRAME_FILTERS)[number]
+export const CAMERA_FRAME_NOISE = ['none', 'poisson', 'emccd'] as const
+export type CameraFrameNoise = (typeof CAMERA_FRAME_NOISE)[number]
+export const CAMERA_FRAME_READOUTS = ['atoms', 'roi'] as const
+export type CameraFrameReadout = (typeof CAMERA_FRAME_READOUTS)[number]
+export interface CameraFrameState {
+  kind: 'camera-frame'
+  rows: number
+  cols: number
+  occupancy?: string | { p: number; seed: number }
+  sites?: [number, number][]
+  photons?: number
+  psf?: number
+  background?: number
+  noise?: CameraFrameNoise
+  gain?: number
+  sigma?: number
+  seed?: number
+  roi?: boolean | { size: number }
+  show?: CameraFrameShow
+  panels?: 1 | 2 | 3
+  panel?: { show: CameraFrameShow; filter?: CameraFrameFilter }[]
+  denoise?: 'none' | 'wiener'
+  readouts?: CameraFrameReadout[]
+  shot?: CameraFrameShot
+}
+
+/* ---- timeline (SVG; GANDALF platform G2): ordered boxes on a time axis, one lane per row (rounds, pipelining) ---- */
+/**
+ * Lanes of timed boxes. `rows` (1-8): `{ label, group?, segments }`; a segment is `{ kind, from, to, label? }` with kind 'gate', 'move', 'acquire', 'reset', 'classify' or
+ * 'denoise', `0 <= from < to`, ordered and not overlapping within a row (at most 64 a row, 200 in all); the times come from the engine (physics/qec/timing.ts and the pages' own
+ * segment builders), never from the story. Rows with the same `group` are one schedule (an unpipelined run has a row of gates and acquisitions and a row of classification, say); a
+ * row with no group is its own. `unit`: 'ms' (default), 'µs' or 's'. `marks`: at most 4 `{ at, label }` vertical lines. `readouts`: 'total' (each schedule's end: its last box's `to`; default)
+ * and 'saving' (the first schedule's end minus the second's, and the share).
+ */
+export const TIMELINE_SEGMENT_KINDS = ['gate', 'move', 'acquire', 'reset', 'classify', 'denoise'] as const
+export type TimelineSegmentKind = (typeof TIMELINE_SEGMENT_KINDS)[number]
+export const TIMELINE_UNITS = ['ms', 'µs', 's'] as const
+export type TimelineUnit = (typeof TIMELINE_UNITS)[number]
+export const TIMELINE_READOUTS = ['total', 'saving'] as const
+export type TimelineReadout = (typeof TIMELINE_READOUTS)[number]
+export interface TimelineSegment {
+  kind: TimelineSegmentKind
+  from: number
+  to: number
+  label?: string
+}
+export interface TimelineState {
+  kind: 'timeline'
+  rows: { label: string; group?: string; segments: TimelineSegment[] }[]
+  unit?: TimelineUnit
+  marks?: { at: number; label: string }[]
+  readouts?: TimelineReadout[]
+  shot?: TimelineShot
+}
+
 export type StageState =
   | LabState
   | HilbertPlaneState
@@ -1648,6 +1726,8 @@ export type StageState =
   | WavefunctionState
   | SpinLadderState
   | WalkGraphState
+  | CameraFrameState
+  | TimelineState
 export type StateOf<K extends StageKind> = Extract<StageState, { kind: K }>
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -2160,6 +2240,20 @@ export const PASSPORT: { readonly [K in StageKind]: Passport } = {
     note: 'schematic layout · chances and counts are the engine’s; a width is where the walker may be found, not where a particle sits',
     axes: ['vertex', 'edge'],
     fidelityKey: 'walk-graph',
+  },
+  // GANDALF platform G2 (physics/optics/imaging.ts): one simulated frame of a tweezer array; every grey level is the engine's mean or one seeded draw
+  'camera-frame': {
+    title: 'CAMERA FRAME · counts per pixel · simulated',
+    note: 'schematic grid · simulated, not a measurement · the means are the engine’s, the noise is one seeded draw',
+    axes: ['row', 'column'],
+    fidelityKey: 'camera-frame',
+  },
+  // GANDALF platform G2 (physics/qec/timing.ts): boxes on a time axis; each box's start and end come from the engine
+  timeline: {
+    title: 'TIMELINE · boxes on a time axis',
+    note: 'schematic lanes · box edges and totals are the engine’s times; the lane order and colours mean nothing',
+    axes: ['time', 'lane'],
+    fidelityKey: 'timeline',
   },
 }
 

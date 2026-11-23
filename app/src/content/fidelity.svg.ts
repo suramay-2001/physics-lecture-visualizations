@@ -796,6 +796,50 @@ export const SVG_FIDELITY_VARIANTS: Partial<Record<FidelityKey, Fidelity>> = {
   },
 }
 
+// GANDALF platform G2: the camera frame is a shared SVG kind (physics/optics/imaging.ts); ids carry no course prefix, as the plan names them
+SVG_FIDELITY['camera-frame'] = {
+  exact: [
+    {
+      id: 'camera-frame-cells',
+      text: 'Each pixel’s mean is the engine’s: the atom’s photons times the share of the point spread function that falls in that pixel, plus the background. A grey level is photons or counts in that pixel.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'camera-frame-weights',
+      text: 'A weights panel shows a filter over the region of interest. Its weights come from the engine’s formulas for our model, not a trained network.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'camera-frame-draw',
+      text: '**A frame is one random draw of a simulation, never a measurement.** Another seed gives other counts; only the means, not a single pixel’s count, are claims.',
+    },
+  ],
+}
+
+// GANDALF platform G2: the timeline is a shared SVG kind (physics/qec/timing.ts)
+SVG_FIDELITY.timeline = {
+  exact: [
+    {
+      id: 'timeline-boxes',
+      text: 'Each box starts and ends at the engine’s times, and a schedule’s total is its last box’s end. Boxes in one row never overlap.',
+    },
+  ],
+  schematic: [
+    {
+      id: 'timeline-lanes',
+      text: 'The order of the lanes and the colours of the box kinds are drawing choices; a box’s label is its kind, not a quantity.',
+    },
+  ],
+  misleading: [
+    {
+      id: 'timeline-overlap',
+      text: '**A box’s length is elapsed time, never effort.** Two lanes overlap only where the engine’s times overlap; the picture shows what the schedule does, not what it could.',
+    },
+  ],
+}
+
 registerSharedFidelity(SVG_FIDELITY)
 registerSharedFidelity(SVG_FIDELITY_VARIANTS)
 

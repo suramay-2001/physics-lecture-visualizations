@@ -45,6 +45,10 @@ import { TwoQubitScene } from './TwoQubitScene'
 import { interpTwoQubitStage, resolveTwoQubitStage, twoQubitReadouts, validateTwoQubitStage } from './twoQubit'
 import { WalkGraphScene } from './WalkGraphScene'
 import { interpWalkGraphStage, resolveWalkGraphStage, validateWalkGraphStage, walkGraphReadouts } from './walkGraph'
+import { CameraFrameScene } from './CameraFrameScene'
+import { cameraFrameReadouts, interpCameraFrameStage, resolveCameraFrameStage, validateCameraFrameStage } from './cameraFrame'
+import { TimelineScene } from './TimelineScene'
+import { interpTimelineStage, resolveTimelineStage, timelineReadouts, validateTimelineStage } from './timeline'
 import './svg.css'
 
 const complexPlane: SvgKindDef<'complex-plane'> = {
@@ -233,6 +237,26 @@ const walkGraph: SvgKindDef<'walk-graph'> = {
   print: { w: 320, h: 300 },
 }
 
+const cameraFrame: SvgKindDef<'camera-frame'> = {
+  kind: 'camera-frame',
+  resolve: resolveCameraFrameStage,
+  interpolate: interpCameraFrameStage,
+  validate: validateCameraFrameStage,
+  readouts: cameraFrameReadouts,
+  Scene: CameraFrameScene,
+  print: { w: 320, h: 300 },
+}
+
+const timeline: SvgKindDef<'timeline'> = {
+  kind: 'timeline',
+  resolve: resolveTimelineStage,
+  interpolate: interpTimelineStage,
+  validate: validateTimelineStage,
+  readouts: timelineReadouts,
+  Scene: TimelineScene,
+  print: { w: 320, h: 220 },
+}
+
 /** Every SVG kind, in KIND_RENDER order. */
 export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   complexPlane as unknown as SvgKindDef,
@@ -253,6 +277,8 @@ export const SVG_KIND_DEFS: readonly SvgKindDef[] = [
   wavefunction as unknown as SvgKindDef,
   spinLadder as unknown as SvgKindDef,
   walkGraph as unknown as SvgKindDef,
+  cameraFrame as unknown as SvgKindDef,
+  timeline as unknown as SvgKindDef,
 ]
 
 for (const def of SVG_KIND_DEFS) registerSvgKind(def)

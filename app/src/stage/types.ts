@@ -35,6 +35,12 @@ import type {
   SpinLadderReadout,
   WalkGraphReadout,
   WalkGraphShow,
+  CameraFrameReadout,
+  CameraFrameFilter,
+  CameraFrameNoise,
+  TimelineReadout,
+  TimelineSegmentKind,
+  TimelineUnit,
   WavefunctionOverlay,
   WavefunctionPanel,
   WavefunctionPotential,
@@ -84,7 +90,7 @@ import type {
   TwoQubitState,
   ViewSlot,
 } from '../content/stage'
-import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from '../content/stageVocab'
+import type { Anchor, AmpShot, BallShot, BitsShot, BlochShot, Bb84Shot, CircuitShot, ClocksShot, CodeShot, ComplexShot, GroverPlaneShot, HopfShot, LabShot, MatrixShot, ModuleMapShot, OperatorShot, PauliProgramShot, PlaneShot, PlotShot, SpacetimeShot, SpinLadderShot, SurgeryGraphShot, TimelineShot, CameraFrameShot, TwoQubitShot, WalkGraphShot, WavefunctionShot } from '../content/stageVocab'
 import type { AxisSpec, JValue } from '../physics/angmom'
 import type { Vec } from '../physics/linalg'
 import type { OpClass } from '../physics/operators'
@@ -629,6 +635,8 @@ export interface ResolvedPlotSeries {
   points: { x: number; y: number }[]
   /** x is the distance d or the rounds R (only whole odd points, drawn as dots joined by a line). */
   discrete: boolean
+  /** drawn as a staircase (a histogram or probability mass function) */
+  step?: boolean
 }
 /** B2: a scatter of points (content/stage.ts PlotPointsState), with the drawn ranges. */
 export interface ResolvedPlotPoints {
@@ -678,6 +686,8 @@ export interface ResolvedPlot {
   reportedMarks?: { x: number; label: string; source: string }[]
   /** B3: the authored whole x values of a function of d or of the rounds R (carried only when authored). */
   xs?: number[]
+  /** GANDALF platform G2: the named curve (and `vs`) is drawn as a staircase (carried only when authored). */
+  step?: boolean
   shot?: PlotShot
 }
 
@@ -1829,6 +1839,74 @@ export interface ResolvedWalkGraph {
   shot?: WalkGraphShot
 }
 
+/* --------------------------------------------- camera-frame (SVG; GANDALF platform G2) --------------------------------------------- */
+/** The authored inputs of a camera frame (normalised: defaults filled in, the occupancy as a string). */
+export interface CameraFrameInputs {
+  rows: number
+  cols: number
+  /** the atoms as pixel positions, from `sites` or the occupancy */
+  sites: { r: number; c: number }[]
+  photons: number
+  psf: number
+  background: number
+  noise: CameraFrameNoise
+  gain: number | null
+  sigma: number | null
+  seed: number
+  roi: number | null
+  panels: { show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised'; filter: CameraFrameFilter | null }[]
+  denoise: 'none' | 'wiener'
+  readouts: CameraFrameReadout[]
+  shot?: CameraFrameShot
+}
+/** One drawn panel: row-major values with the range the grey scale spans and the unit its legend names. */
+export interface CameraFramePanel {
+  show: 'occupancy' | 'photons' | 'counts' | 'weights' | 'denoised'
+  filter: CameraFrameFilter | null
+  title: string
+  unit: string
+  values: number[]
+  lo: number
+  hi: number
+}
+export interface ResolvedCameraFrame {
+  kind: 'camera-frame'
+  rows: number
+  cols: number
+  sites: { r: number; c: number }[]
+  noise: CameraFrameNoise
+  panels: CameraFramePanel[]
+  /** the region of interest around the first atom: its top-left pixel and side (null without one) */
+  roi: { r0: number; c0: number; size: number } | null
+  /** the expected photons in the ROI (from the means, never from the draw); null without an ROI */
+  roiMean: number | null
+  readouts: CameraFrameReadout[]
+  inputs: CameraFrameInputs
+  shot?: CameraFrameShot
+}
+
+/* --------------------------------------------- timeline (SVG; GANDALF platform G2) --------------------------------------------- */
+export interface TimelineInputs {
+  rows: { label: string; group: string; segments: { kind: TimelineSegmentKind; from: number; to: number; label: string | null }[] }[]
+  unit: TimelineUnit
+  marks: { at: number; label: string }[]
+  readouts: TimelineReadout[]
+  shot?: TimelineShot
+}
+export interface ResolvedTimeline {
+  kind: 'timeline'
+  rows: { label: string; group: string; segments: { kind: TimelineSegmentKind; from: number; to: number; label: string | null }[]; end: number }[]
+  unit: TimelineUnit
+  marks: { at: number; label: string }[]
+  /** the schedules (rows sharing a group, in first-row order) with the end of each: its last box's `to` */
+  schedules: { name: string; end: number }[]
+  /** the right end of the axis: the longest end, or a mark beyond it */
+  span: number
+  readouts: TimelineReadout[]
+  inputs: TimelineInputs
+  shot?: TimelineShot
+}
+
 export type AnyResolved =
   | ResolvedLab
   | ResolvedPlane
@@ -1855,6 +1933,8 @@ export type AnyResolved =
   | ResolvedWavefunction
   | ResolvedSpinLadder
   | ResolvedWalkGraph
+  | ResolvedCameraFrame
+  | ResolvedTimeline
 export type Resolved<K extends StageKind> = Extract<AnyResolved, { kind: K }>
 
 /* ---------------------------------------- frames ---------------------------------------- */

@@ -108,7 +108,7 @@ export class NotesSpecError extends Error {
  */
 export const NOTES_FIGURE_KINDS: readonly string[] = [
   'hilbert-plane', 'bloch', 'bloch-ball', 'operator-space', 'lab-r3', 'complex-plane', 'amplitudes', 'circuit', 'matrix', 'two-qubit', 'plot', 'bb84', 'clocks', 'grover-plane',
-  'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder', 'walk-graph',
+  'bits', 'code', 'spacetime', 'pauli-program', 'surgery-graph', 'module-map', 'wavefunction', 'spin-ladder', 'walk-graph', 'camera-frame', 'timeline',
 ]
 
 /**

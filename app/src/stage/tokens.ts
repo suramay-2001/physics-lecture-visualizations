@@ -38,6 +38,8 @@ export const STAGE_BG: { readonly [K in StageKind]: string } & { readonly inset:
   wavefunction: '#161d2c', // a complex function along a line (448 L12; SVG): the state ground
   'spin-ladder': '#161d2c', // the m ladder of spin j (448 L7; SVG): the state ground
   'walk-graph': '#161d2c', // the star and ring graphs of Q19's walks (709 Q19; SVG): the state ground
+  'camera-frame': '#161d2c', // a simulated camera frame (GANDALF platform; SVG): the state ground
+  timeline: '#161d2c', // boxes on a time axis (GANDALF platform; SVG): the state ground
   'module-map': '#161d2c', // the bicycle machine as modules, adapters and a T factory (Papers P1; SVG): the state ground
   inset: '#1d2536', // inset views (mini Bloch, lab inset), L* 14.7
 }
@@ -81,6 +83,8 @@ export const STAGE_THEME: { readonly [C in CourseId]: { readonly bg: typeof STAG
       wavefunction: '#101830',
       'spin-ladder': '#101830',
       'walk-graph': '#101830',
+      'camera-frame': '#101830',
+      timeline: '#101830',
       'module-map': '#101830',
       inset: '#18223d',
     },
