@@ -1,0 +1,26 @@
+{
+ "about": "Claim values for the Optics Lab page O10 (light from one atom), quadrature of the collected solid angle and closed forms. Regenerate: python3 pipeline/claims_optics/o_track.py",
+ "values": {
+  "o10RmaxCs": 1.64,
+  "o10RSat": 8.22,
+  "o10RExample": 1.73,
+  "o10CollNa40": 0.0417,
+  "o10CollNa55": 0.0824,
+  "o10CollNa65": 0.12,
+  "o10CollNa70": 0.1429,
+  "o10Floor5": 0.00674,
+  "o10Floor7": 0.000912,
+  "o10NScat5": 521.0,
+  "o10NScat7": 729.0,
+  "o10TauM5": 0.0578,
+  "o10GainK": 198.0,
+  "o10PhotonsToDepth": 908.0,
+  "o10DepumpN": 2702.0,
+  "o10Surv500": 0.831,
+  "o10RepCE": 0.0096,
+  "o10RepKwonLo": 0.016,
+  "o10RepKwonHi": 0.02,
+  "o10RepDepump": 3.7,
+  "o10RepDepthmK": 0.18
+ }
+}

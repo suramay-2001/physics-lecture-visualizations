@@ -1,0 +1,32 @@
+{
+ "about": "Claim values for the Optics Lab page O11 (counting atoms), scipy Poisson scans, the Erlang law convolved with read noise, and a grid search. Regenerate: python3 pipeline/claims_optics/o_track.py",
+ "values": {
+  "o11ExErr": 0.00323,
+  "o11ExEb": 0.00531,
+  "o11ExEd": 0.00115,
+  "o11DprimeRatio": 2.0,
+  "o11Err50": 0.0449,
+  "o11Err100": 0.014,
+  "o11Err150": 0.00267,
+  "o11Err260": 0.000196,
+  "o11Err350": 1.66e-05,
+  "o11PaperMean": 0.000225,
+  "o11Enf": 2.0,
+  "o11EmccdErr": 0.000175,
+  "o11EmccdFloor": 7.5,
+  "o11ToyTau": 234.0,
+  "o11ToyTotal": 0.0012,
+  "o11ToyMisread": 0.000264,
+  "o11FS80": 0.999833,
+  "o11FS20": 0.991335,
+  "o11RepRateB": 54.4,
+  "o11RepRateD": 0.52,
+  "o11RepEb": 5e-05,
+  "o11RepEd": 0.0004,
+  "o11RepMs": 0.26,
+  "o11RepF80": 0.9999374,
+  "o11RepS80": 0.9998952,
+  "o11RepF20": 0.999571,
+  "o11RepS20": 0.99176
+ }
+}
