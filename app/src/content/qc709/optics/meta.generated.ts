@@ -482,10 +482,173 @@ export const OPTICS_META: NotesLectureMeta[] = [
         "feeds": []
       }
     ]
+  },
+  {
+    "id": "O7",
+    "number": 7,
+    "title": "From vapour to a cold cloud",
+    "book": "Manetsch et al., a tweezer array of 6100 qubits, arXiv:2403.12021, Methods",
+    "pages": "pp. 12–21",
+    "topics": [
+      "the order of one shot of the run",
+      "a magneto-optical trap filling from a vapour",
+      "a polarization-gradient step below the Doppler limit",
+      "what the numbers of the paper check"
+    ],
+    "units": [
+      {
+        "id": "o7-sequence",
+        "title": "§1 The order of one shot",
+        "question": "One shot of the run is a short list of steps, and most of its time goes to cooling, cleaning up and imaging rather than to gates.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 12–21",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-cooling"
+          }
+        ]
+      },
+      {
+        "id": "o7-mot",
+        "title": "§2 Filling the trap",
+        "question": "The cloud grows by a balance of capture and loss, and the force law of page O5 turns the settings of the run into a spring, a damping and a size.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 21",
+        "paras": 4,
+        "feeds": [
+          {
+            "chapter": "Q24",
+            "unit": "q24-bloch-eq"
+          }
+        ]
+      },
+      {
+        "id": "o7-pgc",
+        "title": "§3 Below the Doppler limit, on purpose",
+        "question": "Turning off the field, raising the detuning and lowering the intensity let the polarization gradients cool the cloud far under the plain Doppler limit.",
+        "challenges": [],
+        "equations": [],
+        "pages": "p. 21",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-cooling"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "O8",
+    "number": 8,
+    "title": "One atom in a beam of light",
+    "book": "Manetsch et al., a tweezer array of 6100 qubits, arXiv:2403.12021, Methods",
+    "pages": "pp. 3–25",
+    "topics": [
+      "the focus of a tweezer and its size",
+      "the depth from the atom’s polarizability",
+      "how far the atom moves in the well",
+      "what the trap light itself does to the atom"
+    ],
+    "units": [
+      {
+        "id": "o8-beam",
+        "title": "§1 The size of the focus",
+        "question": "A laser focused by an objective makes a bright spot a little over a micrometre wide, and the two measured trap frequencies are enough to size it.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–25",
+        "paras": 4,
+        "feeds": []
+      },
+      {
+        "id": "o8-depth",
+        "title": "§2 How deep the well is",
+        "question": "Far below both cesium lines the depth is the polarizability times the intensity, and a two-line model gives a depth near the reported average.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–25",
+        "paras": 3,
+        "feeds": []
+      },
+      {
+        "id": "o8-motion",
+        "title": "§3 Cold enough to stay in the well",
+        "question": "A cloud at twenty microkelvin sits in the middle of the well, and a photon of the imaging light shakes it only a little.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–25",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q25",
+            "unit": "q25-atom-gates"
+          }
+        ]
+      },
+      {
+        "id": "o8-heat",
+        "title": "§4 What the trap light itself does",
+        "question": "The trap light scatters a few photons a second and each one heats the atom, which sets a floor under every lifetime that the vacuum has not already set.",
+        "challenges": [],
+        "equations": [],
+        "pages": "pp. 3–25",
+        "paras": 3,
+        "feeds": [
+          {
+            "chapter": "Q24",
+            "unit": "q24-lindblad"
+          }
+        ]
+      }
+    ]
   }
 ]
 
 export const OPTICS_BY_UNIT: Record<string, UnitNoteRow[]> = {
+  "q24-bloch-eq": [
+    {
+      "lecture": "O7",
+      "unit": "o7-mot",
+      "label": "Optics Lab O7, §2, p. 21",
+      "where": "§2, p. 21"
+    }
+  ],
+  "q24-lindblad": [
+    {
+      "lecture": "O8",
+      "unit": "o8-heat",
+      "label": "Optics Lab O8, §4, pp. 3–25",
+      "where": "§4, pp. 3–25"
+    }
+  ],
+  "q25-atom-gates": [
+    {
+      "lecture": "O8",
+      "unit": "o8-motion",
+      "label": "Optics Lab O8, §3, pp. 3–25",
+      "where": "§3, pp. 3–25"
+    }
+  ],
+  "q25-cooling": [
+    {
+      "lecture": "O7",
+      "unit": "o7-sequence",
+      "label": "Optics Lab O7, §1, pp. 12–21",
+      "where": "§1, pp. 12–21"
+    },
+    {
+      "lecture": "O7",
+      "unit": "o7-pgc",
+      "label": "Optics Lab O7, §3, p. 21",
+      "where": "§3, p. 21"
+    }
+  ],
   "q5-interferometer": [
     {
       "lecture": "O6",

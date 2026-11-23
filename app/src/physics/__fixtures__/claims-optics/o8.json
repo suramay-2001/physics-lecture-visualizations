@@ -13,7 +13,6 @@
   "o8FrAt14": 25.0,
   "o8FzAt14": 4.81,
   "o8DepthPaperWaist": 0.171,
-  "o8Sigma4": 89.1,
   "o8Sigma20": 192.0,
   "o8Eta": 0.266,
   "o8EtaSq": 0.0705,
@@ -28,6 +27,7 @@
   "o8RepFzKHz": 5.64,
   "o8RepPowerMW": 1.4,
   "o8RepLifeMin": 22.9,
+  "o8RepSpacingUm": 7.2,
   "o8RepNa": 0.65
  }
 }

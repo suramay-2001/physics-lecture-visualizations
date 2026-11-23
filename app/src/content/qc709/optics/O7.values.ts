@@ -40,6 +40,9 @@ export const V = {
   /* reported (Manetsch et al., arXiv:2403.12021v4, p. 21) */
   o7RepIsat: 1.1, // mW/cm²: "I₀ ≈ 1.1 mW cm⁻²" for the stretched-state transition
   o7RepCloudMm: 1.6, // mm: "~1.6-mm 1/e² diameter MOT cloud"
+  o7RepMotDetuning: 3.17, // |Δ| in units of Γ: "Δ = −3.17Γ" (the MOT beams)
+  o7RepBeamCm: 2.5, // cm: "Each beam has a size of 2.5 cm in diameter"
+  o7RepPgcDetuning: 19.5, // |Δ| in units of Γ: "Δ = −19.5Γ" (the 3D PGC step)
 } as const
 
 export type ValueKey = keyof typeof V

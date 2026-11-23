@@ -87,6 +87,9 @@ o7 = {
     # reported (Manetsch et al., arXiv:2403.12021v4, Methods "Loading single atoms in tweezers", p. 21)
     "o7RepIsat": 1.1,
     "o7RepCloudMm": 1.6,
+    "o7RepMotDetuning": 3.17,
+    "o7RepBeamCm": 2.5,
+    "o7RepPgcDetuning": 19.5,
 }
 
 # ------------------------------------------------------------------ O8
@@ -141,7 +144,6 @@ o8 = {
     "o8FrAt14": rnd(math.sqrt(4 * U14 / (CS_M * w0**2)) / two_pi / 1e3, 1),
     "o8FzAt14": rnd(math.sqrt(2 * U14 / (CS_M * zR**2)) / two_pi / 1e3, 2),
     "o8DepthPaperWaist": rnd(depth_J(1.4e-3, 1.17e-6) / kB * 1e3, 3),
-    "o8Sigma4": rnd(math.sqrt(kB * 4.3e-6 / (CS_M * w_r**2)) * 1e9, 1),
     "o8Sigma20": rnd(math.sqrt(kB * 20e-6 / (CS_M * w_r**2)) * 1e9, 0),
     "o8Eta": rnd(k852 * math.sqrt(hb / (2 * CS_M * w_r)), 3),
     "o8EtaSq": rnd((k852 * math.sqrt(hb / (2 * CS_M * w_r))) ** 2, 4),
@@ -157,6 +159,7 @@ o8 = {
     "o8RepFzKHz": 5.64,
     "o8RepPowerMW": 1.4,
     "o8RepLifeMin": 22.9,
+    "o8RepSpacingUm": 7.2,
     "o8RepNa": 0.65,
 }
 

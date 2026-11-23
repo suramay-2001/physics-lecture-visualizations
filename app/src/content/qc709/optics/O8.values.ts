@@ -40,7 +40,6 @@ export const V = {
   o8FzAt14: r(f14.fz / 1e3, 2), // kHz
   o8DepthPaperWaist: r((tweezerDepth(1.4e-3, 1.17e-6, LAM) / K_BOLTZMANN) * 1e3, 3), // mK at 1.4 mW with the waist the paper itself infers
   /* o8-motion */
-  o8Sigma4: r(thermalRms(M, omegaR, 4.3e-6) * 1e9, 1), // nm at 4.3 µK
   o8Sigma20: r(thermalRms(M, omegaR, 20e-6) * 1e9, 0), // nm at 20 µK
   o8Eta: r(lambDicke(M, omegaR, waveNumber(CS_D2)), 3), // for the 852 nm photon
   o8EtaSq: r(lambDicke(M, omegaR, waveNumber(CS_D2)) ** 2, 4),
@@ -57,6 +56,7 @@ export const V = {
   o8RepFzKHz: 5.64, // kHz: "5.64(3) kHz", p. 18 and p. 25
   o8RepPowerMW: 1.4, // mW per tweezer at the atom plane, p. 3
   o8RepLifeMin: 22.9, // min: "22.9(1) min", p. 4
+  o8RepSpacingUm: 7.2, // µm: "spaced by ∼7.2 µm", p. 3
   o8RepNa: 0.65, // the objective's NA at the trapping wavelength, p. 20
 } as const
 
