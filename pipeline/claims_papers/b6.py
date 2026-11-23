@@ -84,12 +84,12 @@ values['b6ShrinkZ'] = lz
 values['b6PzOverPx'] = pz / px
 # other waits used in the prose (a long wait and a short one)
 px32, py32, pz32, _, _ = idle_block('', T1, T2, 32.0)
-values['b6PzAt32msPct'] = 100 * pz32
 # the clue: T1 = 2 s, T2 = 0.4 s, 20 ms; and T1 = infinity (a huge T1), T2 = 1 s, 10 ms
 cpx, cpy, cpz, _, _ = idle_block('', 2.0, 0.4, 20.0)
-values['b6ClueTwPzPct'] = 100 * cpz
+values['b6ClueTwPz'] = cpz
+values['b6ClueInT2'] = 0.4
 ipx, ipy, ipz, _, _ = idle_block('', 1e12, 1.0, 10.0)
-values['b6ClueTwInfPct'] = 100 * (ipx + ipy + ipz)
+values['b6ClueTwInf'] = ipx + ipy + ipz
 # challenges: p_Z in percent at 50 ms with T1 = 5, T2 = 0.5; total at T1 = infinity, T2 = 0.25, 10 ms
 qx, qy, qz, _, _ = idle_block('', 5.0, 0.5, 50.0)
 extra['ch.twirl.pzPct'] = 100 * qz
@@ -130,7 +130,7 @@ def pL(tms, d):
 values['b6PmAt1ms'] = pm(1.0)
 values['b6PmAt2ms'] = pm(2.0)
 sci('b6PmAt4ms', pm(4.0))
-for t in (1, 2, 4, 10):
+for t in (2, 4, 10):
     values[f'b6PeffAt{t}'] = peff(float(t))
 grid = np.arange(1, 400 + 1) * 0.05
 pe = np.array([peff(float(x)) for x in grid])
@@ -148,7 +148,6 @@ for d in (3, 11):
     values[f'b6Amp2tstarD{d}'] = pL(2 * tstar, d) / pL(tstar, d)
 sci('b6PLStarD11', pL(tstar, 11))
 sci('b6PLAt10msD11', pL(10.0, 11))
-values['b6PeffStarOverPth'] = float(pe[imin]) / PTH
 values['b6Peff1OverPth'] = peff(1.0) / PTH
 # the engine's golden-section refinement, checked against a bounded scipy minimiser on the same bracket (an engine check)
 r = minimize_scalar(peff, bounds=(tstar - 0.05, tstar + 0.05), method='bounded', options={'xatol': 1e-9})
@@ -173,8 +172,6 @@ for d, p in ((3, 0.1), (5, 0.1), (7, 0.05)):
     assert abs(bf - repfail(d, p)) < 1e-15
 extra['eng.vote.5.0.1'] = repfail(5, 0.1)
 extra['eng.vote.7.0.05'] = repfail(7, 0.05)
-values['b6Rep3p01'] = repfail(3, 0.01)
-values['b6Exponent11'] = 6.0
 # mixed rates: 5 places at 0.001, 6 at 0.005, k = 6
 ps = [0.001] * 5 + [0.005] * 6
 
@@ -221,8 +218,19 @@ values['b6ReadFracSC'] = share(4, 0.034, 0.0, 0.0005)[1]
 values['b6RatioAtom'] = 1.0 * 1000.0 / 0.4
 values['b6RatioSC'] = 500.0 / 34.0
 values['b6InLayers'] = 4.0
+values['b6InMove'] = 0.2
+values['b6InMoveTyp'] = 0.3
+values['b6ClueInMove'] = 0.1
+values['b6TypFrac'] = share(4, 2.0, 0.3, 3.0)[1]
+values['b6ReadFracReload'] = share(4, 0.4, 0.2, 1.0, 1.0)[1]
+values['b6InP2'] = 0.005
+values['b6ClueInP'] = 0.2
+values['b6InE'] = 0.01
+values['b6InMoveReload'] = 0.2
+values['b6ClueInE'] = 0.2
 values['b6ClueFrac'] = share(6, 1.0, 0.1, 2.0)[1]
 values['b6ClueRatio'] = 2.0 * 1000.0 / 1.0
+values['b6ClueGate'] = 6 * 1.0 / 1000.0
 extra['ch.cycle.frac'] = share(4, 0.5, 0.3, 3.0)[1]
 extra['ch.cycle.ratio'] = 3.0 * 1000.0 / 2.0
 extra['eng.share.at.2ms'] = share(4, 0.4, 0.2, 2.0)[1]
@@ -267,6 +275,8 @@ values['b6ClueSerial'] = serial(7, .02, .5, .2)
 values['b6CluePipe'] = pipe(7, .02, .5, .2)
 values['b6CluePipeSlow'] = pipe(7, .02, .5, 1.0)
 values['b6ClueBreakEven'] = .02 + .5
+values['b6ClueInR'] = .5
+values['b6ClueInC'] = .2
 extra['ch.pipe.serial'] = serial(9, .01, 1.0, .4)
 extra['ch.pipe.pipe'] = pipe(9, .01, 1.0, .4)
 extra['ch.pipe.slow'] = pipe(9, .01, 1.0, 1.5)
@@ -278,7 +288,8 @@ S = 0.9998952
 loss = 1 - S
 n11 = 2 * 11 ** 2 - 1
 values['b6AtomsD11'] = float(n11)
-values['b6InLoss'] = 1.048e-4
+sci('b6InLoss', loss)
+values['b6InSurv'] = S
 values['b6LossPerRound'] = n11 * 1.048e-4
 values['b6LossPer11Rounds'] = n11 * 11 * 1.048e-4
 values['b6NoLoss11Rounds'] = (1 - 1.048e-4) ** (n11 * 11)
