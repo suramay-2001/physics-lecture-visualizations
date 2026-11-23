@@ -57,7 +57,19 @@ The last batch (Q12, Q13, Q14, F2-F6) is merged; see "Evidence" for its gate. Re
 Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part V), both tracks, derivation views (#7),
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
-**Next action:** none queued. When new 448 notes arrive (L21+), follow the L19–L20 batch below: ingest → one planner
+**Next action (2026-11-23): GANDALF batch — Optics Lab experiment track + Papers P2 + public-launch audit + LinkedIn kit.**
+Owner (budget 50 weekly points, meter 0 % at start, reset Fri 11-27 19:00 UTC): (1) build out the Optics Lab from the
+Metcalf–van der Straten textbook (`sources/mvs`) from a research assistant's view as an **experiment track** (run sheet:
+oven → MOT → molasses → tweezer loading → fluorescence imaging → readout, each stage a live bench) developed in tandem with
+(2) the paper *Enabling fast and accurate neutral atom readout through image denoising* (GANDALF, arXiv:2510.25982v2,
+ingested as `sources/paper-gdf`, registered in `pipeline/course.papers.json`): deep research over its 40 references
+(skill `deep-research`; notes and report in the git-ignored `sources/research/`; owner approved saving ≤ ~15 open-access
+arXiv PDFs into `sources/ref-gdf-*`), then lectures in Papers (P2 + 2 background chapters); (3) a security audit for
+public viewing, fixes of leaks and attack vectors; (4) a LinkedIn post (links: live site URL placeholder + GitHub repo)
+and demo video recordings with presenting pointers (kept out of the repo). Order: audit ∥ research → plans + rulings →
+builds → review + fix → gate, e2e, audit → push → videos + post.
+
+**Previous next action:** none queued. When new 448 notes arrive (L21+), follow the L19–L20 batch below: ingest → one planner
 for the batch → judge rulings → one stage/engine agent if a stage addition is ruled → one builder per lecture in parallel
 → Sonnet merge agent → one review + fix → gate, full preview e2e, unpiped audit → push. Scratchpad briefs do not survive
 a new session: the briefs used for L19–L20 are kept, path-free, in `docs/patterns/briefs-448/` (01 planner … 07 arcade).

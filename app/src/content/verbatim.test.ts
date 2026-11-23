@@ -144,7 +144,11 @@ describe('no source documents inside app/', () => {
 })
 
 const { dir: SOURCES, why } = findSources()
-const SOURCE_FILES = SOURCES ? walk(SOURCES, (f) => /\.(md|txt)$/i.test(f)) : []
+// sources/research/ holds this project's own research notes and reports (deep-research output); they quote the repo itself,
+// so they are not a copyrighted source and would flag the repo's own titles (pipeline/audit_public.py excludes them too).
+const SOURCE_FILES = SOURCES
+  ? walk(SOURCES, (f) => /\.(md|txt)$/i.test(f) && !/[\\/]research[\\/](research_notes|reports)[\\/]/.test(f))
+  : []
 if (!SOURCES || SOURCE_FILES.length === 0) console.log(`sources/ absent, verbatim check skipped (${why})`)
 
 describe.skipIf(!SOURCES || SOURCE_FILES.length === 0)('verbatim overlap vs sources/**', () => {

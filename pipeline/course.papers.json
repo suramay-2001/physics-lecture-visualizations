@@ -17,6 +17,16 @@
       "dpi": 110
     },
     {
+      "id": "paper-gdf",
+      "file": "paper-gdf",
+      "role": "paper",
+      "title": "Mude, Phuttitarn, Maurya, Sinha, Saffman & Tannu — Enabling fast and accurate neutral atom readout through image denoising (GANDALF; arXiv:2510.25982v2, 2025)",
+      "license": "arXiv licence: paraphrase and cite (section, page, figure or table); never republish its text or figures",
+      "render": true,
+      "render_all": true,
+      "dpi": 110
+    },
+    {
       "id": "ref-fow12",
       "file": "ref-fow12",
       "role": "reference",
