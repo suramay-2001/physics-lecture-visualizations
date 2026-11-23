@@ -13,7 +13,7 @@ Proposal only (role P, skill `02-part-map`). It amends `P-709-map.md` and its ru
 | D1 Order | **the course's order wins**: the notes teach two-qubit states, the Bell basis, stabilizer parities and GHZ/Mermin (L5–L7 p. 34) *before* ρ (L7 pp. 34–40); Bergou does ρ (Ch. 2) before entanglement (Ch. 3) |
 | D2 L6 split | Bell measurement + commuting stabilizers join the Bell-basis chapter, new **Q6**; GHZ, X/Y bit strings and Mermin form new **Q7**. Not the Bell-inequality chapter: the notes teach them before ρ, and Mermin needs neither ρ nor statistics |
 | D3 Renumber | old Q6–Q12 → **Q8–Q14**; old Q13–Q25 → **Q15–Q27** (titles kept). Q6 joins Part II; Part III is retitled **"Correlations and the density matrix"** (Q7–Q9); Parts IV (Q10–Q12) and V (Q13–Q14) keep their titles |
-| D4 Foundations | **F2, F3, F4, F6 folded** into chapters that already teach them (§3); old F5 kept, trimmed, renumbered **F2**; F7/F8 → F3/F4 (judge Q4). Saves ≈ 18 points |
+| D4 Foundations | **F2, F3, F4, F6 folded** into chapters that already teach them (§3); old F5 kept, trimmed, renumbered **F2**; F7/F8 → F3/F4 (judge Q4). Saves four chapters' worth of work |
 | D5 Q3 | Q3 now spans **notes L3–L4** (pp. 11–20): one chapter, re-aligned, two new derivations (§1.2) |
 
 ## 1. Ownership of the notes, L1–L7
@@ -226,7 +226,7 @@ planned chapters would re-teach built units in both tracks.
 | Moved to Part X (old Q21 → Q23) | mutual information, KL, classical fidelity, L1 distance |
 | Src | notes p. 15 (⟨M⟩ = Σ M_αP_α), p. 18 (⟨Aⁿ⟩); N&C App. 1 p. 608, §11.1 pp. 500–503; Bergou §3.3 pp. 34–37, §3.7.1 p. 47; Reif §1.2–1.6 (reference only, as in 448) |
 | Bridges | 448 l1-average, l3-spread, l7-spreads; reuses `binomialPmf` and the `sigmaBand` readout |
-| Saving / loss | four chapters × ≈ 4.5 points ≈ **18 points**; lost: Foundations-level Formal extras (dual spaces, rank–nullity, Jordan form) and three planned films. No Part II–V derivation needs them |
+| Saving / loss | four chapters of work saved; lost: Foundations-level Formal extras (dual spaces, rank–nullity, Jordan form) and three planned films. No Part II–V derivation needs them |
 
 ## 4. Derivations and their visuals
 
@@ -411,24 +411,22 @@ interface TwoQubitState {
 
 ## 7. Build batches
 
-Costs in weekly points: an Opus planner ≈ 1.5 per two chapters, a Sonnet build ≈ 2 per chapter, an Opus review ≈ 1 per
-chapter, a Sonnet fix, engine or stage agent ≈ 1–2. Opus plans and reviews; Sonnet builds and fixes. The judge (main
+Opus plans and reviews; Sonnet builds and fixes. The judge (main
 session) rules each plan (`04`) and merges each branch (`08`, `09`) between steps; check usage after every batch (`18`).
 
-| Batch | Steps (skill · model · points) | Parallel | Points |
-|---|---|---|---|
-| 1 (in flight) | re-map (this); W-709 #7/#8; `matrix` v1; reviews Q2+Q3, Q4+Q5 | yes | spent |
-| 2 | **E1** (`11` · Sonnet · 1) · **two-qubit** (`10` · Sonnet · 2) · **matrix v2 + amplitudes/circuit fields** (`10` · Sonnet · 1.5) · **plan Q6+Q7** (`03` · Opus · 1.5) · retrofit **R1** F1+Q1, **R2** Q2+Q3 (`07` · Sonnet · 1.5 each: review items, §1.2 moves, derivation views, notation beats) | 6 agents | 9 |
-| 3 | **build Q6, Q7** (`05` · Sonnet · 2 each) · retrofit **R3** Q4+Q5 (`07` · Sonnet · 1.5; needs matrix v2) · **plan Q8+Q9+F2** (`03` · Opus · 2) · **E2** (`11` · Sonnet · 1.5) | 5 | 9 |
-| 4 | **review Q6, Q7** (`06` · Opus · 2) → **fix** (`07` · Sonnet · 2) · **build Q8, Q9, F2** (Sonnet · 6) · **plan Q10+Q11+Q12** (Opus · 2) · **plot** kind if ruled (Sonnet · 1) | 6 | 13 |
-| 5 | **review Q8, Q9, F2** (3) → **fix** (3) · **build Q10, Q11, Q12** (6) · **E3** (1.5) · **plan Q13+Q14** (1.5) | 6 | 15 |
-| 6 | **review Q10–Q12** (3) → **fix** (3) · **build Q13, Q14** (4) | 4 | 10 |
-| 7 | **review Q13, Q14** (2) → **fix** (2) · BUILD-LOG, `graphify update .` | 2 | 4 |
+| Batch | Steps (skill · model) | Parallel |
+|---|---|---|
+| 1 (in flight) | re-map (this); W-709 #7/#8; `matrix` v1; reviews Q2+Q3, Q4+Q5 | yes |
+| 2 | **E1** (`11` · Sonnet) · **two-qubit** (`10` · Sonnet) · **matrix v2 + amplitudes/circuit fields** (`10` · Sonnet) · **plan Q6+Q7** (`03` · Opus) · retrofit **R1** F1+Q1, **R2** Q2+Q3 (`07` · Sonnet: review items, §1.2 moves, derivation views, notation beats) | 6 agents |
+| 3 | **build Q6, Q7** (`05` · Sonnet) · retrofit **R3** Q4+Q5 (`07` · Sonnet; needs matrix v2) · **plan Q8+Q9+F2** (`03` · Opus) · **E2** (`11` · Sonnet) | 5 |
+| 4 | **review Q6, Q7** (`06` · Opus) → **fix** (`07` · Sonnet) · **build Q8, Q9, F2** (Sonnet) · **plan Q10+Q11+Q12** (Opus) · **plot** kind if ruled (Sonnet) | 6 |
+| 5 | **review Q8, Q9, F2** → **fix** · **build Q10, Q11, Q12** · **E3** · **plan Q13+Q14** | 6 |
+| 6 | **review Q10–Q12** → **fix** · **build Q13, Q14** | 4 |
+| 7 | **review Q13, Q14** → **fix** · BUILD-LOG, `graphify update .` | 2 |
 
 | Topic | Note |
 |---|---|
-| Total | ≈ 60 points for batches 2–7, plus ≈ 6–10 for the judge's turns (rulings, merges, visual QA); fits the 82 % aim only if batch 1 cost ≤ 10 |
-| Cut line | usage > **55 % after batch 4** → batches 6–7 (Part V builds) move to next week, plans kept; > **70 % after batch 5** → the Q10–Q12 reviews become one Opus agent (≈ −1) |
+| Cut line | if usage is high after batch 4, batches 6–7 (Part V builds) move to the next window, plans kept; after batch 5, the Q10–Q12 reviews become one Opus agent |
 | Order | E1 and the kinds land before the first build that needs them (Q6); R1/R2 run while Q6+Q7 are planned; R3 waits for matrix v2 (Q4's new views use `product`/`lin`); each planner covers the next group while the current group builds |
 
 ## 8. Questions for the judge
@@ -437,7 +435,7 @@ session) rules each plan (`04`) and merges each branch (`08`, `09`) between step
 |---|---|---|
 | 1 | New chapters Q6 (two qubits, Bell basis, parities) and Q7 (GHZ, Mermin), rather than folding L6 into the Bell-inequality chapter? | **Yes**: the notes' order; Mermin needs no ρ; L5–L7 p. 34 is ≈ 14 pages, too much for one chapter |
 | 2 | Renumber old Q6–Q12 → Q8–Q14 and Q13–Q25 → Q15–Q27; Q6 joins Part II; Part III retitled "Correlations and the density matrix"? | **Yes**: only `outline.ts`/`outline.test.ts` and four built-text mentions change (R1, R3) |
-| 3 | Fold F2, F3, F4, F6; keep a trimmed F5? | **Yes**: ≈ 18 points saved; gap check in §3 |
+| 3 | Fold F2, F3, F4, F6; keep a trimmed F5? | **Yes**: saves four chapters' work; gap check in §3 |
 | 4 | F ids: renumber F5 → F2, F7 → F3, F8 → F4, or keep stable ids with gaps? | **Renumber**: none is built, readers see a gap-free sequence; record the map in the ruling |
 | 5 | Q3 stays one chapter over L3–L4 (6 units, one new beat) rather than splitting L4 off? | **Keep one**: its units already match L4's sections; a split costs a whole build |
 | 6 | `two-qubit` render path: SVG (oblique balls + grid) or GL? | **SVG**: prints (so W-709 #7 figure strips work), no new WebGL context, and the 3×3 grid is 2-D anyway |

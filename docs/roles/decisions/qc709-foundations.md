@@ -1,7 +1,7 @@
 # Ruling: build the Foundations chapters standalone (2026-10-03, reverses the fold)
 
 The user: "build the fundamentals along with the rest of the chapters." This SUPERSEDES ruling 3 of
-`qc709-remap.md` (the fold of F2/F3/F4/F6). With a fresh weekly window, the Foundations Part is built as standalone
+`qc709-remap.md` (the fold of F2/F3/F4/F6). With a fresh usage window, the Foundations Part is built as standalone
 chapters, as the original semester map intended.
 
 **The Foundations sequence (math backbone; each ground-up, two tracks, reached by bridges):**
@@ -26,4 +26,4 @@ fold. Old F7 (bits/Boolean) and F8 (Fourier) serve Parts VII+ (algorithms), beyo
 with numpy twins. No chapter is on a legacy allowlist.
 
 **Build order:** plan F2+F3 and F4+F5 and F6 (Opus) → rule → build (Sonnet) → merge → review → fix, interleaved with the
-remaining Q chapters, paced under the weekly cap (aim 82%, stop by 85%).
+remaining Q chapters, paced under the owner's usage cap.

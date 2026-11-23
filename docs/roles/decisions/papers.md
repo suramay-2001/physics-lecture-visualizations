@@ -11,7 +11,7 @@ the git-ignored `sources/paper-tdg/`, 68 pp., 17 figures, 10 tables, ~137 refere
   visualizations must be executable from what ingestion produces.
 - **References:** followed only as far as a step requires.
 - **Prerequisites:** built out in full and linked, not summarized.
-- **Budget:** up to 75 % weekly usage before the Friday 2026-10-16 reset.
+- **Budget:** a usage cap set by the owner for the week.
 - Not objected to, so taken as approved: two kinds of number (R3); two reading tracks (R1).
 
 ## Rulings

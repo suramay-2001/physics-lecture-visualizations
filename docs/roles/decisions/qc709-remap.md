@@ -1,7 +1,7 @@
 # Rulings: the 709 re-map against notes L1–L7 (2026-10-02)
 
 Judge rulings on `docs/roles/proposals/P-709-remap-L1L7.md` §8. Scope set by the user on 2026-10-02: notes L1–L7, plus
-the chapters through Part V, plus Foundations F2–F6. Usage cap for the week: aim for 82%, stop by 85%.
+the chapters through Part V, plus Foundations F2–F6. The owner's usage cap applies.
 
 1. **New chapters Q6** ("Two qubits: products, entanglement and the Bell basis") **and Q7** ("GHZ and Mermin"): YES. They
    follow the notes' order.

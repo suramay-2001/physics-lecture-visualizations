@@ -30,7 +30,7 @@ session — not just when something already feels slow.
      about correctness or wording.
 3. **Check usage after the batch**, not just before — a batch that ran longer than expected can leave less
    headroom than planned for the next one.
-4. **Stop at about 78% of a cap.** Don't run the last agent of a batch "to see if it fits" — leave headroom for
+4. **Stop at the threshold the owner sets (leave headroom below the cap).** Don't run the last agent of a batch "to see if it fits" — leave headroom for
    the merge-gate and visual-QA steps that must follow a build before the batch can be called done.
 5. **Resume after the reset**, picking up exactly where "Next action" in BUILD-LOG says.
 6. **A stalled agent needs resuming with SendMessage**, not a fresh relaunch — it keeps its context, and a fresh

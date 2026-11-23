@@ -1,7 +1,7 @@
 # Rulings: the 448 Townsend pass over L1–L13 (judge, 2026-10-20)
 
 Owner (2026-10-20): update all thirteen 448 lectures with Townsend (2nd ed.) Ch 1–6 formalism, visualizations and
-formulas, and add sample questions based on the released homeworks; the private homework record applies; problem TYPES only are used; budget 25 weekly points. Plans: `docs/roles/proposals/P-448-townsend-G1.md` (L1–L4),
+formulas, and add sample questions based on the released homeworks; the private homework record applies; problem TYPES only are used. Plans: `docs/roles/proposals/P-448-townsend-G1.md` (L1–L4),
 `-G2.md` (L5–L8), `-G3.md` (L9–L10), `-G4.md` (L11–L13). Private digests (equations, figures, examples):
 `sources/townsend/digest-G{1..4}.md` (git-ignored). Every plan's open questions are answered with its recommendation
 unless a ruling below says otherwise.

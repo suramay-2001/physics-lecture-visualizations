@@ -58,7 +58,7 @@ Built + merged: ALL Foundations F1-F6 and Q1-Q14 (the whole course through Part 
 notation beats (#8), engine-backed numbers with numpy twins. Engines E1/E2/E3. Stage kinds matrix v2, two-qubit, plot.
 
 **Next action (2026-11-23): GANDALF batch — Optics Lab experiment track + Papers P2 + public-launch audit + LinkedIn kit.**
-Owner (budget 50 weekly points, meter 0 % at start, reset Fri 11-27 19:00 UTC): (1) build out the Optics Lab from the
+Owner: (1) build out the Optics Lab from the
 Metcalf–van der Straten textbook (`sources/mvs`) from a research assistant's view as an **experiment track** (run sheet:
 oven → MOT → molasses → tweezer loading → fluorescence imaging → readout, each stage a live bench) developed in tandem with
 (2) the paper *Enabling fast and accurate neutral atom readout through image denoising* (GANDALF, arXiv:2510.25982v2,
@@ -91,7 +91,7 @@ Gate 340 files / 17 875 tests; full preview e2e 408 passed. The judge re-derived
 - R3: stage sources `wavefunction.source.barrierWave {E,V0,a}` (readouts `reflection`, `transmission`) and
   `wavefunction.source.well {V0,a,n}` (readouts `norm`, `energy`, `tail`), plot curves `wellMatchEven/Odd`; engines
   `physics/wave19.ts`, `wave20.ts` live only in lazy chunks (SvgStage, PlotScene).
-- HW8 (due 11/12, sheet not ingested; holds a below-barrier problem) recorded **submitted** by the user.
+- HW8 (sheet not ingested; holds a below-barrier problem): status confirmed by the owner (private record).
 Counts: L19 5 units / 25 beats / 2 derivations / 19 challenges (3 practice) / 59 keys; L20 5 units / 30 beats /
 5 derivations / 24 challenges (5 practice) / 85 keys. e2e: 113 nav units, 20 map lines, L19 and L20 SVG-only.
 Review `audits/448-L19L20-review.md`: FIX-FIRST (1 S, 6 N, 10 nits) → all fixed except nit 5 (ruled no change); nit 10
@@ -101,7 +101,7 @@ Final gate green after the fix pass (339 files, 17 843 tests); full preview e2e 
 **DONE and PUSHED (2026-11-07): 448 L14–L18; 709 Arcade and films for Q19–Q27.** 448: five new lectures from the
 notes (Schrödinger equation and stationary states; free particles, wavepackets, dispersion; Gaussian packets and
 Ehrenfest; classical mean motion and quantum reflection; reflection and tunnelling), each with Townsend books beats,
-formula boards, practice questions (HW6/HW7 submitted), engines `physics/wave14.ts`–`wave18.ts`, the `wavefunction`
+formula boards, practice questions, engines `physics/wave14.ts`–`wave18.ts`, the `wavefunction`
 `potential` field; ownership per `decisions/448-L14L18.md` (L13 keeps its notes units; Townsend-only units moved to the
 lecture whose notes teach them: box/stationary → L14, fringes → L15, Ex. 6.4/Ehrenfest → L16, flow → L17/L18, p. 231
 Correction → L18; `l13-flow` deleted). Reviews `audits/P-L14L15-review.md`, `P-L16L18-review.md` and fix passes merged.
@@ -114,8 +114,8 @@ macOS has no `timeout`: run long git/vitest steps in the background instead.
 **Next action (2026-11-06): 448 L14–L18, then Arcade and films for 709 Q19–Q27.** Owner: build the new 448 notes
 (the owner's local copy of the 448 L14–L18 notes PDF, ingested as `sources/L14`–`L18`: Schrödinger equation and stationary
 states; free particles, wavepackets, group velocity, dispersion; Gaussian packets and Ehrenfest; classical mean motion
-and quantum reflection; reflection and tunnelling), then Arcade rounds and films for Q19–Q27. 448 HW6/HW7 submitted
-(`homework-status.md`). Budget 35 points (meter 3 % at start; weekly reset Fri 11-06 19:00 UTC). Overlap to resolve: the
+and quantum reflection; reflection and tunnelling), then Arcade rounds and films for Q19–Q27. Homework status:
+see the private record (`homework-status.md`). Overlap to resolve: the
 Townsend pass put books-only units in L13 (`l13-stationary`, `l13-flow`, step/barrier tunnelling with the p. 231
 Correction) that L14–L18's notes now teach — the notes lectures own them; plan the moves or link-backs.
 
@@ -126,7 +126,7 @@ built (one Sonnet builder per chapter, engine + content), reviewed in pairs (`au
 `atoms.ts`, `iontrap.ts`, `photons.ts`, `solid.ts`; Q25 reuses `physics/optics/cooling.ts` and tags the Optics Lab's
 glossary. Merges of parallel chapters were done by a Sonnet merge agent in the main checkout (unions of e2e lists,
 bridges, concepts, `PlotCurveName` + `| OpticsCurveName`, plot tables). The "planned chapter" e2e step now asserts none
-remain. Entry ~485 KB raw (~12 KB headroom). Weekly meter ~49 % at the end (cap 54 %).
+remain. Entry ~485 KB raw (~12 KB headroom).
 NEXT (owner's call): Arcade items, films and openers for Q19–Q27 were deferred; a live-site header check needs the URL.
 LESSONS: a failed command early in an `&&` chain silently skipped writing two briefs (agents launched against missing
 files) — write briefs in their own command and `ls` them before launching; reviewers can quote the book: the leak hook
@@ -134,7 +134,7 @@ catches 12-word runs in audits too.
 
 **Optics Lab PUSHED (2026-10-29; rulings `decisions/optics-lab.md` O1–O8).** Owner: build Metcalf and van der Straten,
 *Cooling and Trapping of Neutral Atoms* (`sources/mvs`, git-ignored) as optical experiments, prioritized, Sonnet workers,
-≤ 10 points. Built: the notes machinery generalized to a second collection `optics` (`O1`–`O6`, `#/709/optics`, chips
+within a small batch. Built: the notes machinery generalized to a second collection `optics` (`O1`–`O6`, `#/709/optics`, chips
 "From the optics lab"), paragraph widgets, the `optics-bench` widget (sliders → engine curves/readouts, right-hand axis),
 `physics/optics/cooling.ts` + `collisions.ts` (~100 functions, twins `make_optics_fixtures.py`, `claims_optics/`),
 12 presets, plot additions; independent review (`audits/P-optics-lab-review.md`): ten Corrections ship (C8 cut), all
@@ -145,8 +145,7 @@ LESSON: an e2e spec written against a seed page must be re-run once the real con
 the generated meta, never from seed literals.
 
 **Next action (2026-10-29): 709 Q20, Q23 and hardware Q24–Q27.** Owner: build Q20 and the hardware chapters, plus Q23
-(709 then complete through Part XI). Budget 30 weekly points (meter 24 % at start, so stop by ~54 %; reset Fri 10-30
-19:00 UTC). Lean shape: three paired planners (Q20+Q23, Q24+Q25, Q26+Q27; plans `docs/roles/proposals/P-Q2x-story.md`,
+(709 then complete through Part XI). Lean shape: three paired planners (Q20+Q23, Q24+Q25, Q26+Q27; plans `docs/roles/proposals/P-Q2x-story.md`,
 numpy in the scratchpad), ONE builder per chapter (engine + content, ≤ 180 steps, two at a time), one review + one fix
 pass per pair, then gate, full e2e, audit, push. Bergou-full page images are all rendered (offsets: P-709-map (d)-E1).
 Hardware numbers quoted from experiments: words only unless a 709 `reported` channel exists (planners report which).
@@ -158,14 +157,13 @@ Bergou's scattering walk on the star graph (r = (n−2)/n, t = 2/n), star and ex
 ⌊n/2⌋ steps, re-derived to N = 100), Trotter simulation of a 3-spin chain (1/M error), QAOA on the 4-cycle; the coin walk
 is one beyond-the-book deeper beat; VQE named only. Engine `physics/qc/walk.ts`, `trotter.ts`, `variational.ts`
 (twins `pipeline/make_walk_fixtures.py`, `claims_qc709/q19.py`), SVG kind `walk-graph`, nine plot curves. Review
-`audits/P-Q19-review.md` PASS with fixes, all fixed. Entry 496,666 raw (~0.8 KB headroom). Weekly meter ~8 % at the end.
+`audits/P-Q19-review.md` PASS with fixes, all fixed. Entry 496,666 raw (~0.8 KB headroom).
 NEXT for 709: Q20 (machines), Q23–Q27 (hardware; confirm numbering against the owner's outline). The 448 browser pane is
 hidden in this app session: live-stage checks rely on `story.spec.ts` (Q19 is in BUILT_709_SVG).
 
 **Next action (2026-10-20): 448 Townsend pass over L1–L13.** Owner: update all 13 lectures with Townsend Ch 1–6
 formalism, visualizations (engine-drawn, never copied figures) and formulas, plus homework-style practice questions;
-448 HW1–HW6 submitted (`homework-status.md`; the HW1/3/4/6 files are the owner's own solution scans, read locally for
-problem TYPES only — `scratchpad/hw448/topics.md`, never committed). Budget 25 weekly points (meter 11 % at start).
+Homework status: see the private record (`homework-status.md`); only problem TYPES were used, never copied.
 Townsend Ch 1–6 page images now rendered (`course.config.json` townsend `render_all`, 100 dpi; the OCR text lacks
 display equations). Chapter starts (printed): 1, 29, 75, 111, 141, 191. IN FLIGHT: four digest-and-plan agents (G1
 L1–L4 ↔ Ch 1, §2.1–2.3; G2 L5–L8 ↔ §2.4–Ch 3; G3 L9–L10 ↔ Ch 5; G4 L11–L13 ↔ Ch 4, 6) writing git-ignored
@@ -178,17 +176,16 @@ questions per lecture (`Challenge.practice`, dashed chip); new units `l7-ladder`
 (printed 0.68, ours 0.706) confirmed twice. Reviews A (L1–L4, L9–L10) and B (L5–L8, L11–L13) and both fix passes merged:
 L1 path record 0 / ¼ / ½ now agrees with L3; two practice questions that reproduced HW2 replaced; L11 ammonia numbers to
 words (T4). Entry budget: the pass pushed it 2.1 KB over; fixed by moving lecture-only exports out of shared modules
-(a shared chunk keeps every export any chunk imports), now 496,026 / 168,838 (~1.4 KB headroom). Weekly meter ~27 %.
+(a shared chunk keeps every export any chunk imports), now 496,026 / 168,838 (~1.4 KB headroom).
 LESSONS: a builder started before a conflicted merge is committed starts from stale main — finish the merge first;
 `union` resolvers must not treat a line containing `|` as a type union (CURVE_X); beat-id lint renames old books beats
-(b5 → b5a) when a group gains letters: grep e2e and bridge tables; the 5-hour window, not the weekly cap, bounded
-three parallel heavy agents (85 % → paused one, waited for the reset).
+(b5 → b5a) when a group gains letters: grep e2e and bridge tables; the usage window bounded
+three parallel heavy agents (paused one, waited for the reset).
 
-**Next action (2026-10-17): 709 notes, new edition (58 pp.).** User cap 20 weekly points (meter 0 % at start, reset
-Fri 2026-10-23 19:00 UTC). The notes PDF grew 40 → 58 pp.: three contents pages were added at the front, so old pp. 2–34 → new +2 (identical text; small rewrites on new
+**Next action (2026-10-17): 709 notes, new edition (58 pp.).** The notes PDF grew 40 → 58 pp.: three contents pages were added at the front, so old pp. 2–34 → new +2 (identical text; small rewrites on new
 pp. 23–25, 28); old pp. 35–40 reorganized into L7 (pp. 35–37), L8 9/30 (38–43), L9 10/5 (44–46); new L10 10/7 (47–55,
 entanglement criteria, entropies) and L11 10/12 (56–58, Bell, CHSH). Re-ingested as `qc709-n1`…`n11`
-(`course.qc709.json`; local path → the new PDF; stale page renders removed). HW3 recorded submitted. Owner decisions:
+(`course.qc709.json`; local path → the new PDF; stale page renders removed). HW3 status recorded privately. Owner decisions:
 (1) update the chapters (citations + Q8/Q9/Q10/Q12 deltas), (2) a NEW in-site 709 "Lecture notes" section, one prose
 page per class lecture (L1–L7 short, L8–L11 full), engine-backed numbers, links into chapter units.
 DONE (2026-10-18; rulings `decisions/qc709-notes.md` W1–W12, P1–P12, R1–R4): notes platform (`content/qc709/notes/`,
@@ -196,7 +193,7 @@ DONE (2026-10-18; rulings `decisions/qc709-notes.md` W1–W12, P1–P12, R1–R4
 384 citations migrated; engine `coherenceCriterion`, `conditionalEntropy`, `bellThreeDirections`, `purifyEnsemble`;
 Q8/Q9 beats, Q10 `q10-bell`, Q12 `q12-coherence` + `q12-family`; two independent reviews
 (`audits/P-709-notes-deltas-review.md`, `P-709-notes-pages-review.md`) and their fix passes; figure clipping fixed in
-the `amplitudes` and `matrix` kinds. Gate 260 files / 13,271 tests. Weekly meter ~10 % for the whole batch.
+the `amplitudes` and `matrix` kinds. Gate 260 files / 13,271 tests.
 ADDING A LECTURE NEXT WEEK: card `docs/context/cards/notes-platform.md` (lecture checklist): ingest → N<k>.ts (chapter keys
 preferred) → bridges → `UPDATE_META=1` twice → `ROUTES` + `BUILT` lines → `notes.overlap.test.ts` must pass (no 7-word run
 shared with `sources/qc709-n*`) → review → push. Chapter deltas for new material go through a remap plan as here.
@@ -207,7 +204,7 @@ LESSONS: the judge's own heads-up can be wrong (R1: CHSH is sufficient-only too)
 well; an 8-gram verbatim guard misses sentence-by-sentence tracking: the 7-word overlap test is the floor for prose
 written from one source; parallel builds conflict on `meta.generated.ts`/`bridges.ts` only — regenerate after each merge.
 
-**Next action (2026-10-16).** DONE since 4cf5448 (user: "build as much as you can", past the 85 % cap; weekly ~90 %):
+**Next action (2026-10-16).** DONE since 4cf5448 (owner: "build as much as you can"):
 independent reviews of Q21, Q22, B1–B4 (`audits/P-Q21Q22-review.md`, `P-B1B2-review.md`, `P-B3B4-review.md`) and their
 fixes (every item; Q22 Arcade built; B1/B2 tolerance 0 and `pp-…` bridges; B4 Rosetta line moved); 448 L12 and L13
 built from new notes (Townsend Ch 3–6 now ingested), reviewed (`audits/P-L12L13-review.md`) and fixed; new `wavefunction`
@@ -218,11 +215,10 @@ in `docs/context/conventions.md`; the generator does not parse 448 plan unit ids
 live-site header smoke test once the owner shares the URL. Sleep/lid-closed runs keep producing load-only e2e failures:
 rerun the failed specs before treating them as real.
 
-**Next action (2026-10-15, after the Fri 2026-10-16 19:00 UTC reset).** PUSHED (origin/main 4cf5448, gate 248 files /
+**Next action (2026-10-15).** PUSHED (origin/main 4cf5448, gate 248 files /
 12,336 tests, full preview 338/338, audit clean): 709 Q21 + Q22; the Papers section with B1–B4 and the paper lecture P1
 (*Tour de gross*), whose seven Corrections were each confirmed against the page images by an independent Opus check
-(`docs/roles/audits/P-P1-corrections-review.md`; E2/E5/E7 reworded; E7 ratified, `decisions/papers-P1.md` R9). Weekly
-usage stopped at 82 % (user cap 85 %). The owner approves the deploy in Actions.
+(`docs/roles/audits/P-P1-corrections-review.md`; E2/E5/E7 reworded; E7 ratified, `decisions/papers-P1.md` R9). The owner approves the deploy in Actions.
 OPEN, in priority order: (1) independent reviews of Q21, Q22, B1–B4 (skill 06; only P1's Corrections were reviewed) and
 one fix pass; (2) P1 polish: Formal-track contact sheets were never viewed; P1 has no `window.__stage` so it is not in
 `BUILT_PAPERS_SVG` (no beat-sync e2e); concept stations; (3) fix-pass items already known: B1 integer challenges use tol
@@ -230,12 +226,10 @@ one fix pass; (2) P1 polish: Formal-track contact sheets were never viewed; P1 h
 rounds (Q22x) not built; B4's Rosetta line for Bravyi–Kitaev "T-type" vs "H-type" sits in unit 1, not in the injection
 unit; (4) deferred widgets `code-lab`, `curve-explorer`, `machine-dial`; Papers Arcade; (5) Townsend Ch 3–5 ingest for
 448 (asked the user; local script, ~no usage); (6) live-site header smoke test once the owner shares the URL.
-Lessons (cost): pack-based Sonnet builds still cost 520–800k tokens (150–260 steps) — the step count, not the pack, drives
-cost; a long orchestrator context (~800k here) makes every merge expensive — compact or start a fresh session that reads
+Lessons (cost): the step count, not the pack, drives an agent's cost; a long orchestrator context (~800k here) makes every merge expensive — compact or start a fresh session that reads
 this log before the next batch. The user-facing paper guide (one-hour read) is a private artifact, not in the repo.
 
-**Next action (2026-10-14, evening): Papers builds under a 15-point budget.** User cap 85 % weekly before the Fri
-2026-10-16 19:00 UTC reset (65 % now); goal: finish everything in ≤ 15 points. DONE on main (not pushed): QEC engine
+**Next action (2026-10-14, evening): Papers builds under a usage budget.** DONE on main (not pushed): QEC engine
 (`physics/qec`, gross [[144,12]] / two-gross [[288,12]] independently re-verified), Papers platform (spec, allow-listed
 recipe registry, `reported`, trail, References page, prerequisite map, placeholder P1), the shared `code` stage kind,
 the crawl (`docs/papers/tdg/`), the 12 user-approved reference PDFs (`sources/ref-*`, text-only, registered in
@@ -250,16 +244,11 @@ builds `spacetime` + the `code`/`circuit`/`plot`/`bits` additions + the Papers b
 reference); then B2 ∥ B3 (B3 also builds `surgery-graph`, `pauli-program`, bloch marks) → B4 → P1 (`module-map`, 14
 recipes). Widgets `code-lab` and `machine-dial` deferred. Then ONE Opus review of P1's Corrections E1–E6 + reported
 numbers against the page images (PDFs now local) + ONE Sonnet framing review of Q21–B4; ONE Sonnet fix agent; gate +
-full e2e + unpiped audit; push. Check usage after the first two builds; if they exceed ~1.5 points each, drop the
-Sonnet framing review.
-**Cost ledger (2026-10-14; agent token totals as the harness reports them; the meter does not attribute points):**
-crawl Opus 597k/179 steps · Papers platform Opus 605k/269 · Q21/Q22 plans Opus 478k/97 · P1 plan Opus 615k/132 ·
-QEC engine Sonnet 445k/154 · B1/B2 plans Sonnet 626k/120 · B3/B4 plans Sonnet 616k/122 · `code` kind Sonnet 762k/286.
-Meter 45 % → 65 % for these 4.74M agent tokens plus orchestration ≈ 0.24M reported tokens per weekly point overall.
+full e2e + unpiped audit; push. Check usage after the first two builds; drop the Sonnet framing review if they run over.
 Cost grows ~quadratically with an agent's steps (every step re-reads its context): short agents with packs beat long
 paired ones; the orchestrator's own context (~570k before /compact) makes every merge step expensive.
 
-**Next action (2026-10-11, cap raised to 50 %).** Rulings for the deferred features: `docs/roles/decisions/qc709-deferred-features.md`.
+**Next action (2026-10-11).** Rulings for the deferred features: `docs/roles/decisions/qc709-deferred-features.md`.
 DONE on main since 9d9e60d (pushed up to 9d9e60d; the rest awaits one quiet full preview run + unpiped audit + push):
 notation deferred minors (7 more entries, underline fixed on tall content, Read mode has no cards, the key loads near the
 viewport; `docs/roles/audits/notation-review.md` R fixes); W16 `oracle-bench` (DJ, BV, Grover, Simon, and a Hadamard-signs
@@ -272,7 +261,7 @@ cannot cancel a reader's smooth scroll). DONE too: the media (Part VII Grover op
 `render.ts`/`check_manifest.ts` take a film; `openerFrames.test.ts` audits every opener's frames). Lab page budget re-set to
 16,400 / 7,050 (+10 %) after the merges regrouped shared lazy plumbing 14 B over.
 THEN (running at the time of writing): gate + FULL preview e2e (quiet machine: parallel agents gave load-only failures three times — F5 b2,
-Q2 formal, two whole-course scan timeouts, now 60 s) + unpiped audit, push; BUILD-LOG; stop at ≤ 50 % weekly.
+Q2 formal, two whole-course scan timeouts, now 60 s) + unpiped audit, push; BUILD-LOG.
 OPEN after this pass: `katex.min.css` still in the entry stylesheet; lab page chunk at 14,818 of its 15,000 budget (thin);
 Grover-mode wires are x₂x₁x₀ while Q17 calls the marked string x₀ (mild clash, next P pass); Higgsfield decor needs the
 owner's go-ahead per batch; live-site header smoke test once the owner shares the URL; L7 p. 14 and L10 p. 18 with the user.
@@ -294,10 +283,7 @@ only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend,
    P-Q10-story.md still carries the old Tsirelson sign (planning record only).
 3. Deferred media (films, Blender openers, Higgsfield decor) for Parts II-V; Formulas709/Help709 stubs.
 
-**Measured costs** (for pacing; weekly points on the Pro plan):
-- An Opus planner for two chapters: 520–690k tokens, 1–2 points (Q4+Q5 took 520k tokens and 1 point).
-- A Sonnet chapter build: 0.85–1.0M tokens, about 2 points (Q4 took 856k tokens, Q5 850k).
-- A Sonnet docs or wiring agent: 300–400k tokens, about 1 point.
+**Pacing note:** per-agent cost figures are kept privately (`private/usage-log.md`).
 - This session's own turns carry a large context: keep them few, and delegate reading.
 
 **2026-09-29 (Part II, both chapters MERGED; gate 3837; e2e preview 119/119, dev 92 after the fix below):**
@@ -317,12 +303,10 @@ only); stage platform gaps (matrix transitions never eigh a non-Hermitian blend,
      still stubs.
      - **Entry headroom is about 0.3 KB gzip:** the next platform change must trim the entry or raise the budget with
        a reason.
-   - **Decor:** three Higgsfield plate loops in `app/public/decor/qc709/` (105 credits, the user approved the
+   - **Decor:** three Higgsfield plate loops in `app/public/decor/qc709/` (the owner approved the
      download). DecorVideo wiring is in flight (Sonnet, port 5194).
-   - **Homework:** every current assignment is submitted (`docs/roles/decisions/homework-status.md`).
-   - **Usage cap:** stay under 80% weekly. It was 67% at 21:30 (+4); the week resets 2026-10-02 19:00Z.
-     - A Sonnet agent of about 300k tokens costs about 1 point.
-     - The Q2/Q3 plan (Opus) is in flight: measure it before launching builds.
+   - **Homework:** status is kept privately (`docs/roles/decisions/homework-status.md` holds the rule).
+   - **Usage:** check usage before launching builds (skill 18); the numbers are private.
 2. **709 stage kinds batch 1: MERGED** (the SVG route, `complex-plane`, `amplitudes`, `circuit`, Q1's fields).
    - QA fix f644e48: print-figure labels.
    - Entry-closure headroom is about 1.6 KB gzip; watch it.
@@ -626,7 +610,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
   `top − vh/2` to `bottom − vh/2` to reach the last frame.
 - Canva MCP needs OAuth (user must authorize in claude.ai connector settings). Blender MCP needs
   Blender running with the MCP add-on on localhost:9876 (was not running 2026-09-23).
-  Higgsfield connected (995 credits at start) — spending credits needs the user's go-ahead.
+  Higgsfield connected — decor clips need the owner's approval per batch.
 
 - Split stages: each slot now has its own readout column (`StageOverlay`: `.stage-readouts[data-slot="bottom"]` at the
   lower slot's top-right). One shared column made the lower view's ψ look like the upper view's (L6 QA).
@@ -705,7 +689,7 @@ cinematic UI design** → extract skill → L2 → L7 → Babylon /lab.
 - Bundle: KaTeX, GSAP, the glossary and every widget are lazy as of 2026-10-11 (chunk rules (n), (o), (p)).
 - The "truly home" golf level (L7 plan) needs a sign target in `GamePage` and a move set that cannot undo in pairs; the
   plan's fallback spot-the-error round `arrow-back-ket-back` ships instead.
-- Blocked on user: authorize Canva connector (formula cards). Higgsfield credits need the user's go-ahead.
+- Blocked on user: authorize Canva connector (formula cards). Higgsfield decor clips need the owner's approval per batch.
 - Course's own sources (Vavilov 2019 notes, Walker 2020 notes) are not public; public analogues:
   MIT 8.05 (Zwiebach) L3–6, Susskind TM lectures, 3B1B Essence of Linear Algebra ch. 9/13/14.
 

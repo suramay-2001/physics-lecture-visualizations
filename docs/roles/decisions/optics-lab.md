@@ -1,7 +1,7 @@
 # Rulings: the 709 Optics Lab (Metcalf and van der Straten, Cooling and Trapping of Neutral Atoms) (judge, 2026-10-29)
 
 Owner (2026-10-29): build the textbook's chapters and visualizations as optical experiments, prioritized within hours,
-with Sonnet/Haiku workers (Opus for decisions only), in ≤ 10 weekly points (5–6 if possible) without losing quality.
+with Sonnet/Haiku workers (Opus for decisions only), under a small usage budget, without losing quality.
 Source `sources/mvs` (git-ignored, copyrighted; paraphrase, cite chapter/§ and page). Plan:
 `docs/roles/proposals/P-optics-lab.md` (6 pages O1–O6, 32 sections, ~96 claims after cuts, 12 `optics-bench` presets,
 `physics/optics/cooling.ts` + `collisions.ts`, 18 plot additions, 11 errata).

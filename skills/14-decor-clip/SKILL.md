@@ -44,7 +44,7 @@ ambience loop"). Only after the user has approved spending credits for that spec
 ## Outputs
 - Clip files under `app/public/decor/<course-slug>/`.
 - A `DecorVideo` usage in the relevant page/component.
-- A BUILD-LOG line recording credits spent and the batch's shot list.
+- A BUILD-LOG line recording the batch's shot list (credit amounts go in the private log).
 
 ## Pitfalls
 - Treating "the user approved 709 decor in general" as covering a later batch — re-ask every batch; approval is

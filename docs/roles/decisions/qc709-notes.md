@@ -1,8 +1,7 @@
 # Rulings: the 709 "Lecture notes" section and the new notes edition (judge, 2026-10-17)
 
 Owner's decisions (2026-10-17): a new in-site 709 "Lecture notes" section, one prose page per class lecture (L1–L7 short,
-L8–L11 full), engine-backed numbers, links into the chapter units; the private homework record allows it (`homework-status.md`); budget 20 weekly
-points for the whole batch. Platform design: `docs/roles/proposals/W-709-notes.md` (adopted as written except where a
+L8–L11 full), engine-backed numbers, links into the chapter units; the private homework record allows it (`homework-status.md`). Platform design: `docs/roles/proposals/W-709-notes.md` (adopted as written except where a
 ruling below says otherwise). Content and chapter deltas: `docs/roles/proposals/P-709-remap-L8L11.md` (rulings P1–Pn below,
 added when that plan is judged).
 

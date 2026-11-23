@@ -27,6 +27,6 @@ downloads); `decisions/papers.md`; `decisions/qc709-Q21Q22.md`.
   re-verifies each; one that cannot be confirmed is cut.
 - S7 **Downloads**: the 12 recommended and 6 optional PDFs in `downloads.md` go to the user for approval as one listed
   batch. Until approved, planners, builders and reviewers read references online only.
-- S8 **Order and budget** (user cap 85 % before the Friday reset): now — the `code` kind (running), the B1+B2, B3+B4 and
+- S8 **Order and budget** (under the owner's usage cap): now — the `code` kind (running), the B1+B2, B3+B4 and
   P1 plans; then Q21 ∥ Q22 builds once `code` merges; then the three shared kinds; then B1 → B2 → B3 → B4 → P1 builds,
   one review per pair, fixes. Builds and the B plans on Sonnet; the P1 plan and the reviews on Opus.

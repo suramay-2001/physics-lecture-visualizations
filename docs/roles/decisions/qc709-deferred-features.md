@@ -1,6 +1,6 @@
 # Rulings: the deferred 709 features (judge, 2026-10-11)
 
-The user raised the weekly cap to 50 % and asked for "the remaining features as planned". Everything planned for the
+The user raised the usage cap and asked for "the remaining features as planned". Everything planned for the
 courses' content is built, reviewed and fixed (448 L1–L11; 709 F1–F8, Q1–Q18). What remains are the items the plans
 proposed and earlier rulings deferred. Order of work, and the rulings each one builds under.
 
