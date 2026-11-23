@@ -68,3 +68,14 @@ export function pipelineSim(d: number, g: number, r: number, c: number): number 
   }
   return classEnd
 }
+
+/**
+ * Added by the P2 builder (P-P2-story §9.1; B6 owns this module and extends it): the Pauli-twirled idle chances of a qubit waiting for a time t (Tomita and Svore 2014, Eqs. 9 and 10):
+ * p_X = p_Y = (1 − e^(−t/T1))/4 and p_Z = (1 − e^(−t/T2))/2 − p_X, in the unit of t, T1 and T2 (any one unit). `total` is p_X + p_Y + p_Z.
+ */
+export function pauliTwirl(t: number, T1: number, T2: number): { pX: number; pY: number; pZ: number; total: number } {
+  if (!(Number.isFinite(t) && t >= 0 && T1 > 0 && T2 > 0)) throw new RangeError('pauliTwirl: a time t >= 0 and positive T1, T2')
+  const pX = (1 - Math.exp(-t / T1)) / 4
+  const pZ = (1 - Math.exp(-t / T2)) / 2 - pX
+  return { pX, pY: pX, pZ, total: 2 * pX + pZ }
+}
