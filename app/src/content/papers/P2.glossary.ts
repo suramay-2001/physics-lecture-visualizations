@@ -53,7 +53,7 @@ export const GLOSSARY: GlossEntry[] = [
     "id": "pp-denoiser",
     "term": "denoiser",
     "gloss": "A trained network that turns a dim, noisy picture into a clean one before the decision.",
-    "formal": "A conditional GAN generator mapping a short-exposure image to the long-exposure image of the same shot.",
+    "formal": "A conditional GAN generator that maps a short-exposure frame to the paired long-exposure frame.",
     "first": "p2-denoiser:b1"
   },
   {

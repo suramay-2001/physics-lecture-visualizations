@@ -3599,7 +3599,7 @@ export const P2: PaperSpec = {
           "id": "p2-pipeline:b5",
           "phase": "lecture",
           "text": "At one fixed readout time of 1.5 ms, a pipelined baseline and GANDALF differ by only 0.4 ms. The large gain comes from reaching the accuracy at a shorter readout, not from the schedule. The text’s 0.19 s to 0.152 s matches no bar.",
-          "formal": "With the same $t_r=1.5$ ms for both, the pipelined baseline takes $151.5$ ms and GANDALF $151.1$ ms, a difference of $0.4$ ms (our derived model, with its labelled fit). The gain of Fig. 15 therefore comes from the shorter readout the denoiser permits, not from the schedule. The text of §7.3 (p. 13) says “0.19 s to 0.152 s” at that readout time. No bar equals 0.19 s (the nearest is $8.9$ ms away), and $0.19/0.152=1.25$ is not the factor of the same paragraph. Also 0.152 s is close to the three-percent bar. See the correction below.",
+          "formal": "With the same $t_r=1.5$ ms for both, the pipelined baseline takes $151.5$ ms and GANDALF $151.1$ ms, a difference of $0.4$ ms (our derived model, with its labelled fit). The gain of Fig. 15 therefore comes from the shorter readout the denoiser permits, not from the schedule. The text of §7.3 (p. 13) says “0.19 s to 0.152 s” at that readout time. No bar equals 0.19 s (the nearest is $8.9$ ms away), and $0.19/0.152=1.25$ is not the factor of the same paragraph. Also 0.152 s lies near the three-percent bar. See the correction below.",
           "caption": "the nine printed bars and the two numbers of the text",
           "captionFormal": "Fig. 15 bars and the text’s 0.19 s and 0.152 s at tolerance three percent",
           "stage": {
@@ -4071,7 +4071,7 @@ export const P2: PaperSpec = {
           "id": "p2-logical:b3",
           "phase": "lecture",
           "text": "Fig. 14 shows bars for three readout times. We read no values from the bars. The text prints two factors. The surface code’s logical error is 5 times lower at 4 ms. The BB code’s is up to 35.8 times lower at the shortest time.",
-          "formal": "Fig. 14 (p. 12): bars for the surface code ($d=11$) and the BB code ($d=12$) at three readout times, graphical, so no value is read from them. Printed in the text (p. 13): 5 times for the surface code at 4 ms and up to 35.8 times for the BB code at the shortest readout; the abstract says 35 times (neutral note N14). At long readout the gains are outweighed by idling.",
+          "formal": "Fig. 14 (p. 12): bars for the surface code ($d=11$) and the BB code ($d=12$) at three readout times, graphical, so no value is read from them. Printed in the text (p. 13): 5 times for the surface code, measured at 4 ms, and up to 35.8 times for the BB code at its shortest readout; the abstract says 35 times (neutral note N14). At long readout the gains are outweighed by idling.",
           "caption": "the two printed factors only (no bar values read)",
           "captionFormal": "printed factors of §7.2: surface code 5× at 4 ms, BB code up to 35.8× at the shortest time",
           "stage": {
@@ -4098,7 +4098,7 @@ export const P2: PaperSpec = {
           "reported": [
             {
               "id": "f14-5x",
-              "text": "Logical error reduction for the surface code at 4 ms",
+              "text": "Surface-code error reduction, 4 ms readout",
               "value": "5x",
               "source": "paper-gdf",
               "at": {
@@ -4109,7 +4109,7 @@ export const P2: PaperSpec = {
             },
             {
               "id": "f14-35",
-              "text": "Logical error reduction for the BB code at 1.5 ms",
+              "text": "BB-code error reduction, shortest readout",
               "value": "up to 35.8x",
               "source": "paper-gdf",
               "at": {
@@ -4587,8 +4587,8 @@ export const P2: PaperSpec = {
         "label": "7.3",
         "page": 13
       },
-      "says": "At the shortest readout time of 1.5 ms, 100 rounds take 0.19 s with the baseline and 0.152 s with GANDALF and pipelining.",
-      "shouldSay": "Comparing the tables, we find no bar of Fig. 15 equal to 190 ms: the nearest is 8.9 ms away. The ratio 0.19 / 0.152 = 1.25 is not the 1.77 of the same paragraph. Its plotted two-percent pair gives 321.5 / 181.1 = 1.775, and 0.152 s is close to the three-percent bar of 151.1 ms."
+      "says": "At the shortest readout (1.5 ms), 100 rounds take 0.19 s for the baseline and 0.152 s once the denoiser and pipelining are used.",
+      "shouldSay": "Comparing the tables, we find no bar of Fig. 15 equal to 190 ms: the nearest is 8.9 ms away. The ratio 0.19 / 0.152 = 1.25 is not the 1.77 of the same paragraph. Its plotted two-percent pair gives 321.5 / 181.1 = 1.775, and 0.152 s lies near the three-percent bar, 151.1 ms."
     }
   ]
 }
